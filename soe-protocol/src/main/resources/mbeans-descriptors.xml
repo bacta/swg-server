@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbeans-descriptors PUBLIC
+        "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+        "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+<mbeans-descriptors>
+    <mbean id="SoeTransceiverBean"
+           name="SoeTransceiverBean"
+           description="SoeTransceiver with Apache Commons Modeler"
+           type="com.ocdsoft.bacta.com.ocdsoft.bacta.swg.protocol.io.udp.SoeTransceiver">
+
+        <attribute name="incomingMessages" description="Incoming Message count" getMethod="getIncomingMessageCount" type="long"/>
+        <attribute name="outgoingMessages" description="Outgoing Message count" getMethod="getOutgoingMessageCount" type="long"/>
+        <attribute name="numConnections" description="Number of active connections" getMethod="getConnectionCount" type="long"/>
+        <attribute name="averageUserQueueSize" description="Average user send queue size" getMethod="getAverageSendQueueSize" type="double"/>
+
+    </mbean>
+</mbeans-descriptors>
