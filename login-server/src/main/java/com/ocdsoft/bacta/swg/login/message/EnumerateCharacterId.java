@@ -1,10 +1,8 @@
 package com.ocdsoft.bacta.swg.login.message;
 
 
-import com.ocdsoft.bacta.swg.protocol.message.GameNetworkMessage;
-import com.ocdsoft.bacta.swg.protocol.message.Priority;
-import com.ocdsoft.bacta.swg.shared.identity.CharacterInfo;
-import com.ocdsoft.bacta.swg.shared.identity.SoeAccount;
+import com.ocdsoft.bacta.soe.protocol.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.protocol.message.Priority;
 
 import java.nio.ByteBuffer;
 import java.util.Set;

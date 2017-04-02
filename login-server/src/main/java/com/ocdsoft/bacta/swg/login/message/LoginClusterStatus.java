@@ -6,11 +6,11 @@ import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 import com.ocdsoft.bacta.engine.network.client.ServerStatus;
 import com.ocdsoft.bacta.engine.utils.BufferUtil;
 import com.ocdsoft.bacta.engine.utils.UnsignedUtil;
-import com.ocdsoft.bacta.swg.protocol.io.udp.GameNetworkConfiguration;
-import com.ocdsoft.bacta.swg.protocol.message.GameNetworkMessage;
-import com.ocdsoft.bacta.swg.protocol.message.Priority;
-import com.ocdsoft.bacta.swg.protocol.util.SoeMessageUtil;
-import com.ocdsoft.bacta.swg.server.login.object.PopulationStatus;
+import com.ocdsoft.bacta.soe.protocol.io.udp.GameNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.protocol.message.Priority;
+import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
+import com.ocdsoft.bacta.swg.login.object.PopulationStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,22 +23,22 @@ import java.util.stream.Collectors;
 @Priority(0x3)
 public class LoginClusterStatus extends GameNetworkMessage {
 
-    private final Set<ClusterData> clusterDataSet;
+    private final Set<Data> clusterDataSet;
 
     private LoginClusterStatus() {
         clusterDataSet = new TreeSet<>();
     }
 
-	public LoginClusterStatus(Collection<com.ocdsoft.bacta.swg.shared.object.ClusterData> clusterServerSet) {
+	public LoginClusterStatus(Collection<Data> clusterServerSet) {
         this();
-        clusterDataSet.addAll(clusterServerSet.stream().map(com.ocdsoft.bacta.swg.shared.object.ClusterData::getStatusClusterData).collect(Collectors.toList()));
+        clusterDataSet.addAll(clusterServerSet.stream().map(Data::getStatusClusterData).collect(Collectors.toList()));
 	}
 
     public LoginClusterStatus(ByteBuffer buffer) {
         this();
         int count = buffer.getInt();
         for(int i = 0; i < count; ++i) {
-            ClusterData status = new ClusterData(buffer);
+            Data status = new Data(buffer);
             clusterDataSet.add(status);
         }
     }
@@ -48,7 +48,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
 
         buffer.putInt(clusterDataSet.size());
 
-        for (ClusterData clusterData : clusterDataSet) {
+        for (Data clusterData : clusterDataSet) {
             clusterData.writeToBuffer(buffer);
         }
     }
@@ -76,7 +76,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
 
     @Singleton
     @Getter
-    public static class ClusterData implements ByteBufferWritable, Comparable<ClusterData> {
+    public static class Data implements ByteBufferWritable, Comparable<Data> {
 
         private int id;
         private String connectionServerAddress;
@@ -96,7 +96,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
         @Setter
         private int onlineFreeTrialLimit;
 
-        public ClusterData(final ByteBuffer buffer) {
+        public Data(final ByteBuffer buffer) {
             id = buffer.getInt();
             connectionServerAddress = BufferUtil.getAscii(buffer);
             connectionServerPort = UnsignedUtil.getUnsignedShort(buffer);
@@ -111,7 +111,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
             onlineFreeTrialLimit = buffer.getInt();
         }
 
-        public ClusterData(final int id) {
+        public Data(final int id) {
             this.id = id;
             connectionServerAddress = "";
             connectionServerPort = 0;
@@ -126,7 +126,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
             onlineFreeTrialLimit = 0;
         }
 
-        public ClusterData(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
+        public Data(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
             id = networkConfiguration.getClusterId();
             connectionServerAddress = networkConfiguration.getPublicAddress().getHostAddress();
             connectionServerPort = networkConfiguration.getUdpPort();
@@ -166,7 +166,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
         public boolean isRecommended()  { return !dontRecommend;  }
 
         @Override
-        public int compareTo(ClusterData o) {
+        public int compareTo(Data o) {
             return connectionServerAddress.compareTo(o.connectionServerAddress);
         }
     }

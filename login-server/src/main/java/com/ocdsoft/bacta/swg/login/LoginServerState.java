@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.swg.login;
 
 import com.ocdsoft.bacta.engine.network.client.ServerStatus;
-import com.ocdsoft.bacta.swg.protocol.ServerState;
-import com.ocdsoft.bacta.swg.protocol.ServerType;
+import com.ocdsoft.bacta.soe.protocol.ServerState;
+import com.ocdsoft.bacta.soe.protocol.ServerType;
 
 /**
  * Created by Kyle on 3/22/14.

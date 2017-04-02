@@ -6,7 +6,7 @@
     <mbean id="SoeTransceiverBean"
            name="SoeTransceiverBean"
            description="SoeTransceiver with Apache Commons Modeler"
-           type="com.ocdsoft.bacta.com.ocdsoft.bacta.swg.protocol.io.udp.SoeTransceiver">
+           type="com.ocdsoft.bacta.com.ocdsoft.bacta.soe.protocol.io.udp.SoeTransceiver">
 
         <attribute name="incomingMessages" description="Incoming Message count" getMethod="getIncomingMessageCount" type="long"/>
         <attribute name="outgoingMessages" description="Outgoing Message count" getMethod="getOutgoingMessageCount" type="long"/>

@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.swg.protocol.protocol;
+package com.ocdsoft.bacta.soe.protocol.protocol;
 
 import java.util.Random;
 

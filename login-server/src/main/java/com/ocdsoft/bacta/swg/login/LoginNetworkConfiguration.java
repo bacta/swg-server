@@ -3,8 +3,8 @@ package com.ocdsoft.bacta.swg.login;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
-import com.ocdsoft.bacta.swg.protocol.io.udp.BaseNetworkConfiguration;
-import com.ocdsoft.bacta.swg.protocol.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.io.udp.BaseNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.io.udp.NetworkConfiguration;
 
 import java.net.UnknownHostException;
 

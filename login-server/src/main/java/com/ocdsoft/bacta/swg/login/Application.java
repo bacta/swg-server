@@ -1,11 +1,14 @@
 package com.ocdsoft.bacta.swg.login;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.network.client.ServerStatus;
-import com.ocdsoft.bacta.swg.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.swg.protocol.io.udp.SoeTransceiver;
-import com.ocdsoft.bacta.swg.protocol.service.OutgoingConnectionService;
+import com.ocdsoft.bacta.soe.protocol.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.io.udp.SoeTransceiver;
+import com.ocdsoft.bacta.soe.protocol.service.OutgoingConnectionService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +21,19 @@ import java.util.function.Consumer;
  */
 
 @Singleton
+@Slf4j
 public class Application implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
     private final LoginServerState serverState;
     private final SoeTransceiver transceiver;
+
+    public static void main(String args[]) {
+        log.info("Starting LoginServer");
+        Injector injector = Guice.createInjector(new LoginModule());
+        Application loginServer = injector.getInstance(Application.class);
+        Thread loginThread = new Thread(loginServer);
+        loginThread.start();
+    }
 
     @Inject
     public Application(final LoginServerState serverState,
@@ -31,10 +42,6 @@ public class Application implements Runnable {
 
         this.serverState = serverState;
         this.transceiver = transceiver;
-
-        UdpServerBuilder()
-                .withHandler()
-
 
 
         ((LoginOutgoingConnectionService)outgoingConnectionService).createConnection = transceiver::createOutgoingConnection;
@@ -45,14 +52,14 @@ public class Application implements Runnable {
 
         try {
 
-            LOGGER.info("Login Server is starting");
+            log.info("Login Server is starting");
             serverState.setServerStatus(ServerStatus.UP);
 
             transceiver.run();
-            LOGGER.info("Stopping");
+            log.info("Stopping");
 
         } catch (Exception e) {
-            LOGGER.error("Error cluster transceiver", e);
+            log.error("Error cluster transceiver", e);
         }
     }
 

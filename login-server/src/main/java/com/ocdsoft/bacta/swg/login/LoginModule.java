@@ -1,10 +1,19 @@
 package com.ocdsoft.bacta.swg.login;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
+import com.ocdsoft.bacta.soe.protocol.ServerState;
+import com.ocdsoft.bacta.soe.protocol.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.service.OutgoingConnectionService;
 
-/**
- * Created by kyle on 6/4/2016.
- */
-public abstract class LoginModule extends AbstractModule implements Module {
+public class LoginModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+
+		bind(ServerState.class).to(LoginServerState.class);
+		bind(NetworkConfiguration.class).to(LoginNetworkConfiguration.class);
+		bind(OutgoingConnectionService.class).to(Application.LoginOutgoingConnectionService.class);
+
+	}
+
 }
