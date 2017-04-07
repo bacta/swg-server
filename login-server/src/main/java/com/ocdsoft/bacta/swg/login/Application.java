@@ -1,18 +1,20 @@
 package com.ocdsoft.bacta.swg.login;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.ocdsoft.bacta.engine.network.client.ServerStatus;
-import com.ocdsoft.bacta.soe.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.protocol.io.udp.SoeTransceiver;
+import com.google.inject.*;
+import com.ocdsoft.bacta.engine.ServerBuilder;
+import com.ocdsoft.bacta.engine.network.ServerStatus;
+import com.ocdsoft.bacta.engine.network.handler.IncomingMessageHandler;
+import com.ocdsoft.bacta.engine.network.handler.OutgoingMessageHandler;
+import com.ocdsoft.bacta.engine.network.pipeline.MessagePipeline;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.handler.ConnectionHandler;
+import com.ocdsoft.bacta.soe.protocol.network.handler.ProtocolHandler;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeProtocolPipeline;
 import com.ocdsoft.bacta.soe.protocol.service.OutgoingConnectionService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -25,9 +27,24 @@ import java.util.function.Consumer;
 public class Application implements Runnable {
 
     private final LoginServerState serverState;
-    private final SoeTransceiver transceiver;
+    private final SoeProtocolPipeline transceiver;
 
     public static void main(String args[]) {
+
+        ServerBuilder.newInstance()
+                .named("Login")
+                .usingModules(new LoginModule(), new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bind(IncomingMessageHandler.class).to(ConnectionHandler.class);
+                        bind(OutgoingMessageHandler.class).to(ProtocolHandler.class);
+                    }
+                })
+                .withState(LoginServerState.class)
+                .build()
+                .run();
+
+
         log.info("Starting LoginServer");
         Injector injector = Guice.createInjector(new LoginModule());
         Application loginServer = injector.getInstance(Application.class);
@@ -37,7 +54,7 @@ public class Application implements Runnable {
 
     @Inject
     public Application(final LoginServerState serverState,
-                       final SoeTransceiver transceiver,
+                       final SoeProtocolPipeline transceiver,
                        final OutgoingConnectionService outgoingConnectionService) {
 
         this.serverState = serverState;

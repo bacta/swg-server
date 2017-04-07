@@ -2,10 +2,10 @@ package com.ocdsoft.bacta.swg.login.controller;
 
 import com.google.inject.Inject;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.soe.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.protocol.controller.ConnectionRolesAllowed;
-import com.ocdsoft.bacta.soe.protocol.controller.GameNetworkMessageController;
-import com.ocdsoft.bacta.soe.protocol.controller.MessageHandled;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
+import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
+import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
 import com.ocdsoft.bacta.swg.login.message.GameServerAuthenticate;
 import com.ocdsoft.bacta.swg.login.service.ClusterService;
 import org.slf4j.Logger;

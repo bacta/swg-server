@@ -2,9 +2,9 @@ package com.ocdsoft.bacta.soe.protocol.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ocdsoft.bacta.soe.protocol.ServerState;
+import com.ocdsoft.bacta.engine.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.soe.protocol.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -71,11 +71,11 @@ public final class GameNetworkMessageTemplateWriter {
                 configuration.getBasePackage().replace(".", fs) + fs  +
                 serverEnv.name().toLowerCase() + fs + "controller" + fs;
         
-        messageClassPath = configuration.getBasePackage() + "." + serverEnv.name().toLowerCase() + ".message";
+        messageClassPath = configuration.getBasePackage() + "." + serverEnv.name().toLowerCase() + ".com.ocdsoft.bacta.swg.login.message";
         messageFilePath = System.getProperty("user.dir") + fs  + "src"
                 + fs + "main" + fs + "java" + fs +
                 configuration.getBasePackage().replace(".", fs) + fs +
-                serverEnv.name().toLowerCase() + fs +  "message" + fs;
+                serverEnv.name().toLowerCase() + fs +  "com.ocdsoft.bacta.swg.login.message" + fs;
 
         tangibleClassPath = configuration.getBasePackage() + ".object.tangible.TangibleObject";
 
@@ -97,7 +97,7 @@ public final class GameNetworkMessageTemplateWriter {
         String messageName = ClientString.get(opcode);
         
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -168,7 +168,7 @@ public final class GameNetworkMessageTemplateWriter {
         String messageName = ObjectControllerNames.get(opcode);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -231,7 +231,7 @@ public final class GameNetworkMessageTemplateWriter {
         String messageName = CommandNames.get(commandHash);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown message opcode: 0x" + Integer.toHexString(commandHash));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
             return;
         }
 
@@ -305,7 +305,7 @@ public final class GameNetworkMessageTemplateWriter {
             writer.flush();
             writer.close();
         } catch(Exception e) {
-            LOGGER.error("Unable to write message", e);
+            LOGGER.error("Unable to write com.ocdsoft.bacta.swg.login.message", e);
         }
     }
 

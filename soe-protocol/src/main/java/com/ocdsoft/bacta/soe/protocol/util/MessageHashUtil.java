@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.util;
 
-import com.ocdsoft.bacta.soe.protocol.dispatch.MessageId;
-import com.ocdsoft.bacta.soe.protocol.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.protocol.network.dispatch.MessageId;
+import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 
 /**
  * Created by kyle on 5/28/2016.

@@ -2,13 +2,13 @@ package com.ocdsoft.bacta.swg.login.controller;
 
 import com.google.inject.Inject;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.soe.protocol.connection.ConnectionRole;
-import com.ocdsoft.bacta.soe.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.protocol.controller.ConnectionRolesAllowed;
-import com.ocdsoft.bacta.soe.protocol.controller.GameNetworkMessageController;
-import com.ocdsoft.bacta.soe.protocol.controller.MessageHandled;
+import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
+import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
+import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
 import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
-import com.ocdsoft.bacta.soe.protocol.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
 import com.ocdsoft.bacta.swg.db.AccountService;
 import com.ocdsoft.bacta.swg.server.game.message.ErrorMessage;
@@ -95,11 +95,7 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
         LoginClientToken token = new LoginClientToken(account.getAuthToken(), account.getId(), account.getUsername());
         connection.sendMessage(token);
 
-        LoginEnumCluster cluster = new LoginEnumCluster(clusterService.getClusterEntries(), timezone);
-        connection.sendMessage(cluster);
-
-        LoginClusterStatus status = new LoginClusterStatus(clusterService.getClusterEntries());
-        connection.sendMessage(status);
+        clusterService.sendClusterData(connection);
 
         EnumerateCharacterId characters = new EnumerateCharacterId(account);
         connection.sendMessage(characters);

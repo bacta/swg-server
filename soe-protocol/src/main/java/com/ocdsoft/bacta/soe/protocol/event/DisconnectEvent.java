@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.event;
 
-import com.ocdsoft.bacta.soe.protocol.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -45,9 +45,12 @@
     </developers>
 
     <modules>
-        <module>server-engine</module>
-        <module>login-server</module>
+        <module>engine</module>
         <module>soe-protocol</module>
+        <module>login-shared</module>
+        <module>login-server</module>
+        <module>db-berkeley</module>
+
     </modules>
 
     <build>
@@ -76,6 +79,26 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>soe-protocol</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>login-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta</groupId>
+                <artifactId>db-berkeley</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta</groupId>
+                <artifactId>db</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>0.9.10</version>
@@ -95,6 +118,7 @@
                 <artifactId>commons-modeler</artifactId>
                 <version>2.0.1</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
