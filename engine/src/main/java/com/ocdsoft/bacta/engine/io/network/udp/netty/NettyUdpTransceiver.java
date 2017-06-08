@@ -54,7 +54,6 @@ public final class NettyUdpTransceiver implements UdpTransceiver {
     @Override
     public void receiveMessage(final InetSocketAddress inetSocketAddress, final ByteBuffer msg) {
         incomingMessages.inc();
-
         coreMessageChannel.handleIncoming(inetSocketAddress, msg);
     }
 
