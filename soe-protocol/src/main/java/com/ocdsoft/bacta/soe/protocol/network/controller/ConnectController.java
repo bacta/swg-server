@@ -1,9 +1,9 @@
 package com.ocdsoft.bacta.soe.protocol.network.controller;
 
 import com.google.inject.Inject;
-import com.ocdsoft.bacta.engine.network.ConnectionState;
+import com.ocdsoft.bacta.engine.io.network.ConnectionState;
 import com.ocdsoft.bacta.soe.protocol.network.connection.Configuration;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.message.ConfirmMessage;
 import com.ocdsoft.bacta.soe.protocol.network.message.TerminateReason;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;
@@ -20,13 +20,13 @@ import java.nio.ByteBuffer;
 public class ConnectController extends BaseSoeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectController.class);
 
-    private final NetworkConfiguration networkConfiguration;
+    private final SoeNetworkConfiguration networkConfiguration;
     private final SessionKeyService keyService;
     private final MBeanServer mBeanServer;
 
     @Inject
     public ConnectController(final SessionKeyService keyService,
-                             final NetworkConfiguration networkConfiguration) {
+                             final SoeNetworkConfiguration networkConfiguration) {
         this.networkConfiguration = networkConfiguration;
         this.keyService = keyService;
         this.mBeanServer = ManagementFactory.getPlatformMBeanServer();

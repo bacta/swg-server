@@ -2,9 +2,9 @@ package com.ocdsoft.bacta.soe.protocol.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ocdsoft.bacta.engine.network.ServerState;
+import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -51,7 +51,7 @@ public final class GameNetworkMessageTemplateWriter {
 
 
     @Inject
-    public GameNetworkMessageTemplateWriter(final NetworkConfiguration configuration, final ServerState serverState) {
+    public GameNetworkMessageTemplateWriter(final SoeNetworkConfiguration configuration, final ServerState serverState) {
 
         this.serverEnv = serverState.getServerType();
 

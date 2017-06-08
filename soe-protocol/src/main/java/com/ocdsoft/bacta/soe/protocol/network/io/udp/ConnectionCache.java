@@ -8,8 +8,6 @@ import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -26,12 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public final class ConnectionCache {
 
-    private final NetworkConfiguration networkConfiguration;
+    private final SoeNetworkConfiguration networkConfiguration;
     private final Map<InetSocketAddress, SoeUdpConnection> connectionMap;
     private final Map<Integer, Queue<SoeUdpConnection>> connectedAccountCache;
 
     @Inject
-    public ConnectionCache(final NetworkConfiguration networkConfiguration, final MetricRegistry metrics) {
+    public ConnectionCache(final SoeNetworkConfiguration networkConfiguration, final MetricRegistry metrics) {
         this.connectionMap = new ConcurrentHashMap<>();
         this.connectedAccountCache = new ConcurrentHashMap<>();
         this.networkConfiguration = networkConfiguration;

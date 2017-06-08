@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>server-engine</artifactId>
+            <artifactId>engine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>

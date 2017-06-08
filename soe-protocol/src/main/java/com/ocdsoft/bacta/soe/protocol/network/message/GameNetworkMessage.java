@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.message;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
-import com.ocdsoft.bacta.engine.network.Message;
+import com.ocdsoft.bacta.engine.io.network.Message;
 
 /**
  * Created by Kyle on 3/26/14.

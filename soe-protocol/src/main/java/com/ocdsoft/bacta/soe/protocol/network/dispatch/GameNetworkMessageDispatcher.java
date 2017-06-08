@@ -2,8 +2,8 @@ package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ocdsoft.bacta.engine.network.dispatch.MessageDispatcher;
-import com.ocdsoft.bacta.engine.network.ServerState;
+import com.ocdsoft.bacta.engine.io.network.dispatch.MessageDispatcher;
+import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer;

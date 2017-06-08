@@ -1,9 +1,10 @@
 package com.ocdsoft.bacta.engine.conf.ini;
 
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 
+import javax.inject.Singleton;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -11,12 +12,17 @@ import java.util.Collection;
 /**
  * Created by crush on 3/21/14.
  */
+
 @Singleton
 public class IniBactaConfiguration implements BactaConfiguration {
     private final IniFile iniFile;
 
     public IniBactaConfiguration() throws URISyntaxException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(IniBactaConfiguration.class.getResourceAsStream("/conf/config.ini")));
+        InputStream configStream = IniBactaConfiguration.class.getResourceAsStream("/conf/config.ini");
+        if(configStream == null) {
+            configStream = IniBactaConfiguration.class.getResourceAsStream("/config.ini");
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
         iniFile = new IniFile(reader);
     }
 

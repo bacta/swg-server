@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.message;
 
-import com.ocdsoft.bacta.engine.network.Message;
+import com.ocdsoft.bacta.engine.io.network.Message;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;

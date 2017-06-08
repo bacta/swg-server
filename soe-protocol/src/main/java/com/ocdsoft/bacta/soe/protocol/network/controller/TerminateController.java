@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.controller;
 
-import com.ocdsoft.bacta.engine.utils.UnsignedUtil;
+import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.message.TerminateReason;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;

@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.ocdsoft.bacta.engine.network.UdpMessageBuilder;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageBuilder;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.message.MultiMessage;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import org.slf4j.Logger;
@@ -19,11 +19,11 @@ public class SoeUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SoeUdpMessageBuilder.class);
 
     private final Queue<ByteBuffer> bufferList;
-    private final NetworkConfiguration configuration;
+    private final SoeNetworkConfiguration configuration;
     private MultiMessage pendingMulti;
     private ByteBuffer pendingBuffer;
 
-    public SoeUdpMessageBuilder(final NetworkConfiguration configuration) {
+    public SoeUdpMessageBuilder(final SoeNetworkConfiguration configuration) {
         this.configuration = configuration;
         bufferList = new ArrayBlockingQueue<>(configuration.getMaxOutstandingPackets());
         pendingMulti = null;

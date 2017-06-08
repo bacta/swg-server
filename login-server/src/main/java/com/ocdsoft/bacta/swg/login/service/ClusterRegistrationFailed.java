@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.swg.login.service;
 
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

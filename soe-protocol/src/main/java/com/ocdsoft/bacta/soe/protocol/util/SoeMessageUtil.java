@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.util;
 
 import com.google.common.io.Files;
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 
 import java.io.File;

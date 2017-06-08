@@ -1,13 +1,12 @@
 package com.ocdsoft.bacta.engine.service.script;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -16,9 +15,8 @@ import java.util.Collection;
  */
 
 @Singleton
+@Slf4j
 public class ScriptEngine {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptEngine.class);
 
     private final GroovyScriptEngine groovyScriptEngine;
 

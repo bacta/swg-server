@@ -3,8 +3,8 @@ package com.ocdsoft.bacta.soe.protocol.network.io.udp;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.ocdsoft.bacta.engine.network.ConnectionState;
-import com.ocdsoft.bacta.engine.network.io.udp.UdpSendChannel;
+import com.ocdsoft.bacta.engine.io.network.ConnectionState;
+import com.ocdsoft.bacta.engine.io.network.udp.UdpSendChannel;
 import com.ocdsoft.bacta.soe.protocol.event.DisconnectEvent;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
@@ -25,7 +25,7 @@ import java.util.Set;
 @Slf4j
 public class ConnectionMessageRelay implements Runnable {
 
-    private final NetworkConfiguration networkConfiguration;
+    private final SoeNetworkConfiguration networkConfiguration;
     private final ConnectionCache connectionCache;
     private final PublisherService publisherService;
     private final UdpSendChannel sendChannel;
@@ -34,7 +34,7 @@ public class ConnectionMessageRelay implements Runnable {
     private final Histogram sendQueueSizes;
 
     @Inject
-    public ConnectionMessageRelay(final NetworkConfiguration networkConfiguration,
+    public ConnectionMessageRelay(final SoeNetworkConfiguration networkConfiguration,
                                   final ConnectionCache connectionCache,
                                   final MetricRegistry metrics,
                                   final PublisherService publisherService,
@@ -55,7 +55,7 @@ public class ConnectionMessageRelay implements Runnable {
 
         try {
 
-            while(!sendChannel.available()) {
+            while(!sendChannel.isOpen()) {
                 Thread.sleep(100);
             }
 

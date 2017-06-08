@@ -1,9 +1,9 @@
 package com.ocdsoft.bacta.soe.protocol.network.handler;
 
-import com.ocdsoft.bacta.engine.network.ConnectionState;
-import com.ocdsoft.bacta.engine.network.handler.IncomingMessageHandler;
-import com.ocdsoft.bacta.engine.network.handler.OutgoingMessageHandler;
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.io.network.ConnectionState;
+import com.ocdsoft.bacta.engine.io.network.channel.InboundMessageChannel;
+import com.ocdsoft.bacta.engine.io.network.channel.OutboundMessageChannel;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionProvider;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.ConnectionCache;
@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
  * Created by kyle on 4/4/2017.
  */
 @Slf4j
-public final class ConnectionHandler implements IncomingMessageHandler<InetSocketAddress, ByteBuffer>, OutgoingMessageHandler<SoeUdpConnection, ByteBuffer> {
+public final class ConnectionHandler implements InboundMessageChannel<InetSocketAddress, ByteBuffer>, OutboundMessageChannel<SoeUdpConnection, ByteBuffer> {
 
     private final ConnectionCache connectionCache;
     private final ProtocolHandler protocolHandler;

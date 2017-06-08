@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
 import com.google.inject.Inject;
-import com.ocdsoft.bacta.engine.network.ServerState;
+import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameClientMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;

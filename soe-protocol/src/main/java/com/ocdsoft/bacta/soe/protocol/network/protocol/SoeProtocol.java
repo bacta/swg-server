@@ -5,12 +5,10 @@ import com.google.inject.Singleton;
 import com.jcraft.jzlib.CRC32;
 import com.jcraft.jzlib.JZlib;
 import com.jcraft.jzlib.ZStream;
-import com.ocdsoft.bacta.engine.utils.UnsignedUtil;
+import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.ocdsoft.bacta.engine.network.UdpMessageBuilder;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageBuilder;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.message.ReliableNetworkMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class ReliableUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> 
 
     public final static Logger logger = LoggerFactory.getLogger(ReliableUdpMessageBuilder.class);
 
-    private final NetworkConfiguration configuration;
+    private final SoeNetworkConfiguration configuration;
     private final AtomicInteger sequenceNum = new AtomicInteger();
     private final Set<ReliableNetworkMessage> containerList;
     private final int maxOutstandingPackets;
@@ -49,7 +49,7 @@ public class ReliableUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> 
 
     private final Queue<ReliableNetworkMessage> unacknowledgedQueue;
 
-    public ReliableUdpMessageBuilder(final SoeUdpConnection connection, final NetworkConfiguration configuration) {
+    public ReliableUdpMessageBuilder(final SoeUdpConnection connection, final SoeNetworkConfiguration configuration) {
 
         this.connection = connection;
         this.configuration = configuration;

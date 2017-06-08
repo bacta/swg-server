@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.message
 
 import com.ocdsoft.bacta.engine.conf.ini.IniBactaConfiguration
-import com.ocdsoft.bacta.engine.network.ConnectionState
+import com.ocdsoft.bacta.engine.io.network.ConnectionState
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection
 import com.ocdsoft.bacta.soe.protocol.network.controller.GroupMessageController
 import com.ocdsoft.bacta.soe.protocol.network.controller.MultiController

@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.message;
 
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.EncryptMethod;
 
 public final class ConfirmMessage extends SoeMessage {

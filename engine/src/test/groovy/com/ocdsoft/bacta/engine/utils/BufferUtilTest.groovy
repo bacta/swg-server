@@ -1,5 +1,6 @@
 package com.ocdsoft.bacta.engine.utils
 
+import com.ocdsoft.bacta.engine.buffer.BufferUtil
 import spock.lang.Specification
 
 import java.nio.ByteBuffer

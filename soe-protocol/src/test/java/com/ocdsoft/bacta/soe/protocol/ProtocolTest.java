@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.protocol.network.protocol;
 
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
-import com.ocdsoft.bacta.engine.utils.UnsignedUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

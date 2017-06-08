@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.controller;
 
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.EncryptMethod;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;

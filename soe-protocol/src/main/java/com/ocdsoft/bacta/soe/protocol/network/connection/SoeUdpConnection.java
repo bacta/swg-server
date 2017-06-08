@@ -1,11 +1,10 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
 import com.codahale.metrics.annotation.Counted;
-import com.ocdsoft.bacta.engine.network.ConnectionState;
-import com.ocdsoft.bacta.engine.network.UdpConnection;
-import com.ocdsoft.bacta.engine.network.UdpMessageProcessor;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.NetworkConfiguration;
-import com.ocdsoft.bacta.soe.protocol.network.message.*;
+import com.ocdsoft.bacta.engine.io.network.ConnectionState;
+import com.ocdsoft.bacta.engine.io.network.udp.UdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageProcessor;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import lombok.Getter;
@@ -102,7 +101,7 @@ public final class SoeUdpConnection extends UdpConnection implements SoeUdpConne
 
     private final GameNetworkMessageSerializer messageSerializer;
 
-    public SoeUdpConnection(final NetworkConfiguration networkConfiguration,
+    public SoeUdpConnection(final SoeNetworkConfiguration networkConfiguration,
                             final InetSocketAddress remoteAddress,
                             final GameNetworkMessageSerializer messageSerializer,
                             final Consumer<SoeUdpConnection> connectCallback) {

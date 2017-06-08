@@ -1,9 +1,9 @@
 package com.ocdsoft.bacta.engine.service.scheduler;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;

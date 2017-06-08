@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

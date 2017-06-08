@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
-import com.ocdsoft.bacta.engine.network.dispatch.MessageDispatcher;
+import com.ocdsoft.bacta.engine.io.network.dispatch.MessageDispatcher;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 
 import java.nio.ByteBuffer;

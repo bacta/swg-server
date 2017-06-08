@@ -1,11 +1,8 @@
 package com.ocdsoft.bacta.db.je;
 
-import com.ocdsoft.bacta.engine.db.Repository;
+import com.ocdsoft.bacta.engine.io.db.Repository;
 import com.ocdsoft.bacta.swg.login.db.ClusterRepository;
 import com.ocdsoft.bacta.swg.login.object.ClusterServerEntry;
-import com.ocdsoft.bacta.swg.login.object.SoeAccount;
-
-import java.util.Set;
 
 /**
  * Created by kyle on 4/2/2017.

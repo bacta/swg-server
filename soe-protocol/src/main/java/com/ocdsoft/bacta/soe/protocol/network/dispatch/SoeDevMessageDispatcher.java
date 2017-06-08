@@ -3,7 +3,7 @@ package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeController;
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeMessageController;

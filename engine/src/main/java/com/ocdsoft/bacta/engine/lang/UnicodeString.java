@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.engine.lang;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;

@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.ocdsoft.bacta.engine.network.ConnectionState;
+import com.ocdsoft.bacta.engine.io.network.ConnectionState;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

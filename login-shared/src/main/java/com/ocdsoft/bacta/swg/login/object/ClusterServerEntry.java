@@ -2,9 +2,9 @@ package com.ocdsoft.bacta.swg.login.object;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
-import com.ocdsoft.bacta.engine.network.ServerStatus;
-import com.ocdsoft.bacta.engine.utils.BufferUtil;
-import com.ocdsoft.bacta.engine.utils.UnsignedUtil;
+import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.GameNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import lombok.Getter;

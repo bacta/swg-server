@@ -3,7 +3,7 @@ package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.engine.network.ServerState;
+import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
