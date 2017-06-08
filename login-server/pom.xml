@@ -19,6 +19,18 @@
             <groupId>com.ocdsoft.bacta</groupId>
             <artifactId>server-engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta.swg</groupId>
+            <artifactId>soe-protocol</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta.swg</groupId>
+            <artifactId>login-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>com.ocdsoft.bacta.db-berkeley</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

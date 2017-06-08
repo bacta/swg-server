@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.swg.login.event;
 
-import com.ocdsoft.bacta.swg.protocol.event.Event;
+import com.ocdsoft.bacta.soe.protocol.event.Event;
 import com.ocdsoft.bacta.swg.shared.object.ClusterData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

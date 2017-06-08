@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.swg.protocol.chat
+package com.ocdsoft.bacta.soe.protocol.chat
 
 import spock.lang.Specification
 import spock.lang.Unroll
