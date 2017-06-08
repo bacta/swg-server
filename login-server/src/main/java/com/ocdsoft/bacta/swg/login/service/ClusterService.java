@@ -3,23 +3,23 @@ package com.ocdsoft.bacta.swg.login.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
-import com.ocdsoft.bacta.engine.network.client.ServerStatus;
-import com.ocdsoft.bacta.engine.network.client.TcpClient;
-import com.ocdsoft.bacta.engine.network.io.tcp.TcpServer;
-import com.ocdsoft.bacta.swg.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.swg.protocol.event.ConnectEvent;
-import com.ocdsoft.bacta.swg.protocol.event.DisconnectEvent;
-import com.ocdsoft.bacta.swg.protocol.service.PublisherService;
-import com.ocdsoft.bacta.swg.db.LoginDatabaseConnector;
-import com.ocdsoft.bacta.swg.server.login.GameClientTcpHandler;
-import com.ocdsoft.bacta.swg.server.login.event.GameServerOnlineEvent;
-import com.ocdsoft.bacta.swg.server.login.message.LoginClusterStatus;
-import com.ocdsoft.bacta.swg.shared.object.ClusterData;
+import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
+import com.ocdsoft.bacta.engine.io.network.tcp.TcpClient;
+import com.ocdsoft.bacta.engine.io.network.tcp.TcpServer;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
+import com.ocdsoft.bacta.soe.protocol.event.DisconnectEvent;
+import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
+import com.ocdsoft.bacta.swg.login.GameClientTcpHandler;
+import com.ocdsoft.bacta.swg.login.db.AccountDatabaseConnector;
+import com.ocdsoft.bacta.swg.login.event.GameServerOnlineEvent;
+import com.ocdsoft.bacta.swg.login.message.LoginClusterStatus;
+import com.ocdsoft.bacta.swg.login.message.LoginEnumCluster;
+import com.ocdsoft.bacta.swg.login.object.ClusterServerEntry;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
@@ -32,20 +32,20 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * Created by kburkhardt on 1/18/15.
  */
 @Singleton
+@Slf4j
 public class ClusterService implements Observer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterService.class);
-
-    private transient final LoginDatabaseConnector dbConnector;
-    private transient final Set<ClusterData> clusterServerSet;
+    private transient final AccountDatabaseConnector dbConnector;
+    private transient final Set<ClusterServerEntry> clusterServerSet;
     private transient final Set<TcpClient> tcpClientSet;
     private transient final Set<SoeUdpConnection> connectedClients;
     private transient final PublisherService publisherService;
 
     private final boolean allowDynamicRegistration;
+    private final int timezone;
 
     @Inject
-    public ClusterService(final LoginDatabaseConnector dbConnector,
+    public ClusterService(final AccountDatabaseConnector dbConnector,
                           final BactaConfiguration bactaConfiguration,
                           final PublisherService publisherService) throws Exception {
 
@@ -60,6 +60,16 @@ public class ClusterService implements Observer {
         this.publisherService.subscribe(ConnectEvent.class, this::addConnection);
         this.publisherService.subscribe(DisconnectEvent.class, this::removeConnection);
         this.publisherService.subscribe(GameServerOnlineEvent.class, this::handleGameServerOnline);
+        timezone = DateTimeZone.getDefault().getOffset(null) / 1000;
+    }
+
+    public void sendClusterData(SoeUdpConnection connection) {
+
+        LoginEnumCluster cluster = new LoginEnumCluster(getEnumCluster(), timezone);
+        connection.sendMessage(cluster);
+
+        LoginClusterStatus status = new LoginClusterStatus(getClusterStatus());
+        connection.sendMessage(status);
     }
 
     private void handleGameServerOnline(final GameServerOnlineEvent gameServerOnlineEvent) {

@@ -1,19 +1,19 @@
 package com.ocdsoft.bacta.swg.login.controller;
 
 import com.google.inject.Inject;
-import com.ocdsoft.bacta.swg.protocol.ServerType;
-import com.ocdsoft.bacta.swg.protocol.connection.ConnectionRole;
-import com.ocdsoft.bacta.swg.protocol.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.swg.protocol.controller.ConnectionRolesAllowed;
-import com.ocdsoft.bacta.swg.protocol.controller.GameNetworkMessageController;
-import com.ocdsoft.bacta.swg.protocol.controller.MessageHandled;
-import com.ocdsoft.bacta.swg.protocol.event.ConnectEvent;
-import com.ocdsoft.bacta.swg.protocol.io.udp.NetworkConfiguration;
-import com.ocdsoft.bacta.swg.protocol.service.PublisherService;
+import com.ocdsoft.bacta.soe.protocol.ServerType;
+import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
+import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
+import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
+import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
 import com.ocdsoft.bacta.swg.db.AccountService;
 import com.ocdsoft.bacta.swg.server.game.message.ErrorMessage;
-import com.ocdsoft.bacta.swg.server.login.message.*;
-import com.ocdsoft.bacta.swg.server.login.service.ClusterService;
+import com.ocdsoft.bacta.swg.login.message.*;
+import com.ocdsoft.bacta.swg.login.service.ClusterService;
 import com.ocdsoft.bacta.swg.shared.identity.SoeAccount;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -28,11 +28,11 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
     private final int timezone;
     private final ClusterService clusterService;
     private final AccountService accountService;
-    private final NetworkConfiguration configuration;
+    private final SoeNetworkConfiguration configuration;
     private final PublisherService publisherService;
 
     @Inject
-    public LoginClientIdController(final NetworkConfiguration configuration,
+    public LoginClientIdController(final SoeNetworkConfiguration configuration,
                                    final ClusterService clusterService,
                                    final AccountService accountService,
                                    final PublisherService publisherService) {
@@ -95,11 +95,7 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
         LoginClientToken token = new LoginClientToken(account.getAuthToken(), account.getId(), account.getUsername());
         connection.sendMessage(token);
 
-        LoginEnumCluster cluster = new LoginEnumCluster(clusterService.getClusterEntries(), timezone);
-        connection.sendMessage(cluster);
-
-        LoginClusterStatus status = new LoginClusterStatus(clusterService.getClusterEntries());
-        connection.sendMessage(status);
+        clusterService.sendClusterData(connection);
 
         EnumerateCharacterId characters = new EnumerateCharacterId(account);
         connection.sendMessage(characters);

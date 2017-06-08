@@ -49,10 +49,10 @@ public final class SecureAuthService {
 //
 //                    String data = br.readLine();
 //                    pw.println(data);
-//                    pw.close();
+//                    pw.shutdown();
 //                }
 //
-//                socket.close();
+//                socket.shutdown();
 //            } catch (IOException ioe) {
 //                // Client disconnected
 //            }
