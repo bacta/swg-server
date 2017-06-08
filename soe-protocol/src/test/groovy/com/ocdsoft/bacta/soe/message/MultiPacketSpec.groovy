@@ -1,14 +1,20 @@
-package com.ocdsoft.bacta.swg.protocol.message
+package com.ocdsoft.bacta.soe.protocol.network.message
 
 import com.ocdsoft.bacta.engine.conf.ini.IniBactaConfiguration
-import com.ocdsoft.bacta.engine.network.client.ConnectionState
-import com.ocdsoft.bacta.swg.protocol.connection.SoeUdpConnection
-import com.ocdsoft.bacta.swg.protocol.controller.*
-import com.ocdsoft.bacta.swg.protocol.dispatch.GameNetworkMessageDispatcher
-import com.ocdsoft.bacta.swg.protocol.dispatch.SoeDevMessageDispatcher
-import com.ocdsoft.bacta.swg.protocol.io.udp.GameNetworkConfiguration
-import com.ocdsoft.bacta.swg.protocol.serialize.GameNetworkMessageSerializer
-import com.ocdsoft.bacta.swg.protocol.util.SoeMessageUtil
+import com.ocdsoft.bacta.engine.io.network.ConnectionState
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection
+import com.ocdsoft.bacta.soe.protocol.network.controller.GroupMessageController
+import com.ocdsoft.bacta.soe.protocol.network.controller.MultiController
+import com.ocdsoft.bacta.soe.protocol.network.controller.ReliableMessageController
+import com.ocdsoft.bacta.soe.protocol.network.controller.SoeMessageController
+import com.ocdsoft.bacta.soe.protocol.network.controller.ZeroEscapeController
+import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType
+import com.ocdsoft.bacta.soe.protocol.network.controller.*
+import com.ocdsoft.bacta.soe.protocol.network.dispatch.GameNetworkMessageDispatcher
+import com.ocdsoft.bacta.soe.protocol.network.dispatch.SoeDevMessageDispatcher
+import com.ocdsoft.bacta.soe.protocol.network.io.udp.GameNetworkConfiguration
+import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer
+import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil
 import spock.lang.Shared
 import spock.lang.Specification
 
