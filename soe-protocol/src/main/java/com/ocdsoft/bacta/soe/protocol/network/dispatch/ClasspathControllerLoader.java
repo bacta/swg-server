@@ -1,8 +1,5 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.ocdsoft.bacta.soe.protocol.ServerType;
 import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
@@ -16,6 +13,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
