@@ -1,12 +1,11 @@
 package com.ocdsoft.bacta.soe.protocol.network.io.udp;
 
-
-import com.ocdsoft.bacta.engine.conf.NetworkConfigImpl;
+import com.ocdsoft.bacta.soe.protocol.network.connection.EncryptMethod;
 
 /**
  * Created by kburkhardt on 2/7/15.
  */
-public interface SoeNetworkConfiguration extends NetworkConfigImpl {
+public interface SoeNetworkConfiguration {
 
     EncryptMethod getEncryptMethod();
     boolean isMultiSoeMessages();

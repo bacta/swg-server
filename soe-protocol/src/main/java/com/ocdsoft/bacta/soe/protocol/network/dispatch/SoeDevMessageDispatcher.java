@@ -1,18 +1,19 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeController;
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
+import groovy.util.logging.Slf4j;
 import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -24,22 +25,16 @@ import java.util.Set;
  * Controllers are required to exist in the com.ocdsoft.bacta.soe.protocol.network.controller package to
  * be loaded.
  */
-@Singleton
-public final class SoeDevMessageDispatcher implements SoeMessageDispatcher {
+@Component
+@Slf4j
+public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SoeDevMessageDispatcher.class);
-
-    private Map<UdpPacketType, SoeMessageController> controllers = new HashMap<>();
-
+    private final Map<UdpPacketType, SoeMessageController> controllers = new HashMap<>();
     private final GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
 
     @Inject
-    public SoeDevMessageDispatcher(final Injector injector, final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
+    public SoeDevMessageDispatcher(final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
         this.gameNetworkMessageDispatcher = gameNetworkMessageDispatcher;
-
-        if(injector != null) {
-            load(injector);
-        }
     }
 
     @Override
@@ -71,7 +66,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher {
         }
     }
 
-    public void load(final Injector injector) {
+    private void load(final ApplicationContext applicationContext) {
         
         Reflections reflections = new Reflections();
 
@@ -101,7 +96,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher {
                 UdpPacketType[] types = controllerAnnotation.handles();
                 LOGGER.debug("Loading SoeMessageController: {}", controllerClass.getSimpleName());
 
-                SoeMessageController controller = injector.getInstance(controllerClass);
+                SoeMessageController controller = applicationContext.getBean(controllerClass);
                 controller.setSoeMessageDispatcher(this);
                 controller.setGameNetworkMessageDispatcher(gameNetworkMessageDispatcher);
 
@@ -118,5 +113,10 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher {
                 LOGGER.error("Unable to add controller", e);
             }
         }
+    }
+
+    @Override
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
+        load(applicationContext);
     }
 }

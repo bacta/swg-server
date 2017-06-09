@@ -9,5 +9,5 @@ import java.nio.ByteBuffer;
  * Created by kyle on 4/4/2017.
  */
 public interface InboundMessageChannel {
-    void receiveMessage(UdpConnection sender, ByteBuffer message);
+    void receiveMessage(InetSocketAddress sender, ByteBuffer message);
 }

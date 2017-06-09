@@ -1,9 +1,8 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.io.network.dispatch.MessageDispatcher;
 import com.ocdsoft.bacta.soe.protocol.network.ServerState;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer;
@@ -12,11 +11,10 @@ import com.ocdsoft.bacta.soe.protocol.util.ClientString;
 import com.ocdsoft.bacta.soe.protocol.util.GameNetworkMessageTemplateWriter;
 import com.ocdsoft.bacta.soe.protocol.util.ObjectControllerNames;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
-import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import gnu.trove.map.TIntObjectMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
 /**
@@ -29,10 +27,9 @@ import java.nio.ByteBuffer;
  * @since 1.0
  */
 
-@Singleton
+@Slf4j
 public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameNetworkMessageDispatcher.class);
     private final static int OBJECT_CONTROLLER_MESSAGE = 0x80CE5E46;
 
     /**
@@ -82,7 +79,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
                 final GameNetworkMessageController controller = controllerData.getController();
                 final GameNetworkMessage incomingMessage = gameNetworkMessageSerializer.readFromBuffer(gameMessageType, buffer);
 
-                LOGGER.trace("[{}] received {}", serverState.getServerType().name(), incomingMessage.getClass().getSimpleName());
+                LOGGER.trace("[{}] received {}", serverState.getServerType(), incomingMessage.getClass().getSimpleName());
 
                 LOGGER.debug("Routing to " + controller.getClass().getSimpleName());
                 controller.handleIncoming(connection, incomingMessage); //Can't fix this one yet.
