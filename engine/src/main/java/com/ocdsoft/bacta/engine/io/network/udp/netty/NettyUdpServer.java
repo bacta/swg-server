@@ -36,6 +36,8 @@ final class NettyUdpServer implements Runnable, ShutdownListener {
 
 		try {
 
+            LOGGER.info("Transceiver Starting");
+
             b = new Bootstrap();
 
             if(Epoll.isAvailable()) {
@@ -46,7 +48,7 @@ final class NettyUdpServer implements Runnable, ShutdownListener {
                 b.channel(NioDatagramChannel.class);
             }
 
-            LOGGER.debug("Starting on port: {}", port);
+            LOGGER.info("Using port: {}", port);
 
 	        b.option(ChannelOption.SO_RCVBUF, 768)
 				.option(ChannelOption.SO_SNDBUF, 768)
@@ -72,11 +74,12 @@ final class NettyUdpServer implements Runnable, ShutdownListener {
 
 			channel = b.bind().sync().channel();
 
-            LOGGER.debug("Running on port: {}", port);
+            LOGGER.info("Running on port: {}", port);
 			channel.closeFuture().await();
 			
 		} catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.info("Transceiver closing on: {}", port);
+            shutdown();
         } finally {
             if (b != null) {
                 b.group().shutdownGracefully();

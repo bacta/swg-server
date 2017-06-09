@@ -89,6 +89,54 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <goal>testGenerateStubs</goal>
+                            <goal>testCompile</goal>
+                            <goal>removeStubs</goal>
+                            <goal>removeTestStubs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <testStubsOutputDirectory>${project.build.directory}/generated-test-sources/groovy-stubs/
+                    </testStubsOutputDirectory>
+                    <stubsOutputDirectory>${project.build.directory}/generated-sources/groovy-stubs/</stubsOutputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/groovy</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -140,7 +188,11 @@
                 <artifactId>commons-modeler</artifactId>
                 <version>2.0.1</version>
             </dependency>
-
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -148,6 +200,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -162,9 +218,7 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
-            <version>1</version>
         </dependency>
-
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
@@ -180,21 +234,21 @@
             <artifactId>groovy-all</artifactId>
             <version>2.4.6</version>
         </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-annotation</artifactId>
-            <version>3.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-healthchecks</artifactId>
-            <version>3.1.2</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.dropwizard.metrics</groupId>-->
+            <!--<artifactId>metrics-core</artifactId>-->
+            <!--<version>3.1.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>io.dropwizard.metrics</groupId>-->
+            <!--<artifactId>metrics-annotation</artifactId>-->
+            <!--<version>3.1.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>io.dropwizard.metrics</groupId>-->
+            <!--<artifactId>metrics-healthchecks</artifactId>-->
+            <!--<version>3.1.2</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>cglib</groupId>

@@ -1,7 +1,5 @@
 package com.ocdsoft.bacta.soe.protocol.network.protocol;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.jcraft.jzlib.CRC32;
 import com.jcraft.jzlib.JZlib;
 import com.jcraft.jzlib.ZStream;
@@ -10,12 +8,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
 @SuppressWarnings("deprecation")
-@Singleton
 @Slf4j
 public final class SoeProtocol {
 
@@ -137,7 +135,7 @@ public final class SoeProtocol {
         
         if (zstream.inflate(JZlib.Z_FINISH) == JZlib.Z_DATA_ERROR)
         {
-            log.info("Error Decompressing");
+            LOGGER.info("Error Decompressing");
             return null;
         }
         
@@ -173,7 +171,7 @@ public final class SoeProtocol {
         
         if (zstream.deflate(JZlib.Z_FINISH) == JZlib.Z_DATA_ERROR)
         {
-            log.info("Error Compressing");
+            LOGGER.info("Error Compressing");
             return data;
         }
         

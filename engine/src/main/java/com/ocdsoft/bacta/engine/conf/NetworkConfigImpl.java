@@ -1,6 +1,7 @@
 package com.ocdsoft.bacta.engine.conf;
 
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,7 +12,6 @@ import java.util.Collection;
  * Created by kyle on 4/12/2016.
  */
 @Data
-@Configuration
 @ConfigurationProperties(prefix = "bacta.network")
 public class NetworkConfigImpl implements NetworkConfig {
 
@@ -37,5 +37,4 @@ public class NetworkConfigImpl implements NetworkConfig {
 
     private boolean disableInstrumentation;
     private boolean logAllNetworkTraffic;
-
 }
