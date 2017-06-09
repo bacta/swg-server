@@ -5,6 +5,7 @@ import com.ocdsoft.bacta.engine.conf.NetworkConfig
 import com.ocdsoft.bacta.engine.io.network.channel.InboundMessageChannel
 import com.ocdsoft.bacta.engine.io.network.udp.netty.NettyUdpTransceiver
 import org.springframework.boot.actuate.metrics.CounterService
+import org.springframework.boot.actuate.metrics.reader.MetricReader
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
@@ -22,6 +23,9 @@ class UdpTransceiverTest extends Specification {
     @Inject
     CounterService counterService;
 
+    @Inject
+    MetricReader metricReader;
+
     def "IsAvailable"() {
         when:
         NetworkConfig networkConfig = Mock()
@@ -34,6 +38,7 @@ class UdpTransceiverTest extends Specification {
 
         then:
         server.isAvailable()
+        server.destroy()
     }
 
     def "SendReceiveMessage"() {
@@ -54,9 +59,18 @@ class UdpTransceiverTest extends Specification {
         UdpTransceiver client = new NettyUdpTransceiver(clientNetworkConfig, counterService, clientInboundMessageChannel)
         client.start();
 
+        UdpConnection serverUdpConnection = Mock()
+        serverUdpConnection.remoteAddress >> new InetSocketAddress(serverNetworkConfig.bindAddress, serverNetworkConfig.bindPort)
+
         when:
+        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
+        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
+        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
 
         then:
-
+        noExceptionThrown()
+        Thread.sleep(1000)
+        metricReader.findOne("counter.network.udp.messages.incoming").getValue() == 3
+        metricReader.findOne("counter.network.udp.messages.outgoing").getValue() == 3
     }
 }
