@@ -2,18 +2,20 @@ package com.ocdsoft.bacta.swg.login.controller;
 
 import com.google.inject.Inject;
 import com.ocdsoft.bacta.soe.protocol.ServerType;
+import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
 import com.ocdsoft.bacta.soe.protocol.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
-import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
 import com.ocdsoft.bacta.swg.db.AccountService;
-import com.ocdsoft.bacta.swg.server.game.message.ErrorMessage;
-import com.ocdsoft.bacta.swg.login.message.*;
+import com.ocdsoft.bacta.swg.login.message.EnumerateCharacterId;
+import com.ocdsoft.bacta.swg.login.message.LoginClientId;
+import com.ocdsoft.bacta.swg.login.message.LoginClientToken;
 import com.ocdsoft.bacta.swg.login.service.ClusterService;
+import com.ocdsoft.bacta.swg.server.game.message.ErrorMessage;
 import com.ocdsoft.bacta.swg.shared.identity.SoeAccount;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -56,7 +58,7 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
             return;
         }
 
-        if (message.getPassword().isEmpty()) {
+        if (message.getKey().isEmpty()) {
             ErrorMessage error = new ErrorMessage("Login Error", "Please enter a password.", false);
             connection.sendMessage(error);
             return;
@@ -65,7 +67,7 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
         SoeAccount account = null;
         try {
 
-            account = accountService.getAccount(message.getUsername());
+            account = accountService.getAccount(message.getId());
 
         } catch (Exception e) {
             ErrorMessage error = new ErrorMessage("Login Error", "Duplicate Accounts in the database", false);
@@ -76,13 +78,13 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
         }
 
         if (account == null) {
-            account = accountService.createAccount(message.getUsername(), message.getPassword());
+            account = accountService.createAccount(message.getId(), message.getKey());
             if (account == null) {
                 ErrorMessage error = new ErrorMessage("Login Error", "Unable to create account.", false);
                 connection.sendMessage(error);
                 return;
             }
-        } else if (!accountService.authenticate(account, message.getPassword())) {
+        } else if (!accountService.authenticate(account, message.getKey())) {
             ErrorMessage error = new ErrorMessage("Login Error", "Invalid username or password.", false);
             connection.sendMessage(error);
             return;

@@ -2,7 +2,7 @@ package com.ocdsoft.bacta.swg.login.message;
 
 import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.protocol.network.message.Priority;
-import com.ocdsoft.bacta.swg.login.object.ClusterServerEntry;
+import com.ocdsoft.bacta.swg.login.object.ClusterData;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
@@ -11,9 +11,9 @@ import java.util.TreeSet;
 @Priority(0x3)
 public class LoginClusterStatus extends GameNetworkMessage {
 
-    private final Set<ClusterServerEntry> clusterDataSet;
+    private final Set<ClusterData> clusterDataSet;
 
-	public LoginClusterStatus(final Set<ClusterServerEntry> clusterServerSet) {
+	public LoginClusterStatus(final Set<ClusterData> clusterServerSet) {
         this.clusterDataSet = clusterServerSet;
 	}
 
@@ -21,7 +21,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
         clusterDataSet = new TreeSet<>();
         final int count = buffer.getInt();
         for(int i = 0; i < count; ++i) {
-            final ClusterServerEntry serverEntry = new ClusterServerEntry(buffer);
+            final ClusterData serverEntry = new ClusterData(buffer);
             clusterDataSet.add(serverEntry);
         }
     }
@@ -31,7 +31,7 @@ public class LoginClusterStatus extends GameNetworkMessage {
 
         buffer.putInt(clusterDataSet.size());
 
-        for (ClusterServerEntry serverEntry : clusterDataSet) {
+        for (ClusterData serverEntry : clusterDataSet) {
             serverEntry.writeToBuffer(buffer);
         }
     }

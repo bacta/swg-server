@@ -75,6 +75,6 @@ public final class CharacterInfo implements Comparable<CharacterInfo> {
         NONE,
         NORMAL,
         JEDI,
-        SPECTRAL;
+        SPECTRAL
     }
 }

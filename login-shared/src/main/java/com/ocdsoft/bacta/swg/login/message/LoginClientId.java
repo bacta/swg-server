@@ -17,21 +17,28 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 @Priority(0x4)
 public final class LoginClientId extends GameNetworkMessage {
-
-    private final String username;
-    private final String password;
+    /**
+     * Serves as the id if logging in through the client directly. If the launchpad has already gained a key for
+     * login, then the id can function as an integer value specifying the requested admin level of the player.
+     */
+    private final String id;
+    /**
+     * Serves as the key if logging in through the client directly. Otherwise, this should be a session key that
+     * the launchpad has already gained from the login server.
+     */
+    private final String key;
     private final String clientVersion;
 
     public LoginClientId(final ByteBuffer buffer) {
-        username = BufferUtil.getAscii(buffer);
-        password = BufferUtil.getAscii(buffer);
+        id = BufferUtil.getAscii(buffer);
+        key = BufferUtil.getAscii(buffer);
         clientVersion = BufferUtil.getAscii(buffer);
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.putAscii(buffer, username);
-        BufferUtil.putAscii(buffer, password);
+        BufferUtil.putAscii(buffer, id);
+        BufferUtil.putAscii(buffer, key);
         BufferUtil.putAscii(buffer, clientVersion);
     }
 }
