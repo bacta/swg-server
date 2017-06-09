@@ -25,3 +25,7 @@ dist/
 
 *.DS_Store
 build.properties
+
+# Berkeley DB files
+*.jdb
+*.lck

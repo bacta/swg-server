@@ -64,6 +64,8 @@
         <module>login-shared</module>
         <module>login-server</module>
         <module>db-berkeley</module>
+        <module>chat-shared</module>
+        <module>chat-server</module>
     </modules>
 
     <build>

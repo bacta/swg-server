@@ -14,7 +14,21 @@
     <groupId>com.ocdsoft.bacta.swg</groupId>
     <artifactId>login-server</artifactId>
 
+    <repositories>
+        <repository>
+            <id>oracleReleases</id>
+            <name>Oracle Released Java Packages</name>
+            <url>http://download.oracle.com/maven</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.sleepycat</groupId>
+            <artifactId>je</artifactId>
+            <version>7.4.5</version>
+        </dependency>
         <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
             <artifactId>server-engine</artifactId>
