@@ -11,6 +11,6 @@ import java.util.TreeSet;
 
 @Data
 public class ClusterStatus {
-    private final Set<ClusterServerEntry> clusterServerEntrySet = new TreeSet<>();
+    private final Set<ClusterData> clusterServerEntrySet = new TreeSet<>();
     private int maxCharactersPerAccount;
 }

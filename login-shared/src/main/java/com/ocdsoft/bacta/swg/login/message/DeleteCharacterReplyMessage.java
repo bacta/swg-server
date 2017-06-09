@@ -14,7 +14,12 @@ import java.nio.ByteBuffer;
 @Priority(0x05)
 @AllArgsConstructor
 public class DeleteCharacterReplyMessage extends GameNetworkMessage {
-
+    /**
+     * The current status of the character deletion request.
+     * 0 = OK
+     * 1 = ALREADY_IN_PROGRESS
+     * 2 = CLUSTER_DOWN
+     */
     private final int status;
 
     public DeleteCharacterReplyMessage(final ByteBuffer buffer) {

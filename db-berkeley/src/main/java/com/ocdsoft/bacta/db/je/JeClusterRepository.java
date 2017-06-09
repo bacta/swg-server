@@ -2,7 +2,7 @@ package com.ocdsoft.bacta.db.je;
 
 import com.ocdsoft.bacta.engine.io.db.Repository;
 import com.ocdsoft.bacta.swg.login.db.ClusterRepository;
-import com.ocdsoft.bacta.swg.login.object.ClusterServerEntry;
+import com.ocdsoft.bacta.swg.login.object.ClusterData;
 
 /**
  * Created by kyle on 4/2/2017.
@@ -22,12 +22,12 @@ public final class JeClusterRepository implements ClusterRepository {
     }
 
     @Override
-    public void delete(Iterable<? extends ClusterServerEntry> entries) {
+    public void delete(Iterable<? extends ClusterData> entries) {
 
     }
 
     @Override
-    public void delete(ClusterServerEntry entry) {
+    public void delete(ClusterData entry) {
 
     }
 
@@ -42,27 +42,27 @@ public final class JeClusterRepository implements ClusterRepository {
     }
 
     @Override
-    public Iterable<ClusterServerEntry> findAll() {
+    public Iterable<ClusterData> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<ClusterServerEntry> findAll(Iterable<Short> shorts) {
+    public Iterable<ClusterData> findAll(Iterable<Short> shorts) {
         return null;
     }
 
     @Override
-    public ClusterServerEntry findOne(Short aShort) {
+    public ClusterData findOne(Short aShort) {
         return null;
     }
 
     @Override
-    public <S extends ClusterServerEntry> Iterable<S> save(Iterable<S> entries) {
+    public <S extends ClusterData> Iterable<S> save(Iterable<S> entries) {
         return null;
     }
 
     @Override
-    public <S extends ClusterServerEntry> S save(S entry) {
+    public <S extends ClusterData> S save(S entry) {
         return null;
     }
 }

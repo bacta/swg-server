@@ -3,19 +3,18 @@ package com.ocdsoft.bacta.swg.login.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
-import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
 import com.ocdsoft.bacta.engine.io.network.tcp.TcpClient;
 import com.ocdsoft.bacta.engine.io.network.tcp.TcpServer;
-import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.event.ConnectEvent;
 import com.ocdsoft.bacta.soe.protocol.event.DisconnectEvent;
+import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
+import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
 import com.ocdsoft.bacta.swg.login.GameClientTcpHandler;
 import com.ocdsoft.bacta.swg.login.db.AccountDatabaseConnector;
 import com.ocdsoft.bacta.swg.login.event.GameServerOnlineEvent;
-import com.ocdsoft.bacta.swg.login.message.LoginClusterStatus;
 import com.ocdsoft.bacta.swg.login.message.LoginEnumCluster;
-import com.ocdsoft.bacta.swg.login.object.ClusterServerEntry;
+import com.ocdsoft.bacta.swg.login.object.ClusterData;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -36,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class ClusterService implements Observer {
 
     private transient final AccountDatabaseConnector dbConnector;
-    private transient final Set<ClusterServerEntry> clusterServerSet;
+    private transient final Set<ClusterData> clusterServerSet;
     private transient final Set<TcpClient> tcpClientSet;
     private transient final Set<SoeUdpConnection> connectedClients;
     private transient final PublisherService publisherService;
@@ -68,7 +67,7 @@ public class ClusterService implements Observer {
         LoginEnumCluster cluster = new LoginEnumCluster(getEnumCluster(), timezone);
         connection.sendMessage(cluster);
 
-        LoginClusterStatus status = new LoginClusterStatus(getClusterStatus());
+        com.ocdsoft.bacta.swg.login.message.LoginClusterStatus status = new com.ocdsoft.bacta.swg.login.message.LoginClusterStatus(getClusterStatus());
         connection.sendMessage(status);
     }
 
@@ -113,7 +112,7 @@ public class ClusterService implements Observer {
         if(status == TcpServer.Status.CONNECTED) {
 
             for(final SoeUdpConnection connection : connectedClients) {
-                connection.sendMessage(new LoginClusterStatus(clusterServerSet));
+                connection.sendMessage(new com.ocdsoft.bacta.swg.login.message.LoginClusterStatus(clusterServerSet));
             }
 
         } else if ( status == TcpServer.Status.DISCONNECTED) {
@@ -127,7 +126,7 @@ public class ClusterService implements Observer {
             }
 
             for(final SoeUdpConnection connection : connectedClients) {
-                connection.sendMessage(new LoginClusterStatus(clusterServerSet));
+                connection.sendMessage(new com.ocdsoft.bacta.swg.login.message.LoginClusterStatus(clusterServerSet));
             }
         }
     }

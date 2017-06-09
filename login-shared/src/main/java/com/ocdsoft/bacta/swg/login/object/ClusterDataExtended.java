@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.swg.login.object;
 
-import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
+import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  */
 @Getter
 @AllArgsConstructor
-public class ClusterServerEntryEx implements ByteBufferWritable {
+public class ClusterDataExtended implements ByteBufferWritable {
 
     private final int clusterId;
     private final String branch;
@@ -23,10 +23,10 @@ public class ClusterServerEntryEx implements ByteBufferWritable {
     private final int reserved3;
     private final int reserved4;
 
-    ClusterServerEntryEx(final int clusterId,
-                         final String branch,
-                         final String networkVersion,
-                         final int version) {
+    ClusterDataExtended(final int clusterId,
+                        final String branch,
+                        final String networkVersion,
+                        final int version) {
 
         this.clusterId = clusterId;
         this.branch = branch;
@@ -38,7 +38,7 @@ public class ClusterServerEntryEx implements ByteBufferWritable {
         this.reserved4 = 0;
     }
 
-    ClusterServerEntryEx(final int id) {
+    ClusterDataExtended(final int id) {
         this.clusterId = id;
         this.branch = "";
         this.networkVersion = "";
@@ -49,7 +49,7 @@ public class ClusterServerEntryEx implements ByteBufferWritable {
         this.reserved4 = 0;
     }
 
-    public ClusterServerEntryEx(ByteBuffer buffer) {
+    public ClusterDataExtended(ByteBuffer buffer) {
         this.clusterId = buffer.getInt();
         this.branch = BufferUtil.getAscii(buffer);
         this.networkVersion = BufferUtil.getAscii(buffer);

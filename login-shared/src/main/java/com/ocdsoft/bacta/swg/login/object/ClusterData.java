@@ -1,10 +1,10 @@
 package com.ocdsoft.bacta.swg.login.object;
 
+import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
+import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
-import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.GameNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import lombok.Getter;
@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  */
 
 @Getter
-public class ClusterServerEntry implements ByteBufferWritable, Comparable<ClusterServerEntry>  {
+public class ClusterData implements ByteBufferWritable, Comparable<ClusterData>  {
 
     private int id;
     private String connectionServerAddress;
@@ -54,7 +54,7 @@ public class ClusterServerEntry implements ByteBufferWritable, Comparable<Cluste
     @Setter
     private int onlineFreeTrialLimit;
 
-    public ClusterServerEntry(final ByteBuffer buffer) {
+    public ClusterData(final ByteBuffer buffer) {
         id = buffer.getInt();
         connectionServerAddress = BufferUtil.getAscii(buffer);
         connectionServerPort = UnsignedUtil.getUnsignedShort(buffer);
@@ -69,7 +69,7 @@ public class ClusterServerEntry implements ByteBufferWritable, Comparable<Cluste
         onlineFreeTrialLimit = buffer.getInt();
     }
 
-    public ClusterServerEntry(final int id) {
+    public ClusterData(final int id) {
         this.id = id;
         connectionServerAddress = "";
         connectionServerPort = 0;
@@ -84,7 +84,7 @@ public class ClusterServerEntry implements ByteBufferWritable, Comparable<Cluste
         onlineFreeTrialLimit = 0;
     }
 
-    public ClusterServerEntry(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
+    public ClusterData(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
         id = networkConfiguration.getClusterId();
         connectionServerAddress = networkConfiguration.getPublicAddress().getHostAddress();
         connectionServerPort = networkConfiguration.getUdpPort();
@@ -124,7 +124,7 @@ public class ClusterServerEntry implements ByteBufferWritable, Comparable<Cluste
     public boolean isRecommended()  { return !dontRecommend;  }
 
     @Override
-    public int compareTo(ClusterServerEntry o) {
+    public int compareTo(ClusterData o) {
         return connectionServerAddress.compareTo(o.connectionServerAddress);
     }
 }
