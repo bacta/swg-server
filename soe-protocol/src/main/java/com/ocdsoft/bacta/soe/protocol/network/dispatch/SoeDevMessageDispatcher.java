@@ -6,7 +6,7 @@ import com.ocdsoft.bacta.soe.protocol.network.controller.SoeController;
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

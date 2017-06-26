@@ -3,7 +3,7 @@ package com.ocdsoft.bacta.soe.protocol.network.connection;
 import com.ocdsoft.bacta.engine.io.network.ConnectionState;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageBuilder;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageProcessor;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +19,10 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
     private final UdpMessageBuilder<ByteBuffer> udpMessageBuilder;
     private final UdpMessageBuilder<ByteBuffer> reliableUdpMessageBuilder;
 
-    private final SoeNetworkConfiguration configuration;
+    private final SharedNetworkConfiguration configuration;
     private final SoeUdpConnection connection;
 
-    public SoeUdpMessageProcessor(final SoeUdpConnection connection, final SoeNetworkConfiguration configuration) {
+    public SoeUdpMessageProcessor(final SoeUdpConnection connection, final SharedNetworkConfiguration configuration) {
 
         this.connection = connection;
         this.configuration = configuration;

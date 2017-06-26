@@ -5,7 +5,6 @@ package com.ocdsoft.bacta.soe.protocol.network.connection;
  */
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
-
 import java.nio.ByteBuffer;
 
 /**

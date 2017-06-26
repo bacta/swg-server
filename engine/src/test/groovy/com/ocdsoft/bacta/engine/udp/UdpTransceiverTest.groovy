@@ -3,7 +3,7 @@ package com.ocdsoft.bacta.engine.io.network.udp
 import com.ocdsoft.bacta.engine.Application
 import com.ocdsoft.bacta.engine.conf.NetworkConfig
 import com.ocdsoft.bacta.engine.io.network.channel.InboundMessageChannel
-import com.ocdsoft.bacta.engine.io.network.udp.netty.NettyUdpTransceiver
+import com.ocdsoft.bacta.engine.io.network.udp.netty.NettyUdpReceiver
 import org.springframework.boot.actuate.metrics.CounterService
 import org.springframework.boot.actuate.metrics.reader.MetricReader
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,7 +33,7 @@ class UdpTransceiverTest extends Specification {
         networkConfig.getBindPort() >> 5000
 
         InboundMessageChannel inboundMessageChannel = Mock()
-        UdpTransceiver server = new NettyUdpTransceiver(networkConfig, counterService, inboundMessageChannel)
+        UdpTransceiver server = new NettyUdpReceiver(networkConfig, counterService, inboundMessageChannel)
         server.start();
 
         then:
@@ -52,11 +52,11 @@ class UdpTransceiverTest extends Specification {
         clientNetworkConfig.getBindPort() >> 5001
 
         InboundMessageChannel serverInboundMessageChannel = Mock()
-        UdpTransceiver server = new NettyUdpTransceiver(serverNetworkConfig, counterService, serverInboundMessageChannel)
+        UdpTransceiver server = new NettyUdpReceiver(serverNetworkConfig, counterService, serverInboundMessageChannel)
         server.start();
 
         InboundMessageChannel clientInboundMessageChannel = Mock()
-        UdpTransceiver client = new NettyUdpTransceiver(clientNetworkConfig, counterService, clientInboundMessageChannel)
+        UdpTransceiver client = new NettyUdpReceiver(clientNetworkConfig, counterService, clientInboundMessageChannel)
         client.start();
 
         UdpConnection serverUdpConnection = Mock()

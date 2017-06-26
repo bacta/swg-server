@@ -10,4 +10,6 @@ import java.nio.ByteBuffer;
  */
 public interface UdpEmitter {
 	void sendMessage(UdpConnection connection, ByteBuffer msg);
+	void sendMessage(int channel, UdpConnection connection, ByteBuffer msg);
+	void registerChannel(int channel, UdpChannel udpChannel);
 }

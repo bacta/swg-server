@@ -2,13 +2,13 @@ package com.ocdsoft.bacta.soe.protocol.network.controller;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Inject;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeProtocolPipeline;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

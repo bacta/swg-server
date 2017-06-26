@@ -1,10 +1,10 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.codahale.metrics.annotation.Counted;
 import com.ocdsoft.bacta.engine.io.network.ConnectionState;
 import com.ocdsoft.bacta.engine.io.network.udp.UdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.io.udp.UdpMessageProcessor;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.network.message.*;
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import lombok.Getter;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public final class SoeUdpConnection extends UdpConnection implements SoeUdpConnectionMBean {
+public final class SoeUdpConnection extends UdpConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SoeUdpConnection.class);
 
@@ -101,7 +101,7 @@ public final class SoeUdpConnection extends UdpConnection implements SoeUdpConne
 
     private final GameNetworkMessageSerializer messageSerializer;
 
-    public SoeUdpConnection(final SoeNetworkConfiguration networkConfiguration,
+    public SoeUdpConnection(final SharedNetworkConfiguration networkConfiguration,
                             final InetSocketAddress remoteAddress,
                             final GameNetworkMessageSerializer messageSerializer,
                             final Consumer<SoeUdpConnection> connectCallback) {
@@ -160,7 +160,6 @@ public final class SoeUdpConnection extends UdpConnection implements SoeUdpConne
         gameNetworkMessagesReceived.incrementAndGet();
     }
 
-    @Counted
     public void sendMessage(SoeMessage message) {
 
         if(state != ConnectionState.DISCONNECTED) {
