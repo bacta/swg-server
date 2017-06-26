@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.network.connection;
 
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,12 +14,12 @@ import java.util.Collection;
 @Slf4j
 public class ConnectionProvider {
 
-    private final SoeNetworkConfiguration networkConfiguration;
+    private final SharedNetworkConfiguration networkConfiguration;
     private final Collection<String> whitelistedAddresses;
     private final GameNetworkMessageSerializer messageSerializer;
 
     @Inject
-    public ConnectionProvider(final SoeNetworkConfiguration networkConfiguration,
+    public ConnectionProvider(final SharedNetworkConfiguration networkConfiguration,
                               final GameNetworkMessageSerializer messageSerializer) {
         this.networkConfiguration = networkConfiguration;
         this.messageSerializer = messageSerializer;

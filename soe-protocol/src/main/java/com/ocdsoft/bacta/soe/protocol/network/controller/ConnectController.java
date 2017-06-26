@@ -1,9 +1,8 @@
 package com.ocdsoft.bacta.soe.protocol.network.controller;
 
-import com.google.inject.Inject;
 import com.ocdsoft.bacta.engine.io.network.ConnectionState;
 import com.ocdsoft.bacta.soe.protocol.network.connection.Configuration;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.message.ConfirmMessage;
 import com.ocdsoft.bacta.soe.protocol.network.message.TerminateReason;
 import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType;
@@ -12,6 +11,7 @@ import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
 import java.nio.ByteBuffer;
@@ -20,13 +20,13 @@ import java.nio.ByteBuffer;
 public class ConnectController extends BaseSoeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectController.class);
 
-    private final SoeNetworkConfiguration networkConfiguration;
+    private final SharedNetworkConfiguration networkConfiguration;
     private final SessionKeyService keyService;
     private final MBeanServer mBeanServer;
 
     @Inject
     public ConnectController(final SessionKeyService keyService,
-                             final SoeNetworkConfiguration networkConfiguration) {
+                             final SharedNetworkConfiguration networkConfiguration) {
         this.networkConfiguration = networkConfiguration;
         this.keyService = keyService;
         this.mBeanServer = ManagementFactory.getPlatformMBeanServer();

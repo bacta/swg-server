@@ -1,10 +1,6 @@
 package com.ocdsoft.bacta.soe.protocol.util;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.ocdsoft.bacta.soe.protocol.network.ServerState;
-import com.ocdsoft.bacta.soe.protocol.ServerType;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -12,7 +8,11 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
+import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -21,13 +21,11 @@ import java.nio.ByteBuffer;
 /**
  * Created by kburkhardt on 1/31/15.
  */
-@Singleton
-public final class GameNetworkMessageTemplateWriter {
+public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameNetworkMessageTemplateWriter.class);
 
     private final VelocityEngine ve;
-    private final ServerType serverEnv;
 
     private final String controllerClassPath;
     private final String controllerFilePath;
@@ -49,11 +47,8 @@ public final class GameNetworkMessageTemplateWriter {
 
     private final String tangibleClassPath;
 
-
     @Inject
-    public GameNetworkMessageTemplateWriter(final SoeNetworkConfiguration configuration, final ServerState serverState) {
-
-        this.serverEnv = serverState.getServerType();
+    public GameNetworkMessageTemplateWriter(final SharedNetworkConfiguration configuration, final TemplateWriterConfig templateWriterConfig) {
 
         ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, LOGGER);
@@ -63,21 +58,21 @@ public final class GameNetworkMessageTemplateWriter {
         ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_CACHE, "true");
         ve.init();
 
-        controllerClassPath = configuration.getBasePackage() + "." + serverEnv.name().toLowerCase() + ".controller";
+        controllerClassPath = templateWriterConfig.getBasePackage() + ".controller";
         String fs = System.getProperty("file.separator");
 
         controllerFilePath = System.getProperty("user.dir") + fs  + "src"
                 + fs + "main" + fs + "java" + fs +
-                configuration.getBasePackage().replace(".", fs) + fs  +
-                serverEnv.name().toLowerCase() + fs + "controller" + fs;
+                templateWriterConfig.getBasePackage().replace(".", fs) + fs +
+                "controller" + fs;
         
-        messageClassPath = configuration.getBasePackage() + "." + serverEnv.name().toLowerCase() + ".com.ocdsoft.bacta.swg.login.message";
+        messageClassPath = templateWriterConfig.getBasePackage() + "." + ".com.ocdsoft.bacta.swg.login.message";
         messageFilePath = System.getProperty("user.dir") + fs  + "src"
                 + fs + "main" + fs + "java" + fs +
-                configuration.getBasePackage().replace(".", fs) + fs +
-                serverEnv.name().toLowerCase() + fs +  "com.ocdsoft.bacta.swg.login.message" + fs;
+                templateWriterConfig.getBasePackage().replace(".", fs) + fs +
+                "com.ocdsoft.bacta.swg.login.message" + fs;
 
-        tangibleClassPath = configuration.getBasePackage() + ".object.tangible.TangibleObject";
+        tangibleClassPath = templateWriterConfig.getBasePackage() + ".object.tangible.TangibleObject";
 
         objControllerClassPath = controllerClassPath  + ".object";
         objControllerFilePath = controllerFilePath + fs + "object" + fs;
@@ -154,7 +149,6 @@ public final class GameNetworkMessageTemplateWriter {
 
         context.put("packageName", controllerClassPath);
         context.put("messageClasspath", messageClassPath);
-        context.put("serverType", "ServerType." + serverEnv);
         context.put("messageName", messageName);
         context.put("messageNameClass", messageName + ".class");
         context.put("className", className);
@@ -309,4 +303,8 @@ public final class GameNetworkMessageTemplateWriter {
         }
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+
+    }
 }

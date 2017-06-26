@@ -2,12 +2,11 @@ package com.ocdsoft.bacta.engine.io.network.udp.netty;
 
 import com.ocdsoft.bacta.engine.conf.NetworkConfig;
 import com.ocdsoft.bacta.engine.io.network.channel.InboundMessageChannel;
-import com.ocdsoft.bacta.engine.io.network.udp.UdpConnection;
-import com.ocdsoft.bacta.engine.io.network.udp.UdpTransceiver;
+import com.ocdsoft.bacta.engine.io.network.udp.UdpReceiver;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
@@ -20,8 +19,8 @@ import java.nio.ByteBuffer;
  *
   */
 @Slf4j
-@Scope("prototype")
-public final class NettyUdpTransceiver implements UdpTransceiver {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public final class NettyUdpReceiver implements UdpReceiver {
 
     private final Thread thread;
     private final NettyUdpServer udpServer;
@@ -32,13 +31,13 @@ public final class NettyUdpTransceiver implements UdpTransceiver {
     private final InboundMessageChannel inboundMessageChannel;
 
     @Inject
-	public NettyUdpTransceiver(final NetworkConfig networkConfiguration,
-                               final CounterService counterService,
-                               final InboundMessageChannel inboundMessageChannel) {
+	public NettyUdpReceiver(final NetworkConfig networkConfiguration,
+                            final CounterService counterService,
+                            final InboundMessageChannel inboundMessageChannel) {
 
         this.counterService = counterService;
 
-        this.udpHandler = new NettyUdpHandler(this);
+        this.udpHandler = new NettyUdpHandler(this, new NettyUdpEmitter());
         udpServer = new NettyUdpServer(networkConfiguration.getBindAddress(), networkConfiguration.getBindPort(), udpHandler);
         this.inboundMessageChannel = inboundMessageChannel;
         this.thread = new Thread(udpServer);
@@ -68,14 +67,7 @@ public final class NettyUdpTransceiver implements UdpTransceiver {
         inboundMessageChannel.receiveMessage(inetSocketAddress, msg);
     }
 
-    @Override
-    public void sendMessage(final UdpConnection connection, final ByteBuffer msg) {
-        udpHandler.writeAndFlush(connection, msg);
-        counterService.increment("network.udp.messages.outgoing");
-    }
-
-    @Override
-    public boolean isAvailable() {
+    private boolean isAvailable() {
         return udpHandler.getCtx() != null;
     }
 

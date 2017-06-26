@@ -1,7 +1,8 @@
 package com.ocdsoft.bacta.soe.protocol.network.io.udp;
 
-import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Inject;
 
 /**
  * Created by kburkhardt on 2/15/14.

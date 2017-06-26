@@ -1,6 +1,5 @@
 package com.ocdsoft.bacta.soe.protocol.network.dispatch;
 
-import com.google.inject.Inject;
 import com.ocdsoft.bacta.soe.protocol.network.ServerState;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameClientMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
@@ -8,6 +7,8 @@ import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
 import gnu.trove.map.TIntObjectMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * Created by crush on 5/26/2016.

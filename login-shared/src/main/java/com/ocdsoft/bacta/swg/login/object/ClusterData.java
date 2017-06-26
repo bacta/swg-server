@@ -5,7 +5,7 @@ import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
 import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.GameNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.GameNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;

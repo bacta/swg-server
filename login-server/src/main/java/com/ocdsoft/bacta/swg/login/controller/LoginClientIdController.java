@@ -8,7 +8,7 @@ import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.protocol.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.protocol.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.protocol.network.controller.MessageHandled;
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.soe.protocol.SharedNetworkConfiguration;
 import com.ocdsoft.bacta.soe.protocol.service.PublisherService;
 import com.ocdsoft.bacta.swg.db.AccountService;
 import com.ocdsoft.bacta.swg.login.message.EnumerateCharacterId;
@@ -30,11 +30,11 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
     private final int timezone;
     private final ClusterService clusterService;
     private final AccountService accountService;
-    private final SoeNetworkConfiguration configuration;
+    private final SharedNetworkConfiguration configuration;
     private final PublisherService publisherService;
 
     @Inject
-    public LoginClientIdController(final SoeNetworkConfiguration configuration,
+    public LoginClientIdController(final SharedNetworkConfiguration configuration,
                                    final ClusterService clusterService,
                                    final AccountService accountService,
                                    final PublisherService publisherService) {
