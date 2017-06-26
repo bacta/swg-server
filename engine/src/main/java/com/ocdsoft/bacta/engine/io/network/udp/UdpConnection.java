@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import java.net.InetSocketAddress;
 
-public abstract class UdpConnection {
+public abstract class UdpConnection implements UdpEmitter {
     @Getter
 	protected InetSocketAddress remoteAddress;
 

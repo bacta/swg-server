@@ -12,5 +12,6 @@ import java.nio.ByteBuffer;
  * @since 1.0
  **/
 public interface UdpReceiver extends DisposableBean {
+	boolean start();
 	void receiveMessage(InetSocketAddress client, ByteBuffer msg);
 }

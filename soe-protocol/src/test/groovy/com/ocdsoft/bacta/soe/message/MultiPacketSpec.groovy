@@ -8,11 +8,9 @@ import com.ocdsoft.bacta.soe.protocol.network.controller.MultiController
 import com.ocdsoft.bacta.soe.protocol.network.controller.ReliableMessageController
 import com.ocdsoft.bacta.soe.protocol.network.controller.SoeMessageController
 import com.ocdsoft.bacta.soe.protocol.network.controller.ZeroEscapeController
-import com.ocdsoft.bacta.soe.protocol.network.message.UdpPacketType
-import com.ocdsoft.bacta.soe.protocol.network.controller.*
 import com.ocdsoft.bacta.soe.protocol.network.dispatch.GameNetworkMessageDispatcher
 import com.ocdsoft.bacta.soe.protocol.network.dispatch.SoeDevMessageDispatcher
-import com.ocdsoft.bacta.soe.protocol.network.io.udp.GameNetworkConfiguration
+import com.ocdsoft.bacta.soe.protocol.GameNetworkConfiguration
 import com.ocdsoft.bacta.soe.protocol.serialize.GameNetworkMessageSerializer
 import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil
 import spock.lang.Shared

@@ -1,6 +1,8 @@
 package com.ocdsoft.bacta.engine.io.network.udp.netty;
 
 import com.ocdsoft.bacta.engine.io.network.udp.UdpConnection;
+import com.ocdsoft.bacta.engine.io.network.udp.UdpEmitter;
+import com.ocdsoft.bacta.engine.io.network.udp.UdpReceiver;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -15,11 +17,13 @@ import java.nio.ByteBuffer;
 @Slf4j
 public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramPacket>  {
 
-    private final NettyUdpTransceiver nettyUdpTransceiver;
+    private final UdpReceiver udpReceiver;
+    private final UdpEmitter udpEmitter;
     private ChannelHandlerContext ctx;
 
-    public NettyUdpHandler(final NettyUdpTransceiver nettyUdpTransceiver) {
-        this.nettyUdpTransceiver = nettyUdpTransceiver;
+    public NettyUdpHandler(final UdpReceiver nettyUdpReceiver, final UdpEmitter udpEmitter) {
+        this.udpReceiver = nettyUdpReceiver;
+        this.udpEmitter = udpEmitter;
     }
 
     public ChannelHandlerContext getCtx() {
@@ -30,6 +34,7 @@ public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramP
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         this.ctx = ctx;
         super.channelRegistered(ctx);
+        udpEmitter.registerChannel(0, new NettyUdpChannel(ctx));
     }
 
     @Override
@@ -40,7 +45,7 @@ public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramP
         msg.content().getBytes(0, buffer);
         buffer.rewind();
 
-        nettyUdpTransceiver.receiveMessage(msg.sender(), buffer);
+        udpReceiver.receiveMessage(msg.sender(), buffer);
     }
 
     @Override
@@ -51,10 +56,5 @@ public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramP
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.error("NettyUdpHandler", cause);
-    }
-
-    public void writeAndFlush(UdpConnection sender, ByteBuffer message) {
-        DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(message), sender.getRemoteAddress());
-        ctx.writeAndFlush(datagramPacket);
     }
 }

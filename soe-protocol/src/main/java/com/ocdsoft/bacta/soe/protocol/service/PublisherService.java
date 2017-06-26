@@ -1,6 +1,5 @@
 package com.ocdsoft.bacta.soe.protocol.service;
 
-import com.google.inject.Singleton;
 import com.ocdsoft.bacta.soe.protocol.event.Event;
 
 import java.util.*;
@@ -9,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * Created by kyle on 5/21/2016.
  */
-@Singleton
+
 public class PublisherService {
 
     private final Map<Class, Set<Consumer>> eventConsumers;
