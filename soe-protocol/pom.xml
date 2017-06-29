@@ -35,10 +35,6 @@
             <groupId>commons-modeler</groupId>
             <artifactId>commons-modeler</artifactId>
         </dependency>
-        <dependency>
-            <groupId>co.paralleluniverse</groupId>
-            <artifactId>quasar-actors</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

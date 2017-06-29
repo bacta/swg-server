@@ -66,6 +66,7 @@
         <module>db-berkeley</module>
         <module>chat-shared</module>
         <module>chat-server</module>
+        <module>game-server</module>
     </modules>
 
     <build>
