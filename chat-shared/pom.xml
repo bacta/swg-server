@@ -24,5 +24,13 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta.swg</groupId>
+            <artifactId>soe-protocol</artifactId>
+        </dependency>
     </dependencies>
 </project>

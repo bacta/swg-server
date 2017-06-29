@@ -11,5 +11,4 @@ import lombok.Getter;
 @Getter
 public class ConnectEvent implements Event {
     private final SoeUdpConnection connection;
-    Actor
 }

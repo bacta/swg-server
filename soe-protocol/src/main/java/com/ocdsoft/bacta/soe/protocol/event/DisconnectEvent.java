@@ -1,6 +1,5 @@
 package com.ocdsoft.bacta.soe.protocol.event;
 
-import co.paralleluniverse.actors.Actor;
 import com.ocdsoft.bacta.soe.protocol.network.connection.SoeUdpConnection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +10,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class DisconnectEvent implements Event {
-    private Actor
     private final SoeUdpConnection connection;
 }
