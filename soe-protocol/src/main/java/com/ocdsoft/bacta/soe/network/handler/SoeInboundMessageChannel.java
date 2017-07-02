@@ -17,7 +17,6 @@ import java.nio.ByteBuffer;
 /**
  * Created by kyle on 6/28/2017.
  */
-@Component
 @Slf4j
 public class SoeInboundMessageChannel implements InboundMessageChannel {
 
