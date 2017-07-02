@@ -10,7 +10,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ocdsoft.bacta.swg</groupId>
+    <groupId>com.ocdsoft.bacta.soe</groupId>
     <artifactId>soe-protocol</artifactId>
     <packaging>jar</packaging>
 
@@ -28,13 +28,22 @@
             <artifactId>velocity</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jzlib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-modeler</groupId>
             <artifactId>commons-modeler</artifactId>
         </dependency>
+        <dependency>
+            <groupId>co.paralleluniverse</groupId>
+            <artifactId>quasar-actors</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>co.paralleluniverse</groupId>
+            <artifactId>quasar-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jzlib</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

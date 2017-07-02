@@ -4,9 +4,8 @@ import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import com.ocdsoft.bacta.engine.conf.BactaConfiguration;
-import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
-import com.ocdsoft.bacta.soe.protocol.GameNetworkConfiguration;
-import com.ocdsoft.bacta.soe.protocol.util.SoeMessageUtil;
+import com.ocdsoft.bacta.soe.network.ServerStatus;
+import com.ocdsoft.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -84,20 +83,20 @@ public class ClusterData implements ByteBufferWritable, Comparable<ClusterData> 
         onlineFreeTrialLimit = 0;
     }
 
-    public ClusterData(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
-        id = networkConfiguration.getClusterId();
-        connectionServerAddress = networkConfiguration.getPublicAddress().getHostAddress();
-        connectionServerPort = networkConfiguration.getUdpPort();
-        connectionServerPingPort = configuration.getInt("Bacta/GameServer", "PingPort");
-        populationOnline = 0;
-        populationOnlineStatus = PopulationStatus.PS_very_light;
-        maxCharactersPerAccount = configuration.getInt("Bacta/GameServer", "MaxCharsPerAccount");
-        timeZone = SoeMessageUtil.getTimeZoneValue();
-        status = ServerStatus.DOWN;
-        dontRecommend = configuration.getBoolean("Bacta/GameServer", "DontRecommended");
-        onlinePlayerLimit = configuration.getInt("Bacta/GameServer", "OnlinePlayerLimit");
-        onlineFreeTrialLimit = configuration.getInt("Bacta/GameServer", "OnlineFreeTrialLimit");
-    }
+//    public ClusterData(final BactaConfiguration configuration, final GameNetworkConfiguration networkConfiguration) {
+//        id = networkConfiguration.getClusterId();
+//        connectionServerAddress = networkConfiguration.getPublicAddress().getHostAddress();
+//        connectionServerPort = networkConfiguration.getUdpPort();
+//        connectionServerPingPort = configuration.getInt("Bacta/GameServer", "PingPort");
+//        populationOnline = 0;
+//        populationOnlineStatus = PopulationStatus.PS_very_light;
+//        maxCharactersPerAccount = configuration.getInt("Bacta/GameServer", "MaxCharsPerAccount");
+//        timeZone = SoeMessageUtil.getTimeZoneValue();
+//        status = ServerStatus.DOWN;
+//        dontRecommend = configuration.getBoolean("Bacta/GameServer", "DontRecommended");
+//        onlinePlayerLimit = configuration.getInt("Bacta/GameServer", "OnlinePlayerLimit");
+//        onlineFreeTrialLimit = configuration.getInt("Bacta/GameServer", "OnlineFreeTrialLimit");
+//    }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {

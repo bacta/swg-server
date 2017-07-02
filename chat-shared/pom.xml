@@ -29,7 +29,7 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
+            <groupId>com.ocdsoft.bacta.soe</groupId>
             <artifactId>soe-protocol</artifactId>
         </dependency>
     </dependencies>
