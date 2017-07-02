@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe;
 
-import com.ocdsoft.bacta.soe.protocol.util.TemplateWriterConfig;
+import com.ocdsoft.bacta.soe.util.TemplateWriterConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 

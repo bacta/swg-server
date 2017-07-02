@@ -1,8 +1,12 @@
 package com.ocdsoft.bacta.db.je;
 
-import com.ocdsoft.bacta.engine.io.db.Repository;
+import com.ocdsoft.bacta.engine.db.Repository;
+import com.ocdsoft.bacta.swg.login.db.ClusterAlreadyExistsException;
 import com.ocdsoft.bacta.swg.login.db.ClusterRepository;
 import com.ocdsoft.bacta.swg.login.object.ClusterData;
+import com.ocdsoft.bacta.swg.login.object.ClusterListEntry;
+
+import java.util.List;
 
 /**
  * Created by kyle on 4/2/2017.
@@ -11,58 +15,44 @@ import com.ocdsoft.bacta.swg.login.object.ClusterData;
 @Repository
 public final class JeClusterRepository implements ClusterRepository {
 
-    @Override
-    public long count() {
-        return 0;
-    }
 
     @Override
-    public void delete(Short aShort) {
-
-    }
-
-    @Override
-    public void delete(Iterable<? extends ClusterData> entries) {
-
-    }
-
-    @Override
-    public void delete(ClusterData entry) {
-
-    }
-
-    @Override
-    public void deleteAll() {
-
-    }
-
-    @Override
-    public boolean exists(Short aShort) {
-        return false;
-    }
-
-    @Override
-    public Iterable<ClusterData> findAll() {
+    public ClusterListEntry create(ClusterListEntry clusterListEntry) throws ClusterAlreadyExistsException {
         return null;
     }
 
     @Override
-    public Iterable<ClusterData> findAll(Iterable<Short> shorts) {
+    public ClusterListEntry update(ClusterListEntry clusterListEntry) {
         return null;
     }
 
     @Override
-    public ClusterData findOne(Short aShort) {
+    public List<ClusterListEntry> get() {
         return null;
     }
 
     @Override
-    public <S extends ClusterData> Iterable<S> save(Iterable<S> entries) {
+    public ClusterListEntry get(int clusterId) {
         return null;
     }
 
     @Override
-    public <S extends ClusterData> S save(S entry) {
+    public ClusterListEntry get(String clusterName) {
         return null;
+    }
+
+    @Override
+    public void delete() {
+
+    }
+
+    @Override
+    public void delete(int clusterId) {
+
+    }
+
+    @Override
+    public void delete(String clusterName) {
+
     }
 }

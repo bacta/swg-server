@@ -1,11 +1,14 @@
 package com.ocdsoft.bacta.engine.io.network.udp
 
+import com.codahale.metrics.MetricRegistry
 import com.ocdsoft.bacta.engine.Application
-import com.ocdsoft.bacta.engine.conf.NetworkConfig
-import com.ocdsoft.bacta.engine.io.network.channel.InboundMessageChannel
-import com.ocdsoft.bacta.engine.io.network.udp.netty.NettyUdpReceiver
-import org.springframework.boot.actuate.metrics.CounterService
-import org.springframework.boot.actuate.metrics.reader.MetricReader
+import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel
+import com.ocdsoft.bacta.engine.network.udp.UdpEmitterMetrics
+import com.ocdsoft.bacta.engine.network.udp.UdpConnection
+import com.ocdsoft.bacta.engine.network.udp.UdpEmitter
+import com.ocdsoft.bacta.engine.network.udp.UdpReceiverMetrics
+import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpEmitter
+import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpReceiver
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
@@ -21,19 +24,14 @@ import java.nio.ByteBuffer
 class UdpTransceiverTest extends Specification {
 
     @Inject
-    CounterService counterService;
-
-    @Inject
-    MetricReader metricReader;
+    MetricRegistry metricRegistry;
 
     def "IsAvailable"() {
         when:
-        NetworkConfig networkConfig = Mock()
-        networkConfig.getBindAddress() >> InetAddress.localHost
-        networkConfig.getBindPort() >> 5000
 
+        def receiverMetrics = new UdpReceiverMetrics(metricRegistry,"server");
         InboundMessageChannel inboundMessageChannel = Mock()
-        UdpTransceiver server = new NettyUdpReceiver(networkConfig, counterService, inboundMessageChannel)
+        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, receiverMetrics, inboundMessageChannel)
         server.start();
 
         then:
@@ -43,24 +41,18 @@ class UdpTransceiverTest extends Specification {
 
     def "SendReceiveMessage"() {
         setup:
-        NetworkConfig serverNetworkConfig = Mock()
-        serverNetworkConfig.getBindAddress() >> InetAddress.localHost
-        serverNetworkConfig.getBindPort() >> 5000
 
-        NetworkConfig clientNetworkConfig = Mock()
-        clientNetworkConfig.getBindAddress() >> InetAddress.localHost
-        clientNetworkConfig.getBindPort() >> 5001
+        def receiverMetrics = new UdpReceiverMetrics(metricRegistry,"server");
 
         InboundMessageChannel serverInboundMessageChannel = Mock()
-        UdpTransceiver server = new NettyUdpReceiver(serverNetworkConfig, counterService, serverInboundMessageChannel)
+        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, receiverMetrics, serverInboundMessageChannel)
         server.start();
 
-        InboundMessageChannel clientInboundMessageChannel = Mock()
-        UdpTransceiver client = new NettyUdpReceiver(clientNetworkConfig, counterService, clientInboundMessageChannel)
-        client.start();
+        def emitterMetrics = new UdpEmitterMetrics(metricRegistry, "testclient");
+        UdpEmitter client = new NettyUdpEmitter(emitterMetrics, server.getChannel())
 
         UdpConnection serverUdpConnection = Mock()
-        serverUdpConnection.remoteAddress >> new InetSocketAddress(serverNetworkConfig.bindAddress, serverNetworkConfig.bindPort)
+        serverUdpConnection.remoteAddress >> new InetSocketAddress(InetAddress.localHost, 5000)
 
         when:
         client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
@@ -68,9 +60,9 @@ class UdpTransceiverTest extends Specification {
         client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
 
         then:
+
         noExceptionThrown()
         Thread.sleep(1000)
-        metricReader.findOne("counter.network.udp.messages.incoming").getValue() == 3
-        metricReader.findOne("counter.network.udp.messages.outgoing").getValue() == 3
+        receiverMetrics.getMessageCount() == 3
     }
 }

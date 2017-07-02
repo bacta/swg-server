@@ -34,7 +34,7 @@ public class JeDatabaseEnv implements ShutdownListener {
             initialized = true;
 
         } catch (DatabaseException dbe) {
-            log.error("Unable to created environment", dbe);
+            LOGGER.error("Unable to created environment", dbe);
             System.exit(1);
         }
     }

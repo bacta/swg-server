@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.swg.login.message;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.protocol.network.message.Priority;
+import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.network.message.Priority;
 import com.ocdsoft.bacta.swg.login.object.ClusterDataExtended;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class LoginClusterStatusEx extends GameNetworkMessage {
     private final Set<ClusterDataExtended> extendedClusterDataSet;
 
     public LoginClusterStatusEx(final ByteBuffer buffer) {
-        extendedClusterDataSet = BufferUtil.getTreeSet(buffer, LoginClusterStatusEx::new);
+        extendedClusterDataSet = BufferUtil.getTreeSet(buffer, ClusterDataExtended::new);
     }
 
     @Override
