@@ -25,7 +25,6 @@ import java.util.Set;
  * Controllers are required to exist in the com.ocdsoft.bacta.soe.protocol.network.controller package to
  * be loaded.
  */
-@Component
 @Slf4j
 public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 

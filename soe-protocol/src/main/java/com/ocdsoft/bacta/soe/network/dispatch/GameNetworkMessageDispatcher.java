@@ -70,7 +70,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
         if (controllerData != null) {
             if (!controllerData.containsRoles(connection.getRoles())) {
-                LOGGER.error("{} Controller security blocked access: {}", serverState.getServerType(), controllerData.getController().getClass().getName());
+                LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
                 LOGGER.error("Connection: " + connection.toString());
                 return;
             }
@@ -79,7 +79,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
                 final GameNetworkMessageController controller = controllerData.getController();
                 final GameNetworkMessage incomingMessage = gameNetworkMessageSerializer.readFromBuffer(gameMessageType, buffer);
 
-                LOGGER.trace("[{}] received {}", serverState.getServerType(), incomingMessage.getClass().getSimpleName());
+                LOGGER.trace("received {}", incomingMessage.getClass().getSimpleName());
 
                 LOGGER.debug("Routing to " + controller.getClass().getSimpleName());
                 controller.handleIncoming(connection, incomingMessage); //Can't fix this one yet.
@@ -108,7 +108,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
             final String propertyName = Integer.toHexString(gameMessageType);
             gameNetworkMessageTemplateWriter.createGameNetworkMessageFiles(priority, gameMessageType, buffer);
-            LOGGER.error("{} Unhandled SWG Message: '{}' 0x{}", serverState.getServerType(), ClientString.get(propertyName), propertyName);
+            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
             LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
         }
     }

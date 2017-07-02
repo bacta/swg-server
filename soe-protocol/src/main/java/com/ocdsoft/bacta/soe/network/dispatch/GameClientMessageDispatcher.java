@@ -39,7 +39,7 @@ public final class GameClientMessageDispatcher {
 
         if (controllerData != null) {
             if (!controllerData.containsRoles(connection.getRoles())) {
-                LOGGER.error("{} Controller security blocked access: {}", serverState.getServerType(), controllerData.getController().getClass().getName());
+                LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
                 LOGGER.error("Connection: " + connection.toString());
                 return;
             }
