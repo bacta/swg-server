@@ -11,8 +11,9 @@ import java.net.InetAddress;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "soe.server.login")
+@ConfigurationProperties(prefix = "bacta.server.login")
 public class LoginServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
+    private boolean enableAutoGalaxyRegistration;
 }
