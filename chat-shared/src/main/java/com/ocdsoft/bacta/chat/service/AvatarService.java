@@ -12,7 +12,7 @@ import com.ocdsoft.bacta.chat.ChatAvatarId;
  * services rely on the AvatarService for resolving networkId and avatarId relationships.
  * <p>
  * When a new player logs in, they should connect with the chat service, registering that they are ready to participate
- * in the various chat services. Likewise, as their connection to the GameServer changes, the chat service should
+ * in the various chat services. Likewise, as their soe to the GameServer changes, the chat service should
  * potentially disconnect the player.
  */
 public interface AvatarService {
@@ -28,12 +28,12 @@ public interface AvatarService {
 
     /**
      * Connects a player to the chat service. This indicates that the player is ready to participate in the various
-     * chat services. When a player connects, other services will be notified of the connection.
+     * chat services. When a player connects, other services will be notified of the soe.
      *
-     * @param connectionId    The connection with which the player has connected to the game server.
+     * @param connectionId    The soe with which the player has connected to the game server.
      * @param characterName The name of the character connecting.
      * @param networkId     The id of the character on the game server.
-     * @param isSecure      If the connection is using a secure protocol.
+     * @param isSecure      If the soe is using a secure protocol.
      * @param isSubscribed  If the account is subscribed.
      * @throws AvatarDoesNotExistException If the chat service believes the character is already connected, but the
      *                                     disconnect attempt fails due to the chat service having no record of the avatar.

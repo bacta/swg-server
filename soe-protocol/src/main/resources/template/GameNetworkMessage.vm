@@ -1,9 +1,9 @@
 package $packageName;
 
-import com.ocdsoft.bacta.soe.message.GameNetworkMessage;
+import GameNetworkMessage;
 import com.ocdsoft.bacta.soe.util.SOECRC32;
 import lombok.Getter;
-import com.ocdsoft.bacta.soe.message.Priority;
+import Priority;
 
 import java.nio.ByteBuffer;
 

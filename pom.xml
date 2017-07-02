@@ -61,11 +61,12 @@
     <modules>
         <module>engine</module>
         <module>soe-protocol</module>
-        <module>login-shared</module>
+        <module>galaxy-server</module>
         <module>login-server</module>
+        <module>login-shared</module>
         <module>db-berkeley</module>
         <module>chat-shared</module>
-        <module>chat-server</module>
+        <module>connection-server</module>
         <module>game-server</module>
     </modules>
 
@@ -144,7 +145,7 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <groupId>com.ocdsoft.bacta.soe</groupId>
                 <artifactId>soe-protocol</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -161,6 +162,11 @@
             <dependency>
                 <groupId>com.ocdsoft.bacta</groupId>
                 <artifactId>db</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta</groupId>
+                <artifactId>soe-shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

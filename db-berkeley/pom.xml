@@ -9,7 +9,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ocdsoft.bacta</groupId>
     <artifactId>db-berkeley</artifactId>
 
     <repositories>
@@ -30,6 +29,10 @@
         <dependency>
             <groupId>com.ocdsoft.bacta.swg</groupId>
             <artifactId>login-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>engine</artifactId>
         </dependency>
     </dependencies>
 

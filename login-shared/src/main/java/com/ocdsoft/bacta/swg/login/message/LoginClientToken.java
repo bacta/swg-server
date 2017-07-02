@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.swg.login.message;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.protocol.network.message.Priority;
+import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.network.message.Priority;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;

@@ -2,7 +2,7 @@ package com.ocdsoft.bacta.chat.message;
 
 import com.ocdsoft.bacta.chat.ChatAvatarId;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,8 +1,7 @@
 package com.ocdsoft.bacta.swg.login;
 
-import com.ocdsoft.bacta.soe.protocol.network.ServerStatus;
-import com.ocdsoft.bacta.soe.protocol.network.ServerState;
-import com.ocdsoft.bacta.soe.protocol.ServerType;
+import com.ocdsoft.bacta.soe.network.ServerStatus;
+import com.ocdsoft.bacta.soe.network.ServerState;
 
 /**
  * Created by Kyle on 3/22/14.
@@ -17,11 +16,6 @@ public class LoginServerState implements ServerState {
 
     public int getClusterId() {
         return 0;
-    }
-
-    @Override
-    public ServerType getServerType() {
-        return ServerType.LOGIN;
     }
 
     @Override
