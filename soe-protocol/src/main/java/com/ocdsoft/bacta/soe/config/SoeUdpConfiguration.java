@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.config;
 
-import com.ocdsoft.bacta.soe.network.EncryptMethod;
+import com.ocdsoft.bacta.soe.network.message.EncryptMethod;
 import lombok.Getter;
 
 /**

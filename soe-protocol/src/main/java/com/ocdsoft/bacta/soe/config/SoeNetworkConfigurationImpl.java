@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.config;
 
-import com.ocdsoft.bacta.soe.network.EncryptMethod;
+import com.ocdsoft.bacta.soe.network.message.EncryptMethod;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Component
 @Data
-@ConfigurationProperties(prefix = "soe.network.shared")
+@ConfigurationProperties(prefix = "bacta.network.shared")
 public final class SoeNetworkConfigurationImpl implements SoeNetworkConfiguration {
 
     private InetAddress bindAddress;
@@ -91,6 +91,8 @@ public final class SoeNetworkConfigurationImpl implements SoeNetworkConfiguratio
     private boolean multiGameMessages;
     private int connectionsPerAccount;
     private String requiredClientVersion;
+    private String metricsPrefix;
+    private String baseMessageClassPath;
 //
 //    private int encryptCode;
 //    private boolean compression;

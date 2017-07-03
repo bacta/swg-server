@@ -48,16 +48,13 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
      */
     private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
-    private final ServerState serverState;
 
     @Inject
     public GameNetworkMessageDispatcher(final ClasspathControllerLoader controllerLoader,
-                                        final ServerState serverState,
                                         final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                         final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
         this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
-        this.serverState = serverState;
         this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
 
         controllers = controllerLoader.getControllers(GameNetworkMessageController.class);
@@ -97,6 +94,13 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
     }
 
     private void handleMissingController(short priority, int gameMessageType, ByteBuffer buffer) {
+
+        if(gameNetworkMessageTemplateWriter == null) {
+            final String propertyName = Integer.toHexString(gameMessageType);
+            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
+            return;
+        }
+
         if (gameMessageType == OBJECT_CONTROLLER_MESSAGE) {
             final int objcType = buffer.getInt(4);
             final String propertyName = Integer.toHexString(objcType);

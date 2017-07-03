@@ -10,10 +10,12 @@ import com.ocdsoft.bacta.soe.service.SessionKeyService;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
+@Component
 @SoeController(handles = {SoeMessageType.cUdpPacketConnect})
 public class ConnectController extends BaseSoeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectController.class);

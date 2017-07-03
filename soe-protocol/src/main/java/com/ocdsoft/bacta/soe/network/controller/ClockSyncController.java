@@ -4,6 +4,7 @@ import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.message.ClockReflectMessage;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import com.ocdsoft.bacta.soe.util.Clock;
+import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
@@ -68,6 +69,7 @@ import java.nio.ByteBuffer;
          00 00 00 00 00 00 08 02  - Our Received - 2050
 
  */
+@Component
 @SoeController(handles = {SoeMessageType.cUdpPacketClockSync})
 public class ClockSyncController extends BaseSoeController {
 
