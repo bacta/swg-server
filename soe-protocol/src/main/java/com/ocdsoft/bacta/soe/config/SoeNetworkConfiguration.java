@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.config;
 
 import com.ocdsoft.bacta.engine.conf.NetworkConfiguration;
-import com.ocdsoft.bacta.soe.network.EncryptMethod;
+import com.ocdsoft.bacta.soe.network.message.EncryptMethod;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -79,4 +79,7 @@ public interface SoeNetworkConfiguration extends NetworkConfiguration {
     boolean isMultiSoeMessages();
     int getConnectionsPerAccount();
     String getRequiredClientVersion();
+    String getMetricsPrefix();
+
+    String getBaseMessageClassPath();
 }

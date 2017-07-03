@@ -20,6 +20,10 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>shared-messages</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
         </dependency>

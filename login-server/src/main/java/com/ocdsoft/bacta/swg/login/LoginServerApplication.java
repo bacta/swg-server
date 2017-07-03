@@ -1,21 +1,24 @@
 package com.ocdsoft.bacta.swg.login;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 /**
  * Created by kburkhardt on 2/14/14.
  */
 
-@Slf4j
 @SpringBootApplication
 @EnableAutoConfiguration
-@EnableConfigurationProperties
-@ComponentScan({"com.ocdsoft.bacta.swg.login"})
+@ComponentScan("com.ocdsoft.bacta")
+@PropertySources({
+        @PropertySource("classpath:soenetworking.properties"),
+        @PropertySource("classpath:application.properties")
+
+})
 public class LoginServerApplication {
 
     public static void main(String[] args) {

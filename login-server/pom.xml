@@ -31,7 +31,6 @@
             <groupId>com.ocdsoft.bacta</groupId>
             <artifactId>db-berkeley</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

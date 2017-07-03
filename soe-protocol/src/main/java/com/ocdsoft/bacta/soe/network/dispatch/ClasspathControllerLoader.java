@@ -4,7 +4,6 @@ import com.ocdsoft.bacta.soe.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.network.controller.MessageHandled;
 import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.ServerState;
 import com.ocdsoft.bacta.soe.util.ClientString;
 import com.ocdsoft.bacta.soe.util.MessageHashUtil;
 import gnu.trove.map.TIntObjectMap;
@@ -15,9 +14,6 @@ import org.springframework.context.ApplicationContext;
 
 import javax.inject.Inject;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,7 +24,6 @@ public final class ClasspathControllerLoader {
 
     private final ApplicationContext context;
 
-    @Inject
     public ClasspathControllerLoader(final ApplicationContext context) {
         this.context = context;
     }

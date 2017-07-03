@@ -4,9 +4,11 @@ import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
+@Component
 @SoeController(handles = {SoeMessageType.cUdpPacketAckAll1, SoeMessageType.cUdpPacketAckAll2, SoeMessageType.cUdpPacketAckAll3, SoeMessageType.cUdpPacketAckAll4})
 public class AckAllController extends BaseSoeController {
 

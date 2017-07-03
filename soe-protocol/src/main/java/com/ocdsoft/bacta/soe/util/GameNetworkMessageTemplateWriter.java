@@ -1,6 +1,7 @@
 package com.ocdsoft.bacta.soe.util;
 
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfigurationImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -21,9 +22,8 @@ import java.nio.ByteBuffer;
 /**
  * Created by kburkhardt on 1/31/15.
  */
+@Slf4j
 public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameNetworkMessageTemplateWriter.class);
 
     private final VelocityEngine ve;
 
@@ -48,7 +48,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
     private final String tangibleClassPath;
 
     @Inject
-    public GameNetworkMessageTemplateWriter(final SoeNetworkConfigurationImpl configuration, final TemplateWriterConfig templateWriterConfig) {
+    public GameNetworkMessageTemplateWriter(final String baseMessagePath) {
 
         ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, LOGGER);
@@ -58,21 +58,21 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_CACHE, "true");
         ve.init();
 
-        controllerClassPath = templateWriterConfig.getBasePackage() + ".controller";
+        controllerClassPath = baseMessagePath + ".controller";
         String fs = System.getProperty("file.separator");
 
         controllerFilePath = System.getProperty("user.dir") + fs  + "src"
                 + fs + "main" + fs + "java" + fs +
-                templateWriterConfig.getBasePackage().replace(".", fs) + fs +
+                baseMessagePath.replace(".", fs) + fs +
                 "controller" + fs;
         
-        messageClassPath = templateWriterConfig.getBasePackage() + "." + ".com.ocdsoft.bacta.swg.login.message";
+        messageClassPath = baseMessagePath + "." + ".com.ocdsoft.bacta.swg.login.message";
         messageFilePath = System.getProperty("user.dir") + fs  + "src"
                 + fs + "main" + fs + "java" + fs +
-                templateWriterConfig.getBasePackage().replace(".", fs) + fs +
+                baseMessagePath.replace(".", fs) + fs +
                 "com.ocdsoft.bacta.swg.login.message" + fs;
 
-        tangibleClassPath = templateWriterConfig.getBasePackage() + ".object.tangible.TangibleObject";
+        tangibleClassPath = baseMessagePath + ".object.tangible.TangibleObject";
 
         objControllerClassPath = controllerClassPath  + ".object";
         objControllerFilePath = controllerFilePath + fs + "object" + fs;
