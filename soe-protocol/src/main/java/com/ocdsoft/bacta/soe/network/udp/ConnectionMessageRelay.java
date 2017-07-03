@@ -8,7 +8,7 @@ import com.ocdsoft.bacta.engine.network.ConnectionState;
 import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.event.DisconnectEvent;
-import com.ocdsoft.bacta.soe.network.connection.ConnectionCache;
+import com.ocdsoft.bacta.soe.network.connection.SoeConnectionCache;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.service.PublisherService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +27,14 @@ import java.util.Set;
 public class ConnectionMessageRelay implements Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
-    private final ConnectionCache connectionCache;
+    private final SoeConnectionCache connectionCache;
     private final PublisherService publisherService;
     private final UdpChannel sendChannel;
 
     private final Histogram sendQueueSizes;
 
-    @Inject
     public ConnectionMessageRelay(final SoeNetworkConfiguration networkConfiguration,
-                                  final ConnectionCache connectionCache,
+                                  final SoeConnectionCache connectionCache,
                                   final PublisherService publisherService,
                                   final MetricRegistry metricRegistry,
                                   final UdpChannel sendChannel) {

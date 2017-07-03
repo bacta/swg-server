@@ -3,9 +3,9 @@ package com.ocdsoft.bacta.soe.network.handler;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.engine.network.ConnectionState;
 import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel;
-import com.ocdsoft.bacta.soe.network.connection.ConnectionProvider;
+import com.ocdsoft.bacta.soe.network.connection.SoeConnectionProvider;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.connection.ConnectionCache;
+import com.ocdsoft.bacta.soe.network.connection.SoeConnectionCache;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,15 +20,14 @@ import java.nio.ByteBuffer;
 @Slf4j
 public class SoeInboundMessageChannel implements InboundMessageChannel {
 
-
-    private final ConnectionCache connectionCache;
+    private final SoeConnectionCache connectionCache;
     private final SoeProtocolHandler protocolHandler;
-    private final ConnectionProvider connectionProvider;
+    private final SoeConnectionProvider connectionProvider;
 
     @Inject
-    public SoeInboundMessageChannel(final ConnectionCache connectionCache,
-                             final SoeProtocolHandler protocolHandler,
-                             final ConnectionProvider connectionProvider) {
+    public SoeInboundMessageChannel(final SoeConnectionCache connectionCache,
+                                    final SoeProtocolHandler protocolHandler,
+                                    final SoeConnectionProvider connectionProvider) {
 
         this.connectionCache = connectionCache;
         this.protocolHandler = protocolHandler;
@@ -59,5 +58,4 @@ public class SoeInboundMessageChannel implements InboundMessageChannel {
             LOGGER.debug("Unsolicited Message from " + sender + ": " + BufferUtil.bytesToHex(message));
         }
     }
-
 }

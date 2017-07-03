@@ -10,3 +10,4 @@ public interface NetworkConfiguration {
     InetAddress getBindAddress();
     int getBindPort();
 }
+

@@ -1,6 +1,7 @@
 package com.ocdsoft.bacta.soe.service;
 
 import com.ocdsoft.bacta.soe.event.Event;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
  * Created by kyle on 5/21/2016.
  */
 
+@Component
 public class PublisherService {
 
     private final Map<Class, Set<Consumer>> eventConsumers;

@@ -4,6 +4,7 @@ import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.network.controller.SoeController;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.controller.SoeMessageController;
+import com.ocdsoft.bacta.soe.network.message.SoeMessage;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import com.ocdsoft.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +22,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Controllers are required to exist in the com.ocdsoft.bacta.soe.protocol.network.controller package to
- * be loaded.
- */
 @Slf4j
 public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 
     private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
     private final GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
 
-    @Inject
     public SoeDevMessageDispatcher(final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
         this.gameNetworkMessageDispatcher = gameNetworkMessageDispatcher;
     }
@@ -66,20 +62,17 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     }
 
     private void load(final ApplicationContext applicationContext) {
-        
-        Reflections reflections = new Reflections();
 
-        Set<Class<? extends SoeMessageController>> subTypes = reflections.getSubTypesOf(SoeMessageController.class);
-
-        Iterator<Class<? extends SoeMessageController>> iter = subTypes.iterator();
-
+        String[] controllerBeanNames = applicationContext.getBeanNamesForType(SoeMessageController.class);
         controllers.clear();
 
-        while (iter.hasNext()) {
+        for (String controllerBeanName : controllerBeanNames) {
+
+            SoeMessageController controller = (SoeMessageController) applicationContext.getBean(controllerBeanName);
 
             try {
                 
-                Class<? extends SoeMessageController> controllerClass = iter.next();
+                Class<? extends SoeMessageController> controllerClass = controller.getClass();
                 
                 if(Modifier.isAbstract(controllerClass.getModifiers())) {
                     continue;
@@ -95,7 +88,6 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
                 SoeMessageType[] types = controllerAnnotation.handles();
                 LOGGER.debug("Loading SoeMessageController: {}", controllerClass.getSimpleName());
 
-                SoeMessageController controller = applicationContext.getBean(controllerClass);
                 controller.setSoeMessageDispatcher(this);
                 controller.setGameNetworkMessageDispatcher(gameNetworkMessageDispatcher);
 

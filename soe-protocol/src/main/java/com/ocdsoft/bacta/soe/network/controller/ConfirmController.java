@@ -2,16 +2,16 @@ package com.ocdsoft.bacta.soe.network.controller;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
 import com.ocdsoft.bacta.soe.config.SoeUdpConfiguration;
-import com.ocdsoft.bacta.soe.network.EncryptMethod;
+import com.ocdsoft.bacta.soe.network.message.EncryptMethod;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
 @Slf4j
+@Component
 @SoeController(handles = {SoeMessageType.cUdpPacketConfirm})
 public class ConfirmController extends BaseSoeController {
 

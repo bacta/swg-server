@@ -68,6 +68,7 @@
         <module>chat-shared</module>
         <module>connection-server</module>
         <module>game-server</module>
+        <module>shared-messages</module>
     </modules>
 
     <build>
@@ -102,10 +103,8 @@
                             <goal>addTestSources</goal>
                             <goal>generateStubs</goal>
                             <goal>compile</goal>
-                            <goal>testGenerateStubs</goal>
                             <goal>testCompile</goal>
                             <goal>removeStubs</goal>
-                            <goal>removeTestStubs</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -152,6 +151,11 @@
             <dependency>
                 <groupId>com.ocdsoft.bacta.swg</groupId>
                 <artifactId>login-shared</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta</groupId>
+                <artifactId>shared-messages</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -254,7 +258,7 @@
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,7 +1,6 @@
 package com.ocdsoft.bacta.soe.network.connection;
 
 import com.ocdsoft.bacta.engine.network.ConnectionState;
-import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
 import com.ocdsoft.bacta.engine.network.udp.UdpConnection;
 import com.ocdsoft.bacta.soe.config.SoeUdpConfiguration;
 import com.ocdsoft.bacta.soe.network.message.*;

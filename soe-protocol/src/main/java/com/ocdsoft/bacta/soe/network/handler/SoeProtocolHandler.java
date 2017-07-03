@@ -40,10 +40,11 @@ public final class SoeProtocolHandler {
 //        }
 //
 //        return buffer;
-//    }
+//
 
     public void handleIncoming(SoeUdpConnection sender, ByteBuffer buffer) {
         SoeMessageType packetType = SoeMessageType.values()[buffer.get(1)];
+        LOGGER.info("{}", packetType);
         ByteBuffer decodedBuffer;
         if (packetType != SoeMessageType.cUdpPacketConnect && packetType != SoeMessageType.cUdpPacketConfirm) {
             decodedBuffer = encryption.decode(sender.getConfiguration().getEncryptCode(), buffer.order(ByteOrder.LITTLE_ENDIAN));
