@@ -3,6 +3,8 @@ package com.ocdsoft.bacta.soe.network.connection;
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageSerializer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -11,6 +13,8 @@ import java.util.Collection;
  * Created by kyle on 4/4/2017.
  */
 @Slf4j
+@Component
+@Scope("prototype")
 public class SoeConnectionProvider {
 
     private final SoeNetworkConfiguration networkConfiguration;

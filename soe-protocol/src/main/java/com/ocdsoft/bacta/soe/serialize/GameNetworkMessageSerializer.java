@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.soe.serialize;
 
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 
 import java.nio.ByteBuffer;
 

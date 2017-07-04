@@ -2,9 +2,8 @@ package com.ocdsoft.bacta.soe.network.dispatch;
 
 import com.ocdsoft.bacta.engine.network.dispatch.MessageDispatcher;
 import com.ocdsoft.bacta.soe.network.controller.GameNetworkMessageController;
-import com.ocdsoft.bacta.soe.network.ServerState;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageSerializer;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
 import com.ocdsoft.bacta.soe.util.ClientString;

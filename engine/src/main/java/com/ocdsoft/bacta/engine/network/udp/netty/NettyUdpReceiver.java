@@ -1,10 +1,8 @@
 package com.ocdsoft.bacta.engine.network.udp.netty;
 
-import com.codahale.metrics.Counter;
 import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel;
-import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
-import com.ocdsoft.bacta.engine.network.udp.UdpReceiver;
-import com.ocdsoft.bacta.engine.network.udp.UdpReceiverMetrics;
+import com.ocdsoft.bacta.engine.network.udp.*;
+import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
@@ -24,18 +22,18 @@ public final class NettyUdpReceiver implements UdpReceiver {
     private final NettyUdpServer udpServer;
     private final NettyUdpHandler udpHandler;
 
-    private final UdpReceiverMetrics metrics;
+    private final UdpMetrics metrics;
 
     private final InboundMessageChannel inboundMessageChannel;
 
 	public NettyUdpReceiver(final InetAddress bindAddress,
                             final int bindPort,
-                            final UdpReceiverMetrics metrics,
+                            final UdpMetrics metrics,
                             final InboundMessageChannel inboundMessageChannel) {
 
         this.metrics = metrics;
 
-        this.udpHandler = new NettyUdpHandler(this);
+        this.udpHandler = new NettyUdpHandler(this, metrics);
         udpServer = new NettyUdpServer(bindAddress, bindPort, udpHandler);
         this.inboundMessageChannel = inboundMessageChannel;
         this.thread = new Thread(udpServer);
@@ -44,7 +42,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
     }
 
     @Override
-    public boolean start() {
+    public UdpEmitter start() {
         thread.start();
         int attempts = 0;
         while(!isAvailable() && attempts < 10) {
@@ -56,23 +54,18 @@ public final class NettyUdpReceiver implements UdpReceiver {
                 e.printStackTrace();
             }
         }
-        return isAvailable();
+        return udpHandler.getEmitter();
     }
 
     @Override
     public void receiveMessage(final InetSocketAddress inetSocketAddress, final ByteBuffer msg) {
-        metrics.inc();
+        metrics.receiveMessage();
         inboundMessageChannel.receiveMessage(inetSocketAddress, msg);
     }
 
     @Override
     public boolean isAvailable() {
-        return udpHandler.getChannel() != null;
-    }
-
-    @Override
-    public UdpChannel getChannel() {
-        return udpHandler.getChannel();
+        return udpHandler.isReady();
     }
 
     @Override

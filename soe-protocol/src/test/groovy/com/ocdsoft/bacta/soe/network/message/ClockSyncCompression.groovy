@@ -10,7 +10,7 @@ import java.nio.ByteOrder;
 /**
  * Created by kyle on 7/2/2017.
  */
-public class ClockSyncCompressionTest extends Specification {
+public class ClockSyncCompression extends Specification {
 
     def "CompressionTest"() {
 

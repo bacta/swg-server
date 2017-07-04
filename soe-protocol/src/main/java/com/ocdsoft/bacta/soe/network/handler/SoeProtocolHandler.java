@@ -6,6 +6,8 @@ import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.dispatch.SoeMessageDispatcher;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
@@ -15,6 +17,8 @@ import java.nio.ByteOrder;
  * Created by kyle on 4/4/2017.
  */
 @Slf4j
+@Component
+@Scope("prototype")
 public final class SoeProtocolHandler {
 
     private final SoeEncryption encryption;
@@ -56,7 +60,7 @@ public final class SoeProtocolHandler {
             sender.increaseProtocolMessageReceived();
             soeMessageDispatcher.dispatch(sender, decodedBuffer);
         } else {
-            LOGGER.warn("Unhandled message {}}", packetType);
+            LOGGER.warn("Unhandled message {}", packetType);
         }
     }
 }

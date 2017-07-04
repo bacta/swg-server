@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.swg.login.message;
 
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.Priority;
 import com.ocdsoft.bacta.swg.login.object.ClusterData;
 
 import java.nio.ByteBuffer;

@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.swg.login.message;
 
 
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.Priority;
 import com.ocdsoft.bacta.swg.login.object.CharacterInfo;
 import com.ocdsoft.bacta.swg.login.object.SoeAccount;
 
@@ -14,6 +14,10 @@ import java.util.TreeSet;
 public final class EnumerateCharacterId extends GameNetworkMessage {
 
     private final Set<CharacterInfo> characterInfoList = new TreeSet<>();
+
+    public EnumerateCharacterId() {
+
+    }
 
     public EnumerateCharacterId(final SoeAccount account) {
         characterInfoList.addAll(account.getCharacterList());
