@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.soe.serialize;
 
-import com.ocdsoft.bacta.soe.network.message.game.GameControllerMessage;
-import com.ocdsoft.bacta.soe.network.message.game.GameControllerMessageType;
-import com.ocdsoft.bacta.soe.network.message.game.MessageQueueData;
+import com.ocdsoft.bacta.network.message.game.GameControllerMessage;
+import com.ocdsoft.bacta.network.message.game.GameControllerMessageType;
+import com.ocdsoft.bacta.network.message.game.MessageQueueData;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 

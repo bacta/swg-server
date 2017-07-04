@@ -1,7 +1,6 @@
-package com.ocdsoft.bacta.soe.network.message.game;
+package com.ocdsoft.bacta.network.message.game;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;

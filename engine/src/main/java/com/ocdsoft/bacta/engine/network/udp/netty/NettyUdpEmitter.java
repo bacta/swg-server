@@ -1,24 +1,22 @@
 package com.ocdsoft.bacta.engine.network.udp.netty;
 
-import com.ocdsoft.bacta.engine.network.udp.UdpEmitterMetrics;
-import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
-import com.ocdsoft.bacta.engine.network.udp.UdpConnection;
-import com.ocdsoft.bacta.engine.network.udp.UdpEmitter;
+import com.ocdsoft.bacta.engine.network.udp.*;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
 /**
  * Created by kyle on 6/11/2017.
  */
-public class NettyUdpEmitter implements UdpEmitter {
+class NettyUdpEmitter implements UdpEmitter {
 
-    private final UdpEmitterMetrics emitterMetrics;
+    private final UdpMetrics emitterMetrics;
     private final NettyUdpChannels udpChannels;
 
-    public NettyUdpEmitter(final UdpEmitterMetrics emitterMetrics, final UdpChannel mainChannel) {
+    NettyUdpEmitter(final UdpMetrics emitterMetrics) {
         this.emitterMetrics = emitterMetrics;
         this.udpChannels = new NettyUdpChannels();
-        registerChannel(UdpChannel.MAIN, mainChannel);
     }
 
     @Override
@@ -28,7 +26,7 @@ public class NettyUdpEmitter implements UdpEmitter {
 
     @Override
     public void sendMessage(final int channel, final UdpConnection connection,final ByteBuffer msg) {
-        emitterMetrics.inc(channel);
+        emitterMetrics.sendMessage(channel);
         udpChannels.writeToChannel(channel, connection.getRemoteAddress(), msg);
     }
 
@@ -36,5 +34,9 @@ public class NettyUdpEmitter implements UdpEmitter {
     public void registerChannel(final int channel, final UdpChannel udpChannel) {
         emitterMetrics.registerChannel(channel);
         udpChannels.registerChannel(channel, udpChannel);
+    }
+
+    boolean hasChannel() {
+        return this.udpChannels.hasChannel();
     }
 }

@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.swg.login;
+package com.ocdsoft.bacta.soe.galaxy;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,10 +11,9 @@ import java.net.InetAddress;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "bacta.server.login")
-public class LoginServerProperties {
+@ConfigurationProperties(prefix = "bacta.server.galaxy")
+public class GalaxyServerProperties {
     private InetAddress bindAddress;
     private int publicBindPort;
     private int privateBindPort;
-    private boolean enableAutoGalaxyRegistration;
 }

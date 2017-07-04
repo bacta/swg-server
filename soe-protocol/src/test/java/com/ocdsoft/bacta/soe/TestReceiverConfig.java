@@ -1,13 +1,10 @@
 package com.ocdsoft.bacta.soe;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import com.ocdsoft.bacta.engine.conf.NetworkConfiguration;
 import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel;
+import com.ocdsoft.bacta.engine.network.udp.UdpMetrics;
 import com.ocdsoft.bacta.engine.network.udp.UdpReceiver;
-import com.ocdsoft.bacta.engine.network.udp.UdpReceiverMetrics;
 import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpReceiver;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,7 +32,7 @@ public class TestReceiverConfig {
         final UdpReceiver udpReceiver = new NettyUdpReceiver(
                 InetAddress.getLoopbackAddress(),
                 5000,
-                new UdpReceiverMetrics(metricRegistry, "test"),
+                new UdpMetrics(metricRegistry, "test"),
                 new InboundMessageChannel() {
                     @Override
                     public void receiveMessage(InetSocketAddress sender, ByteBuffer message) {

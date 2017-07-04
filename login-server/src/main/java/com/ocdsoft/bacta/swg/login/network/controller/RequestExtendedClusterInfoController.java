@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,21 +22,23 @@ import java.util.stream.Collectors;
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
 public class RequestExtendedClusterInfoController implements GameNetworkMessageController<RequestExtendedClusterInfo> {
 
-    private final ClusterService clusterService;
-
-    @Inject
-    public RequestExtendedClusterInfoController(final ClusterService clusterService) {
-        this.clusterService = clusterService;
-    }
+//    private final ClusterService clusterService;
+//
+//    @Inject
+//    public RequestExtendedClusterInfoController(final ClusterService clusterService) {
+//        this.clusterService = clusterService;
+//    }
 
 
     @Override
     public void handleIncoming(SoeUdpConnection loginConnection, RequestExtendedClusterInfo message) throws Exception {
-        LoginClusterStatusEx loginClusterStatusEx = new LoginClusterStatusEx(
-                clusterService.getClusterEntries().stream()
-                .map(ClusterData::getExtendedClusterData)
-                .collect(Collectors.toSet())
-        );
+//        LoginClusterStatusEx loginClusterStatusEx = new LoginClusterStatusEx(
+//                clusterService.getClusterEntries().stream()
+//                .map(ClusterData::getExtendedClusterData)
+//                .collect(Collectors.toSet())
+//        );
+
+        LoginClusterStatusEx loginClusterStatusEx = new LoginClusterStatusEx(new HashSet<>());
         loginConnection.sendMessage(loginClusterStatusEx);
     }
 }

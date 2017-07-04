@@ -5,6 +5,7 @@ import com.ocdsoft.bacta.engine.network.udp.UdpConnection;
 import com.ocdsoft.bacta.soe.config.SoeUdpConfiguration;
 import com.ocdsoft.bacta.soe.network.message.*;
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfiguration;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageSerializer;
 import com.ocdsoft.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
@@ -21,7 +22,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Slf4j
-public final class SoeUdpConnection extends UdpConnection {
+public final class SoeUdpConnection implements UdpConnection {
+
+    @Getter
+    protected InetSocketAddress remoteAddress;
+
+    @Getter
+    @Setter
+    protected ConnectionState state;
 
     @Getter
     private int id;
@@ -37,8 +45,6 @@ public final class SoeUdpConnection extends UdpConnection {
     @Getter
     @Setter
     private String accountUsername;
-    
-    private ConnectionState state;
 
     private final UdpMessageProcessor<ByteBuffer> udpMessageProcessor;
 

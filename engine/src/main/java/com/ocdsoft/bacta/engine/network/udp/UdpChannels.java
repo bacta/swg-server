@@ -9,4 +9,5 @@ import java.nio.ByteBuffer;
 public interface UdpChannels {
     void registerChannel(int channel, UdpChannel udpChannel);
     void writeToChannel(int channel, InetSocketAddress remoteAddress, ByteBuffer msg);
+    boolean hasChannel();
 }
