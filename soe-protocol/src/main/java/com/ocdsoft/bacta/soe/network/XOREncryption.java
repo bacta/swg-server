@@ -7,6 +7,8 @@ import com.ocdsoft.bacta.engine.buffer.UnsignedUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
@@ -14,6 +16,8 @@ import java.nio.ByteOrder;
 
 @SuppressWarnings("deprecation")
 @Slf4j
+@Component
+@Scope("prototype")
 public final class XOREncryption implements SoeEncryption {
 
     @Getter
@@ -137,7 +141,7 @@ public final class XOREncryption implements SoeEncryption {
         
         if (zstream.inflate(JZlib.Z_FINISH) == JZlib.Z_DATA_ERROR)
         {
-            LOGGER.info("Error Decompressing");
+            LOGGER.info("Error Decompressing '{}'", zstream.getMessage());
             return null;
         }
         
@@ -173,7 +177,7 @@ public final class XOREncryption implements SoeEncryption {
         
         if (zstream.deflate(JZlib.Z_FINISH) == JZlib.Z_DATA_ERROR)
         {
-            LOGGER.info("Error Compressing");
+            LOGGER.info("Error Compressing '{}'", zstream.getMessage());
             return data;
         }
         

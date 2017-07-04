@@ -9,20 +9,23 @@ import lombok.Getter;
 /**
  * Created by kyle on 6/30/2017.
  */
-public class UdpEmitterMetrics {
+public class UdpMetrics {
 
     private final MetricRegistry metricRegistry;
     private final String namePrefix;
     private final Counter sentMessages;
     private final Counter channelsRegistered;
+    private final Counter receivedMessages;
+
     private final TIntObjectMap<Counter> counterMap;
 
-    public UdpEmitterMetrics(final MetricRegistry metricRegistry, final String namePrefix) {
+    public UdpMetrics(final MetricRegistry metricRegistry, final String namePrefix) {
         this.metricRegistry = metricRegistry;
         this.namePrefix = namePrefix;
         counterMap = new TIntObjectHashMap<>();
         sentMessages = metricRegistry.counter(namePrefix + ".messages.sent");
         channelsRegistered = metricRegistry.counter(namePrefix + ".channels.registered");
+        this.receivedMessages = metricRegistry.counter(namePrefix + ".messages.received");
     }
 
     public void registerChannel(int channel) {
@@ -30,11 +33,15 @@ public class UdpEmitterMetrics {
         counterMap.put(channel, metricRegistry.counter(namePrefix + ".messages.sent." + channel));
     }
 
-    public void inc(int channel) {
+    public void sendMessage(int channel) {
         sentMessages.inc();
         Counter counter = counterMap.get(channel);
         if(counter != null) {
             counter.inc();
         }
+    }
+
+    public void receiveMessage() {
+        receivedMessages.inc();
     }
 }

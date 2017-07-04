@@ -2,8 +2,8 @@ package com.ocdsoft.bacta.swg.login.message;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.Priority;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
@@ -19,6 +19,7 @@ public class LoginEnumCluster extends GameNetworkMessage {
 
     public LoginEnumCluster() {
         clusterDataSet = new TreeSet<>();
+        maxCharactersPerAccount = 2;
     }
 
 	public LoginEnumCluster(final Set<LoginEnumCluster.Data> clusterServerSet, final int maxCharactersPerAccount) {

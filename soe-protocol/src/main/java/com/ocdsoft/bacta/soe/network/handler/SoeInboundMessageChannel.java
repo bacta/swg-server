@@ -5,9 +5,11 @@ import com.ocdsoft.bacta.engine.network.ConnectionState;
 import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel;
 import com.ocdsoft.bacta.soe.network.connection.SoeConnectionProvider;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.connection.SoeConnectionCache;
+import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnectionCache;
 import com.ocdsoft.bacta.soe.network.message.SoeMessageType;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -18,14 +20,17 @@ import java.nio.ByteBuffer;
  * Created by kyle on 6/28/2017.
  */
 @Slf4j
+@Component
+@Scope("prototype")
 public class SoeInboundMessageChannel implements InboundMessageChannel {
 
-    private final SoeConnectionCache connectionCache;
+    @Getter
+    private final SoeUdpConnectionCache connectionCache;
     private final SoeProtocolHandler protocolHandler;
     private final SoeConnectionProvider connectionProvider;
 
     @Inject
-    public SoeInboundMessageChannel(final SoeConnectionCache connectionCache,
+    public SoeInboundMessageChannel(final SoeUdpConnectionCache connectionCache,
                                     final SoeProtocolHandler protocolHandler,
                                     final SoeConnectionProvider connectionProvider) {
 

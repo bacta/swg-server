@@ -12,6 +12,7 @@ import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -23,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 @Slf4j
+@Component
+@Scope("prototype")
 public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 
     private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
