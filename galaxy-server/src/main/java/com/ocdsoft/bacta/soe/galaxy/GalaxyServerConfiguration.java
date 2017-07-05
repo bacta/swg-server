@@ -15,9 +15,8 @@ import javax.inject.Inject;
 
 @Configuration
 @ConfigurationProperties
-public class GalaxyServerConfiguration implements ApplicationContextAware {
+public class GalaxyServerConfiguration {
 
-    private ApplicationContext applicationContext;
     private final MetricRegistry metricRegistry;
     private final GalaxyServerProperties galaxyServerProperties;
 
@@ -65,9 +64,4 @@ public class GalaxyServerConfiguration implements ApplicationContextAware {
 //
 //        return relay;
 //    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 }
