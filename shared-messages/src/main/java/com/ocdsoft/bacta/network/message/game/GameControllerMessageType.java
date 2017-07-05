@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.soe.network.message.game;
+package com.ocdsoft.bacta.network.message.game;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;

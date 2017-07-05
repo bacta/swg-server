@@ -3,39 +3,32 @@ package com.ocdsoft.bacta.soe.network.connection;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfiguration;
-import com.ocdsoft.bacta.soe.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.metrics.GaugeService;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by kyle on 5/28/2016.
- * This class houses and manages all the soe objects
  */
 @Slf4j
-public final class SoeConnectionCache {
+@Component
+@Scope("prototype")
+public final class SoeUdpConnectionCache {
 
-    private final SoeNetworkConfiguration networkConfiguration;
     private final Map<InetSocketAddress, SoeUdpConnection> connectionMap;
     private final Map<Integer, Queue<SoeUdpConnection>> connectedAccountCache;
-    private final Gauge<Integer> sizeGauge;
 
     @Inject
-    public SoeConnectionCache(final SoeNetworkConfiguration networkConfiguration,
-                              final MetricRegistry metricRegistry) {
-
+    public SoeUdpConnectionCache() {
         this.connectionMap = new ConcurrentHashMap<>();
         this.connectedAccountCache = new ConcurrentHashMap<>();
-        this.networkConfiguration = networkConfiguration;
-        this.sizeGauge = connectionMap::size;
-        metricRegistry.register(networkConfiguration.getMetricsPrefix(), sizeGauge);
     }
 
     /**
@@ -101,31 +94,32 @@ public final class SoeConnectionCache {
      * Add new soe.  This method will disconnect any non-authenticated soe or a soe without associated BactaId
      * @param connection
      */
-    public void addAccountConnection(final SoeUdpConnection connection) {
-
-        // If someone tries to add an account before it has been authenticated, disconnect it
-        if(!(connection.getBactaId() >= 0) || !connection.hasRole(ConnectionRole.AUTHENTICATED)) {
-            connection.terminate(TerminateReason.NEWATTEMPT);
-            LOGGER.error("Connection {} is not associated with an account and authenticated is {}, terminating", connection.getId(), connection.hasRole(ConnectionRole.AUTHENTICATED));
-            return;
-        }
-
-        Queue<SoeUdpConnection> connectionQueue = connectedAccountCache.get(connection.getBactaId());
-        if (connectionQueue != null) {
-            while (connectionQueue.size() >= networkConfiguration.getConnectionsPerAccount()) {
-                SoeUdpConnection connectionToDisconnect = connectionQueue.poll();
-                connectionToDisconnect.terminate(TerminateReason.NEWATTEMPT);
-                LOGGER.trace("Account {} exceed the number of allowed connections ({}), terminating oldest soe {}",
-                        connection.getAccountUsername(),
-                        networkConfiguration.getConnectionsPerAccount(),
-                        connection.getId());
-            }
-        } else {
-            connectionQueue = new ArrayBlockingQueue<>(networkConfiguration.getConnectionsPerAccount());
-            connectedAccountCache.put(connection.getBactaId(), connectionQueue);
-            LOGGER.trace("Account {} is making first soe {}", connection.getAccountUsername(), connection.getId());
-        }
-
-        connectionQueue.add(connection);
-    }
+//    @Override
+//    public void addAccountConnection(final SoeUdpConnection connection) {
+//
+//        // If someone tries to add an account before it has been authenticated, disconnect it
+//        if(!(connection.getBactaId() >= 0) || !connection.hasRole(ConnectionRole.AUTHENTICATED)) {
+//            connection.terminate(TerminateReason.NEWATTEMPT);
+//            LOGGER.error("Connection {} is not associated with an account and authenticated is {}, terminating", connection.getId(), connection.hasRole(ConnectionRole.AUTHENTICATED));
+//            return;
+//        }
+//
+//        Queue<SoeUdpConnection> connectionQueue = connectedAccountCache.get(connection.getBactaId());
+//        if (connectionQueue != null) {
+//            while (connectionQueue.size() >= networkConfiguration.getConnectionsPerAccount()) {
+//                SoeUdpConnection connectionToDisconnect = connectionQueue.poll();
+//                connectionToDisconnect.terminate(TerminateReason.NEWATTEMPT);
+//                LOGGER.trace("Account {} exceed the number of allowed connections ({}), terminating oldest soe {}",
+//                        connection.getAccountUsername(),
+//                        networkConfiguration.getConnectionsPerAccount(),
+//                        connection.getId());
+//            }
+//        } else {
+//            connectionQueue = new ArrayBlockingQueue<>(networkConfiguration.getConnectionsPerAccount());
+//            connectedAccountCache.put(connection.getBactaId(), connectionQueue);
+//            LOGGER.trace("Account {} is making first soe {}", connection.getAccountUsername(), connection.getId());
+//        }
+//
+//        connectionQueue.add(connection);
+//    }
 }

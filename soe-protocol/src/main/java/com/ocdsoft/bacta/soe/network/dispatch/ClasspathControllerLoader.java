@@ -3,7 +3,7 @@ package com.ocdsoft.bacta.soe.network.dispatch;
 import com.ocdsoft.bacta.soe.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.network.controller.MessageHandled;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.util.ClientString;
 import com.ocdsoft.bacta.soe.util.MessageHashUtil;
 import gnu.trove.map.TIntObjectMap;
@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.springframework.context.ApplicationContext;
 
-import javax.inject.Inject;
 import java.lang.reflect.Modifier;
 import java.util.Set;
 
