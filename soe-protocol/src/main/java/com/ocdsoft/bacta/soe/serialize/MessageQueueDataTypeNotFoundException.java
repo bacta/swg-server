@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.serialize;
 
 
-import com.ocdsoft.bacta.network.message.game.GameControllerMessageType;
+import io.bacta.game.GameControllerMessageType;
 
 /**
  * Created by crush on 5/29/2016.

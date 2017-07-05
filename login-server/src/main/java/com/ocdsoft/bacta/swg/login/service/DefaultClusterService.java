@@ -1,10 +1,10 @@
 package com.ocdsoft.bacta.swg.login.service;
 
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
 import com.ocdsoft.bacta.swg.login.GalaxyRegistrationFailedException;
 import com.ocdsoft.bacta.swg.login.object.ClusterListEntry;
 import com.ocdsoft.bacta.swg.login.repository.ClusterRepository;
+import io.bacta.shared.GameNetworkMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

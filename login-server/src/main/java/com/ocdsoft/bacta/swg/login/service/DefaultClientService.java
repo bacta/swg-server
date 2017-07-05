@@ -1,9 +1,9 @@
 package com.ocdsoft.bacta.swg.login.service;
 
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.message.login.LoginIncorrectClientId;
-import com.ocdsoft.bacta.soe.network.message.login.ServerNowEpochTime;
 import com.ocdsoft.bacta.swg.login.LoginServerProperties;
+import io.bacta.login.message.LoginIncorrectClientId;
+import io.bacta.login.message.ServerNowEpochTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -5,8 +5,8 @@ import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.network.controller.MessageHandled;
-import com.ocdsoft.bacta.soe.network.message.login.LoginClientId;
 import com.ocdsoft.bacta.swg.login.service.ClientService;
+import io.bacta.login.message.LoginClientId;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

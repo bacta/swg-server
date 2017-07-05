@@ -3,7 +3,6 @@ package com.ocdsoft.bacta.soe.network.dispatch;
 import com.ocdsoft.bacta.engine.network.dispatch.MessageDispatcher;
 import com.ocdsoft.bacta.soe.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageSerializer;
 import com.ocdsoft.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
 import com.ocdsoft.bacta.soe.util.ClientString;
@@ -11,6 +10,7 @@ import com.ocdsoft.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import com.ocdsoft.bacta.soe.util.ObjectControllerNames;
 import com.ocdsoft.bacta.soe.util.SoeMessageUtil;
 import gnu.trove.map.TIntObjectMap;
+import io.bacta.shared.GameNetworkMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;

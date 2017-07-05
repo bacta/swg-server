@@ -2,7 +2,7 @@ package io.bacta.login.message;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import io.bacta.game.GameNetworkMessage;
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.game.Priority;
 import lombok.Getter;
 

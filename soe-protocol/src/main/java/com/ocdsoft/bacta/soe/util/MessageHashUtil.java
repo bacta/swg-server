@@ -1,7 +1,8 @@
 package com.ocdsoft.bacta.soe.util;
 
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
-import com.ocdsoft.bacta.network.message.game.MessageId;
+
+import io.bacta.shared.GameNetworkMessage;
+import io.bacta.game.MessageId;
 
 /**
  * Created by kyle on 5/28/2016.
