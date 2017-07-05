@@ -16,5 +16,14 @@ public class LoginServerProperties {
     private InetAddress bindAddress;
     private int publicBindPort;
     private int privateBindPort;
-    private boolean enableAutoGalaxyRegistration;
+    private String requiredClientVersion;
+    private boolean autoGalaxyRegistrationEnabled;
+    private boolean internalBypassOnlineLimitEnabled;
+    private boolean skippingTutorialAllowedForAll;
+    private boolean validateClientVersionEnabled;
+    private int populationExtremelyHeavyThresholdPercent;
+    private int populationVeryHeavyThresholdPercent;
+    private int populationHeavyThresholdPercent;
+    private int populationMediumThresholdPercent;
+    private int populationLightThresholdPercent;
 }
