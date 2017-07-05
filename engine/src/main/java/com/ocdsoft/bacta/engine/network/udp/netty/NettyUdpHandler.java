@@ -2,6 +2,7 @@ package com.ocdsoft.bacta.engine.network.udp.netty;
 
 import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
 import com.ocdsoft.bacta.engine.network.udp.UdpEmitter;
+import com.ocdsoft.bacta.engine.network.udp.UdpMetrics;
 import com.ocdsoft.bacta.engine.network.udp.UdpReceiver;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -14,19 +15,20 @@ import java.nio.ByteBuffer;
  * Created by kyle on 6/6/2017.
  */
 @Slf4j
-public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramPacket>  {
+final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramPacket>  {
 
-    private final UdpReceiver udpReceiver;
-    private NettyUdpChannel nettyUdpChannel;
+    private final NettyUdpReceiver udpReceiver;
+    private final NettyUdpEmitter udpEmitter;
 
-    public NettyUdpHandler(final UdpReceiver nettyUdpReceiver) {
+    NettyUdpHandler(final NettyUdpReceiver nettyUdpReceiver, final UdpMetrics metrics) {
         this.udpReceiver = nettyUdpReceiver;
+        this.udpEmitter = new NettyUdpEmitter(metrics);
     }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
-        this.nettyUdpChannel = new NettyUdpChannel(ctx);
+        this.udpEmitter.registerChannel(UdpChannel.MAIN, new NettyUdpChannel(ctx));
     }
 
     @Override
@@ -50,7 +52,11 @@ public final class NettyUdpHandler extends SimpleChannelInboundHandler<DatagramP
         LOGGER.error("NettyUdpHandler", cause);
     }
 
-    public UdpChannel getChannel() {
-        return nettyUdpChannel;
+    boolean isReady() {
+        return this.udpEmitter.hasChannel();
+    }
+
+    UdpEmitter getEmitter() {
+        return udpEmitter;
     }
 }

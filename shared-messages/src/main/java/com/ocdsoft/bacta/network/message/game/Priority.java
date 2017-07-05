@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.soe.network.message.game;
+package com.ocdsoft.bacta.network.message.game;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

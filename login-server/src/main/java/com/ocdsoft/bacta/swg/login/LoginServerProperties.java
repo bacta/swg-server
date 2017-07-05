@@ -14,7 +14,8 @@ import java.net.InetAddress;
 @ConfigurationProperties(prefix = "bacta.server.login")
 public class LoginServerProperties {
     private InetAddress bindAddress;
-    private int bindPort;
+    private int publicBindPort;
+    private int privateBindPort;
     private String requiredClientVersion;
     private boolean autoGalaxyRegistrationEnabled;
     private boolean internalBypassOnlineLimitEnabled;

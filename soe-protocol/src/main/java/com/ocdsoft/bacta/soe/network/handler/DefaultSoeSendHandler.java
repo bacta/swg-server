@@ -1,17 +1,18 @@
-package com.ocdsoft.bacta.soe.network.udp;
+package com.ocdsoft.bacta.soe.network.handler;
 
-
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.annotation.Timed;
 import com.ocdsoft.bacta.engine.network.ConnectionState;
-import com.ocdsoft.bacta.engine.network.udp.UdpChannel;
+import com.ocdsoft.bacta.engine.network.udp.*;
 import com.ocdsoft.bacta.soe.config.SoeNetworkConfiguration;
 import com.ocdsoft.bacta.soe.event.DisconnectEvent;
-import com.ocdsoft.bacta.soe.network.connection.SoeConnectionCache;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnectionCache;
 import com.ocdsoft.bacta.soe.service.PublisherService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
@@ -21,30 +22,48 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by kyle on 4/4/2017.
+ * Created by kyle on 7/3/2017.
  */
+
 @Slf4j
-public class ConnectionMessageRelay implements Runnable {
+@Component
+@Scope("prototype")
+public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
-    private final SoeConnectionCache connectionCache;
     private final PublisherService publisherService;
-    private final UdpChannel sendChannel;
+    private final MetricRegistry metricRegistry;
 
-    private final Histogram sendQueueSizes;
+    private UdpEmitter emitter;
+    private SoeUdpConnectionCache connectionCache;
 
-    public ConnectionMessageRelay(final SoeNetworkConfiguration networkConfiguration,
-                                  final SoeConnectionCache connectionCache,
-                                  final PublisherService publisherService,
-                                  final MetricRegistry metricRegistry,
-                                  final UdpChannel sendChannel) {
+    private Histogram sendQueueSizes;
+    private Gauge<Integer> sizeGauge;
+
+    private final Thread sendThread;
+
+    @Inject
+    public DefaultSoeSendHandler(final SoeNetworkConfiguration networkConfiguration,
+                                 final PublisherService publisherService,
+                                 final MetricRegistry metricRegistry) {
 
         this.networkConfiguration = networkConfiguration;
-        this.connectionCache = connectionCache;
         this.publisherService = publisherService;
-        this.sendChannel = sendChannel;
+        this.metricRegistry = metricRegistry;
 
-        sendQueueSizes = metricRegistry.histogram(MetricRegistry.name(ConnectionMessageRelay.class, "outgoing-queue"));
+        sendThread = new Thread(this);
+    }
+
+    @Override
+    public void start(final String metricPrefix, final SoeUdpConnectionCache connectionCache, final UdpEmitter udpEmitter) {
+        if(!sendThread.isAlive()) {
+            sendThread.setName("SendHandler");
+            sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
+            metricRegistry.register(metricPrefix, (Gauge<Integer>) () -> connectionCache.getConnectionCount());
+            this.connectionCache = connectionCache;
+            this.emitter = udpEmitter;
+            sendThread.start();
+        }
     }
 
     @Override
@@ -75,7 +94,6 @@ public class ConnectionMessageRelay implements Runnable {
         }
     }
 
-    @Timed
     private void sendPendingMessages() {
 
         final Set<InetSocketAddress> connectionList = connectionCache.keySet();
@@ -98,7 +116,7 @@ public class ConnectionMessageRelay implements Runnable {
             }
 
             for (final ByteBuffer message : messages) {
-                sendChannel.writeAndFlush(connection.getRemoteAddress(), message);
+                emitter.sendMessage(connection, message);
             }
         }
 
@@ -114,5 +132,4 @@ public class ConnectionMessageRelay implements Runnable {
             }
         }
     }
-
 }

@@ -2,11 +2,11 @@ package com.ocdsoft.bacta.soe.serialize;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.game.GameControllerMessageType;
-import com.ocdsoft.bacta.soe.network.message.game.MessageQueueData;
-import com.ocdsoft.bacta.soe.network.message.game.ObjControllerMessage;
-import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.GameControllerMessageType;
+import com.ocdsoft.bacta.network.message.game.MessageQueueData;
+import com.ocdsoft.bacta.network.message.game.ObjControllerMessage;
+import com.ocdsoft.bacta.network.message.game.Priority;
 import com.ocdsoft.bacta.soe.util.MessageHashUtil;
 import com.ocdsoft.bacta.soe.util.SOECRC32;
 
@@ -15,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.lang.reflect.Constructor;
@@ -30,6 +32,8 @@ import java.util.Set;
  */
 
 @Slf4j
+@Component
+@Scope("prototype")
 public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSerializer {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
