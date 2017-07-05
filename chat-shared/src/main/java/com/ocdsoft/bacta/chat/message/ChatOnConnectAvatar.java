@@ -1,6 +1,6 @@
 package com.ocdsoft.bacta.chat.message;
 
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import io.bacta.game.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;
