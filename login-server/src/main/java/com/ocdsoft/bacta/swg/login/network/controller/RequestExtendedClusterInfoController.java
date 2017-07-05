@@ -6,40 +6,29 @@ import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.network.controller.MessageHandled;
-import com.ocdsoft.bacta.swg.login.message.LoginClusterStatusEx;
-import com.ocdsoft.bacta.swg.login.message.RequestExtendedClusterInfo;
-import com.ocdsoft.bacta.swg.login.object.ClusterData;
+import com.ocdsoft.bacta.soe.network.message.login.RequestExtendedClusterInfo;
+import com.ocdsoft.bacta.swg.login.service.ClusterService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Service
 @MessageHandled(handles = RequestExtendedClusterInfo.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
 public class RequestExtendedClusterInfoController implements GameNetworkMessageController<RequestExtendedClusterInfo> {
 
-//    private final ClusterService clusterService;
-//
-//    @Inject
-//    public RequestExtendedClusterInfoController(final ClusterService clusterService) {
-//        this.clusterService = clusterService;
-//    }
+    private final ClusterService clusterService;
 
+    @Inject
+    public RequestExtendedClusterInfoController(final ClusterService clusterService) {
+        this.clusterService = clusterService;
+    }
 
     @Override
     public void handleIncoming(SoeUdpConnection loginConnection, RequestExtendedClusterInfo message) throws Exception {
-//        LoginClusterStatusEx loginClusterStatusEx = new LoginClusterStatusEx(
-//                clusterService.getClusterEntries().stream()
-//                .map(ClusterData::getExtendedClusterData)
-//                .collect(Collectors.toSet())
-//        );
-
-        LoginClusterStatusEx loginClusterStatusEx = new LoginClusterStatusEx(new HashSet<>());
-        loginConnection.sendMessage(loginClusterStatusEx);
+        clusterService.sendExtendedClusterStatus(loginConnection);
     }
 }
 
