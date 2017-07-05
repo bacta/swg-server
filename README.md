@@ -1,5 +1,5 @@
 # Introduction
-Insert awesome introduction here.
+Insert very awesome introduction here.
 
 # Installation
 After cloning the repository, import the pom.xml.
