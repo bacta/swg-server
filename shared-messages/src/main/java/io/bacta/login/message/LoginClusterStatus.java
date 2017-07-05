@@ -64,8 +64,8 @@ public final class LoginClusterStatus extends GameNetworkMessage {
     public static final class ClusterData implements ByteBufferWritable {
 	    private final int clusterId;
 	    private final String connectionServerAddress;
-	    private final int connectionServerPort; //unsigned short
-	    private final int connectionServerPingPort; //unsigned short
+	    private final short connectionServerPort; //unsigned short
+	    private final short connectionServerPingPort; //unsigned short
 	    private final int populationOnline; //must be signed, -1 is a legitimate value meaning not available (for security reason)
         private final PopulationStatus populationStatus;
         private final int maxCharactersPerAccount;
