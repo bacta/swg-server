@@ -1,6 +1,7 @@
 package io.bacta.game;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
+import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

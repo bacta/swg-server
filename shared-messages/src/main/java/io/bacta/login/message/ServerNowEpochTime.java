@@ -1,6 +1,6 @@
 package io.bacta.login.message;
 
-import io.bacta.game.GameNetworkMessage;
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.game.Priority;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

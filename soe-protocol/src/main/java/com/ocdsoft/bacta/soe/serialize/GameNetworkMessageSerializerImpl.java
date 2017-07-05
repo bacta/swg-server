@@ -2,14 +2,11 @@ package com.ocdsoft.bacta.soe.serialize;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
-import com.ocdsoft.bacta.network.message.game.GameControllerMessageType;
-import com.ocdsoft.bacta.network.message.game.MessageQueueData;
-import com.ocdsoft.bacta.network.message.game.ObjControllerMessage;
-import com.ocdsoft.bacta.network.message.game.Priority;
 import com.ocdsoft.bacta.soe.util.MessageHashUtil;
 import com.ocdsoft.bacta.soe.util.SOECRC32;
 
+import io.bacta.game.*;
+import io.bacta.shared.GameNetworkMessage;
 import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

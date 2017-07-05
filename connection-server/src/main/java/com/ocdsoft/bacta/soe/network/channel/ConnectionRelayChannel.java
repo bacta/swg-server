@@ -13,15 +13,15 @@ import java.nio.ByteBuffer;
  */
 public class ConnectionRelayChannel implements InboundMessageChannel {
 
-    private final Cache<Integer, InetSocketAddress> connectionCache;
+    //private final Cache<Integer, InetSocketAddress> connectionCache;
 
     public ConnectionRelayChannel() {
-        connectionCache = CacheBuilder.newBuilder()
-                .removalListener()
-                .initialCapacity()
-                .maximumSize()
-                .expireAfterAccess()
-                .build();
+//        connectionCache = CacheBuilder.newBuilder()
+//                .removalListener()
+//                .initialCapacity()
+//                .maximumSize()
+//                .expireAfterAccess()
+//                .build();
     }
 
     @Override

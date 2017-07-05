@@ -1,10 +1,10 @@
 package com.ocdsoft.bacta.swg.login.service;
 
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
 import com.ocdsoft.bacta.swg.login.GalaxyRegistrationFailedException;
 import com.ocdsoft.bacta.swg.login.LoginServerProperties;
 import com.ocdsoft.bacta.swg.login.object.ClusterListEntry;
+import io.bacta.shared.GameNetworkMessage;
 
 /**
  * Created by crush on 7/2/2017.

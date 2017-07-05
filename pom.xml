@@ -71,6 +71,7 @@
         <module>game-server</module>
         <module>shared-messages</module>
         <module>client-launcher-cli</module>
+        <module>session-client</module>
     </modules>
 
     <build>
