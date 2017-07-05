@@ -1,0 +1,26 @@
+package com.ocdsoft.bacta.soe.network.message.login;
+
+import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.soe.network.message.Subscribable;
+import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.nio.ByteBuffer;
+
+@AllArgsConstructor
+@Getter
+@Priority(0x4)
+public final class GameServerStatus extends GameNetworkMessage implements Subscribable {
+
+
+    public GameServerStatus(final ByteBuffer buffer) {
+        //this.clusterServer = new ClusterData(buffer);
+    }
+
+    @Override
+    public void writeToBuffer(final ByteBuffer buffer) {
+        //clusterServer.writeToBuffer(buffer);
+    }
+
+}
