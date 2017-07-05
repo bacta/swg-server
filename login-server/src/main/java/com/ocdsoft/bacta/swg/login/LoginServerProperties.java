@@ -15,5 +15,14 @@ import java.net.InetAddress;
 public class LoginServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
-    private boolean enableAutoGalaxyRegistration;
+    private String requiredClientVersion;
+    private boolean autoGalaxyRegistrationEnabled;
+    private boolean internalBypassOnlineLimitEnabled;
+    private boolean skippingTutorialAllowedForAll;
+    private boolean validateClientVersionEnabled;
+    private int populationExtremelyHeavyThresholdPercent;
+    private int populationVeryHeavyThresholdPercent;
+    private int populationHeavyThresholdPercent;
+    private int populationMediumThresholdPercent;
+    private int populationLightThresholdPercent;
 }
