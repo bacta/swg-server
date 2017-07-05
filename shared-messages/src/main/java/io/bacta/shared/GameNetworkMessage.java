@@ -1,7 +1,7 @@
 package io.bacta.shared;
 
-import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
-import com.ocdsoft.bacta.engine.network.Message;
+import bacta.io.buffer.ByteBufferWritable;
+import bacta.io.network.Message;
 
 /**
  * Created by Kyle on 3/26/14.
