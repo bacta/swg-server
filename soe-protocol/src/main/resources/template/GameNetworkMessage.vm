@@ -1,7 +1,7 @@
 package $packageName;
 
 import GameNetworkMessage;
-import com.ocdsoft.bacta.soe.util.SOECRC32;
+import SOECRC32;
 import lombok.Getter;
 import Priority;
 

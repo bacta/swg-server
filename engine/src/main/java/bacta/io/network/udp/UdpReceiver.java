@@ -1,0 +1,17 @@
+package bacta.io.network.udp;
+
+import org.springframework.beans.factory.DisposableBean;
+
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+
+/**
+ * 
+ * @author Kyle Burkhardt
+ * @since 1.0
+ **/
+public interface UdpReceiver extends DisposableBean {
+	UdpEmitter start();
+	void receiveMessage(InetSocketAddress client, ByteBuffer msg);
+	boolean isAvailable();
+}

@@ -1,10 +1,10 @@
 package io.bacta.login.message;
 
 
-import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
-import io.bacta.shared.GameNetworkMessage;
+import bacta.io.buffer.BufferUtil;
+import bacta.io.buffer.ByteBufferWritable;
 import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
