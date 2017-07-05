@@ -1,4 +1,4 @@
-package com.ocdsoft.bacta.soe.network.message;
+package com.ocdsoft.bacta.network.message.game;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.network.Message;

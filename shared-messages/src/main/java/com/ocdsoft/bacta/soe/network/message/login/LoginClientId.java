@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.soe.network.message.login;
 
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.Priority;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

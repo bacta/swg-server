@@ -1,7 +1,7 @@
 package com.ocdsoft.bacta.soe.network.controller;
 
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
+import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 
 /**
  * Created by crush on 5/27/2016.

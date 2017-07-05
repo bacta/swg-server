@@ -1,8 +1,8 @@
 package com.ocdsoft.bacta.soe.network.message.login;
 
 import com.ocdsoft.bacta.soe.network.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.network.message.Subscribable;
 import com.ocdsoft.bacta.soe.network.message.game.Priority;
+import com.ocdsoft.bacta.soe.network.message.Subscribable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -32,4 +32,9 @@ class NettyUdpChannels implements UdpChannels {
 
         udpChannel.writeAndFlush(remoteAddress, msg);
     }
+
+    @Override
+    public boolean hasChannel() {
+        return !channels.isEmpty();
+    }
 }

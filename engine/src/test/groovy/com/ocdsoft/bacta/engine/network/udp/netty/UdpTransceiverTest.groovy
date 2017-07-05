@@ -1,14 +1,11 @@
-package com.ocdsoft.bacta.engine.io.network.udp
+package com.ocdsoft.bacta.engine.network.udp.netty
 
 import com.codahale.metrics.MetricRegistry
 import com.ocdsoft.bacta.engine.Application
 import com.ocdsoft.bacta.engine.network.channel.InboundMessageChannel
-import com.ocdsoft.bacta.engine.network.udp.UdpEmitterMetrics
 import com.ocdsoft.bacta.engine.network.udp.UdpConnection
 import com.ocdsoft.bacta.engine.network.udp.UdpEmitter
-import com.ocdsoft.bacta.engine.network.udp.UdpReceiverMetrics
-import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpEmitter
-import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpReceiver
+import com.ocdsoft.bacta.engine.network.udp.UdpMetrics
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
@@ -29,7 +26,7 @@ class UdpTransceiverTest extends Specification {
     def "IsAvailable"() {
         when:
 
-        def receiverMetrics = new UdpReceiverMetrics(metricRegistry,"server");
+        def receiverMetrics = new UdpMetrics(metricRegistry,"server");
         InboundMessageChannel inboundMessageChannel = Mock()
         def server = new NettyUdpReceiver(InetAddress.localHost, 5000, receiverMetrics, inboundMessageChannel)
         server.start();
@@ -42,14 +39,13 @@ class UdpTransceiverTest extends Specification {
     def "SendReceiveMessage"() {
         setup:
 
-        def receiverMetrics = new UdpReceiverMetrics(metricRegistry,"server");
+        def metrics = new UdpMetrics(metricRegistry,"server");
 
         InboundMessageChannel serverInboundMessageChannel = Mock()
-        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, receiverMetrics, serverInboundMessageChannel)
+        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, metrics, serverInboundMessageChannel)
         server.start();
 
-        def emitterMetrics = new UdpEmitterMetrics(metricRegistry, "testclient");
-        UdpEmitter client = new NettyUdpEmitter(emitterMetrics, server.getChannel())
+        UdpEmitter client = server.udpHandler.udpEmitter;
 
         UdpConnection serverUdpConnection = Mock()
         serverUdpConnection.remoteAddress >> new InetSocketAddress(InetAddress.localHost, 5000)
@@ -63,6 +59,7 @@ class UdpTransceiverTest extends Specification {
 
         noExceptionThrown()
         Thread.sleep(1000)
-        receiverMetrics.getMessageCount() == 3
+        metrics.sentMessages.count == 3
+        metrics.receivedMessages.count == 3
     }
 }
