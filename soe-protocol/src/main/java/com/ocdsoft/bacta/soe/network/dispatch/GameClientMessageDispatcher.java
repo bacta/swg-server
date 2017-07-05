@@ -3,8 +3,8 @@ package com.ocdsoft.bacta.soe.network.dispatch;
 import com.ocdsoft.bacta.soe.network.ServerState;
 import com.ocdsoft.bacta.soe.network.controller.GameClientMessageController;
 import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
 import gnu.trove.map.TIntObjectMap;
+import io.bacta.shared.GameNetworkMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

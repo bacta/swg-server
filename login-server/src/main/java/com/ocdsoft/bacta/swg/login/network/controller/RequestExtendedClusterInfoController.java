@@ -6,8 +6,8 @@ import com.ocdsoft.bacta.soe.network.connection.SoeUdpConnection;
 import com.ocdsoft.bacta.soe.network.controller.ConnectionRolesAllowed;
 import com.ocdsoft.bacta.soe.network.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.network.controller.MessageHandled;
-import com.ocdsoft.bacta.soe.network.message.login.RequestExtendedClusterInfo;
 import com.ocdsoft.bacta.swg.login.service.ClusterService;
+import io.bacta.login.message.RequestExtendedClusterInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package io.bacta.game;
+package io.bacta.shared;
 
 import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
 import com.ocdsoft.bacta.engine.network.Message;

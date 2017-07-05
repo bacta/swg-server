@@ -1,6 +1,7 @@
 package com.ocdsoft.bacta.soe.network.controller;
 
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+
+import io.bacta.shared.GameNetworkMessage;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

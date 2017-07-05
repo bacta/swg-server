@@ -2,7 +2,6 @@ package com.ocdsoft.bacta.soe;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import com.ocdsoft.bacta.engine.network.udp.UdpReceiverMetrics;
 import com.ocdsoft.bacta.soe.network.channel.ConnectionRelayChannel;
 import com.ocdsoft.bacta.engine.network.udp.UdpReceiver;
 import com.ocdsoft.bacta.engine.network.udp.netty.NettyUdpReceiver;
@@ -34,37 +33,5 @@ public class ConnectionServerConfiguration {
         this.connectionServerProperties = connectionServerProperties;
     }
 
-    @Bean
-    @Qualifier("LoginReceiver")
-    public UdpReceiver getLoginReceiver() {
 
-        Counter counter = metricRegistry.counter("network.udp.login.messages.incoming");
-
-        final UdpReceiver udpReceiver = new NettyUdpReceiver(
-                connectionServerProperties.getLoginBindAddress(),
-                connectionServerProperties.getLoginBindPort(),
-                new UdpReceiverMetrics(metricRegistry, "soe.server.connection.login"),
-                new ConnectionRelayChannel()
-        );
-
-        udpReceiver.start();
-        return udpReceiver;
-    }
-
-    @Bean
-    @Qualifier("GameReceiver")
-    public UdpReceiver getGameReceiver() {
-
-        Counter counter = metricRegistry.counter("network.udp.game.messages.incoming");
-
-        final UdpReceiver udpReceiver = new NettyUdpReceiver(
-                connectionServerProperties.getGameBindAddress(),
-                connectionServerProperties.getGameBindPort(),
-                new UdpReceiverMetrics(metricRegistry, "soe.server.connection.game"),
-                new ConnectionRelayChannel()
-        );
-
-        udpReceiver.start();
-        return udpReceiver;
-    }
 }

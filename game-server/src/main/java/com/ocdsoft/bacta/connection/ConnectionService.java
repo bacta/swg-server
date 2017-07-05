@@ -1,6 +1,7 @@
 package com.ocdsoft.bacta.connection;
 
-import com.ocdsoft.bacta.soe.protocol.network.message.GameNetworkMessage;
+
+import io.bacta.shared.GameNetworkMessage;
 
 /**
  * Created by crush on 6/29/2017.

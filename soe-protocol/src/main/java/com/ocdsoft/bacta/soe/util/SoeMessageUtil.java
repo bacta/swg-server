@@ -2,7 +2,7 @@ package com.ocdsoft.bacta.soe.util;
 
 import com.google.common.io.Files;
 import com.ocdsoft.bacta.engine.buffer.BufferUtil;
-import com.ocdsoft.bacta.network.message.game.GameNetworkMessage;
+import io.bacta.shared.GameNetworkMessage;
 
 import java.io.File;
 import java.io.IOException;
