@@ -20,12 +20,13 @@
 
 package io.bacta.login.message;
 
-import bacta.io.buffer.BufferUtil;
-import bacta.io.buffer.ByteBufferWritable;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.buffer.ByteBufferWritable;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
@@ -53,8 +54,7 @@ public final class LoginClusterStatusEx extends GameNetworkMessage {
      * This is a data transfer object.
      */
     @Getter
-    @AllArgsConstructor
-    public static final class ClusterData implements ByteBufferWritable {
+    public static final class ClusterData implements ByteBufferWritable, Comparable<ClusterData> {
         private final int clusterId;
         private final String branch;
         private final String networkVersion;
@@ -63,6 +63,17 @@ public final class LoginClusterStatusEx extends GameNetworkMessage {
         private final int reserved2;
         private final int reserved3;
         private final int reserved4;
+
+        public ClusterData(int clusterId, String branch, String networkVersion, int version) {
+            this.clusterId = clusterId;
+            this.branch = branch;
+            this.networkVersion = networkVersion;
+            this.version = version;
+            this.reserved1 = 0;
+            this.reserved2 = 0;
+            this.reserved3 = 0;
+            this.reserved4 = 0;
+        }
 
         public ClusterData(final ByteBuffer buffer) {
             this.clusterId = buffer.getInt();
@@ -86,6 +97,11 @@ public final class LoginClusterStatusEx extends GameNetworkMessage {
             BufferUtil.put(buffer, reserved2);
             BufferUtil.put(buffer, reserved3);
             BufferUtil.put(buffer, reserved4);
+        }
+
+        @Override
+        public int compareTo(@NonNull final ClusterData o) {
+            return Integer.compare(clusterId, o.clusterId);
         }
     }
 }

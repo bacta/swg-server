@@ -20,7 +20,7 @@
 
 package io.bacta.connection.message;
 
-import bacta.io.buffer.BufferUtil;
+import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;

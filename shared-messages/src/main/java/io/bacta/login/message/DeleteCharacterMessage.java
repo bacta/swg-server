@@ -28,10 +28,9 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
-      02 00 00 00 8B 04 00 00 01 00 00 00 00 A9 3A 
-
-  SOECRC32.hashCode(DeleteCharacterMessage.class.getSimpleName()); // 0xe87ad031
-  */
+ * SwgClient->LoginServer
+ * Requests the deletion of the given character on the given cluster.
+ */
 @Getter
 @AllArgsConstructor
 @Priority(0x3)
@@ -50,4 +49,8 @@ public final class DeleteCharacterMessage extends GameNetworkMessage {
         buffer.putInt(clusterId);
         buffer.putLong(characterId);
     }
+
+    /**
+     02 00 00 00 8B 04 00 00 01 00 00 00 00 A9 3A
+     */
 }

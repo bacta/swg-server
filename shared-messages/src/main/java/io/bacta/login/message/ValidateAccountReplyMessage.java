@@ -20,7 +20,7 @@
 
 package io.bacta.login.message;
 
-import bacta.io.buffer.BufferUtil;
+import io.bacta.buffer.BufferUtil;
 import io.bacta.galaxy.message.ValidateAccountMessage;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
