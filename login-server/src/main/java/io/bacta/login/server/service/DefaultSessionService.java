@@ -18,31 +18,33 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.login.server.service;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import org.springframework.stereotype.Service;
 
 /**
- * Created by kburkhardt on 2/14/14.
+ * Created by crush on 7/5/2017.
  */
-
-@SpringBootApplication
-@EnableAutoConfiguration
-@ComponentScan({"io.bacta.login", "io.bacta.soe"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
-
-})
-public class LoginServerApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(LoginServerApplication.class, args);
+@Service
+public class DefaultSessionService implements SessionService {
+    @Override
+    public boolean validate(SoeUdpConnection connection, String key) {
+        return false;
     }
 
+    @Override
+    public boolean login(SoeUdpConnection connection, String username, String password) {
+        return false;
+    }
+
+    @Override
+    public void pushKeys() {
+
+    }
+
+    @Override
+    public void pushKeyToAllServers() {
+
+    }
 }
