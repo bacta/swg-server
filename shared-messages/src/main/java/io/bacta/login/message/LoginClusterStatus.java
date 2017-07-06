@@ -20,53 +20,42 @@
 
 package io.bacta.login.message;
 
-import bacta.io.buffer.BufferUtil;
-import bacta.io.buffer.ByteBufferWritable;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.buffer.ByteBufferWritable;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Priority(0x3)
 public final class LoginClusterStatus extends GameNetworkMessage {
-
     private final Set<ClusterData> clusterDataSet;
 
-	public LoginClusterStatus(final Set<ClusterData> clusterServerSet) {
+    public LoginClusterStatus(final Set<ClusterData> clusterServerSet) {
         this.clusterDataSet = clusterServerSet;
-	}
+    }
 
     public LoginClusterStatus(final ByteBuffer buffer) {
-        clusterDataSet = new TreeSet<>();
-        final int count = buffer.getInt();
-
-        for(int i = 0; i < count; ++i) {
-            final ClusterData serverEntry = new ClusterData(buffer);
-            clusterDataSet.add(serverEntry);
-        }
+        clusterDataSet = BufferUtil.getTreeSet(buffer, ClusterData::new);
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        buffer.putInt(clusterDataSet.size());
-
-        for (final ClusterData serverEntry : clusterDataSet) {
-            serverEntry.writeToBuffer(buffer);
-        }
+        BufferUtil.put(buffer, clusterDataSet);
     }
 
     @Getter
     @AllArgsConstructor
-    public static final class ClusterData implements ByteBufferWritable {
-	    private final int clusterId;
-	    private final String connectionServerAddress;
-	    private final short connectionServerPort; //unsigned short
-	    private final short connectionServerPingPort; //unsigned short
-	    private final int populationOnline; //must be signed, -1 is a legitimate value meaning not available (for security reason)
+    public static final class ClusterData implements ByteBufferWritable, Comparable<ClusterData> {
+        private final int clusterId;
+        private final String connectionServerAddress;
+        private final short connectionServerPort; //unsigned short
+        private final short connectionServerPingPort; //unsigned short
+        private final int populationOnline; //must be signed, -1 is a legitimate value meaning not available (for security reason)
         private final PopulationStatus populationStatus;
         private final int maxCharactersPerAccount;
         private final int timeZone;
@@ -106,23 +95,28 @@ public final class LoginClusterStatus extends GameNetworkMessage {
             BufferUtil.put(buffer, onlineFreeTrialLimit);
         }
 
+        @Override
+        public int compareTo(@NonNull ClusterData o) {
+            return Integer.compare(clusterId, o.clusterId);
+        }
+
         public enum Status {
-	        DOWN(0),
+            DOWN(0),
             LOADING(1),
             UP(2),
             LOCKED(3),
             RESTRICTED(4),
             FULL(5);
 
-	        private static Status[] values = values();
-	        private final int value;
+            private static Status[] values = values();
+            private final int value;
 
-	        Status(final int value) {
-	            this.value = value;
+            Status(final int value) {
+                this.value = value;
             }
 
             public static Status from(final int value) {
-	            return values[value];
+                return values[value];
             }
         }
 

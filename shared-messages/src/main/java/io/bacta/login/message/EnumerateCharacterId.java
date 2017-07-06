@@ -21,8 +21,8 @@
 package io.bacta.login.message;
 
 
-import bacta.io.buffer.BufferUtil;
-import bacta.io.buffer.ByteBufferWritable;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.buffer.ByteBufferWritable;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;

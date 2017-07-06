@@ -33,21 +33,35 @@ import java.nio.ByteBuffer;
 @Getter
 @Priority(0x05)
 @AllArgsConstructor
-public class DeleteCharacterReplyMessage extends GameNetworkMessage {
+public final class DeleteCharacterReplyMessage extends GameNetworkMessage {
     /**
      * The current status of the character deletion request.
-     * 0 = OK
-     * 1 = ALREADY_IN_PROGRESS
-     * 2 = CLUSTER_DOWN
      */
-    private final int status;
+    private final Status status;
 
     public DeleteCharacterReplyMessage(final ByteBuffer buffer) {
-        status = buffer.getInt();
+        status = Status.from(buffer.getInt());
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        buffer.putInt(status);
+        buffer.putInt(status.value);
+    }
+
+    public enum Status {
+        OK(0),
+        ALREADY_IN_PROGRESS(1),
+        CLUSTER_DOWN(2);
+
+        private static final Status[] values = values();
+        private final int value;
+
+        Status(final int value) {
+            this.value = value;
+        }
+
+        public static Status from(final int value) {
+            return values[value];
+        }
     }
 }

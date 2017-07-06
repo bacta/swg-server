@@ -20,8 +20,8 @@
 
 package io.bacta.login.message;
 
-import bacta.io.buffer.BufferUtil;
-import bacta.io.buffer.ByteBufferWritable;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.buffer.ByteBufferWritable;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.Getter;
@@ -30,11 +30,16 @@ import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * LoginServer->SwgClient
+ * Lists the galaxies registered with the LoginServer.
+ */
+
 @Priority(0x2)
 @Getter
 public class LoginEnumCluster extends GameNetworkMessage {
 
-    private final Set<LoginEnumCluster.Data> clusterDataSet;
+    private final Set<ClusterData> clusterDataSet;
     private int maxCharactersPerAccount;
 
     public LoginEnumCluster() {
@@ -42,13 +47,13 @@ public class LoginEnumCluster extends GameNetworkMessage {
         maxCharactersPerAccount = 2;
     }
 
-	public LoginEnumCluster(final Set<LoginEnumCluster.Data> clusterServerSet, final int maxCharactersPerAccount) {
+	public LoginEnumCluster(final Set<ClusterData> clusterServerSet, final int maxCharactersPerAccount) {
         this.clusterDataSet = clusterServerSet;
         this.maxCharactersPerAccount = maxCharactersPerAccount;
 	}
 
     public LoginEnumCluster(final ByteBuffer buffer) {
-        clusterDataSet = BufferUtil.getTreeSet(buffer, Data::new);
+        clusterDataSet = BufferUtil.getTreeSet(buffer, ClusterData::new);
         maxCharactersPerAccount = buffer.getInt();
     }
 
@@ -59,19 +64,19 @@ public class LoginEnumCluster extends GameNetworkMessage {
     }
 
     @Getter
-    public static class Data implements ByteBufferWritable, Comparable<Data> {
+    public static final class ClusterData implements ByteBufferWritable, Comparable<ClusterData> {
 
         private final int id;
         private final String name;
         private final int timezone;  // Offset from GMT in seconds
 
-        public Data(final int id, final String name, final int timezone) {
+        public ClusterData(final int id, final String name, final int timezone) {
             this.id = id;
             this.name = name;
             this.timezone = timezone;
         }
 
-        public Data(final ByteBuffer buffer) {
+        public ClusterData(final ByteBuffer buffer) {
             id = buffer.getInt();
             name = BufferUtil.getAscii(buffer);
             timezone = buffer.getInt();
@@ -85,7 +90,7 @@ public class LoginEnumCluster extends GameNetworkMessage {
         }
 
         @Override
-        public int compareTo(Data o) {
+        public int compareTo(final ClusterData o) {
             return Integer.compare(id, o.getId());
         }
     }
