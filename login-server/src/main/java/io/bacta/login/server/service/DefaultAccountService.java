@@ -22,10 +22,12 @@ package io.bacta.login.server.service;
 
 import io.bacta.login.server.AccountRegistrationFailedException;
 import io.bacta.login.server.object.Account;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by crush on 7/3/2017.
  */
+@Service
 public final class DefaultAccountService implements AccountService {
     @Override
     public void validateAccount(int bactaId, int clusterId, int subscriptionBits, boolean canCreateRegular, boolean canCreateJedi, boolean canSkipJedi, boolean canSkipTutorial) {
