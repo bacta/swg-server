@@ -31,6 +31,10 @@ import java.nio.ByteBuffer;
 @Priority(0x04)
 public final class LoginKeyPush extends GameNetworkMessage {
 
+    public LoginKeyPush(ByteBuffer buffer) {
+
+    }
+
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
 
