@@ -20,8 +20,8 @@
 
 package io.bacta.shared;
 
-import bacta.io.buffer.ByteBufferWritable;
-import bacta.io.network.Message;
+import io.bacta.buffer.ByteBufferWritable;
+import io.bacta.network.Message;
 
 /**
  * Created by Kyle on 3/26/14.
