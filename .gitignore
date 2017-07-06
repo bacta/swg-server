@@ -29,3 +29,6 @@ build.properties
 # Berkeley DB files
 *.jdb
 *.lck
+
+# H2 DB files
+*.db
