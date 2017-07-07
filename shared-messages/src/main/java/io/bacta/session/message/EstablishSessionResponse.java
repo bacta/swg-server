@@ -28,29 +28,33 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * SessionClient->SessionServer
+ * SessionServer->SessionClient
  * <p>
- * Request to establish a new session for the given login credentials.
+ * Responds to a request to establish a session, indicating if the session was established successfully, and returning
+ * a sessionId to be used for future requests.
  * <p>
- * The response to this message is {@link EstablishSessionResponseMessage}.
+ * The request for this message is {@link EstablishSession}.
  */
 @Getter
 @AllArgsConstructor
-public final class EstablishSessionMessage extends GameNetworkMessage {
+public final class EstablishSessionResponse extends GameNetworkMessage {
     private final int requestId;
-    private final String username;
-    private final String password;
+    private final SessionResult result;
+    private final int bactaId;
+    private final String sessionId;
 
-    public EstablishSessionMessage(ByteBuffer buffer) {
+    public EstablishSessionResponse(ByteBuffer buffer) {
         requestId = buffer.getInt();
-        username = BufferUtil.getAscii(buffer);
-        password = BufferUtil.getAscii(buffer);
+        result = SessionResult.from(buffer.getInt());
+        bactaId = buffer.getInt();
+        sessionId = BufferUtil.getAscii(buffer);
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
         BufferUtil.put(buffer, requestId);
-        BufferUtil.putAscii(buffer, username);
-        BufferUtil.putAscii(buffer, password);
+        BufferUtil.put(buffer, result.getValue());
+        BufferUtil.put(buffer, bactaId);
+        BufferUtil.putAscii(buffer, sessionId);
     }
 }

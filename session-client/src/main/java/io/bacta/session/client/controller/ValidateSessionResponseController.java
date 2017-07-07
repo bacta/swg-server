@@ -18,28 +18,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.server.controller;
+package io.bacta.session.client.controller;
 
-import io.bacta.session.message.EstablishSessionMessage;
+import io.bacta.session.client.SessionClient;
+import io.bacta.session.message.ValidateSessionResponse;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+
 /**
- * Handles the {@link EstablishSessionMessage} message.
+ * Created by crush on 7/7/2017.
  */
-@Slf4j
 @Component
-@MessageHandled(handles = EstablishSessionMessage.class)
+@MessageHandled(handles = ValidateSessionResponse.class)
 @ConnectionRolesAllowed({})
-public class EstablishSessionMessageController implements GameNetworkMessageController<EstablishSessionMessage> {
+public final class ValidateSessionResponseController implements GameNetworkMessageController<ValidateSessionResponse> {
+
+    private final SessionClient sessionClient;
+
+    @Inject
+    public ValidateSessionResponseController(SessionClient sessionClient) {
+        this.sessionClient = sessionClient;
+    }
+
     @Override
-    public void handleIncoming(SoeUdpConnection connection, EstablishSessionMessage message) throws Exception {
-        LOGGER.info("Received request to establish a session for {} with password {}.",
-                message.getUsername(),
-                message.getPassword());
+    public void handleIncoming(SoeUdpConnection connection, ValidateSessionResponse message) throws Exception {
+        sessionClient.receivedValidateSessionResponse(connection, message);
     }
 }
