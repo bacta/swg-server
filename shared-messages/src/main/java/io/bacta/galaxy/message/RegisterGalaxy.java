@@ -18,11 +18,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.galaxy.message;
 
 import io.bacta.buffer.BufferUtil;
-import io.bacta.galaxy.message.ValidateAccountMessage;
 import io.bacta.game.Priority;
+import io.bacta.login.message.RegisterGalaxyAck;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,40 +30,29 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/4/2017.
- * <p>
- * Replies to {@link ValidateAccountMessage}.
- * LoginServer->GalaxyServer
- * <p>
- * Additional validation for an account connecting to a galaxy server.
+ * When a GalaxyServer comes online, it will try to register with a configured LoginServer. The GalaxyServer doesn't know
+ * it's own galaxy id, so it just announces its name and some other information. The LoginServer will send back
+ * {@link RegisterGalaxyAck} informing the GalaxyServer of its galaxy id in the
+ * LoginServer cluster.
  */
 @Getter
-@Priority(0x07)
+@Priority(0x02)
 @AllArgsConstructor
-public final class ValidateAccountReplyMessage extends GameNetworkMessage {
-    private final int bactaId;
-    private final boolean canLogin;
-    private final boolean canCreateRegular;
-    private final boolean canCreateJedi;
-    private final boolean canSkipTutorial;
-    private final int track; //do we need this?
-    //AutoArray<Pair<NetworkId, String>> consumedRewardEvents;
-    //AutoArray<Pair<NetworkId, String>> claimedRewardItems;
+public final class RegisterGalaxy extends GameNetworkMessage {
+    private final String clusterName;
+    private final int timeZone;
+    private final String networkVersion;
 
-    public ValidateAccountReplyMessage(ByteBuffer buffer) {
-        bactaId = buffer.getInt();
-        canLogin = BufferUtil.getBoolean(buffer);
-        canCreateRegular = BufferUtil.getBoolean(buffer);
-        canCreateJedi = BufferUtil.getBoolean(buffer);
-        canSkipTutorial = BufferUtil.getBoolean(buffer);
-        track = buffer.getInt();
-
-        throw new UnsupportedOperationException("Not implemented.");
+    public RegisterGalaxy(final ByteBuffer buffer) {
+        clusterName = BufferUtil.getAscii(buffer);
+        timeZone = buffer.getInt();
+        networkVersion = BufferUtil.getAscii(buffer);
     }
 
     @Override
-    public void writeToBuffer(ByteBuffer buffer) {
-        throw new UnsupportedOperationException("Not implemented.");
+    public void writeToBuffer(final ByteBuffer buffer) {
+        BufferUtil.put(buffer, clusterName);
+        BufferUtil.put(buffer, timeZone);
+        BufferUtil.put(buffer, networkVersion);
     }
-
 }

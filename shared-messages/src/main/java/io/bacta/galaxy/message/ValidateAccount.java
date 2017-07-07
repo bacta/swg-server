@@ -22,7 +22,6 @@ package io.bacta.galaxy.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
-import io.bacta.login.message.GalaxyRegistrationAckMessage;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,29 +29,23 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * When a GalaxyServer comes online, it will try to register with a configured LoginServer. The GalaxyServer doesn't know
- * it's own galaxy id, so it just announces its name and some other information. The LoginServer will send back
- * {@link GalaxyRegistrationAckMessage} informing the GalaxyServer of its galaxy id in the
- * LoginServer cluster.
+ * GalaxyServer->LoginServer validates that the specified account has permission.
  */
 @Getter
-@Priority(0x02)
+@Priority(0x04)
 @AllArgsConstructor
-public final class GalaxyRegistrationMessage extends GameNetworkMessage {
-    private final String clusterName;
-    private final int timeZone;
-    private final String networkVersion;
+public final class ValidateAccount extends GameNetworkMessage {
+    private final int bactaId;
+    private final int subscriptionBits;
 
-    public GalaxyRegistrationMessage(final ByteBuffer buffer) {
-        clusterName = BufferUtil.getAscii(buffer);
-        timeZone = buffer.getInt();
-        networkVersion = BufferUtil.getAscii(buffer);
+    public ValidateAccount(ByteBuffer buffer) {
+        bactaId = buffer.getInt();
+        subscriptionBits = buffer.getInt();
     }
 
     @Override
-    public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.put(buffer, clusterName);
-        BufferUtil.put(buffer, timeZone);
-        BufferUtil.put(buffer, networkVersion);
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, bactaId);
+        BufferUtil.put(buffer, subscriptionBits);
     }
 }

@@ -23,6 +23,7 @@ package io.bacta.session.client;
 import co.paralleluniverse.fibers.Suspendable;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.session.client.controller.EstablishSessionResponseController;
 import io.bacta.session.message.*;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public final class SessionClient {
             final int requestId = nextRequestId.incrementAndGet();
             final SessionRequestAsync request = new SessionRequestAsync() {
                 protected void requestAsync() {
-                    final ValidateSessionMessage message = new ValidateSessionMessage(requestId, key);
+                    final ValidateSession message = new ValidateSession(requestId, key);
                     //Send to SessionServer.
                 }
             };
@@ -90,7 +91,7 @@ public final class SessionClient {
             final int requestId = nextRequestId.incrementAndGet();
             final SessionRequestAsync request = new SessionRequestAsync() {
                 protected void requestAsync() {
-                    final EstablishSessionMessage message = new EstablishSessionMessage(requestId, username, password);
+                    final EstablishSession message = new EstablishSession(requestId, username, password);
                     //Send to SessionServer.
                 }
             };
@@ -105,15 +106,15 @@ public final class SessionClient {
     }
 
     /**
-     * Called when the {@link io.bacta.session.client.controller.EstablishSessionResponseMessageController} has received
-     * the response for an {@link EstablishSessionResponseMessage} from the SessionServer.
+     * Called when the {@link EstablishSessionResponseController} has received
+     * the response for an {@link EstablishSessionResponse} from the SessionServer.
      * <p>
      * This should complete the Future that was awaiting the response.
      *
      * @param connection The connection that sent the response. Should be a connection to the session server.
      * @param response   The response message.
      */
-    public void receivedEstablishSessionResponse(SoeUdpConnection connection, EstablishSessionResponseMessage response) {
+    public void receivedEstablishSessionResponse(SoeUdpConnection connection, EstablishSessionResponse response) {
         final int requestId = response.getRequestId();
 
         final SessionRequestAsync outstandingRequest = outstandingRequests.get(requestId);
@@ -136,7 +137,7 @@ public final class SessionClient {
         outstandingRequests.remove(requestId);
     }
 
-    public void receivedValidateSessionResponse(SoeUdpConnection connection, ValidateSessionResponseMessage response) {
+    public void receivedValidateSessionResponse(SoeUdpConnection connection, ValidateSessionResponse response) {
         final int requestId = response.getRequestId();
 
         final SessionRequestAsync outstandingRequest = outstandingRequests.get(requestId);

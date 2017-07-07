@@ -85,6 +85,21 @@ public final class DefaultClientService implements ClientService {
     @Override
     public void clientValidated(SoeUdpConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
         //implement admin
+
+        //Create a key with:
+        //If they logged in with a session, then the key is comprised of the sessionId + accountId
+        //Otherwise, the key is comprised of the accountId, if they are connecting with god client, and username
+        //Encrypt the key with the keyshare.
+        //Encrypting the token is for the connection server's protection. If the connection server can't decrypt the
+        //token, then it would mean it came from an untrusted login server.
+
+
+
+        //Send LoginClientToken (token, accountId, username);
+        //Send LoginEnumCluster
+        //Send CharacterCreationDisabled
+        //Send EnumerateCharacterId
+        //Send LoginClusterStatus
     }
 
     private void establishSessionMode(final String username, final String password) {

@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.message;
+package io.bacta.login.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
@@ -29,27 +29,23 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * SessionServer->SessionClient
- * <p>
- * Response indicating whether a session is valid or not. Also includes an error code indicating why it isn't valid.
- * <p>
- * Response to the request message {@link ValidateSessionMessage}.
+ * Created by crush on 7/4/2017.
+ *
+ * LoginServer to GalaxyServer. Tells the GalaxyServer its RegisterGalaxyAck according to the LoginServer. This message also
+ * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
  */
 @Getter
 @Priority(0x02)
 @AllArgsConstructor
-public final class ValidateSessionResponseMessage extends GameNetworkMessage {
-    private final int requestId;
-    private final SessionResult result;
+public final class RegisterGalaxyAck extends GameNetworkMessage {
+    private final int clusterId;
 
-    public ValidateSessionResponseMessage(ByteBuffer buffer) {
-        requestId = buffer.getInt();
-        result = SessionResult.from(buffer.getInt());
+    public RegisterGalaxyAck(final ByteBuffer buffer) {
+        clusterId = buffer.getInt();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, requestId);
-        BufferUtil.put(buffer, result.getValue());
+        BufferUtil.put(buffer, clusterId);
     }
 }
