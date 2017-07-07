@@ -29,42 +29,23 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
-    00 09
-    00 00
-    04 00
-    96 1F 13 41
-    04 00
-    61 73 64 66
-    00 00
-    0E 00 32 30 30 35 30 34 30 38 2D 31 38 3A 30 30
-    00 FC 79
-  */
+ * Created by crush on 7/4/2017.
+ *
+ * LoginServer to GalaxyServer. Tells the GalaxyServer its GalaxyRegistrationAckMessage according to the LoginServer. This message also
+ * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
+ */
 @Getter
+@Priority(0x02)
 @AllArgsConstructor
-@Priority(0x4)
-public final class LoginClientId extends GameNetworkMessage {
-    /**
-     * Serves as the id if logging in through the client directly. If the launchpad has already gained a key for
-     * login, then the id can function as an integer value specifying the requested admin level of the player.
-     */
-    private final String id;
-    /**
-     * Serves as the key if logging in through the client directly. Otherwise, this should be a session key that
-     * the launchpad has already gained from the login server.
-     */
-    private final String key;
-    private final String clientVersion;
+public final class GalaxyRegistrationAckMessage extends GameNetworkMessage {
+    private final int clusterId;
 
-    public LoginClientId(final ByteBuffer buffer) {
-        id = BufferUtil.getAscii(buffer);
-        key = BufferUtil.getAscii(buffer);
-        clientVersion = BufferUtil.getAscii(buffer);
+    public GalaxyRegistrationAckMessage(final ByteBuffer buffer) {
+        clusterId = buffer.getInt();
     }
 
     @Override
-    public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.putAscii(buffer, id);
-        BufferUtil.putAscii(buffer, key);
-        BufferUtil.putAscii(buffer, clientVersion);
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, clusterId);
     }
 }

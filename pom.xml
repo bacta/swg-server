@@ -72,6 +72,7 @@
         <module>shared-messages</module>
         <module>client-launcher-cli</module>
         <module>session-client</module>
+        <module>session-server</module>
     </modules>
 
     <build>

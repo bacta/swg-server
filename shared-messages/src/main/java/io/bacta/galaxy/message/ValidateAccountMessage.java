@@ -29,7 +29,7 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/4/2017.
+ * GalaxyServer->LoginServer validates that the specified account has permission.
  */
 @Getter
 @Priority(0x04)

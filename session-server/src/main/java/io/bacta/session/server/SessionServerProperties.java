@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.session.server;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,27 +27,12 @@ import org.springframework.context.annotation.Configuration;
 import java.net.InetAddress;
 
 /**
- * Created by kyle on 6/29/2017.
+ * Created by crush on 7/6/2017.
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "bacta.server.establish")
-public class LoginServerProperties {
+@ConfigurationProperties(prefix = "bacta.server.session")
+public class SessionServerProperties {
     private InetAddress bindAddress;
-    private int publicBindPort;
-    private int privateBindPort;
-    private int maxCharactersPerAccount;
-    /**
-     * Describes how sessions are handled on the establish server.
-     */
-    private LoginSessionMode sessionMode;
-    private boolean autoGalaxyRegistrationEnabled;
-    private boolean internalBypassOnlineLimitEnabled;
-    private boolean skippingTutorialAllowedForAll;
-    private boolean validateClientVersionEnabled;
-    private int populationExtremelyHeavyThresholdPercent;
-    private int populationVeryHeavyThresholdPercent;
-    private int populationHeavyThresholdPercent;
-    private int populationMediumThresholdPercent;
-    private int populationLightThresholdPercent;
+    private int bindPort;
 }

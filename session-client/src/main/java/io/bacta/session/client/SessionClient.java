@@ -20,22 +20,76 @@
 
 package io.bacta.session.client;
 
+import io.bacta.session.message.EstablishSessionMessage;
+import io.bacta.session.message.EstablishSessionResponseMessage;
+import io.bacta.session.message.ValidateSessionMessage;
+import io.bacta.session.message.ValidateSessionResponseMessage;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * Created by crush on 7/4/2017.
+ * A client that communicates directly with a Session Server.
+ * <p>
+ * Sessions are established by first executing the {@link #establish(String, String)} method. The token from that flow can then be passed around to
+ * identify with other servers. The servers will use the {@link #validate(String)} method to ensure that a token is valid.
  */
-public interface SessionClient {
-    /**
-     * Validate an existing session key.
-     * @param key The key being validated.
-     * @return A session result which can be interrogated about the success or failure of the operation.
-     */
-    SessionResult validate(String key);
+@Scope("prototype")
+@Component
+public final class SessionClient {
+    private static final AtomicInteger nextRequestId = new AtomicInteger();
+
+    private final SessionClientProperties properties;
+
+    @Inject
+    public SessionClient(final SessionClientProperties properties) {
+        this.properties = properties;
+    }
 
     /**
-     * Login with a username and password, obtaining a session key from the session server.
+     * Validate an existing session key.
+     *
+     * @param key The key being validated.
+     */
+    public void validate(final String key) {
+        final int requestId = nextRequestId.incrementAndGet();
+        final ValidateSessionMessage message = new ValidateSessionMessage(requestId, key);
+
+        //We need a connection to the session server.
+        //sessionServerConnection.sendMessage(message);
+    }
+
+    /**
+     * Establish a connection with a username and password, obtaining a session key from the session server.
+     *
      * @param username The username.
      * @param password The password.
-     * @return A session result with the status of the operation, and the session key if the operation succeeded.
      */
-    SessionResult login(String username, String password);
+    public void establish(final String username, final String password) {
+        final int requestId = nextRequestId.incrementAndGet();
+        final EstablishSessionMessage message = new EstablishSessionMessage(requestId, username, password);
+
+        //We need a connection to the session server.
+        //sessionServerConnection.sendMessage(message);
+    }
+
+    /**
+     * Handles a response to a validate session response.
+     *
+     * @param responseMessage The response message.
+     */
+    private void validationReceived(final ValidateSessionResponseMessage responseMessage) {
+        final int requestId = responseMessage.getRequestId();
+    }
+
+    /**
+     * Handles a response to an establish session response.
+     *
+     * @param responseMessage The response message.
+     */
+    private void loginReceived(final EstablishSessionResponseMessage responseMessage) {
+        final int requestId = responseMessage.getRequestId();
+    }
 }
