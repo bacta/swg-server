@@ -18,10 +18,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.session.message;
 
 import io.bacta.buffer.BufferUtil;
-import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,23 +28,29 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/4/2017.
- *
- * LoginServer to GalaxyServer. Tells the GalaxyServer its GalaxyRegistrationAckMessage according to the LoginServer. This message also
- * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
+ * SessionClient->SessionServer
+ * <p>
+ * Request to establish a new session for the given login credentials.
+ * <p>
+ * The response to this message is {@link EstablishSessionResponse}.
  */
 @Getter
-@Priority(0x02)
 @AllArgsConstructor
-public final class GalaxyRegistrationAckMessage extends GameNetworkMessage {
-    private final int clusterId;
+public final class EstablishSession extends GameNetworkMessage {
+    private final int requestId;
+    private final String username;
+    private final String password;
 
-    public GalaxyRegistrationAckMessage(final ByteBuffer buffer) {
-        clusterId = buffer.getInt();
+    public EstablishSession(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        username = BufferUtil.getAscii(buffer);
+        password = BufferUtil.getAscii(buffer);
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, clusterId);
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.putAscii(buffer, username);
+        BufferUtil.putAscii(buffer, password);
     }
 }

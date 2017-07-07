@@ -18,9 +18,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.message;
+package io.bacta.login.message;
 
 import io.bacta.buffer.BufferUtil;
+import io.bacta.galaxy.message.ValidateAccount;
+import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,33 +30,40 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * SessionServer->SessionClient
+ * Created by crush on 7/4/2017.
  * <p>
- * Responds to a request to establish a session, indicating if the session was established successfully, and returning
- * a sessionId to be used for future requests.
+ * Replies to {@link ValidateAccount}.
+ * LoginServer->GalaxyServer
  * <p>
- * The request for this message is {@link EstablishSessionMessage}.
+ * Additional validation for an account connecting to a galaxy server.
  */
 @Getter
+@Priority(0x07)
 @AllArgsConstructor
-public final class EstablishSessionResponseMessage extends GameNetworkMessage {
-    private final int requestId;
-    private final SessionResult result;
+public final class ValidateAccountResponse extends GameNetworkMessage {
     private final int bactaId;
-    private final String sessionId;
+    private final boolean canLogin;
+    private final boolean canCreateRegular;
+    private final boolean canCreateJedi;
+    private final boolean canSkipTutorial;
+    private final int track; //do we need this?
+    //AutoArray<Pair<NetworkId, String>> consumedRewardEvents;
+    //AutoArray<Pair<NetworkId, String>> claimedRewardItems;
 
-    public EstablishSessionResponseMessage(ByteBuffer buffer) {
-        requestId = buffer.getInt();
-        result = SessionResult.from(buffer.getInt());
+    public ValidateAccountResponse(ByteBuffer buffer) {
         bactaId = buffer.getInt();
-        sessionId = BufferUtil.getAscii(buffer);
+        canLogin = BufferUtil.getBoolean(buffer);
+        canCreateRegular = BufferUtil.getBoolean(buffer);
+        canCreateJedi = BufferUtil.getBoolean(buffer);
+        canSkipTutorial = BufferUtil.getBoolean(buffer);
+        track = buffer.getInt();
+
+        throw new UnsupportedOperationException("Not implemented.");
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, requestId);
-        BufferUtil.put(buffer, result.getValue());
-        BufferUtil.put(buffer, bactaId);
-        BufferUtil.putAscii(buffer, sessionId);
+        throw new UnsupportedOperationException("Not implemented.");
     }
+
 }

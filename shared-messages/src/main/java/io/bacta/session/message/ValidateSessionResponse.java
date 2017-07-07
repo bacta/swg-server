@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.message;
+package io.bacta.session.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
@@ -29,23 +29,27 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * GalaxyServer->LoginServer validates that the specified account has permission.
+ * SessionServer->SessionClient
+ * <p>
+ * Response indicating whether a session is valid or not. Also includes an error code indicating why it isn't valid.
+ * <p>
+ * Response to the request message {@link ValidateSession}.
  */
 @Getter
-@Priority(0x04)
+@Priority(0x02)
 @AllArgsConstructor
-public final class ValidateAccountMessage extends GameNetworkMessage {
-    private final int bactaId;
-    private final int subscriptionBits;
+public final class ValidateSessionResponse extends GameNetworkMessage {
+    private final int requestId;
+    private final SessionResult result;
 
-    public ValidateAccountMessage(ByteBuffer buffer) {
-        bactaId = buffer.getInt();
-        subscriptionBits = buffer.getInt();
+    public ValidateSessionResponse(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        result = SessionResult.from(buffer.getInt());
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, bactaId);
-        BufferUtil.put(buffer, subscriptionBits);
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.put(buffer, result.getValue());
     }
 }

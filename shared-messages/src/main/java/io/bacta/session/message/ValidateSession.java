@@ -18,35 +18,38 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.client.controller;
+package io.bacta.session.message;
 
-import io.bacta.session.client.SessionClient;
-import io.bacta.session.message.ValidateSessionResponseMessage;
-import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.controller.ConnectionRolesAllowed;
-import io.bacta.soe.network.controller.GameNetworkMessageController;
-import io.bacta.soe.network.controller.MessageHandled;
-import org.springframework.stereotype.Component;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import javax.inject.Inject;
+import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/7/2017.
+ * SessionClient->SessionServer
+ * <p>
+ * Requests that the session server validate a session.
+ * <p>
+ * The response to this message is {@link ValidateSessionResponse}.
  */
-@Component
-@MessageHandled(handles = ValidateSessionResponseMessage.class)
-@ConnectionRolesAllowed({})
-public final class ValidateSessionResponseMessageController implements GameNetworkMessageController<ValidateSessionResponseMessage> {
+@Getter
+@Priority(0x02)
+@AllArgsConstructor
+public final class ValidateSession extends GameNetworkMessage {
+    private final int requestId;
+    private final String sessionId;
 
-    private final SessionClient sessionClient;
-
-    @Inject
-    public ValidateSessionResponseMessageController(SessionClient sessionClient) {
-        this.sessionClient = sessionClient;
+    public ValidateSession(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        sessionId = BufferUtil.getAscii(buffer);
     }
 
     @Override
-    public void handleIncoming(SoeUdpConnection connection, ValidateSessionResponseMessage message) throws Exception {
-        sessionClient.receivedValidateSessionResponse(connection, message);
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.putAscii(buffer, sessionId);
     }
 }

@@ -123,7 +123,7 @@ public interface AccountService {
 //
 //            //Send a message to the galaxy server to find out if this account is allowed to establish to the requested cluster.
 //            //The central server will send us back a response which will continue the establish process.
-//            //ValidateAccountReplyMessage msg = new ValidateAccountReplyMessage(stationId, canLogin, canCreateRegular, canCreateJedi, canSkipTutorial);
+//            //ValidateAccountResponse msg = new ValidateAccountResponse(stationId, canLogin, canCreateRegular, canCreateJedi, canSkipTutorial);
 //            //clusterListEntry.centralServerConnection.send(msg);
 //        }
 //    }

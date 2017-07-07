@@ -18,38 +18,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.message;
+package io.bacta.session.server.controller;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.game.Priority;
-import io.bacta.shared.GameNetworkMessage;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.nio.ByteBuffer;
+import io.bacta.session.message.EstablishSession;
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.controller.MessageHandled;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
- * SessionClient->SessionServer
- * <p>
- * Requests that the session server validate a session.
- * <p>
- * The response to this message is {@link ValidateSessionResponseMessage}.
+ * Handles the {@link EstablishSession} message.
  */
-@Getter
-@Priority(0x02)
-@AllArgsConstructor
-public final class ValidateSessionMessage extends GameNetworkMessage {
-    private final int requestId;
-    private final String sessionId;
-
-    public ValidateSessionMessage(ByteBuffer buffer) {
-        requestId = buffer.getInt();
-        sessionId = BufferUtil.getAscii(buffer);
-    }
-
+@Slf4j
+@Component
+@MessageHandled(handles = EstablishSession.class)
+@ConnectionRolesAllowed({})
+public class EstablishSessionController implements GameNetworkMessageController<EstablishSession> {
     @Override
-    public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, requestId);
-        BufferUtil.putAscii(buffer, sessionId);
+    public void handleIncoming(SoeUdpConnection connection, EstablishSession message) throws Exception {
+        LOGGER.info("Received request to establish a session for {} with password {}.",
+                message.getUsername(),
+                message.getPassword());
     }
 }
