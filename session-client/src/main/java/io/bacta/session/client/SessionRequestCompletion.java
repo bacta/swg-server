@@ -18,38 +18,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.message;
+package io.bacta.session.client;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.game.Priority;
-import io.bacta.shared.GameNetworkMessage;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.nio.ByteBuffer;
+import io.bacta.session.message.Session;
 
 /**
- * SessionServer->SessionClient
- * <p>
- * Response indicating whether a session is valid or not. Also includes an error code indicating why it isn't valid.
- * <p>
- * Response to the request message {@link ValidateSessionMessage}.
+ * Created by crush on 7/7/2017.
  */
-@Getter
-@Priority(0x02)
-@AllArgsConstructor
-public final class ValidateSessionResponseMessage extends GameNetworkMessage {
-    private final int requestId;
-    private final SessionResult result;
-
-    public ValidateSessionResponseMessage(ByteBuffer buffer) {
-        requestId = buffer.getInt();
-        result = SessionResult.from(buffer.getInt());
-    }
-
-    @Override
-    public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, requestId);
-        BufferUtil.put(buffer, result.getValue());
-    }
+interface SessionRequestCompletion {
+    void success(Session session);
+    void failure(SessionRequestException exception);
 }
