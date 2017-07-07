@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.connection.message;
+package io.bacta.login.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
@@ -30,37 +30,24 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by crush on 7/4/2017.
- *
- * ConnectionServer to CentralServer and LoginServer. Updates how many players are currently connected
- * to the connection server.
+ * <p>
+ * LoginServer to GalaxyServer informing it that the created character has been added to the database.
  */
 @Getter
-@Priority(0x04)
+@Priority(0x06)
 @AllArgsConstructor
-public final class UpdatePlayerCountMessage extends GameNetworkMessage{
-    private final boolean loadedRecently;
-    private final int playerCount;
-    private final int freeTrialCount;
-    private final int emptySceneCount;
-    private final int tutorialSceneCount;
-    private final int falconSceneCount;
+public final class LoginCreateCharacterAck extends GameNetworkMessage {
+    private final int stationId;
+    private final long characterNetworkId;
 
-    public UpdatePlayerCountMessage(ByteBuffer buffer) {
-        loadedRecently = BufferUtil.getBoolean(buffer);
-        playerCount = buffer.getInt();
-        freeTrialCount = buffer.getInt();
-        emptySceneCount = buffer.getInt();
-        tutorialSceneCount = buffer.getInt();
-        falconSceneCount = buffer.getInt();
+    public LoginCreateCharacterAck(ByteBuffer buffer) {
+        stationId = buffer.getInt();
+        characterNetworkId = buffer.getLong();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, loadedRecently);
-        BufferUtil.put(buffer, playerCount);
-        BufferUtil.put(buffer, freeTrialCount);
-        BufferUtil.put(buffer, emptySceneCount);
-        BufferUtil.put(buffer, tutorialSceneCount);
-        BufferUtil.put(buffer, falconSceneCount);
+        BufferUtil.put(buffer, stationId);
+        BufferUtil.put(buffer, characterNetworkId);
     }
 }

@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.connection.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
@@ -30,24 +30,37 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by crush on 7/4/2017.
- * <p>
- * LoginServer to GalaxyServer informing it that the created character has been added to the database.
+ *
+ * ConnectionServer to CentralServer and LoginServer. Updates how many players are currently connected
+ * to the connection server.
  */
 @Getter
-@Priority(0x06)
+@Priority(0x04)
 @AllArgsConstructor
-public final class LoginCreateCharacterAckMessage extends GameNetworkMessage {
-    private final int stationId;
-    private final long characterNetworkId;
+public final class UpdateOnlinePlayerCount extends GameNetworkMessage{
+    private final boolean loadedRecently;
+    private final int playerCount;
+    private final int freeTrialCount;
+    private final int emptySceneCount;
+    private final int tutorialSceneCount;
+    private final int falconSceneCount;
 
-    public LoginCreateCharacterAckMessage(ByteBuffer buffer) {
-        stationId = buffer.getInt();
-        characterNetworkId = buffer.getLong();
+    public UpdateOnlinePlayerCount(ByteBuffer buffer) {
+        loadedRecently = BufferUtil.getBoolean(buffer);
+        playerCount = buffer.getInt();
+        freeTrialCount = buffer.getInt();
+        emptySceneCount = buffer.getInt();
+        tutorialSceneCount = buffer.getInt();
+        falconSceneCount = buffer.getInt();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, stationId);
-        BufferUtil.put(buffer, characterNetworkId);
+        BufferUtil.put(buffer, loadedRecently);
+        BufferUtil.put(buffer, playerCount);
+        BufferUtil.put(buffer, freeTrialCount);
+        BufferUtil.put(buffer, emptySceneCount);
+        BufferUtil.put(buffer, tutorialSceneCount);
+        BufferUtil.put(buffer, falconSceneCount);
     }
 }

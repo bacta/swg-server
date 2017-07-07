@@ -31,18 +31,18 @@ import java.nio.ByteBuffer;
  * Created by crush on 7/4/2017.
  * <p>
  * GalaxyServer to LoginServer informing LoginServer to add the specified character to the login database
- * and reply with LoginCreateCharacterAckMessage.
+ * and reply with LoginCreateCharacterAck.
  */
 @Getter
 @AllArgsConstructor
-public final class LoginCreateCharacterMessage extends GameNetworkMessage {
+public final class LoginCreateCharacter extends GameNetworkMessage {
     private final int bactaId;
     private final String characterName;
     private final long characterObjectId;
     private final int templateId;
     private final boolean jedi;
 
-    public LoginCreateCharacterMessage(ByteBuffer buffer) {
+    public LoginCreateCharacter(ByteBuffer buffer) {
         bactaId = buffer.getInt();
         characterName = BufferUtil.getUnicode(buffer);
         characterObjectId = buffer.getLong();
