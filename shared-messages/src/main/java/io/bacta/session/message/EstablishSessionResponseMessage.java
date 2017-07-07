@@ -39,13 +39,13 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 public final class EstablishSessionResponseMessage extends GameNetworkMessage {
     private final int requestId;
-    private final Result result;
+    private final SessionResult result;
     private final int bactaId;
     private final String sessionId;
 
     public EstablishSessionResponseMessage(ByteBuffer buffer) {
         requestId = buffer.getInt();
-        result = Result.from(buffer.getInt());
+        result = SessionResult.from(buffer.getInt());
         bactaId = buffer.getInt();
         sessionId = BufferUtil.getAscii(buffer);
     }
@@ -53,26 +53,8 @@ public final class EstablishSessionResponseMessage extends GameNetworkMessage {
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
         BufferUtil.put(buffer, requestId);
-        BufferUtil.put(buffer, result.value);
+        BufferUtil.put(buffer, result.getValue());
         BufferUtil.put(buffer, bactaId);
         BufferUtil.putAscii(buffer, sessionId);
-    }
-
-    public enum Result {
-        SUCCESS(0),
-        BAD_USERNAME(1),
-        BAD_PASSWORD(2),
-        ACCOUNT_CLOSED(3);
-
-        private static final Result[] values = values();
-        private final int value;
-
-        Result(final int value) {
-            this.value = value;
-        }
-
-        public static Result from(final int value) {
-            return values[value];
-        }
     }
 }

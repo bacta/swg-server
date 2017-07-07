@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "bacta.session.client")
-class SessionClientProperties {
+public class SessionClientProperties {
     private String sessionServerAddress;
     private short sessionServerPort;
 }

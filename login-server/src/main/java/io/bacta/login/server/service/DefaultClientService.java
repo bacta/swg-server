@@ -54,8 +54,7 @@ public final class DefaultClientService implements ClientService {
 
     @Override
     public void validateClient(SoeUdpConnection connection, String clientVersion, String id, String key) {
-        //Send the client the server "now" epoch time so that the client has an idea
-        //of how much difference there is between the client's epoch time and the server epoch time.
+        //Client wants to know the difference in time between the server and client.
         final int epoch = (int) (System.currentTimeMillis() / 1000);
 
         LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getRemoteAddress());
@@ -66,25 +65,37 @@ public final class DefaultClientService implements ClientService {
         if (!validateClientVersion(connection, clientVersion))
             return;
 
-        //LoginServer can be configured for different validation modes:
-        // - SessionValidate  - The key in the LoginClientId is expected to be a session key.
-        // - SessionEstablish - The id of the LoginClientId is the username, and the key is the password.
-        // - SessionDiscover  - Attempts to discover the best method for establishing a session. First it will
-        //                      inspect the id.
         switch (loginServerProperties.getSessionMode()) {
-            case ESTABLISH:
+            case ESTABLISH: {
+                establishSessionMode(id, key);
                 break;
-            case VALIDATE:
+            }
+            case VALIDATE: {
+                validateSessionMode(key);
                 break;
+            }
             case DISCOVER:
-            default:
+            default: {
+                discoverSessionMode(id, key);
                 break;
+            }
         }
     }
 
     @Override
     public void clientValidated(SoeUdpConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
         //implement admin
+    }
+
+    private void establishSessionMode(final String username, final String password) {
+        //final Session session = sessionClient.establish(username, password);
+    }
+
+    private void validateSessionMode(final String sessionKey) {
+        //final Session session = sessionClient.validate(sessionKey);
+    }
+
+    private void discoverSessionMode(final String id, final String key) {
     }
 
     private boolean validateClientVersion(SoeUdpConnection connection, String clientVersion) {

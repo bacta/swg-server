@@ -18,38 +18,35 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.message;
+package io.bacta.session.client.controller;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.game.Priority;
-import io.bacta.shared.GameNetworkMessage;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import io.bacta.session.client.SessionClient;
+import io.bacta.session.message.ValidateSessionResponseMessage;
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.controller.MessageHandled;
+import org.springframework.stereotype.Component;
 
-import java.nio.ByteBuffer;
+import javax.inject.Inject;
 
 /**
- * SessionServer->SessionClient
- * <p>
- * Response indicating whether a session is valid or not. Also includes an error code indicating why it isn't valid.
- * <p>
- * Response to the request message {@link ValidateSessionMessage}.
+ * Created by crush on 7/7/2017.
  */
-@Getter
-@Priority(0x02)
-@AllArgsConstructor
-public final class ValidateSessionResponseMessage extends GameNetworkMessage {
-    private final int requestId;
-    private final SessionResult result;
+@Component
+@MessageHandled(handles = ValidateSessionResponseMessage.class)
+@ConnectionRolesAllowed({})
+public final class ValidateSessionResponseMessageController implements GameNetworkMessageController<ValidateSessionResponseMessage> {
 
-    public ValidateSessionResponseMessage(ByteBuffer buffer) {
-        requestId = buffer.getInt();
-        result = SessionResult.from(buffer.getInt());
+    private final SessionClient sessionClient;
+
+    @Inject
+    public ValidateSessionResponseMessageController(SessionClient sessionClient) {
+        this.sessionClient = sessionClient;
     }
 
     @Override
-    public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, requestId);
-        BufferUtil.put(buffer, result.getValue());
+    public void handleIncoming(SoeUdpConnection connection, ValidateSessionResponseMessage message) throws Exception {
+        sessionClient.receivedValidateSessionResponse(connection, message);
     }
 }

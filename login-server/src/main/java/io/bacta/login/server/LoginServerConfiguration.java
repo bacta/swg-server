@@ -97,7 +97,6 @@ public class LoginServerConfiguration implements ApplicationContextAware {
         return udpReceiver;
     }
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
