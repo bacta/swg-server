@@ -31,7 +31,7 @@ import java.net.InetAddress;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "bacta.server.establish")
+@ConfigurationProperties(prefix = "bacta.server.login")
 public class LoginServerProperties {
     private InetAddress bindAddress;
     private int publicBindPort;
