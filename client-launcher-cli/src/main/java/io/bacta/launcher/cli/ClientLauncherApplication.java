@@ -77,9 +77,9 @@ public final class ClientLauncherApplication {
             password = promptPropertyIfNeeded(scanner, "Username", properties.getPassword());
         }
 
-        final SessionResult result = sessionClient.login(username, password);
+        //final SessionResult result = sessionClient.establish(username, password);
 
-        internalLaunchClient(result);
+        //internalLaunchClient(result);
     }
 
     private String promptPropertyIfNeeded(final Scanner scanner, final String label, final String existingValue) {
@@ -94,10 +94,11 @@ public final class ClientLauncherApplication {
 
     private SessionResult obtainSession(final String username, final String password) {
         printStream.print("Obtaining session...");
-        final SessionResult sessionResult = sessionClient.login(username, password);
+        //final SessionResult sessionResult = sessionClient.establish(username, password);
         printStream.printf("done.%n");
 
-        return sessionResult;
+        //return sessionResult;
+        return null;
     }
 
     private void internalLaunchClient(SessionResult result) {

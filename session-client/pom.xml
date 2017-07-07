@@ -22,5 +22,13 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>com.ocdsoft.bacta</groupId>
+          <artifactId>engine</artifactId>
+      </dependency>
+    <dependency>
+      <groupId>com.ocdsoft.bacta</groupId>
+      <artifactId>shared-messages</artifactId>
+    </dependency>
   </dependencies>
 </project>

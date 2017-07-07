@@ -18,20 +18,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server.service;
+package io.bacta.session.server.controller;
 
+import io.bacta.session.message.EstablishSessionMessage;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.controller.MessageHandled;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
- * Created by crush on 7/3/2017.
+ * Handles the {@link EstablishSessionMessage} message.
  */
-public interface SessionService {
-    boolean validate(SoeUdpConnection connection, String key);
-    boolean login(SoeUdpConnection connection, String username, String password);
-
-    //KeyShareKey getCurrentKey();
-    //KeyShareToken makeToken(byte[] data);
-
-    void pushKeys(/* CentralServerConnection* targetCentralServer */);
-    void pushKeyToAllServers();
+@Slf4j
+@Component
+@MessageHandled(handles = EstablishSessionMessage.class)
+@ConnectionRolesAllowed({})
+public class EstablishSessionMessageController implements GameNetworkMessageController<EstablishSessionMessage> {
+    @Override
+    public void handleIncoming(SoeUdpConnection connection, EstablishSessionMessage message) throws Exception {
+        LOGGER.info("Received request to establish a session for {} with password {}.",
+                message.getUsername(),
+                message.getPassword());
+    }
 }

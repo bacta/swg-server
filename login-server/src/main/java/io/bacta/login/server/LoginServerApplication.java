@@ -33,7 +33,7 @@ import org.springframework.context.annotation.PropertySources;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@ComponentScan({"io.bacta.login", "io.bacta.soe"})
+@ComponentScan({"io.bacta.establish", "io.bacta.soe"})
 @PropertySources({
         @PropertySource("classpath:soenetworking.properties"),
         @PropertySource("classpath:application.properties")

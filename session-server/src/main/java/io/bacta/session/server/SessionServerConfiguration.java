@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.session.server;
 
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.network.udp.UdpEmitter;
@@ -28,43 +28,37 @@ import io.bacta.network.udp.netty.NettyUdpReceiver;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.handler.SoeInboundMessageChannel;
 import io.bacta.soe.network.handler.SoeUdpSendHandler;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
 
 /**
- * Created by kyle on 4/12/2016.
+ * Created by crush on 7/6/2017.
  */
-
 @Configuration
 @ConfigurationProperties
-public class LoginServerConfiguration implements ApplicationContextAware {
-
-    private ApplicationContext applicationContext;
+public class SessionServerConfiguration {
+    private final SessionServerProperties sessionServerProperties;
     private final MetricRegistry metricRegistry;
-    private final LoginServerProperties loginServerProperties;
 
     @Inject
-    public LoginServerConfiguration(final MetricRegistry metricRegistry,
-                                    final LoginServerProperties loginServerProperties) {
+    public SessionServerConfiguration(final SessionServerProperties sessionServerProperties,
+                                      final MetricRegistry metricRegistry) {
+        this.sessionServerProperties = sessionServerProperties;
         this.metricRegistry = metricRegistry;
-        this.loginServerProperties = loginServerProperties;
     }
 
     @Bean
     @Inject
-    public UdpReceiver getLoginPublicReceiver(SoeInboundMessageChannel inboundMessageChannel, SoeUdpSendHandler sendHandler) {
+    public UdpReceiver getSessionReceiver(SoeInboundMessageChannel inboundMessageChannel, SoeUdpSendHandler sendHandler) {
 
-        String metricsPrefix = "soe.server.connection.establish.public";
+        String metricsPrefix = "io.bacta.session.server";
 
         final UdpReceiver udpReceiver = new NettyUdpReceiver(
-                loginServerProperties.getBindAddress(),
-                loginServerProperties.getPublicBindPort(),
+                sessionServerProperties.getBindAddress(),
+                sessionServerProperties.getBindPort(),
                 new UdpMetrics(metricRegistry, metricsPrefix),
                 inboundMessageChannel
         );
@@ -74,32 +68,5 @@ public class LoginServerConfiguration implements ApplicationContextAware {
         sendHandler.start(metricsPrefix, connectionCache, emitter);
 
         return udpReceiver;
-    }
-
-
-    @Bean
-    @Inject
-    public UdpReceiver getLoginPrivateReceiver(SoeInboundMessageChannel inboundMessageChannel, SoeUdpSendHandler sendHandler) {
-
-        String metricsPrefix = "soe.server.connection.establish.private";
-
-        final UdpReceiver udpReceiver = new NettyUdpReceiver(
-                loginServerProperties.getBindAddress(),
-                loginServerProperties.getPrivateBindPort(),
-                new UdpMetrics(metricRegistry, metricsPrefix),
-                inboundMessageChannel
-        );
-
-        SoeUdpConnectionCache connectionCache = inboundMessageChannel.getConnectionCache();
-        UdpEmitter emitter = udpReceiver.start();
-        sendHandler.start(metricsPrefix, connectionCache, emitter);
-
-        return udpReceiver;
-    }
-
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }
