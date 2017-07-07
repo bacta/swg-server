@@ -20,13 +20,19 @@
 
 package io.bacta.login.server.service;
 
-import io.bacta.login.server.entity.AvatarEntity;
+import io.bacta.login.message.EnumerateCharacterId;
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Services character information and requests on the LoginServer.
  */
+@Slf4j
+@Service
 public class DefaultCharacterService implements CharacterService {
     @Override
     public void deleteCharacter(int clusterId, long networkId, int bactaId) {
@@ -69,7 +75,13 @@ public class DefaultCharacterService implements CharacterService {
     }
 
     @Override
-    public void sendAvatarList(int bactaId, int bactaIdNumberJediSlot, List<AvatarEntity> avatars) {
+    public void sendEnumerateCharacters(SoeUdpConnection connection, int bactaId) {
+        final Set<EnumerateCharacterId.CharacterData> characterDataSet = new HashSet<>();
 
+        //TODO: Retrieve characters and populate character data for the given account.
+
+        final EnumerateCharacterId message = new EnumerateCharacterId(characterDataSet);
+        connection.sendMessage(message);
     }
+
 }

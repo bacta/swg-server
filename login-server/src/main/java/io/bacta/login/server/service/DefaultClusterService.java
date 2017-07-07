@@ -22,6 +22,7 @@ package io.bacta.login.server.service;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.login.message.CharacterCreationDisabled;
 import io.bacta.login.message.LoginClusterStatus;
 import io.bacta.login.message.LoginClusterStatusEx;
 import io.bacta.login.message.LoginEnumCluster;
@@ -37,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -50,13 +52,16 @@ public final class DefaultClusterService implements ClusterService {
     private final ClusterRepository clusterRepository;
     private final LoginServerProperties properties;
     private final TIntObjectMap<ClusterListEntry> clusters;
+    private final Set<String> disabledCharacterCreationClusters;
 
     @Inject
     public DefaultClusterService(ClusterRepository clusterRepository,
                                  LoginServerProperties properties) {
         this.clusterRepository = clusterRepository;
         this.properties = properties;
-        this.clusters = new TIntObjectHashMap<>();
+
+        clusters = new TIntObjectHashMap<>();
+        disabledCharacterCreationClusters = new HashSet<>();
     }
 
     @Override
@@ -131,6 +136,12 @@ public final class DefaultClusterService implements ClusterService {
         }
 
         final LoginEnumCluster message = new LoginEnumCluster(clusterData, properties.getMaxCharactersPerAccount());
+        connection.sendMessage(message);
+    }
+
+    @Override
+    public void sendDisabledCharacterCreationServers(SoeUdpConnection connection) {
+        final CharacterCreationDisabled message = new CharacterCreationDisabled(disabledCharacterCreationClusters);
         connection.sendMessage(message);
     }
 
