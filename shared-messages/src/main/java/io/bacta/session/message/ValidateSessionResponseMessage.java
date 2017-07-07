@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.session.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.game.Priority;
@@ -29,42 +29,44 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
-    00 09
-    00 00
-    04 00
-    96 1F 13 41
-    04 00
-    61 73 64 66
-    00 00
-    0E 00 32 30 30 35 30 34 30 38 2D 31 38 3A 30 30
-    00 FC 79
-  */
+ * SessionServer->SessionClient
+ * <p>
+ * Response indicating whether a session is valid or not. Also includes an error code indicating why it isn't valid.
+ * <p>
+ * Response to the request message {@link ValidateSessionMessage}.
+ */
 @Getter
+@Priority(0x02)
 @AllArgsConstructor
-@Priority(0x4)
-public final class LoginClientId extends GameNetworkMessage {
-    /**
-     * Serves as the id if logging in through the client directly. If the launchpad has already gained a key for
-     * login, then the id can function as an integer value specifying the requested admin level of the player.
-     */
-    private final String id;
-    /**
-     * Serves as the key if logging in through the client directly. Otherwise, this should be a session key that
-     * the launchpad has already gained from the login server.
-     */
-    private final String key;
-    private final String clientVersion;
+public final class ValidateSessionResponseMessage extends GameNetworkMessage {
+    private final int requestId;
+    private final Result result;
 
-    public LoginClientId(final ByteBuffer buffer) {
-        id = BufferUtil.getAscii(buffer);
-        key = BufferUtil.getAscii(buffer);
-        clientVersion = BufferUtil.getAscii(buffer);
+    public ValidateSessionResponseMessage(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        result = Result.from(buffer.getInt());
     }
 
     @Override
-    public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.putAscii(buffer, id);
-        BufferUtil.putAscii(buffer, key);
-        BufferUtil.putAscii(buffer, clientVersion);
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.put(buffer, result.value);
+    }
+
+    public enum Result {
+        SUCCESS(0),
+        UNKNOWN(1),
+        EXPIRED(2);
+
+        private static final Result[] values = values();
+        private final int value;
+
+        Result(final int value) {
+            this.value = value;
+        }
+
+        public static Result from(final int value) {
+            return values[value];
+        }
     }
 }

@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.message;
+package io.bacta.session.message;
 
 import io.bacta.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
@@ -28,34 +28,51 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/4/2017.
+ * SessionServer->SessionClient
  * <p>
- * GalaxyServer to LoginServer informing LoginServer to add the specified character to the login database
- * and reply with LoginCreateCharacterAckMessage.
+ * Responds to a request to establish a session, indicating if the session was established successfully, and returning
+ * a sessionId to be used for future requests.
+ * <p>
+ * The request for this message is {@link EstablishSessionMessage}.
  */
 @Getter
 @AllArgsConstructor
-public final class LoginCreateCharacterMessage extends GameNetworkMessage {
+public final class EstablishSessionResponseMessage extends GameNetworkMessage {
+    private final int requestId;
+    private final Result result;
     private final int bactaId;
-    private final String characterName;
-    private final long characterObjectId;
-    private final int templateId;
-    private final boolean jedi;
+    private final String sessionId;
 
-    public LoginCreateCharacterMessage(ByteBuffer buffer) {
+    public EstablishSessionResponseMessage(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        result = Result.from(buffer.getInt());
         bactaId = buffer.getInt();
-        characterName = BufferUtil.getUnicode(buffer);
-        characterObjectId = buffer.getLong();
-        templateId = buffer.getInt();
-        jedi = BufferUtil.getBoolean(buffer);
+        sessionId = BufferUtil.getAscii(buffer);
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.put(buffer, result.value);
         BufferUtil.put(buffer, bactaId);
-        BufferUtil.putUnicode(buffer, characterName);
-        BufferUtil.put(buffer, characterObjectId);
-        BufferUtil.put(buffer, templateId);
-        BufferUtil.put(buffer, jedi);
+        BufferUtil.putAscii(buffer, sessionId);
+    }
+
+    public enum Result {
+        SUCCESS(0),
+        BAD_USERNAME(1),
+        BAD_PASSWORD(2),
+        ACCOUNT_CLOSED(3);
+
+        private static final Result[] values = values();
+        private final int value;
+
+        Result(final int value) {
+            this.value = value;
+        }
+
+        public static Result from(final int value) {
+            return values[value];
+        }
     }
 }

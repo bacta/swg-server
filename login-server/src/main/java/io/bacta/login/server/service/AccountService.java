@@ -97,7 +97,7 @@ public interface AccountService {
 //                    canCreateJedi = false;
 //                }
 //
-//                //limit login/character creation based on subscription feature bits.
+//                //limit establish/character creation based on subscription feature bits.
 //                if (((subscriptionBits & ClientSubscriptionFeature.FREE_TRIAL) != 0)
 //                    && ((subscriptionBits & ClientSubscriptionFeature.BASE) == 0)) {
 //
@@ -121,8 +121,8 @@ public interface AccountService {
 //            if (loginServerProperties.isSkippingTutorialAllowedForAll())
 //                canSkipTutorial = true;
 //
-//            //Send a message to the galaxy server to find out if this account is allowed to login to the requested cluster.
-//            //The central server will send us back a response which will continue the login process.
+//            //Send a message to the galaxy server to find out if this account is allowed to establish to the requested cluster.
+//            //The central server will send us back a response which will continue the establish process.
 //            //ValidateAccountReplyMessage msg = new ValidateAccountReplyMessage(stationId, canLogin, canCreateRegular, canCreateJedi, canSkipTutorial);
 //            //clusterListEntry.centralServerConnection.send(msg);
 //        }

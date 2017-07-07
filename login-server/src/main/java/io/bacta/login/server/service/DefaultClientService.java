@@ -20,15 +20,16 @@
 
 package io.bacta.login.server.service;
 
+import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
+import io.bacta.session.client.SessionClient;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by crush on 7/3/2017.
@@ -36,43 +37,49 @@ import java.util.List;
 @Slf4j
 @Service
 public final class DefaultClientService implements ClientService {
-    private final SessionService sessionService;
-
-    private final List<SoeUdpConnection> validatedClients;
     private final LoginServerProperties loginServerProperties;
+    private final SessionClient sessionClient;
+
+    //TODO: Is this the best way to get this value!?
+    private final String requiredClientVersion;
 
     @Inject
-    public DefaultClientService(SessionService sessionService, LoginServerProperties loginServerProperties) {
-        this.sessionService = sessionService;
+    public DefaultClientService(LoginServerProperties loginServerProperties,
+                                SessionClient sessionClient,
+                                @Value("${bacta.network.shared.requiredClientVersion}") String requiredClientVersion) {
         this.loginServerProperties = loginServerProperties;
-
-        this.validatedClients = new ArrayList<>();
+        this.sessionClient = sessionClient;
+        this.requiredClientVersion = requiredClientVersion;
     }
 
     @Override
     public void validateClient(SoeUdpConnection connection, String clientVersion, String id, String key) {
         //Send the client the server "now" epoch time so that the client has an idea
         //of how much difference there is between the client's epoch time and the server epoch time.
-        final ServerNowEpochTime serverEpoch = new ServerNowEpochTime((int) (System.currentTimeMillis() / 1000));
+        final int epoch = (int) (System.currentTimeMillis() / 1000);
+
+        LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getRemoteAddress());
+
+        final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
         connection.sendMessage(serverEpoch);
 
         if (!validateClientVersion(connection, clientVersion))
             return;
 
-        //First try to validate the key, assuming it as a session key.
-        //If that fails, then fallback to trying username/password.
-        if (!sessionService.validate(connection, key)) {
-            if (!sessionService.login(connection, id, key)) {
-                //Failed to identify. Reject them.
-            }
+        //LoginServer can be configured for different validation modes:
+        // - SessionValidate  - The key in the LoginClientId is expected to be a session key.
+        // - SessionEstablish - The id of the LoginClientId is the username, and the key is the password.
+        // - SessionDiscover  - Attempts to discover the best method for establishing a session. First it will
+        //                      inspect the id.
+        switch (loginServerProperties.getSessionMode()) {
+            case ESTABLISH:
+                break;
+            case VALIDATE:
+                break;
+            case DISCOVER:
+            default:
+                break;
         }
-
-        //Login with id/key based on login type:
-        //- Session Validate: means that the id is the requestedAdminSuid and key is the session token from launchpad.
-        //- Session Login: means that we don't have a session yet. id is the username, key is the password.
-        //otherwise, treat id as the bactaId. If it's not a number, then hash it.
-
-        //clientValidated(connection, suid, id, null, true, 0xFFFFFF, 0xFFFFFF);
     }
 
     @Override
@@ -81,20 +88,20 @@ public final class DefaultClientService implements ClientService {
     }
 
     private boolean validateClientVersion(SoeUdpConnection connection, String clientVersion) {
-//        //TODO: In the future, we might want to change up how versions are validated.
-//        if (loginServerProperties.isValidateClientVersionEnabled()
-//                && loginServerProperties.getRequiredClientVersion().equals(clientVersion)) {
-//
-//            LOGGER.warn("Client {} tried to login with version {} but {} was required.",
-//                    connection.getRemoteAddress(),
-//                    clientVersion,
-//                    loginServerProperties.getRequiredClientVersion());
-//
-//            final LoginIncorrectClientId incorrectId = new LoginIncorrectClientId("", "");
-//            connection.sendMessage(incorrectId);
-//
-//            return false;
-//        }
+        //TODO: In the future, we might want to change up how versions are validated.
+        if (loginServerProperties.isValidateClientVersionEnabled()
+                && requiredClientVersion.equals(clientVersion)) {
+
+            LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
+                    connection.getRemoteAddress(),
+                    clientVersion,
+                    requiredClientVersion);
+
+            final LoginIncorrectClientId incorrectId = new LoginIncorrectClientId("", "");
+            connection.sendMessage(incorrectId);
+
+            return false;
+        }
 
         return true;
     }

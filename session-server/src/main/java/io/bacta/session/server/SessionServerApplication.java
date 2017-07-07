@@ -18,19 +18,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.session.client;
+package io.bacta.session.server;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 /**
- * Created by crush on 7/4/2017.
+ * Created by crush on 7/6/2017.
  */
-public final class DefaultSessionClient implements SessionClient {
-    @Override
-    public SessionResult validate(String key) {
-        return null;
-    }
+@SpringBootApplication
+@EnableAutoConfiguration
+@ComponentScan({"io.bacta.session.server", "io.bacta.soe"})
+@PropertySources({
+        @PropertySource("classpath:soenetworking.properties"),
+        @PropertySource("classpath:application.properties")
 
-    @Override
-    public SessionResult login(String username, String password) {
-        return null;
+})
+public class SessionServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SessionServerApplication.class, args);
     }
 }

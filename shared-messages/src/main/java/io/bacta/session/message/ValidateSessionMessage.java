@@ -18,33 +18,38 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server.service;
+package io.bacta.session.message;
 
-import io.bacta.soe.network.connection.SoeUdpConnection;
-import org.springframework.stereotype.Service;
+import io.bacta.buffer.BufferUtil;
+import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/5/2017.
+ * SessionClient->SessionServer
+ * <p>
+ * Requests that the session server validate a session.
+ * <p>
+ * The response to this message is {@link ValidateSessionResponseMessage}.
  */
-@Service
-public class DefaultSessionService implements SessionService {
-    @Override
-    public boolean validate(SoeUdpConnection connection, String key) {
-        return false;
+@Getter
+@Priority(0x02)
+@AllArgsConstructor
+public final class ValidateSessionMessage extends GameNetworkMessage {
+    private final int requestId;
+    private final String sessionId;
+
+    public ValidateSessionMessage(ByteBuffer buffer) {
+        requestId = buffer.getInt();
+        sessionId = BufferUtil.getAscii(buffer);
     }
 
     @Override
-    public boolean login(SoeUdpConnection connection, String username, String password) {
-        return false;
-    }
-
-    @Override
-    public void pushKeys() {
-
-    }
-
-    @Override
-    public void pushKeyToAllServers() {
-
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, requestId);
+        BufferUtil.putAscii(buffer, sessionId);
     }
 }

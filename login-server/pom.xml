@@ -35,6 +35,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>session-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
 </project>
