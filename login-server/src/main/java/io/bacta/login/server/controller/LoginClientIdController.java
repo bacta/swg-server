@@ -47,4 +47,3 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
         clientService.validateClient(connection, message.getClientVersion(), message.getId(), message.getKey());
     }
 }
-
