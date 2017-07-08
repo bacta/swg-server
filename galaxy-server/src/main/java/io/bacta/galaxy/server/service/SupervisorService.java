@@ -20,7 +20,7 @@
 
 package io.bacta.galaxy.server.service;
 
-import io.bacta.galaxy.message.RegisterGalaxy;
+import io.bacta.galaxy.message.ConnectGalaxyServer;
 import io.bacta.soe.service.InternalMessageService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -44,7 +44,7 @@ public class SupervisorService implements ApplicationListener<ApplicationReadyEv
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
         // Notify Login we are up and running
-        messageService.getLoginServerConnection().sendMessage(new RegisterGalaxy(
+        messageService.getLoginServerConnection().sendMessage(new ConnectGalaxyServer(
                 "Bacta",
                 4,
                 "test"
