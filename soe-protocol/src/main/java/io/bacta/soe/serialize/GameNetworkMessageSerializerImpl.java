@@ -138,6 +138,7 @@ public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSeria
             message.writeToBuffer(buffer);
 
             buffer.limit(buffer.position());
+            buffer.position(0);
             return buffer;
 
         } catch (BufferOverflowException e) {
