@@ -22,10 +22,7 @@ package io.bacta.login.server.service;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.login.message.CharacterCreationDisabled;
-import io.bacta.login.message.LoginClusterStatus;
-import io.bacta.login.message.LoginClusterStatusEx;
-import io.bacta.login.message.LoginEnumCluster;
+import io.bacta.login.message.*;
 import io.bacta.login.server.GalaxyRegistrationFailedException;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.entity.ClusterEntity;
@@ -34,6 +31,7 @@ import io.bacta.login.server.object.ConnectionServerEntry;
 import io.bacta.login.server.repository.ClusterRepository;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -80,13 +78,21 @@ public final class DefaultClusterService implements ClusterService {
     }
 
     @Override
+    public ClusterListEntry findClusterByAddress(String address, short port) {
+        return clusters.valueCollection().stream()
+                .filter(entry -> entry.getAddress().equalsIgnoreCase(address) && entry.getPort() == port)
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public void refreshClusterList() {
         LOGGER.info("Refreshing known clusters.");
 
         if (clusterRepository.count() == 0) {
-            LOGGER.warn("Creating test cluster since the repository was empty.");
-            final ClusterEntity entity = new ClusterEntity("Test Server", "127.0.0.1", (short)44463);
-            clusterRepository.save(entity);
+            //LOGGER.warn("Creating test cluster since the repository was empty.");
+            //final ClusterEntity entity = new ClusterEntity("Test Server", "127.0.0.1", (short)44463);
+            //clusterRepository.save(entity);
         }
 
         final Iterable<ClusterEntity> clusterEntities = clusterRepository.findAll();
@@ -113,8 +119,81 @@ public final class DefaultClusterService implements ClusterService {
     }
 
     @Override
-    public ClusterListEntry registerCluster(String clusterName, String address, short port) throws GalaxyRegistrationFailedException {
-        return null;
+    public ClusterListEntry connectCluster(SoeUdpConnection connection, String clusterName, int timeZone, String networkVersion)
+            throws GalaxyRegistrationFailedException {
+
+        //A cluster is announcing that it is ready to register with the login server.
+        //We need to look up this cluster, and see that it is one we are expecting.
+        //If we aren't expecting it, then we check if auto galaxy registration is enabled. If so, then we add it,
+        //and continue with registration.
+
+        //TODO: Check the incoming network version to make sure that it agrees with LoginServer.
+
+        final String address = connection.getRemoteAddress().getHostName();
+        final short port = (short) connection.getRemoteAddress().getPort();
+
+        ClusterListEntry clusterListEntry = findClusterByAddress(address, port);
+
+        //We could not find a known cluster at the address from which the cluster is connecting. Attempt automatic
+        //registration if enabled. Otherwise, throw exception.
+        if (clusterListEntry == null) {
+            if (properties.isAutoGalaxyRegistrationEnabled()) {
+                clusterListEntry = registerCluster(clusterName, address, port);
+            } else {
+                LOGGER.error("Unknown galaxy {}({}) rejected because auto registration is disabled.",
+                        clusterName,
+                        connection.getRemoteAddress());
+
+                connection.terminate(TerminateReason.REFUSED);
+                return null;
+            }
+        }
+
+        //If the name of the connection cluster doesn't match the known cluster at this address, then disconnect.
+        if (!clusterListEntry.getName().equalsIgnoreCase(clusterName)) {
+            LOGGER.error("Rejected galaxy from {}({}) because its name didn't match the entry on file. ({})",
+                    clusterName,
+                    connection.getRemoteAddress(),
+                    clusterListEntry.getName());
+
+            connection.terminate(TerminateReason.REFUSED);
+            return null;
+        }
+
+        //Set the connection on the cluster list entry.
+        clusterListEntry.setGalaxyServerConnection(connection);
+        clusterListEntry.setTimeZone(timeZone);
+        clusterListEntry.setNetworkVersion(networkVersion);
+        //TODO: Other initialization like online player limits, etc.
+
+        final ConnectGalaxyServerAck message = new ConnectGalaxyServerAck(clusterListEntry.getId());
+        connection.sendMessage(message);
+
+        //TODO: UpdateClusterLockedAndSecretState
+        //Send the locked and secret state to the galaxy server so that it knows the LoginServer has put it into that
+        //state until it hears otherwise.
+
+        LOGGER.info("Galaxy {}(id: {}, addr: {}) successfully connected to the cluster.",
+                clusterName,
+                clusterListEntry.getId(),
+                connection.getRemoteAddress());
+
+        return clusterListEntry;
+    }
+
+    private ClusterListEntry registerCluster(String clusterName, String address, short port) {
+        LOGGER.info("Registering new galaxy {} at address {}:{}.", clusterName, address, port);
+        //TODO: The mapping could use some work still.
+        ClusterEntity clusterEntity = new ClusterEntity(clusterName, address, port);
+        clusterEntity = clusterRepository.save(clusterEntity);
+
+        final ClusterListEntry clusterListEntry = new ClusterListEntry(clusterEntity.getId(), clusterName);
+        ClusterEntity.map(clusterEntity, clusterListEntry);
+
+        //Put the new cluster into the clusters map.
+        clusters.put(clusterListEntry.getId(), clusterListEntry);
+
+        return clusterListEntry;
     }
 
     @Override

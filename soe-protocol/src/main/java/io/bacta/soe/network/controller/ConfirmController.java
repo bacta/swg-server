@@ -54,6 +54,8 @@ public class ConfirmController extends BaseSoeController {
                 encryptCode
         );
 
+        configuration.setEncryptCode(encryptCode);
+
         connection.setConfiguration(configuration);
 
         connection.confirm();

@@ -20,6 +20,7 @@
 
 package io.bacta.login.server.object;
 
+import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +35,8 @@ import java.util.TreeSet;
 public final class ClusterListEntry {
     private final int id;
     private final String name;
-    //private CentralServerConnection galaxyServerConnection;
+    //TODO: Replace this with a connection subclass for GalaxyServer.
+    private SoeUdpConnection galaxyServerConnection;
     private final SortedSet<ConnectionServerEntry> connectionServers;
     private int numPlayers;
     private int numFreeTrialPlayers;

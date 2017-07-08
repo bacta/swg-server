@@ -18,13 +18,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.login.message;
+
+import io.bacta.buffer.BufferUtil;
+import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 7/3/2017.
+ * Created by crush on 7/4/2017.
+ *
+ * LoginServer to GalaxyServer. Tells the GalaxyServer its cluster id according to the LoginServer. This message also
+ * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
  */
-public final class AccountRegistrationFailedException extends Exception{
-    public AccountRegistrationFailedException(String message) {
-        super(message);
+@Getter
+@Priority(0x02)
+@AllArgsConstructor
+public final class ConnectGalaxyServerAck extends GameNetworkMessage {
+    private final int clusterId;
+
+    public ConnectGalaxyServerAck(final ByteBuffer buffer) {
+        clusterId = buffer.getInt();
+    }
+
+    @Override
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, clusterId);
     }
 }
