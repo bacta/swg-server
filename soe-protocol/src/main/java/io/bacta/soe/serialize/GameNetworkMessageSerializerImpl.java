@@ -33,10 +33,13 @@ import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.lang.reflect.Constructor;
 import java.nio.BufferOverflowException;
@@ -44,7 +47,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by kyle on 5/4/2016.
@@ -53,31 +55,35 @@ import java.util.Set;
 @Slf4j
 @Component
 @Scope("prototype")
-public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSerializer {
+public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSerializer, ApplicationContextAware {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
     private final IntObjectHashMap<Constructor<? extends GameNetworkMessage>> messageConstructorMap;
     private final Map<Class<? extends GameNetworkMessage>, MessageData> messageDataMap;
     private final Histogram histogram;
 
-    @Inject
-    public GameNetworkMessageSerializerImpl(final MetricRegistry metricRegistry) {
+    private ApplicationContext context;
 
-        this.objControllerMessageSerializer = new ObjControllerMessageSerializer();
+    @Inject
+    public GameNetworkMessageSerializerImpl(final MetricRegistry metricRegistry, final ObjControllerMessageSerializer objControllerMessageSerializer) {
+
+        this.objControllerMessageSerializer = objControllerMessageSerializer;
         this.histogram = metricRegistry.histogram("GameNetworkMessageBufferAllocations");
         this.messageDataMap = new HashMap<>();
         this.messageConstructorMap = new IntObjectHashMap<>();
-
-        loadMessages();
     }
 
+    @PostConstruct
     private void loadMessages() {
-        final Reflections reflections = new Reflections();
-        final Set<Class<? extends GameNetworkMessage>> subTypes = reflections.getSubTypesOf(GameNetworkMessage.class);
-        subTypes.forEach(this::loadMessageClass);
+
+        String[] messageBeanNames = context.getBeanNamesForType(GameNetworkMessage.class);
+        for(String messageName : messageBeanNames) {
+            GameNetworkMessage message = (GameNetworkMessage) context.getBean(messageName);
+            loadMessageClass(message.getClass());
+        }
     }
 
-    public void loadMessageClass(Class<? extends GameNetworkMessage> messageClass) {
+    public void loadMessageClass( Class<? extends GameNetworkMessage> messageClass) {
 
         final int hash = MessageHashUtil.getHash(messageClass);
 
@@ -126,7 +132,6 @@ public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSeria
             message.writeToBuffer(buffer);
 
             buffer.limit(buffer.position());
-            buffer.rewind();
             return buffer;
 
         } catch (BufferOverflowException e) {
@@ -165,6 +170,11 @@ public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSeria
         }
 
         return message;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 
     @Getter

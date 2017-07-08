@@ -21,7 +21,6 @@
 package io.bacta.soe.config;
 
 import io.bacta.conf.NetworkConfiguration;
-import io.bacta.soe.network.message.EncryptMethod;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -32,11 +31,18 @@ import java.util.Set;
  */
 public interface SoeNetworkConfiguration extends NetworkConfiguration {
 
+    default int getHardMaxOutstandingPackets() {
+        return 30000;
+    }
+
+    default int getReliableChannelCount() {
+        return 4;
+    }
+
     InetAddress getPublicAddress();
     Collection<String> getTrustedClients();
     boolean isCompression();
     int getProtocolVersion();
-    EncryptMethod getEncryptMethod();
     int getMaxReliablePayload();
 
     int getMaxRawPacketSize();
@@ -47,6 +53,7 @@ public interface SoeNetworkConfiguration extends NetworkConfiguration {
     int getNoDataTimeout();
     int getMaxInstandingPackets();
     int getMaxOutstandingPackets();
+
     boolean isLogAllNetworkTraffic();
     byte getCrcBytes();
     int getHashTableSize();

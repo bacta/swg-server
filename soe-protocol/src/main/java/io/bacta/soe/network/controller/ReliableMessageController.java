@@ -20,14 +20,18 @@
 
 package io.bacta.soe.network.controller;
 
+import io.bacta.soe.config.SoeNetworkConfiguration;
+import io.bacta.soe.network.connection.PendingReliablePackets;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Slf4j
 @Component
 @SoeController(handles = {
         SoeMessageType.cUdpPacketReliable1,
@@ -40,33 +44,93 @@ import java.nio.ByteBuffer;
         SoeMessageType.cUdpPacketFragment4})
 public class ReliableMessageController extends BaseSoeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReliableMessageController.class);
+    private final SoeNetworkConfiguration networkConfiguration;
+
+    @Inject
+    public ReliableMessageController(final SoeNetworkConfiguration networkConfiguration) {
+        this.networkConfiguration = networkConfiguration;
+    }
 
     @Override
     public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
-        short sequenceNum = buffer.getShort();
-        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", connection.getId(), sequenceNum, buffer.order());
-        connection.sendAck(sequenceNum);
+        AtomicLong nextClientReliableStamp = connection.getReliableStamp();
+        short reliableStamp = buffer.getShort();
+        long reliableId = getReliableIncomingId(reliableStamp, nextClientReliableStamp.get());
 
-        if(type == SoeMessageType.cUdpPacketFragment1 ||
-                type == SoeMessageType.cUdpPacketFragment2 ||
-                type == SoeMessageType.cUdpPacketFragment3 ||
-                type == SoeMessageType.cUdpPacketFragment4) {
-
-            buffer = connection.addIncomingFragment(buffer);
+        if (reliableId >= nextClientReliableStamp.get() + networkConfiguration.getMaxInstandingPackets()) {
+            return;        // if we do not have buffer space to hold onto this packet, then we simply must pretend like it was lost
         }
 
-        if (buffer != null) {
+        ReliablePacketMode mode = ReliablePacketMode.values()[((type.getValue() - SoeMessageType.cUdpPacketReliable1.getValue()) / networkConfiguration.getReliableChannelCount())];
+        
+        if (reliableId >= nextClientReliableStamp.get()) {
 
-            try {
+            PendingReliablePackets pendingReliablePackets = connection.getPendingReliablePackets();
 
-                soeMessageDispatcher.dispatch(connection, buffer);
+            // is this the packet we are waiting for
+            if (nextClientReliableStamp.get() == reliableId)  {
+                // if so, process it immediately
+                processPacket(mode, connection, buffer);
+                nextClientReliableStamp.incrementAndGet();
 
-            } catch (Exception e) {
-                LOGGER.error("Unable to handle ZeroEscape", e);
+                // process other packets that have arrived
+                ByteBuffer pendingBuffer;
+                while ((pendingBuffer = pendingReliablePackets.getNext(nextClientReliableStamp.get())) != null) {
+
+                    SoeMessageType nextType = SoeMessageType.values()[pendingBuffer.get(1)];
+                    mode = ReliablePacketMode.values()[((nextType.getValue() - SoeMessageType.cUdpPacketReliable1.getValue()) / networkConfiguration.getReliableChannelCount())];
+
+                    processPacket(mode, connection, pendingBuffer);
+
+                    nextClientReliableStamp.incrementAndGet();
+                }
             }
-
+            // not the one we need next, but it is later than the one we need , so store it in our buffer until it's turn comes up
+            else {
+                pendingReliablePackets.add(reliableId, buffer);
+            }
         }
+        
+        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", connection.getId(), reliableStamp, buffer.order());
+        connection.sendAck(reliableStamp);
+    }
+
+    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer) {
+
+        if(mode == ReliablePacketMode.cReliablePacketModeReliable) {
+
+            soeMessageDispatcher.dispatch(connection, buffer);
+
+        } else if (mode == ReliablePacketMode.cReliablePacketModeFragment) {
+
+            ByteBuffer completeFragment = connection.addIncomingFragment(buffer);
+            if(completeFragment != null) {
+                soeMessageDispatcher.dispatch(connection, buffer);
+            }
+        }
+    }
+
+    private long getReliableIncomingId(int reliableStamp, long nextClientReliableStamp) {
+
+        // since we can never have anywhere close to 65000 packets outstanding, we only need to
+        // to send the low order word of the reliableId in the UdpPacketReliable and UdpPacketAck
+        // packets, because we can reconstruct the full id from that, we just need to take
+        // into account the wrap around issue.  We basically prepend the last-known
+        // high-order word.  If we end up significantly below the head of our chain, then we
+        // know we need to pick the entry 0x10000 higher.  If we fall significantly above
+        // our previous high-end, then we know we need to go the other way.
+        long reliableId = reliableStamp | (nextClientReliableStamp & (~(long)0xffff));
+        if (reliableId < nextClientReliableStamp - networkConfiguration.getHardMaxOutstandingPackets())
+            reliableId += 0x10000;
+        if (reliableId > nextClientReliableStamp + networkConfiguration.getHardMaxOutstandingPackets())
+            reliableId -= 0x10000;
+        return(reliableId);
+    }
+
+    private enum ReliablePacketMode {
+        cReliablePacketModeReliable,
+        cReliablePacketModeFragment,
+        cReliablePacketModeDelivered
     }
 }

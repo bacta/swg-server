@@ -24,6 +24,7 @@ import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.session.client.SessionClient;
+import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +81,8 @@ public final class DefaultClientService implements ClientService {
                 break;
             }
         }
+
+        connection.addRole(ConnectionRole.AUTHENTICATED);
     }
 
     @Override

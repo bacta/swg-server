@@ -27,5 +27,5 @@ import io.bacta.soe.network.connection.SoeUdpConnectionCache;
  * Created by kyle on 7/3/2017.
  */
 public interface SoeUdpSendHandler {
-    void start(final String metricsPrefix, final SoeUdpConnectionCache connectionCache, final UdpEmitter udpEmitter);
+    void start(final String metricsPrefix, final SoeUdpConnectionCache connectionCache, SoeProtocolHandler soeProtocolHandler, final UdpEmitter udpEmitter);
 }

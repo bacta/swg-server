@@ -45,10 +45,14 @@ public abstract class SoeMessage implements Message {
         packetType.writeToBuffer(buffer);
     }
 
-    public ByteBuffer slice() {
+    public ByteBuffer prepare() {
         buffer.limit(buffer.position());
         buffer.rewind();
-        return buffer.slice();
+        return buffer;
+    }
+
+    public ByteBuffer slice() {
+        return prepare().slice();
     }
 
     public int size() {

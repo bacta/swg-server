@@ -30,6 +30,7 @@ import io.bacta.soe.event.DisconnectEvent;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.service.PublisherService;
+import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -56,6 +57,7 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
 
     private UdpEmitter emitter;
     private SoeUdpConnectionCache connectionCache;
+    private SoeProtocolHandler protocolHandler;
 
     private Histogram sendQueueSizes;
     private Gauge<Integer> sizeGauge;
@@ -75,12 +77,13 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
     }
 
     @Override
-    public void start(final String metricPrefix, final SoeUdpConnectionCache connectionCache, final UdpEmitter udpEmitter) {
+    public void start(final String metricPrefix, final SoeUdpConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpEmitter udpEmitter) {
         if(!sendThread.isAlive()) {
             sendThread.setName("SendHandler");
             sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
             metricRegistry.register(metricPrefix, (Gauge<Integer>) () -> connectionCache.getConnectionCount());
             this.connectionCache = connectionCache;
+            this.protocolHandler = protocolHandler;
             this.emitter = udpEmitter;
             sendThread.start();
         }
@@ -136,7 +139,9 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
             }
 
             for (final ByteBuffer message : messages) {
-                emitter.sendMessage(connection, message);
+                ByteBuffer encodedMessage = protocolHandler.handleOutgoing(connection, message);
+                emitter.sendMessage(connection, encodedMessage);
+                LOGGER.info("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
             }
         }
 

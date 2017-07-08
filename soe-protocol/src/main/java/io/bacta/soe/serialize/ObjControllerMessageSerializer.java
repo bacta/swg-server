@@ -25,31 +25,43 @@ import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by crush on 5/29/2016.
  */
 @Slf4j
-public final class ObjControllerMessageSerializer {
+@Component
+@Scope("prototype")
+public final class ObjControllerMessageSerializer implements ApplicationContextAware {
 
     private final Map<GameControllerMessageType, Constructor<? extends MessageQueueData>> messageQueueDataConstructorMap;
+    private ApplicationContext context;
 
+    @Inject
     public ObjControllerMessageSerializer() {
         this.messageQueueDataConstructorMap = new HashMap<>();
-        loadMessages();
     }
 
+    @PostConstruct
     private void loadMessages() {
-        final Reflections reflections = new Reflections();
-        final Set<Class<? extends MessageQueueData>> subTypes = reflections.getSubTypesOf(MessageQueueData.class);
-        subTypes.forEach(this::loadMessageClass);
+
+        String[] messageBeanNames = context.getBeanNamesForType(MessageQueueData.class);
+        for(String messageName : messageBeanNames) {
+            MessageQueueData message = (MessageQueueData) context.getBean(messageName);
+            loadMessageClass(message.getClass());
+        }
     }
 
     private void loadMessageClass(final Class<? extends MessageQueueData> messageClass) {
@@ -87,5 +99,10 @@ public final class ObjControllerMessageSerializer {
             LOGGER.error("Unable to construct message {}", messageConstructor.getName(), e);
             return null;
         }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 }
