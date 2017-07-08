@@ -20,11 +20,18 @@
 
 package io.bacta.login.server.repository;
 
-import io.bacta.login.server.entity.ClusterEntity;
+import io.bacta.login.server.entity.CharacterEntity;
 import org.springframework.data.repository.CrudRepository;
+
+import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by crush on 7/2/2017.
  */
-public interface CharacterRepository extends CrudRepository<ClusterEntity, Integer> {
+public interface CharacterRepository extends CrudRepository<CharacterEntity, CharacterEntity.CharacterEntityKey> {
+    List<CharacterEntity> findByBactaId(int bactaId);
+
+    @Transactional
+    void deleteByBactaId(int bactaId);
 }
