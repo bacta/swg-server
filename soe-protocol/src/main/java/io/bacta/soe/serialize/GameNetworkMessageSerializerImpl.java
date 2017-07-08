@@ -33,6 +33,7 @@ import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -47,6 +48,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by kyle on 5/4/2016.
@@ -76,11 +78,15 @@ public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSeria
     @PostConstruct
     private void loadMessages() {
 
-        String[] messageBeanNames = context.getBeanNamesForType(GameNetworkMessage.class);
-        for(String messageName : messageBeanNames) {
-            GameNetworkMessage message = (GameNetworkMessage) context.getBean(messageName);
-            loadMessageClass(message.getClass());
-        }
+        final Reflections reflections = new Reflections("io.bacta");
+        final Set<Class<? extends GameNetworkMessage>> subTypes = reflections.getSubTypesOf(GameNetworkMessage.class);
+        subTypes.forEach(this::loadMessageClass);
+
+//        String[] messageBeanNames = context.getBeanNamesForType(GameNetworkMessage.class);
+//        for(String messageName : messageBeanNames) {
+//            GameNetworkMessage message = (GameNetworkMessage) context.getBean(messageName);
+//            loadMessageClass(message.getClass());
+//        }
     }
 
     public void loadMessageClass( Class<? extends GameNetworkMessage> messageClass) {
