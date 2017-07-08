@@ -138,7 +138,7 @@ public final class SoeUdpConnection implements UdpConnection {
                             final GameNetworkMessageSerializer messageSerializer) {
         
         this.remoteAddress = remoteAddress;
-        this.state = ConnectionState.DISCONNECTED;
+        this.state = ConnectionState.NEW;
         this.messageSerializer = messageSerializer;
 
         this.configuration = new SoeUdpConfiguration(

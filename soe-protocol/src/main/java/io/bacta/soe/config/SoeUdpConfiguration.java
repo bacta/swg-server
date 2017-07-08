@@ -41,6 +41,11 @@ public class SoeUdpConfiguration {
         this.compression = compression;
     }
 
+    public SoeUdpConfiguration(int protocolVersion, int crcBytes, int maxRawPacketSize, boolean compression, int encryptCode) {
+        this(protocolVersion, crcBytes, maxRawPacketSize, compression);
+        this.encryptCode = encryptCode;
+    }
+
     public void setEncryptCode(int code) {
         this.encryptCode = code;
     }
