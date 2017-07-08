@@ -31,6 +31,11 @@ public class IniFileTest {
     private IniFile iniFile = new IniFile(IniFileTest.class.getResource("/test.ini").getPath());
 
     @Test
+    public void fileExists() throws Exception {
+        assertTrue(iniFile != null);
+    }
+
+    @Test
     public void testInclude() throws Exception {
         assertTrue(iniFile.getBoolean("TestSection/IncludeTest", "testInclude"));
     }
