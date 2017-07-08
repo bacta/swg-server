@@ -21,7 +21,6 @@
 package io.bacta.login.server.service;
 
 import io.bacta.login.server.GalaxyRegistrationFailedException;
-import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.object.ClusterListEntry;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeUdpConnection;
@@ -46,23 +45,29 @@ public interface ClusterService {
      */
     ClusterListEntry findClusterByName(String clusterName);
 
+    ClusterListEntry findClusterByAddress(String address, short port);
+
     /**
      * Gets the latest information about each registered cluster from the repository.
      */
     void refreshClusterList();
 
+
     /**
-     * Attempts to register a new galaxy cluster. This requires that {@link LoginServerProperties#autoGalaxyRegistrationEnabled}
-     * be set to true.
+     * Attempts to connect a galaxy that is announcing itself to the login server. If the galaxy isn't registered with
+     * the LoginServer, then it will be rejected unless the LoginServer is configured to allow automatic galaxy
+     * registration.
      *
-     * @param clusterName The name of the cluster attempting to register
-     * @param address     The host name or IP address of the server.
-     * @param port        The service port for the server.
-     * @return An entry representing this new cluster.
-     * @throws GalaxyRegistrationFailedException If auto galaxy registration is disabled, or another galaxy already exists
-     *                                           at the same name or address.
+     * @param connection     The connection from the incoming galaxy server.
+     * @param clusterName    The name of the galaxy that is connecting. This must match what is in the repository for the
+     *                       galaxy at the given address:port combination, or it will be rejected.
+     * @param timeZone       The timezone in which the galaxy is located.
+     * @param networkVersion The version of the network the galaxy is using. If this doesn't match that of the LoginServer
+     *                       then the connection will be terminated.
+     * @return The ClusterListEntry matching this galaxy.
+     * @throws GalaxyRegistrationFailedException If the galaxy is unable to register with the LoginServer.
      */
-    ClusterListEntry registerCluster(String clusterName, String address, short port)
+    ClusterListEntry connectCluster(SoeUdpConnection connection, String clusterName, int timeZone, String networkVersion)
             throws GalaxyRegistrationFailedException;
 
     /**
@@ -76,18 +81,21 @@ public interface ClusterService {
 
     /**
      * Sends the enumeration of all known clusters, even if they are offline, to the specific client connection.
+     *
      * @param connection The connection which will receive the message.
      */
     void sendClusterEnum(SoeUdpConnection connection);
 
     /**
      * Sends a list of any galaxies that have character creation disabled.
+     *
      * @param connection The connection which will receive the message.
      */
     void sendDisabledCharacterCreationServers(SoeUdpConnection connection);
 
     /**
      * Sends status of all active clusters to a specific client connection.
+     *
      * @param connection The connection which will receive the message.
      */
     void sendClusterStatus(SoeUdpConnection connection);
@@ -99,6 +107,7 @@ public interface ClusterService {
 
     /**
      * Sends extended status of all active clusters to specific client connection.
+     *
      * @param connection The connection which will receive the message.
      */
     void sendExtendedClusterStatus(SoeUdpConnection connection);

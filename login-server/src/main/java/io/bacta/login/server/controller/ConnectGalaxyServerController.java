@@ -20,7 +20,8 @@
 
 package io.bacta.login.server.controller;
 
-import io.bacta.galaxy.message.RegisterGalaxy;
+import io.bacta.galaxy.message.ConnectGalaxyServer;
+import io.bacta.login.server.service.ClusterService;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -28,16 +29,29 @@ import io.bacta.soe.network.controller.MessageHandled;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+
 /**
  * Created by crush on 7/7/2017.
  */
 @Component
 @Slf4j
-@MessageHandled(handles = RegisterGalaxy.class)
+@MessageHandled(handles = ConnectGalaxyServer.class)
 @ConnectionRolesAllowed({})
-public class RegisterGalaxyController implements GameNetworkMessageController<RegisterGalaxy> {
+public class ConnectGalaxyServerController implements GameNetworkMessageController<ConnectGalaxyServer> {
+    private final ClusterService clusterService;
+
+    @Inject
+    public ConnectGalaxyServerController(ClusterService clusterService) {
+        this.clusterService = clusterService;
+    }
+
     @Override
-    public void handleIncoming(SoeUdpConnection connection, RegisterGalaxy message) throws Exception {
-        LOGGER.info("recieved register request");
+    public void handleIncoming(SoeUdpConnection connection, ConnectGalaxyServer message) throws Exception {
+        clusterService.connectCluster(
+                connection,
+                message.getGalaxyName(),
+                message.getTimeZone(),
+                message.getNetworkVersion());
     }
 }
