@@ -20,6 +20,7 @@
 
 package io.bacta.login.server.service;
 
+import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
@@ -39,6 +40,8 @@ import javax.inject.Inject;
 @Service
 public final class DefaultClientService implements ClientService {
     private final LoginServerProperties loginServerProperties;
+    private final CharacterService characterService;
+    private final ClusterService clusterService;
     private final SessionClient sessionClient;
 
     //TODO: Is this the best way to get this value!?
@@ -46,9 +49,13 @@ public final class DefaultClientService implements ClientService {
 
     @Inject
     public DefaultClientService(LoginServerProperties loginServerProperties,
+                                CharacterService characterService,
+                                ClusterService clusterService,
                                 SessionClient sessionClient,
                                 @Value("${bacta.network.shared.requiredClientVersion}") String requiredClientVersion) {
         this.loginServerProperties = loginServerProperties;
+        this.characterService = characterService;
+        this.clusterService = clusterService;
         this.sessionClient = sessionClient;
         this.requiredClientVersion = requiredClientVersion;
     }
@@ -68,16 +75,16 @@ public final class DefaultClientService implements ClientService {
 
         switch (loginServerProperties.getSessionMode()) {
             case ESTABLISH: {
-                establishSessionMode(id, key);
+                establishSessionMode(connection, id, key);
                 break;
             }
             case VALIDATE: {
-                validateSessionMode(key);
+                validateSessionMode(connection, key);
                 break;
             }
             case DISCOVER:
             default: {
-                discoverSessionMode(id, key);
+                discoverSessionMode(connection, id, key);
                 break;
             }
         }
@@ -92,28 +99,32 @@ public final class DefaultClientService implements ClientService {
         //Create a key with:
         //If they logged in with a session, then the key is comprised of the sessionId + accountId
         //Otherwise, the key is comprised of the accountId, if they are connecting with god client, and username
-        //Encrypt the key with the keyshare.
-        //Encrypting the token is for the connection server's protection. If the connection server can't decrypt the
-        //token, then it would mean it came from an untrusted login server.
+        //Encrypt the key before sending to client (not sure why, we've already exposed the sessionId as plain text)
 
+        final String token = "hello world";
+        sendLoginClientToken(connection, token, bactaId, username);
 
-
-        //Send LoginClientToken (token, accountId, username);
-        //Send LoginEnumCluster
-        //Send CharacterCreationDisabled
-        //Send EnumerateCharacterId
-        //Send LoginClusterStatus
+        clusterService.sendClusterEnum(connection);
+        clusterService.sendDisabledCharacterCreationServers(connection);
+        characterService.sendEnumerateCharacters(connection, bactaId);
+        clusterService.sendClusterStatus(connection);
     }
 
-    private void establishSessionMode(final String username, final String password) {
+    private void sendLoginClientToken(SoeUdpConnection connection, String token, int bactaId, String username) {
+        final LoginClientToken message = new LoginClientToken(token, bactaId, username);
+        connection.sendMessage(message);
+    }
+
+    private void establishSessionMode(SoeUdpConnection connection, String username, String password) {
         //final Session session = sessionClient.establish(username, password);
+        clientValidated(connection, 1, username, password, false, 0, 0);
     }
 
-    private void validateSessionMode(final String sessionKey) {
+    private void validateSessionMode(SoeUdpConnection connection, String sessionKey) {
         //final Session session = sessionClient.validate(sessionKey);
     }
 
-    private void discoverSessionMode(final String id, final String key) {
+    private void discoverSessionMode(SoeUdpConnection connection, String id, String key) {
     }
 
     private boolean validateClientVersion(SoeUdpConnection connection, String clientVersion) {
