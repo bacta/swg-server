@@ -81,6 +81,12 @@ public interface ClusterService {
     void sendClusterEnum(SoeUdpConnection connection);
 
     /**
+     * Sends a list of any galaxies that have character creation disabled.
+     * @param connection The connection which will receive the message.
+     */
+    void sendDisabledCharacterCreationServers(SoeUdpConnection connection);
+
+    /**
      * Sends status of all active clusters to a specific client connection.
      * @param connection The connection which will receive the message.
      */

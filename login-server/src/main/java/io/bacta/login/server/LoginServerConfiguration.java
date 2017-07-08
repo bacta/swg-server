@@ -62,7 +62,7 @@ public class LoginServerConfiguration implements ApplicationContextAware {
     @Inject
     public UdpReceiver getLoginPublicReceiver(SoeInboundMessageChannel inboundMessageChannel, SoeUdpSendHandler sendHandler) {
 
-        String metricsPrefix = "soe.server.connection.establish.public";
+        String metricsPrefix = "soe.server.connection.login.public";
 
         final UdpReceiver udpReceiver = new NettyUdpReceiver(
                 loginServerProperties.getBindAddress(),
@@ -86,7 +86,7 @@ public class LoginServerConfiguration implements ApplicationContextAware {
                                                SoeUdpSendHandler sendHandler,
                                                InternalMessageService internalMessageService) {
 
-        String metricsPrefix = "soe.server.connection.establish.private";
+        String metricsPrefix = "soe.server.connection.login.private";
 
         final UdpReceiver udpReceiver = new NettyUdpReceiver(
                 loginServerProperties.getBindAddress(),

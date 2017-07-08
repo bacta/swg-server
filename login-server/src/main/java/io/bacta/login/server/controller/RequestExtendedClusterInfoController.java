@@ -23,7 +23,6 @@ package io.bacta.login.server.controller;
 
 import io.bacta.login.message.RequestExtendedClusterInfo;
 import io.bacta.login.server.service.ClusterService;
-import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -36,7 +35,7 @@ import javax.inject.Inject;
 @Slf4j
 @Service
 @MessageHandled(handles = RequestExtendedClusterInfo.class)
-@ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
+@ConnectionRolesAllowed({})
 public class RequestExtendedClusterInfoController implements GameNetworkMessageController<RequestExtendedClusterInfo> {
 
     private final ClusterService clusterService;

@@ -20,9 +20,7 @@
 
 package io.bacta.login.server.service;
 
-import io.bacta.login.server.entity.AvatarEntity;
-
-import java.util.List;
+import io.bacta.soe.network.connection.SoeUdpConnection;
 
 /**
  * Created by crush on 7/2/2017.
@@ -39,7 +37,8 @@ public interface CharacterService {
     void toggleCompletedTutorial(int bactaId, boolean completed);
 
     //void requestAvatarListForAccount(int bactaId);
-    void sendAvatarList(int bactaId, int bactaIdNumberJediSlot, List<AvatarEntity> avatars);
+    //void sendAvatarList(int bactaId, int bactaIdNumberJediSlot, List<AvatarEntity> avatars);
+    void sendEnumerateCharacters(SoeUdpConnection connection, int bactaId);
 }
 //
 //public class CharacterService {
