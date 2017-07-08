@@ -25,55 +25,57 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
 import io.bacta.soe.util.ClientString;
 import io.bacta.soe.util.MessageHashUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Modifier;
-import java.util.Set;
 
 /**
  * Created by kyle on 4/22/2016.
  */
 @Slf4j
-public final class ClasspathControllerLoader {
+@Component
+@Scope("prototype")
+public final class GameNetworkMessageControllerLoader implements ApplicationContextAware {
 
-    private final ApplicationContext context;
+    private ApplicationContext context;
 
-    public ClasspathControllerLoader(final ApplicationContext context) {
-        this.context = context;
-    }
+    public TIntObjectMap<GameNetworkMessageControllerData> loadControllers() {
 
-    public <T> TIntObjectMap<ControllerData<T>> getControllers(Class<T> clazz) {
+        final TIntObjectMap<GameNetworkMessageControllerData> controllers = new TIntObjectHashMap<>();
+        String[] controllerBeanNames = context.getBeanNamesForType(GameNetworkMessageController.class);
 
-        final TIntObjectMap<ControllerData<T>> controllers = new TIntObjectHashMap<>();
-        final Reflections reflections = new Reflections();
-        final Set<Class<? extends T>> subTypes = reflections.getSubTypesOf(clazz);
-
-        for (final Class<? extends T> controllerClass : subTypes)
-            loadControllerClass(controllers, controllerClass);
+        for (String controllerBeanName : controllerBeanNames) {
+            GameNetworkMessageController controller = (GameNetworkMessageController) context.getBean(controllerBeanName);
+            loadControllerClass(controllers, controller);
+        }
 
         return controllers;
     }
 
-    private <T> void loadControllerClass(final TIntObjectMap<ControllerData<T>> controllers,
-                                         final Class<? extends T> controllerClass) {
+    private <T> void loadControllerClass(final TIntObjectMap<GameNetworkMessageControllerData> controllers,
+                                         final GameNetworkMessageController controller) {
         try {
 
-            if (Modifier.isAbstract(controllerClass.getModifiers()))
+            if (Modifier.isAbstract(controller.getClass().getModifiers()))
                 return;
 
-            MessageHandled controllerAnnotation = controllerClass.getAnnotation(MessageHandled.class);
+            MessageHandled controllerAnnotation = controller.getClass().getAnnotation(MessageHandled.class);
 
             if (controllerAnnotation == null) {
-                LOGGER.warn("Missing @MessageHandled annotation, discarding: " + controllerClass.getName());
+                LOGGER.warn("Missing @MessageHandled annotation, discarding: " + controller.getClass().getName());
                 return;
             }
 
-            final ConnectionRolesAllowed connectionRolesAllowed = controllerClass.getAnnotation(ConnectionRolesAllowed.class);
+            final ConnectionRolesAllowed connectionRolesAllowed = controller.getClass().getAnnotation(ConnectionRolesAllowed.class);
             final ConnectionRole[] connectionRoles;
             if (connectionRolesAllowed == null) {
                 connectionRoles = new ConnectionRole[]{ConnectionRole.AUTHENTICATED};
@@ -88,16 +90,15 @@ public final class ClasspathControllerLoader {
 
                 final String propertyName = Integer.toHexString(hash);
 
-                final T controller = context.getBean(controllerClass);
-                final ControllerData<T> newControllerData = new ControllerData<>(controller, connectionRoles);
+                final GameNetworkMessageControllerData newControllerData = new GameNetworkMessageControllerData(controller, connectionRoles);
 
                 if (!controllers.containsKey(hash)) {
-                    LOGGER.debug("Adding Controller {} '{}' 0x{}", controllerClass.getName(), ClientString.get(propertyName), propertyName);
+                    LOGGER.debug("Adding Controller {} '{}' 0x{}", controller.getClass().getName(), ClientString.get(propertyName), propertyName);
                     controllers.put(hash, newControllerData);
                 } else {
-                    final ControllerData existingController = controllers.get(hash);
-                    LOGGER.error("Controller {} for com.ocdsoft.bacta.swg.login.message '{}'(0x{}) duplicates controller {}.",
-                            controllerClass.getName(),
+                    final GameNetworkMessageControllerData existingController = controllers.get(hash);
+                    LOGGER.error("Controller {} for message '{}'(0x{}) duplicates controller {}.",
+                            controller.getClass().getName(),
                             ClientString.get(propertyName),
                             propertyName,
                             existingController.getController().getClass().getName());
@@ -105,7 +106,12 @@ public final class ClasspathControllerLoader {
                 }
             }
         } catch (Throwable e) {
-            LOGGER.error("Unable to add controller: " + controllerClass.getName(), e);
+            LOGGER.error("Unable to add controller: " + controller.getClass().getName(), e);
         }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
     }
 }

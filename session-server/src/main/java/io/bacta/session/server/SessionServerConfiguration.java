@@ -27,6 +27,7 @@ import io.bacta.network.udp.UdpReceiver;
 import io.bacta.network.udp.netty.NettyUdpReceiver;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.handler.SoeInboundMessageChannel;
+import io.bacta.soe.network.handler.SoeProtocolHandler;
 import io.bacta.soe.network.handler.SoeUdpSendHandler;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -65,7 +66,8 @@ public class SessionServerConfiguration {
 
         SoeUdpConnectionCache connectionCache = inboundMessageChannel.getConnectionCache();
         UdpEmitter emitter = udpReceiver.start();
-        sendHandler.start(metricsPrefix, connectionCache, emitter);
+        SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
+        sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
 
         return udpReceiver;
     }

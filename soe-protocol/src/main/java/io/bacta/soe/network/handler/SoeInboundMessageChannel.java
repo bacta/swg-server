@@ -20,6 +20,8 @@
 
 package io.bacta.soe.network.handler;
 
+import co.paralleluniverse.fibers.Fiber;
+import co.paralleluniverse.strands.SuspendableRunnable;
 import io.bacta.buffer.BufferUtil;
 import io.bacta.network.ConnectionState;
 import io.bacta.network.channel.InboundMessageChannel;
@@ -42,9 +44,9 @@ import java.nio.ByteBuffer;
 @Slf4j
 @Component
 @Scope("prototype")
+@Getter
 public class SoeInboundMessageChannel implements InboundMessageChannel {
 
-    @Getter
     private final SoeUdpConnectionCache connectionCache;
     private final SoeProtocolHandler protocolHandler;
     private final SoeConnectionProvider connectionProvider;
@@ -61,26 +63,29 @@ public class SoeInboundMessageChannel implements InboundMessageChannel {
 
     @Override
     public void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
+        new Fiber<Void>((SuspendableRunnable) () -> {
+            SoeUdpConnection connection = connectionCache.get(sender);
 
-        SoeUdpConnection connection = connectionCache.get(sender);
+            byte type = message.get(1);
+            if(type >= 0 && type <= 0x1E) {
 
-        byte type = message.get(1);
-        if(type >= 0 && type <= 0x1E) {
+                SoeMessageType packetType = SoeMessageType.values()[type];
 
-            SoeMessageType packetType = SoeMessageType.values()[type];
-            LOGGER.trace("Received {}", packetType);
-
-            if (packetType == SoeMessageType.cUdpPacketConnect) {
-                connection = connectionProvider.newInstance(sender);
-                connection.setState(ConnectionState.ONLINE);
-                connectionCache.put(sender, connection);
+                if (packetType == SoeMessageType.cUdpPacketConnect) {
+                    connection = connectionProvider.newInstance(sender);
+                    connection.setState(ConnectionState.ONLINE);
+                    connectionCache.put(sender, connection);
+                }
             }
-        }
 
-        if(connection != null) {
-            protocolHandler.handleIncoming(connection, message);
-        } else {
-            LOGGER.debug("Unsolicited Message from " + sender + ": " + BufferUtil.bytesToHex(message));
-        }
+            if(connection != null) {
+                LOGGER.debug("Message from " + sender + ": " + BufferUtil.bytesToHex(message));
+
+                    protocolHandler.handleIncoming(connection, message);
+
+            } else {
+                LOGGER.debug("Unsolicited Message from " + sender + ": " + BufferUtil.bytesToHex(message));
+            }
+        }).start();
     }
 }

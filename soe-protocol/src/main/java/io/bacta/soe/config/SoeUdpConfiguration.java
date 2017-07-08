@@ -20,7 +20,6 @@
 
 package io.bacta.soe.config;
 
-import io.bacta.soe.network.message.EncryptMethod;
 import lombok.Getter;
 
 /**
@@ -31,15 +30,13 @@ public class SoeUdpConfiguration {
 
     private final int protocolVersion;
     private final int crcBytes;
-    private final EncryptMethod encryptMethod;
     private int maxRawPacketSize;
     private final boolean compression;
     private int encryptCode;
 
-    public SoeUdpConfiguration(int protocolVersion, int crcBytes, EncryptMethod encryptMethod, int maxRawPacketSize, boolean compression) {
+    public SoeUdpConfiguration(int protocolVersion, int crcBytes, int maxRawPacketSize, boolean compression) {
         this.protocolVersion = protocolVersion;
         this.crcBytes = crcBytes;
-        this.encryptMethod = encryptMethod;
         this.maxRawPacketSize = maxRawPacketSize;
         this.compression = compression;
     }

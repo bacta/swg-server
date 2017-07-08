@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -124,6 +125,12 @@ public final class SoeUdpConnection implements UdpConnection {
     @Getter
     private int lastPingTime;
 
+    @Getter
+    private AtomicLong reliableStamp;
+
+    @Getter
+    private PendingReliablePackets pendingReliablePackets;
+
     private final GameNetworkMessageSerializer messageSerializer;
 
     public SoeUdpConnection(final SoeNetworkConfiguration networkConfiguration,
@@ -139,7 +146,6 @@ public final class SoeUdpConnection implements UdpConnection {
         this.configuration = new SoeUdpConfiguration(
                 networkConfiguration.getProtocolVersion(),
                 networkConfiguration.getCrcBytes(),
-                networkConfiguration.getEncryptMethod(),
                 networkConfiguration.getMaxRawPacketSize(),
                 networkConfiguration.isCompression()
         );
@@ -151,7 +157,9 @@ public final class SoeUdpConnection implements UdpConnection {
         roles.add(ConnectionRole.UNAUTHENTICATED);
         gameNetworkMessagesSent = new AtomicInteger();
         protocolMessagesSent = new AtomicInteger();
+        reliableStamp = new AtomicLong();
         bactaId = -1;
+        pendingReliablePackets = new PendingReliablePackets(networkConfiguration.getMaxInstandingPackets());
 
         protocolMessagesReceived = new AtomicInteger();
         gameNetworkMessagesReceived = new AtomicInteger();
@@ -187,11 +195,11 @@ public final class SoeUdpConnection implements UdpConnection {
 
     public void sendMessage(SoeMessage message) {
 
-        if(state != ConnectionState.DISCONNECTED) {
+        if(state != ConnectionState.DISCONNECTED || message.getPacketType() == SoeMessageType.cUdpPacketConnect) {
 
             protocolMessagesSent.getAndIncrement();
 
-            if (udpMessageProcessor.addUnreliable(message.slice())) {
+            if (udpMessageProcessor.addUnreliable(message.getBuffer())) {
                 updateLastActivity();
             }
         }
@@ -267,11 +275,6 @@ public final class SoeUdpConnection implements UdpConnection {
     }
 
     public void connect() {
-        if(getState() == ConnectionState.ONLINE) {
-            confirm();
-            return;
-        }
-
         ConnectMessage connectMessage = new ConnectMessage(configuration.getProtocolVersion(), id, configuration.getMaxRawPacketSize());
         sendMessage(connectMessage);
     }

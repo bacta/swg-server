@@ -21,6 +21,7 @@
 package io.bacta.soe.network.dispatch;
 
 import io.bacta.soe.network.connection.ConnectionRole;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
 import lombok.Getter;
 
 import java.util.List;
@@ -29,12 +30,12 @@ import java.util.List;
  * Created by kyle on 4/22/2016.
  */
 @Getter
-public class ControllerData<T> {
-    private final T controller;
+public class GameNetworkMessageControllerData {
+    private final GameNetworkMessageController controller;
     private final ConnectionRole[] roles;
 
-    public ControllerData(final T controller,
-                          final ConnectionRole[] roles) {
+    public GameNetworkMessageControllerData(final GameNetworkMessageController controller,
+                                            final ConnectionRole[] roles) {
         this.controller = controller;
         this.roles = roles;
     }

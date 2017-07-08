@@ -27,7 +27,9 @@ import io.bacta.network.udp.UdpReceiver;
 import io.bacta.network.udp.netty.NettyUdpReceiver;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.handler.SoeInboundMessageChannel;
+import io.bacta.soe.network.handler.SoeProtocolHandler;
 import io.bacta.soe.network.handler.SoeUdpSendHandler;
+import io.bacta.soe.service.InternalMessageService;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -71,7 +73,8 @@ public class LoginServerConfiguration implements ApplicationContextAware {
 
         SoeUdpConnectionCache connectionCache = inboundMessageChannel.getConnectionCache();
         UdpEmitter emitter = udpReceiver.start();
-        sendHandler.start(metricsPrefix, connectionCache, emitter);
+        SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
+        sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
 
         return udpReceiver;
     }
@@ -79,7 +82,9 @@ public class LoginServerConfiguration implements ApplicationContextAware {
 
     @Bean
     @Inject
-    public UdpReceiver getLoginPrivateReceiver(SoeInboundMessageChannel inboundMessageChannel, SoeUdpSendHandler sendHandler) {
+    public UdpReceiver getLoginPrivateReceiver(SoeInboundMessageChannel inboundMessageChannel,
+                                               SoeUdpSendHandler sendHandler,
+                                               InternalMessageService internalMessageService) {
 
         String metricsPrefix = "soe.server.connection.establish.private";
 
@@ -92,10 +97,13 @@ public class LoginServerConfiguration implements ApplicationContextAware {
 
         SoeUdpConnectionCache connectionCache = inboundMessageChannel.getConnectionCache();
         UdpEmitter emitter = udpReceiver.start();
-        sendHandler.start(metricsPrefix, connectionCache, emitter);
+        SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
+        sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
+        internalMessageService.setConnectionCache(connectionCache);
 
         return udpReceiver;
     }
+
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

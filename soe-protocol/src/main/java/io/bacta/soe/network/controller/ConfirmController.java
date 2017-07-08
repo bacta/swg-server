@@ -23,7 +23,6 @@ package io.bacta.soe.network.controller;
 import io.bacta.buffer.BufferUtil;
 import io.bacta.soe.config.SoeUdpConfiguration;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -50,7 +49,6 @@ public class ConfirmController extends BaseSoeController {
         SoeUdpConfiguration configuration = new SoeUdpConfiguration(
                 connection.getConfiguration().getProtocolVersion(),
                 crcBytes,
-                EncryptMethod.values()[cryptMethod],
                 maxRawPacketSize,
                 compression
         );

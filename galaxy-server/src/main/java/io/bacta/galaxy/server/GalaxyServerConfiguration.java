@@ -21,7 +21,17 @@
 package io.bacta.galaxy.server;
 
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.network.udp.UdpEmitter;
+import io.bacta.network.udp.UdpMetrics;
+import io.bacta.network.udp.UdpReceiver;
+import io.bacta.network.udp.netty.NettyUdpReceiver;
+import io.bacta.soe.network.connection.SoeUdpConnectionCache;
+import io.bacta.soe.network.handler.SoeInboundMessageChannel;
+import io.bacta.soe.network.handler.SoeProtocolHandler;
+import io.bacta.soe.network.handler.SoeUdpSendHandler;
+import io.bacta.soe.service.InternalMessageService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
@@ -44,41 +54,28 @@ public class GalaxyServerConfiguration {
         this.galaxyServerProperties = galaxyServerProperties;
     }
 
-//    @Bean
-//    @Inject
-//    @Named("PublicReceiver")
-//    public UdpReceiver getGalaxyPublicReceiver(final SoeInboundMessageChannel inboundMessageChannel) {
-//
-//        final UdpReceiver udpReceiver = new NettyUdpReceiver(
-//                galaxyServerProperties.getBindAddress(),
-//                galaxyServerProperties.getPublicBindPort(),
-//                new UdpReceiverMetrics(metricRegistry, "bacta.server.galaxy"),
-//                inboundMessageChannel
-//        );
-//
-//        udpReceiver.start();
-//        return udpReceiver;
-//    }
-//
-//    @Bean
-//    @Inject
-//    public SoeMessageService getSendRelay(final SoeNetworkConfiguration networkConfiguration,
-//                                          final SoeConnectionCache connectionCache,
-//                                          final PublisherService publisherService,
-//                                          final MetricRegistry metricRegistry,
-//                                          final UdpChannel sendChannel) {
-//
-//        SoeMessageService relay = new SoeMessageService(
-//                networkConfiguration,
-//                connectionCache,
-//                publisherService,
-//                metricRegistry,
-//                sendChannel
-//        );
-//        Thread thread = new Thread(relay);
-//        thread.setName("GalaxySend");
-//        thread.start();
-//
-//        return relay;
-//    }
+    @Bean
+    @Inject
+    public UdpReceiver getGalaxyPrivateReceiver(SoeInboundMessageChannel inboundMessageChannel,
+                                               SoeUdpSendHandler sendHandler,
+                                               InternalMessageService internalMessageService) {
+
+        String metricsPrefix = "io.bacta.galaxy.server";
+
+        final UdpReceiver udpReceiver = new NettyUdpReceiver(
+                galaxyServerProperties.getBindAddress(),
+                galaxyServerProperties.getBindPort(),
+                new UdpMetrics(metricRegistry, metricsPrefix),
+                inboundMessageChannel
+        );
+
+        SoeUdpConnectionCache connectionCache = inboundMessageChannel.getConnectionCache();
+        UdpEmitter emitter = udpReceiver.start();
+        SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
+        sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
+        internalMessageService.setConnectionCache(connectionCache);
+        internalMessageService.setConnectionProvider(inboundMessageChannel.getConnectionProvider());
+
+        return udpReceiver;
+    }
 }

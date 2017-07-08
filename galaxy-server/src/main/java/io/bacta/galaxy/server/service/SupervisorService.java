@@ -20,9 +20,14 @@
 
 package io.bacta.galaxy.server.service;
 
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.service.InternalMessageService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.lang.ref.WeakReference;
 
 /**
  * Created by kyle on 7/2/2017.
@@ -30,12 +35,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class SupervisorService implements ApplicationListener<ApplicationReadyEvent> {
 
+    private final InternalMessageService messageService;
+    private WeakReference<SoeUdpConnection> loginConnection;
 
-
-
+    @Inject
+    public SupervisorService(final InternalMessageService messageService) {
+        this.messageService = messageService;
+    }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
         // Notify Login we are up and running
+        loginConnection = new WeakReference<>(messageService.getLoginServerConnection());
+//        loginConnection.get().sendMessage(new RegisterGalaxy(
+//                "Bacta",
+//                4,
+//                "test"
+//        ));
     }
 }

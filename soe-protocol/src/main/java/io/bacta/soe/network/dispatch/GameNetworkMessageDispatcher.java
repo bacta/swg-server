@@ -54,7 +54,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
     /**
      * Map of controller data to dispatch messages
      */
-    private final TIntObjectMap<ControllerData<GameNetworkMessageController>> controllers;
+    private final TIntObjectMap<GameNetworkMessageControllerData> controllers;
 
     /**
      * Creates the {@link GameNetworkMessage} to be passed to the appropriate controller
@@ -69,20 +69,20 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
 
     @Inject
-    public GameNetworkMessageDispatcher(final ClasspathControllerLoader controllerLoader,
+    public GameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
                                         final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                         final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
         this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
         this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
 
-        controllers = controllerLoader.getControllers(GameNetworkMessageController.class);
+        controllers = controllerLoader.loadControllers();
     }
 
     public void dispatch(short priority, int gameMessageType, SoeUdpConnection connection, ByteBuffer buffer) {
         connection.increaseGameNetworkMessageReceived();
 
-        final ControllerData<GameNetworkMessageController> controllerData = controllers.get(gameMessageType);
+        final GameNetworkMessageControllerData controllerData = controllers.get(gameMessageType);
 
         if (controllerData != null) {
             if (!controllerData.containsRoles(connection.getRoles())) {

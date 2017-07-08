@@ -25,7 +25,7 @@ import com.jcraft.jzlib.ZStream
 import spock.lang.Specification
 
 import java.nio.ByteBuffer
-import java.nio.ByteOrder;
+import java.nio.ByteOrder
 
 /**
  * Created by kyle on 7/2/2017.
@@ -73,8 +73,7 @@ public class ClockSyncCompression extends Specification {
 
         if (zstream.inflate(JZlib.Z_FINISH) == JZlib.Z_DATA_ERROR)
         {
-            LOGGER.info("Error Decompressing");
-            return null;
+            throw new Exception(zstream.getMessage())
         }
         then:
         noExceptionThrown()
