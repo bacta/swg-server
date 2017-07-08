@@ -73,8 +73,7 @@ public class GalaxyServerConfiguration {
         UdpEmitter emitter = udpReceiver.start();
         SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
         sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
-        internalMessageService.setConnectionCache(connectionCache);
-        internalMessageService.setConnectionProvider(inboundMessageChannel.getConnectionProvider());
+        internalMessageService.setConnectionObjects(connectionCache, inboundMessageChannel.getConnectionProvider());
 
         return udpReceiver;
     }

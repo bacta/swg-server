@@ -51,9 +51,9 @@ public class SoeConnectionProvider {
     public SoeUdpConnection newInstance(final InetSocketAddress sender) {
 
         SoeUdpConnection connection = new SoeUdpConnection(
-                networkConfiguration, sender,
-                messageSerializer,
-                null);
+                networkConfiguration,
+                sender,
+                messageSerializer);
 
         if(whitelistedAddresses != null && whitelistedAddresses.contains(sender.getHostString())) {
             connection.addRole(ConnectionRole.WHITELISTED);
