@@ -62,6 +62,8 @@ public final class DefaultClusterService implements ClusterService {
 
         clusters = new TIntObjectHashMap<>();
         disabledCharacterCreationClusters = new HashSet<>();
+
+        refreshClusterList();
     }
 
     @Override
@@ -79,6 +81,14 @@ public final class DefaultClusterService implements ClusterService {
 
     @Override
     public void refreshClusterList() {
+        LOGGER.info("Refreshing known clusters.");
+
+        if (clusterRepository.count() == 0) {
+            LOGGER.warn("Creating test cluster since the repository was empty.");
+            final ClusterEntity entity = new ClusterEntity("Test Server", "127.0.0.1", (short)44463);
+            clusterRepository.save(entity);
+        }
+
         final Iterable<ClusterEntity> clusterEntities = clusterRepository.findAll();
 
         //Rather than clear and rebuild the list, we try and do an add/update/remove because the ClusterListEntry objects

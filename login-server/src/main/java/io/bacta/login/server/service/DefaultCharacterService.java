@@ -20,12 +20,16 @@
 
 package io.bacta.login.server.service;
 
+import io.bacta.login.message.CharacterType;
 import io.bacta.login.message.EnumerateCharacterId;
+import io.bacta.login.server.entity.CharacterEntity;
+import io.bacta.login.server.repository.CharacterRepository;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,6 +38,12 @@ import java.util.Set;
 @Slf4j
 @Service
 public class DefaultCharacterService implements CharacterService {
+    private final CharacterRepository characterRepository;
+
+    public DefaultCharacterService(CharacterRepository characterRepository) {
+        this.characterRepository = characterRepository;
+    }
+
     @Override
     public void deleteCharacter(int clusterId, long networkId, int bactaId) {
 
@@ -41,12 +51,20 @@ public class DefaultCharacterService implements CharacterService {
 
     @Override
     public void deleteAllCharacters(int bactaId) {
-
+        characterRepository.deleteByBactaId(bactaId);
     }
 
     @Override
     public void createCharacter(int clusterId, int bactaId, String characterName, long characterId, int templateId, boolean jedi) {
+        final CharacterEntity entity = new CharacterEntity();
+        entity.setNetworkId(characterId);
+        entity.setClusterId(clusterId);
+        entity.setBactaId(bactaId);
+        entity.setName(characterName);
+        entity.setObjectTemplateId(templateId);
+        entity.setCharacterType(jedi ? CharacterType.JEDI.getValue() : CharacterType.NORMAL.getValue());
 
+        characterRepository.save(entity);
     }
 
     @Override
@@ -76,9 +94,54 @@ public class DefaultCharacterService implements CharacterService {
 
     @Override
     public void sendEnumerateCharacters(SoeUdpConnection connection, int bactaId) {
-        final Set<EnumerateCharacterId.CharacterData> characterDataSet = new HashSet<>();
 
-        //TODO: Retrieve characters and populate character data for the given account.
+        //Add some characters for testing purposes.
+        if (characterRepository.count() == 0) {
+            LOGGER.info("Creating 4 characters for testing.");
+
+            final CharacterEntity entity1 = new CharacterEntity();
+            entity1.setNetworkId(1);
+            entity1.setClusterId(1);
+            entity1.setObjectTemplateId(0xD4A72A70);
+            entity1.setBactaId(bactaId);
+            entity1.setName("Female Human 1");
+            entity1.setCharacterType(CharacterType.NORMAL.getValue());
+
+            final CharacterEntity entity2 = new CharacterEntity();
+            entity2.setNetworkId(2);
+            entity2.setClusterId(1);
+            entity2.setObjectTemplateId(0xD4A72A70);
+            entity2.setBactaId(bactaId);
+            entity2.setName("Female Human 2");
+            entity2.setCharacterType(CharacterType.JEDI.getValue());
+
+            final CharacterEntity entity3 = new CharacterEntity();
+            entity3.setNetworkId(5);
+            entity3.setClusterId(1);
+            entity3.setObjectTemplateId(0x6F6EB65D);
+            entity3.setBactaId(bactaId);
+            entity3.setName("Female Twilek 1");
+            entity3.setCharacterType(CharacterType.SPECTRAL.getValue());
+
+            characterRepository.save(entity1);
+            characterRepository.save(entity2);
+            characterRepository.save(entity3);
+        }
+
+
+        final Set<EnumerateCharacterId.CharacterData> characterDataSet = new HashSet<>();
+        final List<CharacterEntity> characterEntities = characterRepository.findByBactaId(bactaId);
+
+        for (final CharacterEntity entity : characterEntities) {
+            final EnumerateCharacterId.CharacterData data = new EnumerateCharacterId.CharacterData(
+                    entity.getName(),
+                    entity.getObjectTemplateId(),
+                    entity.getNetworkId(),
+                    entity.getClusterId(),
+                    CharacterType.from(entity.getCharacterType()));
+
+            characterDataSet.add(data);
+        }
 
         final EnumerateCharacterId message = new EnumerateCharacterId(characterDataSet);
         connection.sendMessage(message);

@@ -20,18 +20,41 @@
 
 package io.bacta.login.server.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by crush on 7/2/2017.
  */
 @Getter
-@AllArgsConstructor
-public final class AvatarEntity {
-    private final String name;
-    private final int objectTemplateId;
-    private final long networkId;
-    private final int clusterId;
-    private final int characterType;
+@Setter
+@Entity
+@Table(name = "characters")
+@IdClass(CharacterEntity.CharacterEntityKey.class)
+public class CharacterEntity {
+    @Id
+    private long networkId;
+    @Id
+    private int clusterId;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private int objectTemplateId;
+
+    @Column(nullable = false)
+    private int characterType;
+
+    @Id
+    @Column(nullable = false)
+    private int bactaId;
+
+    public static class CharacterEntityKey implements Serializable {
+        private long networkId;
+        private int clusterId;
+    }
 }
