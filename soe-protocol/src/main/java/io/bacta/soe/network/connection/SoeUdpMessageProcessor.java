@@ -59,10 +59,10 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
     @Override
     public boolean addUnreliable(ByteBuffer buffer) {
         if (buffer == null) throw new NullPointerException();
+        buffer.limit(buffer.position());
 
         flushReliable();
 
-        buffer.limit(buffer.position());
         return udpMessageBuilder.add(buffer);
     }
 

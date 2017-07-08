@@ -195,7 +195,7 @@ public final class SoeUdpConnection implements UdpConnection {
 
     public void sendMessage(SoeMessage message) {
 
-        if(state != ConnectionState.DISCONNECTED || message.getPacketType() == SoeMessageType.cUdpPacketConnect) {
+        if(state != ConnectionState.DISCONNECTED ) {
 
             protocolMessagesSent.getAndIncrement();
 
