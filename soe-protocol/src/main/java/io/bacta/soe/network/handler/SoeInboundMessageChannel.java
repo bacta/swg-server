@@ -20,8 +20,6 @@
 
 package io.bacta.soe.network.handler;
 
-import co.paralleluniverse.fibers.Fiber;
-import co.paralleluniverse.strands.SuspendableRunnable;
 import io.bacta.buffer.BufferUtil;
 import io.bacta.network.ConnectionState;
 import io.bacta.network.channel.InboundMessageChannel;
@@ -63,7 +61,7 @@ public class SoeInboundMessageChannel implements InboundMessageChannel {
 
     @Override
     public void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
-        new Fiber<Void>((SuspendableRunnable) () -> {
+        //new Fiber<Void>((SuspendableRunnable) () -> {
             SoeUdpConnection connection = connectionCache.get(sender);
 
             byte type = message.get(1);
@@ -86,6 +84,6 @@ public class SoeInboundMessageChannel implements InboundMessageChannel {
             } else {
                 LOGGER.debug("Unsolicited Message from " + sender + ": " + BufferUtil.bytesToHex(message));
             }
-        }).start();
+        //}).start();
     }
 }
