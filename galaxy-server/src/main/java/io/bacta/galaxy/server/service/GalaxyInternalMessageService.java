@@ -32,21 +32,28 @@ public class GalaxyInternalMessageService implements InternalMessageService {
     private final TaskSchedulerService taskSchedulerService;
 
     private SoeUdpConnection loginConnection;
-    private boolean loginConnectionPending;
 
     @Inject
     public GalaxyInternalMessageService(final SoeNetworkConfiguration networkConfiguration,
                                         final TaskSchedulerService taskSchedulerService) {
 
         this.taskSchedulerService = taskSchedulerService;
-        this.loginConnection = null;
-        this.loginConnectionPending = false;
+
     }
 
     @Override
     public void setConnectionObjects(final SoeUdpConnectionCache connectionCache, final SoeConnectionProvider connectionProvider) {
         this.connectionCache = connectionCache;
         this.connectionProvider = connectionProvider;
+
+        InetAddress loginAddress = null;
+        try {
+            loginAddress = InetAddress.getByName("192.168.1.100");
+        } catch (UnknownHostException e) {
+            LOGGER.error("Unable to parse InetAddress '{}'", "");
+        }
+
+        this.loginConnection = connectionProvider.newInstance(new InetSocketAddress(loginAddress, 44454));
 
         taskSchedulerService.scheduleAtFixedRate(new Task() {
             @Override
@@ -62,26 +69,15 @@ public class GalaxyInternalMessageService implements InternalMessageService {
 
     private void makeLoginConnection() {
 
-        if(!loginConnectionPending && (loginConnection == null || loginConnection.getState() != ConnectionState.ONLINE)) {
-            loginConnectionPending = true;
-            loginConnection = null;
-            InetAddress loginAddress = null;
-            try {
-                loginAddress = InetAddress.getByName("192.168.1.100");
-            } catch (UnknownHostException e) {
-                LOGGER.error("Unable to parse InetAddress '{}'", "");
-            }
-
-            SoeUdpConnection connection = connectionProvider.newInstance(new InetSocketAddress(loginAddress, 44454));
-            connection.setState(ConnectionState.NEW);
-            connectionCache.put(connection.getRemoteAddress(), connection);
-            connection.connect(this::loginConnected);
+        if(loginConnection.getState() != ConnectionState.PENDING && loginConnection.getState() != ConnectionState.ONLINE) {
+            loginConnection.setState(ConnectionState.PENDING);
+            connectionCache.put(loginConnection.getRemoteAddress(), loginConnection);
+            loginConnection.connect(this::loginConnected);
         }
     }
 
     private void loginConnected(SoeUdpConnection connection) {
-        this.loginConnection = connection;
-        loginConnectionPending = false;
+
     }
 
     @Override
@@ -102,7 +98,7 @@ public class GalaxyInternalMessageService implements InternalMessageService {
     @Override
     public SoeUdpConnection getLoginServerConnection() {
 
-        while(loginConnection == null || loginConnection.getState() != ConnectionState.ONLINE) {
+        while(loginConnection.getState() != ConnectionState.ONLINE) {
             try {
                 makeLoginConnection();
                 Strand.sleep(500);

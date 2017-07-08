@@ -50,10 +50,12 @@ public class ConfirmController extends BaseSoeController {
                 connection.getConfiguration().getProtocolVersion(),
                 crcBytes,
                 maxRawPacketSize,
-                compression
+                compression,
+                encryptCode
         );
 
         connection.setConfiguration(configuration);
+
         connection.confirm();
     }
 }
