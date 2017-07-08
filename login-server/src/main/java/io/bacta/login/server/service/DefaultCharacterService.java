@@ -123,9 +123,9 @@ public class DefaultCharacterService implements CharacterService {
             entity3.setName("Female Twilek 1");
             entity3.setCharacterType(CharacterType.SPECTRAL.getValue());
 
-            characterRepository.save(entity1);
-            characterRepository.save(entity2);
-            characterRepository.save(entity3);
+//            characterRepository.save(entity1);
+//            characterRepository.save(entity2);
+//            characterRepository.save(entity3);
         }
 
 
