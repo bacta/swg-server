@@ -99,7 +99,7 @@ public class LoginServerConfiguration implements ApplicationContextAware {
         UdpEmitter emitter = udpReceiver.start();
         SoeProtocolHandler protocolHandler = inboundMessageChannel.getProtocolHandler();
         sendHandler.start(metricsPrefix, connectionCache, protocolHandler, emitter);
-        internalMessageService.setConnectionCache(connectionCache);
+        internalMessageService.setConnectionObjects(connectionCache, inboundMessageChannel.getConnectionProvider());
 
         return udpReceiver;
     }

@@ -20,10 +20,9 @@
 
 package io.bacta.service.scheduler;
 
-import io.bacta.conf.BactaConfiguration;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,15 +31,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by kburkhardt on 2/22/14.
  */
-@Singleton
+@Component
 public class TaskSchedulerService implements SchedulerService {
 
     private final ScheduledExecutorService executor;
 
     @Inject
-    public TaskSchedulerService(BactaConfiguration configuration) {
+    public TaskSchedulerService() {
         //TODO: What should the default really be?
-        executor = Executors.newScheduledThreadPool(configuration.getIntWithDefault("Bacta/Services/Scheduler", "ThreadCount", 4));
+        executor = Executors.newScheduledThreadPool(4);
     }
 
     @Override
