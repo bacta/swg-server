@@ -29,6 +29,7 @@ import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -73,10 +74,10 @@ final class NettyUdpServer implements Runnable, DisposableBean {
 				.option(ChannelOption.SO_BROADCAST, true)
                 
                 //.option(ChannelOption.ALLOCATOR, Unpooled.DEFAULT)
-                    .handler(new ChannelInitializer<NioDatagramChannel>() {
+                    .handler(new ChannelInitializer<DatagramChannel>() {
 
                         @Override
-                        protected void initChannel(NioDatagramChannel ch)
+                        protected void initChannel(DatagramChannel ch)
                                 throws Exception {
 
                             ch.pipeline().addLast(handlers);
