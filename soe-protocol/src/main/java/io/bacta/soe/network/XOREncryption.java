@@ -23,6 +23,7 @@ package io.bacta.soe.network;
 import com.jcraft.jzlib.CRC32;
 import com.jcraft.jzlib.JZlib;
 import com.jcraft.jzlib.ZStream;
+import io.bacta.buffer.BufferUtil;
 import io.bacta.buffer.UnsignedUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,6 +70,7 @@ public final class XOREncryption implements SoeEncryption {
 		if(verifyMessage(seed, data, offset)) {
 
 			decrypt(seed, data, offset);
+            LOGGER.info("Message: " + BufferUtil.bytesToHex(data));
 
 			if(data.get(data.limit() - 3) == 1) {
 				data = decompress(data, offset);
@@ -87,12 +89,10 @@ public final class XOREncryption implements SoeEncryption {
 
 		if(compression && doCompress) {
 			data = compress(data, 2);
-
 			data.put((byte)1);
 		} else {
-
+		    data.limit(data.limit() + 1);
 			data.put((byte)0);
-
 		}
 
 		encrypt(seed, data, 2);

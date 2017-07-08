@@ -65,7 +65,7 @@ public class SoeUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> {
         if(pendingMulti == null) {
             if(pendingBuffer == null) {
                 pendingBuffer = buffer;
-                LOGGER.trace("No data pending, com.ocdsoft.bacta.swg.login.message is first");
+                LOGGER.trace("No data pending, message is first");
             } else {
                 if (pendingBuffer.remaining() + buffer.remaining() <= configuration.getMaxReliablePayload()) {
                     pendingMulti = new MultiMessage(pendingBuffer, buffer);

@@ -25,6 +25,7 @@ import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.config.SoeUdpConfiguration;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.ConfirmMessage;
+import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
 import io.bacta.soe.service.SessionKeyService;
@@ -73,12 +74,21 @@ public class ConnectController extends BaseSoeController {
         
         connection.setState(ConnectionState.ONLINE);
 
+        final EncryptMethod encryptMethod1, encryptMethod2;
+        if (networkConfiguration.isCompression()) {
+            encryptMethod1 = EncryptMethod.USERSUPPLIED;
+            encryptMethod2 = EncryptMethod.XOR;
+        } else {
+            encryptMethod1 = EncryptMethod.NONE;
+            encryptMethod2 = EncryptMethod.NONE;
+        }
+
         ConfirmMessage response = new ConfirmMessage(
                 networkConfiguration.getCrcBytes(), 
                 connectionId,
                 encryptCode,
-                networkConfiguration.getEncryptMethod(), 
-                networkConfiguration.isCompression(), 
+                encryptMethod1,
+                encryptMethod2,
                 maxRawPacketSize
         );
         

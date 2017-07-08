@@ -25,17 +25,19 @@ import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * Created by crush on 7/7/2017.
  */
 @Component
+@Slf4j
 @MessageHandled(handles = RegisterGalaxy.class)
 @ConnectionRolesAllowed({})
 public class RegisterGalaxyController implements GameNetworkMessageController<RegisterGalaxy> {
     @Override
     public void handleIncoming(SoeUdpConnection connection, RegisterGalaxy message) throws Exception {
-
+        LOGGER.info("recieved register request");
     }
 }

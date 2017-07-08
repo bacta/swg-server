@@ -61,6 +61,8 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
         if (buffer == null) throw new NullPointerException();
 
         flushReliable();
+
+        buffer.limit(buffer.position());
         return udpMessageBuilder.add(buffer);
     }
 

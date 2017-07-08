@@ -31,9 +31,10 @@ import java.net.InetAddress;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "bacta.server.galaxy")
+@ConfigurationProperties(prefix = "io.bacta.galaxy.server")
 public class GalaxyServerProperties {
     private InetAddress bindAddress;
-    private int publicBindPort;
-    private int privateBindPort;
+    private int bindPort;
+    private InetAddress loginBindAddress;
+    private int loginBindPort;
 }

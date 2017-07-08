@@ -22,12 +22,10 @@ package io.bacta.soe;
 
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.dispatch.ClasspathControllerLoader;
+import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,7 +35,7 @@ import javax.inject.Inject;
  * Created by kyle on 7/2/2017.
  */
 @Configuration
-public class SoeMessageChannelConfiguration implements ApplicationContextAware {
+public class SoeMessageChannelConfiguration  {
 
     private final MetricRegistry metricRegistry;
     private final SoeNetworkConfiguration networkConfiguration;
@@ -52,18 +50,11 @@ public class SoeMessageChannelConfiguration implements ApplicationContextAware {
 
     @Bean
     @Inject
-    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
+    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader classpathControllerLoader, final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
         return new GameNetworkMessageDispatcher(
-                new ClasspathControllerLoader(applicationContext),
+                classpathControllerLoader,
                 gameNetworkMessageSerializer,
                 null
         );
     }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
-
-
 }

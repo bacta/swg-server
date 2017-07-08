@@ -20,7 +20,6 @@
 
 package io.bacta.soe.config;
 
-import io.bacta.soe.network.message.EncryptMethod;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,6 @@ public final class SoeNetworkConfigurationImpl implements SoeNetworkConfiguratio
     private Collection<String> trustedClients;
     private boolean compression;
     private int protocolVersion;
-    private EncryptMethod encryptMethod;
 
     private boolean logAllNetworkTraffic;
     private byte crcBytes;
