@@ -81,7 +81,7 @@ public final class SoeUdpConnection implements UdpConnection {
     @Getter
     private long lastClientActivity;
 
-    private final Consumer<SoeUdpConnection> connectCallback;
+    private Consumer<SoeUdpConnection> connectCallback;
     
     @Getter
     private final AtomicInteger gameNetworkMessagesSent;
@@ -135,11 +135,9 @@ public final class SoeUdpConnection implements UdpConnection {
 
     public SoeUdpConnection(final SoeNetworkConfiguration networkConfiguration,
                             final InetSocketAddress remoteAddress,
-                            final GameNetworkMessageSerializer messageSerializer,
-                            final Consumer<SoeUdpConnection> connectCallback) {
+                            final GameNetworkMessageSerializer messageSerializer) {
         
         this.remoteAddress = remoteAddress;
-        this.connectCallback = connectCallback;
         this.state = ConnectionState.DISCONNECTED;
         this.messageSerializer = messageSerializer;
 
@@ -160,6 +158,7 @@ public final class SoeUdpConnection implements UdpConnection {
         reliableStamp = new AtomicLong();
         bactaId = -1;
         pendingReliablePackets = new PendingReliablePackets(networkConfiguration.getMaxInstandingPackets());
+        connectCallback = null;
 
         protocolMessagesReceived = new AtomicInteger();
         gameNetworkMessagesReceived = new AtomicInteger();
@@ -274,7 +273,8 @@ public final class SoeUdpConnection implements UdpConnection {
         return incomingFragmentContainer.addFragment(buffer);
     }
 
-    public void connect() {
+    public void connect(Consumer<SoeUdpConnection> connectCallback) {
+        this.connectCallback = connectCallback;
         ConnectMessage connectMessage = new ConnectMessage(configuration.getProtocolVersion(), id, configuration.getMaxRawPacketSize());
         sendMessage(connectMessage);
     }
