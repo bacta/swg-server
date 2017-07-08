@@ -22,6 +22,7 @@ package io.bacta.network;
 
 public enum ConnectionState {
     NEW,
+    PENDING,
 	ONLINE,
     LINKDEAD,
     DISCONNECTED
