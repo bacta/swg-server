@@ -22,11 +22,9 @@ pipeline {
 
         stage ('Build') {
             steps {
-                if (isUnix()) {
-                    sh "mvn -Dmaven.test.failure.ignore=true install"
-                } else {
-                    bat(/"mvn" -Dmaven.test.failure.ignore clean install/)
-                }
+
+                sh "mvn -Dmaven.test.failure.ignore=true install"
+
             }
             post {
                 success {
