@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'Maven 3.5.0'
-        jdk 'jdk8'
+        jdk 'JDK8 131'
     }
     stages {
         stage ('Initialize') {
@@ -15,7 +15,9 @@ pipeline {
         }
 
         stage('Clone sources') {
+            steps {
                 git url: 'https://github.com/bacta/swg-server.git'
+            }
         }
 
         stage ('Build') {
