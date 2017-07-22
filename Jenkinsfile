@@ -14,12 +14,6 @@ pipeline {
             }
         }
 
-        stage('Clone sources') {
-            steps {
-                git url: 'https://github.com/bacta/swg-server.git'
-            }
-        }
-
         stage ('Build') {
             steps {
 
