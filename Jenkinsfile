@@ -17,15 +17,17 @@ pipeline {
 
         stage ('Build') {
             steps {
-                try {
-                    notifySlack()
-                    sh "mvn -Dmaven.test.failure.ignore=true install"
+                script {
+                    try {
+                        notifySlack()
+                        sh "mvn -Dmaven.test.failure.ignore=true install"
 
-                } catch (e) {
-                    currentBuild.result = 'FAILURE'
-                    throw e
-                } finally {
-                    notifySlack(currentBuild.result)
+                    } catch (e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    } finally {
+                        notifySlack(currentBuild.result)
+                    }
                 }
             }
         }
