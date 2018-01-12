@@ -1,6 +1,11 @@
 package io.bacta.login.server;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.login.server.data.GalaxyListEntry;
+import io.bacta.login.server.repository.GalaxyRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -45,4 +50,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public final class GalaxyService {
+    private final GalaxyRepository galaxyRepository;
+    private final LoginServerProperties loginServerProperties;
+    private final TIntObjectMap<GalaxyListEntry> galaxies;
+
+    public GalaxyService(GalaxyRepository galaxyRepository, LoginServerProperties loginServerProperties) {
+        this.galaxyRepository = galaxyRepository;
+        this.loginServerProperties = loginServerProperties;
+
+        this.galaxies = new TIntObjectHashMap<>();
+    }
+
+    @Scheduled(initialDelay = 0, fixedRate = 500)
+    private void refreshGalaxyServerList() {
+        LOGGER.info("Refreshing galaxy server list from repository.");
+    }
 }

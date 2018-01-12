@@ -20,7 +20,6 @@
 
 package io.bacta.login.server;
 
-import akka.actor.ActorSystem;
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.network.connection.ClientConnection;
@@ -85,14 +84,6 @@ public class LoginServerConfiguration implements ApplicationContextAware {
         transceiverGroup.registerSendHandler(sendHandler);
 
         return transceiverGroup;
-    }
-
-    @Bean
-    public ActorSystem getLoginActorSystem() {
-        LOGGER.info("Creating actor system.");
-
-        final ActorSystem actorSystem =  ActorSystem.create(LoginServerConstants.ActorSystem);
-        return actorSystem;
     }
 
     @Override

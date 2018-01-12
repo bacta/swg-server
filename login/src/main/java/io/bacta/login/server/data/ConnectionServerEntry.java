@@ -18,34 +18,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.login.server.data;
 
-import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.game.Priority;
-import io.bacta.shared.GameNetworkMessage;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-import java.nio.ByteBuffer;
+import java.util.Comparator;
 
 /**
- * Created by crush on 7/4/2017.
- *
- * LoginServer to GalaxyServer. Tells the GalaxyServer its cluster id according to the LoginServer. This message also
- * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
+ * Created by crush on 7/2/2017.
  */
 @Getter
-@Priority(0x02)
-@AllArgsConstructor
-public final class ConnectGalaxyServerAck extends GameNetworkMessage {
-    private final int clusterId;
+@RequiredArgsConstructor
+public final class ConnectionServerEntry {
+    private final int id;
+    private final String clientServiceAddress;
+    private final short clientServicePortPrivate;
+    private final short clientServicePortPublic;
+    private final short pingPort;
+    @Setter
+    private int numClients;
 
-    public ConnectGalaxyServerAck(final ByteBuffer buffer) {
-        clusterId = buffer.getInt();
-    }
-
-    @Override
-    public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, clusterId);
+    /**
+     * Used to sort connection server entries by least population. The least populated ConnectionServerEntry should
+     * be the first connection server entry in a set if this comparator is used. That makes lookup of the entry
+     * extremely fast.
+     */
+    public static final class LeastPopulationComparator implements Comparator<ConnectionServerEntry> {
+        @Override
+        public int compare(ConnectionServerEntry x, ConnectionServerEntry y) {
+            return Integer.compare(x.numClients, y.numClients);
+        }
     }
 }
