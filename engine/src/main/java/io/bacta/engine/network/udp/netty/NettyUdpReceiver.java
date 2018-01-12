@@ -26,6 +26,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.function.BiConsumer;
@@ -92,7 +93,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
         return udpHandler.isRegistered();
     }
 
-    @Override
+    @PreDestroy
     public void destroy() throws Exception {
         thread.interrupt();
     }
