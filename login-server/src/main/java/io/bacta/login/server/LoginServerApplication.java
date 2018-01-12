@@ -20,9 +20,11 @@
 
 package io.bacta.login.server;
 
+import io.bacta.engine.context.ApplicationErrorListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
@@ -44,7 +46,10 @@ import org.springframework.context.annotation.PropertySources;
 public class LoginServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LoginServerApplication.class, args);
+
+        new SpringApplicationBuilder(LoginServerApplication.class)
+                .listeners(new ApplicationErrorListener())
+                .run(args);
     }
 
 }

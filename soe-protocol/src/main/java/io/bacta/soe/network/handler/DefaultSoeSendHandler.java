@@ -24,7 +24,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.network.connection.ConnectionState;
-import io.bacta.engine.network.udp.UdpEmitter;
+import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.event.DisconnectEvent;
 import io.bacta.soe.network.connection.SoeConnection;
@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -56,7 +57,7 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
     private final PublisherService publisherService;
     private final MetricRegistry metricRegistry;
 
-    private UdpEmitter emitter;
+    private UdpChannel udpChannel;
     private SoeConnectionCache connectionCache;
     private SoeProtocolHandler protocolHandler;
 
@@ -78,16 +79,21 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
     }
 
     @Override
-    public void start(final String metricPrefix, final SoeConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpEmitter udpEmitter) {
-        if(!sendThread.isAlive()) {
+    public void start(final String metricPrefix, final SoeConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpChannel udpChannel) {
+        if (!sendThread.isAlive()) {
             sendThread.setName("SendHandler");
             sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
             metricRegistry.register(metricPrefix, (Gauge<Integer>) () -> connectionCache.getConnectionCount());
             this.connectionCache = connectionCache;
             this.protocolHandler = protocolHandler;
-            this.emitter = udpEmitter;
+            this.udpChannel = udpChannel;
             sendThread.start();
         }
+    }
+
+    @PreDestroy
+    public void stop() {
+        sendThread.interrupt();
     }
 
     @Override
@@ -114,7 +120,7 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            LOGGER.warn("Send thread interrupted", e);
+            LOGGER.info("Shutting down");
         }
     }
 
@@ -141,13 +147,13 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
             }
 
             final List<ByteBuffer> messages = connection.getPendingMessages();
-            if(messages.size() > 0) {
+            if(messages.isEmpty()) {
                 sendQueueSizes.update(messages.size());
             }
 
             for (final ByteBuffer message : messages) {
                 ByteBuffer encodedMessage = protocolHandler.processOutgoing(connectionProxy, message);
-                emitter.sendMessage(connection.getRemoteAddress(), encodedMessage);
+                udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
                 LOGGER.info("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
             }
         }

@@ -21,7 +21,6 @@
 package io.bacta.engine.network.udp;
 
 import io.netty.channel.socket.DatagramPacket;
-import org.springframework.beans.factory.DisposableBean;
 
 import java.net.InetSocketAddress;
 
@@ -30,7 +29,7 @@ import java.net.InetSocketAddress;
  * @author Kyle Burkhardt
  * @since 1.0
  **/
-public interface UdpReceiver extends DisposableBean {
+public interface UdpReceiver {
 	void receiveMessage(InetSocketAddress client, DatagramPacket msg);
 	boolean isReady();
 }
