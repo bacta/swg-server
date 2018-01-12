@@ -20,149 +20,90 @@
 
 package io.bacta.soe.network.connection;
 
-import io.bacta.network.ConnectionState;
-import io.bacta.network.udp.UdpConnection;
+import io.bacta.engine.network.connection.ConnectionState;
+import io.bacta.engine.network.udp.UdpConnection;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.config.SoeUdpConfiguration;
 import io.bacta.soe.network.message.*;
-import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.management.MalformedObjectNameException;
+import javax.inject.Inject;
 import javax.management.ObjectName;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+/**
+ * Represents a Udp endpoint for a SOE connection.  Contains both {@link SoeIncomingMessageProcessor} and
+ * {@link SoeOutgoingMessageProcessor}
+ *
+ * This class supports JMX instrumentation for remote management
+ */
 @Slf4j
-public final class SoeUdpConnection implements UdpConnection {
+@Getter
+public final class SoeUdpConnection implements UdpConnection, SoeUdpConnectionMBean {
 
-    @Getter
-    protected InetSocketAddress remoteAddress;
+    private final ObjectName objectName;
 
-    @Getter
-    @Setter
-    protected ConnectionState state;
-
-    @Getter
+    private final InetSocketAddress remoteAddress;
     private int id;
-    
-    @Getter
-    @Setter
-    private SoeUdpConfiguration configuration;
 
-    @Getter
-    @Setter
-    private int bactaId;
+    private int protocolVersion;
+    private byte crcBytes;
+    private boolean compression;
 
-    @Getter
-    @Setter
-    private String accountUsername;
+    private final SoeIncomingMessageProcessor incomingMessageProcessor;
+    private final SoeOutgoingMessageProcessor outgoingMessageProcessor;
 
-    private final UdpMessageProcessor<ByteBuffer> udpMessageProcessor;
+    private int maxRawPacketSize;
+    private int encryptCode;
+    private EncryptMethod encryptMethod1;
+    private EncryptMethod encryptMethod2;
 
-    private final AtomicInteger clientSequenceNumber;
-
-    private final IncomingFragmentContainer incomingFragmentContainer;
-
-    private final List<ConnectionRole> roles;
-
-    @Getter
     private long lastActivity;
+    private long lastRemoteActivity;
 
-    @Getter
-    private long lastClientActivity;
+    private TerminateReason terminateReason;
 
-    private Consumer<SoeUdpConnection> connectCallback;
-    
-    @Getter
-    private final AtomicInteger gameNetworkMessagesSent;
-
-    @Getter
-    private final AtomicInteger protocolMessagesSent;
-
-    @Getter
-    private final AtomicInteger protocolMessagesReceived;
-
-    @Getter
-    private final AtomicInteger gameNetworkMessagesReceived;
-
-    @Getter
-    private TerminateReason terminateReason = TerminateReason.NONE;
-
-    @Getter
-    private ObjectName beanName;
-
-    //TODO: Make setters only work once?
-    @Getter
     @Setter
-    private long currentNetworkId;
+    private ConnectionState connectionState;
 
-    @Getter
-    @Setter
-    private String currentCharName;
-
-    @Getter
-    @Setter
-    private int orderedStampLast;
-
-    @Getter
     private int masterPingTime;
-    @Getter
     private int averagePingTime;
-    @Getter
     private int lowPingTime;
-    @Getter
     private int highPingTime;
-    @Getter
     private int lastPingTime;
 
-    @Getter
-    private AtomicLong reliableStamp;
+    private Consumer<SoeUdpConnection> connectCallback;
 
-    @Getter
-    private PendingReliablePackets pendingReliablePackets;
+    @Inject
+    public SoeUdpConnection(final ObjectName objectName,
+                            final InetSocketAddress sender,
+                            final int id,
+                            final SoeNetworkConfiguration networkConfiguration,
+                            final SoeIncomingMessageProcessor incomingMessageProcessor,
+                            final SoeOutgoingMessageProcessor outgoingMessageProcessor) {
 
-    private final GameNetworkMessageSerializer messageSerializer;
+        this.objectName = objectName;
+        this.remoteAddress = sender;
+        this.id = id;
+        this.connectionState = ConnectionState.NEW;
 
-    public SoeUdpConnection(final SoeNetworkConfiguration networkConfiguration,
-                            final InetSocketAddress remoteAddress,
-                            final GameNetworkMessageSerializer messageSerializer) {
-        
-        this.remoteAddress = remoteAddress;
-        this.state = ConnectionState.NEW;
-        this.messageSerializer = messageSerializer;
+        this.protocolVersion = networkConfiguration.getProtocolVersion();
+        this.crcBytes = networkConfiguration.getCrcBytes();
+        this.compression = networkConfiguration.isCompression();
 
-        this.configuration = new SoeUdpConfiguration(
-                networkConfiguration.getProtocolVersion(),
-                networkConfiguration.getCrcBytes(),
-                networkConfiguration.getMaxRawPacketSize(),
-                networkConfiguration.isCompression()
-        );
+        this.maxRawPacketSize = networkConfiguration.getMaxRawPacketSize();
+        this.terminateReason = TerminateReason.NONE;
 
-        udpMessageProcessor = new SoeUdpMessageProcessor(this, networkConfiguration);
-        clientSequenceNumber = new AtomicInteger();
-        incomingFragmentContainer = new IncomingFragmentContainer();
-        roles = new ArrayList<>();
-        roles.add(ConnectionRole.UNAUTHENTICATED);
-        gameNetworkMessagesSent = new AtomicInteger();
-        protocolMessagesSent = new AtomicInteger();
-        reliableStamp = new AtomicLong();
-        bactaId = -1;
-        pendingReliablePackets = new PendingReliablePackets(networkConfiguration.getMaxInstandingPackets());
-        connectCallback = null;
+        this.incomingMessageProcessor = incomingMessageProcessor;
+        this.outgoingMessageProcessor = outgoingMessageProcessor;
 
-        protocolMessagesReceived = new AtomicInteger();
-        gameNetworkMessagesReceived = new AtomicInteger();
-        this.orderedStampLast = 0;
+        this.encryptMethod1 = EncryptMethod.USERSUPPLIED;
+        this.encryptMethod2 = EncryptMethod.XOR;
 
         masterPingTime = 0;
         averagePingTime = 0;
@@ -173,114 +114,91 @@ public final class SoeUdpConnection implements UdpConnection {
         updateLastActivity();
         updateLastClientActivity();
     }
-    
-    public void setId(int id) {
-        this.id = id;
-        try {
-            this.beanName = new ObjectName("Bacta:type=SoeUdpConnection,id=" + id);
-        } catch (MalformedObjectNameException e) {
-            LOGGER.error("Unable to create bean name", e);
-            this.beanName = null;
-        }
-    }
-    
-    public void increaseProtocolMessageReceived() {
-        protocolMessagesReceived.incrementAndGet();
+
+    /**
+     * Update last activity time stamp of when this object initiated and outgoing change
+     */
+    public void updateLastActivity() {
+        lastActivity = System.currentTimeMillis();
     }
 
-    public void increaseGameNetworkMessageReceived() {
-        gameNetworkMessagesReceived.incrementAndGet();
+    /**
+     * Update last activity timestamp of when the remote object has sent a message
+     */
+    public void updateLastClientActivity() {
+        lastRemoteActivity = System.currentTimeMillis();
     }
 
     public void sendMessage(SoeMessage message) {
-
-        if(state != ConnectionState.DISCONNECTED ) {
-
-            protocolMessagesSent.getAndIncrement();
-
-            if (udpMessageProcessor.addUnreliable(message.getBuffer())) {
-                updateLastActivity();
-            }
-        }
+        outgoingMessageProcessor.process(message);
     }
 
     public void sendMessage(GameNetworkMessage message) {
-
-        if(state != ConnectionState.DISCONNECTED) {
-
-            gameNetworkMessagesSent.incrementAndGet();
-            ByteBuffer buffer = messageSerializer.writeToBuffer(message);
-
-            if (!udpMessageProcessor.addReliable(buffer)) {
-                if (getState() == ConnectionState.ONLINE) {
-                    setState(ConnectionState.DISCONNECTED);
-                }
-            } else {
-                updateLastActivity();
-            }
+        if(!outgoingMessageProcessor.process(message)) {
+            terminate(TerminateReason.RELIABLEOVERFLOW);
         }
     }
 
     public List<ByteBuffer> getPendingMessages() {
 
-        List<ByteBuffer> pendingMessageList = new ArrayList<>();
-
-        ByteBuffer buffer;
-        while ((buffer = udpMessageProcessor.processNext()) != null) {
-            pendingMessageList.add(buffer);
-            LOGGER.trace("Sending: {}", SoeMessageUtil.bytesToHex(buffer));
-        }
-
-        if(!pendingMessageList.isEmpty()) {
+        List<ByteBuffer> messages = outgoingMessageProcessor.getPendingMessages();
+        if(!messages.isEmpty()) {
             updateLastActivity();
         }
-
-        return pendingMessageList;
+        return messages;
     }
 
-    public void updateLastActivity() {
-        lastActivity = System.currentTimeMillis();
-    }
-
-    public void updateLastClientActivity() {
-        lastClientActivity = System.currentTimeMillis();
-    }
-
-    public void sendAck(short sequenceNum) {
-        updateLastActivity();
-        sendMessage(new AckAllMessage(sequenceNum));
-        LOGGER.debug("{} Sending AckAll Sequence {}", id, sequenceNum);
+    public void ackClient(short sequenceNum) {
+        updateLastClientActivity();
+        outgoingMessageProcessor.handleClientAck(sequenceNum);
+        sendMessage(new AckMessage(sequenceNum));
     }
 
     public void ackAllFromClient(short sequenceNum) {
-        clientSequenceNumber.set(sequenceNum);
-        udpMessageProcessor.acknowledge(sequenceNum);
         updateLastClientActivity();
-        LOGGER.debug("{} Client Ack for Sequence {}", id, sequenceNum);
-    }
-    
-    @Override
-    public void setState(ConnectionState state) {
-        this.state = state;
-    }
-
-    @Override
-    public ConnectionState getState() {
-        return state;
-    }
-
-    public ByteBuffer addIncomingFragment(ByteBuffer buffer) {
-        return incomingFragmentContainer.addFragment(buffer);
+        outgoingMessageProcessor.handleClientAckAll(sequenceNum);
+        sendMessage(new AckAllMessage(sequenceNum));
     }
 
     public void connect(Consumer<SoeUdpConnection> connectCallback) {
         this.connectCallback = connectCallback;
-        ConnectMessage connectMessage = new ConnectMessage(configuration.getProtocolVersion(), id, configuration.getMaxRawPacketSize());
+        ConnectMessage connectMessage = new ConnectMessage(protocolVersion, id, maxRawPacketSize);
         sendMessage(connectMessage);
     }
 
-    public void confirm() {
-        setState(ConnectionState.ONLINE);
+    public void doConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2) {
+
+        this.id = connectionId;
+        this.encryptCode = encryptCode;
+        this.maxRawPacketSize = maxRawPacketSize;
+        this.encryptMethod1 = encryptMethod1;
+        this.encryptMethod2 = encryptMethod2;
+
+        setConnectionState(ConnectionState.ONLINE);
+
+        ConfirmMessage response = new ConfirmMessage(
+                crcBytes,
+                connectionId,
+                encryptCode,
+                encryptMethod1,
+                encryptMethod2,
+                maxRawPacketSize
+        );
+
+        sendMessage(response);
+    }
+
+    public void confirmed(int connectionID, int encryptCode, byte crcBytes, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2, int maxRawPacketSize) {
+        this.id = connectionID;
+        this.encryptCode = encryptCode;
+        this.crcBytes = crcBytes;
+        this.compression = compression;
+        this.maxRawPacketSize = maxRawPacketSize;
+        this.encryptMethod1 = encryptMethod1;
+        this.encryptMethod2 = encryptMethod2;
+
+        setConnectionState(ConnectionState.ONLINE);
+
         if(connectCallback != null) {
             connectCallback.accept(this);
         }
@@ -296,31 +214,18 @@ public final class SoeUdpConnection implements UdpConnection {
             sendMessage(terminate);
         }
         
-        setState(ConnectionState.DISCONNECTED);
+        setConnectionState(ConnectionState.DISCONNECTED);
         terminateReason = reason;
     }
 
-    public List<ConnectionRole> getRoles() {
-        return roles;
-    }
-
-    public void addRole(ConnectionRole role) {
-        roles.add(role);
-    }
-
-    public boolean hasRole(ConnectionRole role) {
-        for (int i = 0, size = roles.size(); i < size; ++i) {
-            if (roles.get(i) == role)
-                return true;
-        }
-
-        return false;
-    }
-
-    public boolean isGod() {
-        return hasRole(ConnectionRole.GOD);
-    }
-
+    /**
+     * Updates ping information sent by remote client and received in {@link io.bacta.soe.network.controller.ClockSyncController}
+     * @param masterPingTime
+     * @param averagePingTime
+     * @param lowPingTime
+     * @param highPingTime
+     * @param lastPingTime
+     */
     public void updatePingData(final int masterPingTime, final int averagePingTime, final int lowPingTime, final int highPingTime, final int lastPingTime) {
         this.masterPingTime = masterPingTime;
         this.averagePingTime = averagePingTime;
@@ -328,6 +233,25 @@ public final class SoeUdpConnection implements UdpConnection {
         this.highPingTime = highPingTime;
         this.lastPingTime = lastPingTime;
     }
+
+    /**
+     * Get number of SOE protocol messages this connection has sent
+     * @return number of {@link SoeMessage} packets sent
+     */
+    public long getProtocolMessagesSent() {
+        return outgoingMessageProcessor.getOutgoingProtocolMessageCount();
+    }
+
+    /**
+     * Get number of SOE protocol message received
+     * @return number of {@link SoeMessage} packets received
+     */
+    public long getProtocolMessagesReceived() {
+        return incomingMessageProcessor.getIncomingProtocolMessageCount();
+    }
+
+
+
 
 //    013CA650	UdpManager::UdpManager(UdpManager::Params const *)
 //    013CAEB0	UdpManager::~UdpManager(void)

@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network;
 
-import io.bacta.buffer.ByteBufferWritable;
+import io.bacta.engine.buffer.ByteBufferWritable;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;

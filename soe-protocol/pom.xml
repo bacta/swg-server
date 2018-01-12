@@ -36,14 +36,6 @@
             <artifactId>commons-modeler</artifactId>
         </dependency>
         <dependency>
-            <groupId>co.paralleluniverse</groupId>
-            <artifactId>quasar-actors</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>co.paralleluniverse</groupId>
-            <artifactId>quasar-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jzlib</artifactId>
         </dependency>

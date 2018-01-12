@@ -20,12 +20,11 @@
 
 package io.bacta.shared;
 
-import io.bacta.buffer.ByteBufferWritable;
-import io.bacta.network.Message;
+import io.bacta.engine.buffer.ByteBufferWritable;
 
 /**
  * Created by Kyle on 3/26/14.
  */
-public abstract class GameNetworkMessage implements Message, ByteBufferWritable {
+public abstract class GameNetworkMessage implements ByteBufferWritable {
 
 }

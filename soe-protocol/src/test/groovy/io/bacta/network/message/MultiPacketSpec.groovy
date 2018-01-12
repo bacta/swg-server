@@ -21,7 +21,7 @@
 package io.bacta.network.message
 
 import bacta.io.soe.network.controller.*
-import io.bacta.conf.ini.IniBactaConfiguration
+import io.bacta.engine.conf.ini.IniBactaConfiguration
 import io.bacta.soe.config.SoeNetworkConfigurationImpl
 import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.controller.*

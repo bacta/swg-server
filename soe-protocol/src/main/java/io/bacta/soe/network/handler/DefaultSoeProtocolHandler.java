@@ -20,14 +20,13 @@
 
 package io.bacta.soe.network.handler;
 
+import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.SoeEncryption;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
 import io.bacta.soe.network.message.SoeMessageType;
-import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -35,35 +34,42 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Created by kyle on 4/4/2017.
+ * Handler of the SOE protocol for decoding and encoding incoming
+ * Datagram messages
+ *
+ * @author Kyle Burkhardt
+ * @since 1.0
  */
 @Slf4j
 @Component
-@Scope("prototype")
 public final class DefaultSoeProtocolHandler implements SoeProtocolHandler {
 
     private final SoeEncryption encryption;
-    private final SoeMessageDispatcher soeMessageDispatcher;
     private final SoeNetworkConfiguration networkConfiguration;
-
 
     @Inject
     public DefaultSoeProtocolHandler(final SoeNetworkConfiguration networkConfiguration,
-                                     final SoeEncryption encryption,
-                                     final SoeMessageDispatcher soeMessageDispatcher) {
+                                     final SoeEncryption encryption) {
         this.encryption = encryption;
-        this.soeMessageDispatcher = soeMessageDispatcher;
         this.networkConfiguration = networkConfiguration;
         encryption.setCompression(networkConfiguration.isCompression());
     }
 
+    /**
+     * Handles applying SOE protocol to outgoing messages
+     *
+     * @param sender reference to user receiving this reference
+     * @param buffer message buffer without any encoding
+     * @return SOE Encoded and Compressed {@link ByteBuffer}
+     */
     @Override
-    public ByteBuffer handleOutgoing(SoeUdpConnection sender, ByteBuffer buffer) {
+    public ByteBuffer processOutgoing(SoeConnection sender, ByteBuffer buffer) {
         SoeMessageType packetType = SoeMessageType.values()[buffer.get(1)];
+        SoeUdpConnection soeUdpConnection = sender.getSoeUdpConnection();
 
         if (packetType != SoeMessageType.cUdpPacketConnect && packetType != SoeMessageType.cUdpPacketConfirm) {
-            buffer = encryption.encode(sender.getConfiguration().getEncryptCode(), buffer, true);
-            encryption.appendCRC(sender.getConfiguration().getEncryptCode(), buffer, networkConfiguration.getCrcBytes());
+            buffer = encryption.encode(soeUdpConnection.getEncryptCode(), buffer, true);
+            encryption.appendCRC(soeUdpConnection.getEncryptCode(), buffer, networkConfiguration.getCrcBytes());
             buffer.rewind();
         }
 
@@ -71,24 +77,29 @@ public final class DefaultSoeProtocolHandler implements SoeProtocolHandler {
         return buffer;
     }
 
+    /**
+     * Handles unwrapping SOE protocol for incoming {@link ByteBuffer} and dispatching
+     * to
+     *
+     * @param sender
+     * @param buffer
+     */
     @Override
-    public void handleIncoming(SoeUdpConnection sender, ByteBuffer buffer) {
+    public ByteBuffer processIncoming(SoeConnection sender, ByteBuffer buffer) {
         SoeMessageType packetType = SoeMessageType.values()[buffer.get(1)];
-        LOGGER.info("Received raw message from {} {}", sender.getRemoteAddress(), SoeMessageUtil.bytesToHex(buffer));
+        SoeUdpConnection soeUdpConnection = sender.getSoeUdpConnection();
 
         ByteBuffer decodedBuffer;
         if (packetType != SoeMessageType.cUdpPacketConnect && packetType != SoeMessageType.cUdpPacketConfirm && packetType != SoeMessageType.cUdpPacketUnreachableConnection) {
-            decodedBuffer = encryption.decode(sender.getConfiguration().getEncryptCode(), buffer.order(ByteOrder.LITTLE_ENDIAN));
+            decodedBuffer = encryption.decode(soeUdpConnection.getEncryptCode(), buffer.order(ByteOrder.LITTLE_ENDIAN));
         } else {
             decodedBuffer = buffer;
         }
 
-        if(decodedBuffer != null) {
-
-            sender.increaseProtocolMessageReceived();
-            soeMessageDispatcher.dispatch(sender, decodedBuffer);
-        } else {
-            LOGGER.warn("Unhandled message {}", packetType);
+        if(decodedBuffer == null) {
+            LOGGER.warn("Unable to decode incoming message {}", BufferUtil.bytesToHex(buffer));
         }
+
+        return decodedBuffer;
     }
 }

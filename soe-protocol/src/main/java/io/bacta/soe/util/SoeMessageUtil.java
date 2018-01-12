@@ -21,7 +21,7 @@
 package io.bacta.soe.util;
 
 import com.google.common.io.Files;
-import io.bacta.buffer.BufferUtil;
+import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
 
 import java.io.File;

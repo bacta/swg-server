@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network.message;
 
-import io.bacta.buffer.ByteBufferWritable;
+import io.bacta.engine.buffer.ByteBufferWritable;
 
 import java.nio.ByteBuffer;
 

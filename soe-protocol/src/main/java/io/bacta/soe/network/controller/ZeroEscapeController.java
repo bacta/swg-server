@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +36,7 @@ import java.nio.ByteOrder;
 public class ZeroEscapeController extends BaseSoeController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
 
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         int opcode = buffer.getInt();

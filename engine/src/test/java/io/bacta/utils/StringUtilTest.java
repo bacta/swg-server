@@ -20,6 +20,7 @@
 
 package io.bacta.utils;
 
+import io.bacta.engine.utils.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

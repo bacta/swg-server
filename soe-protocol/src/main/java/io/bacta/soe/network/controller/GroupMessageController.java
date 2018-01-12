@@ -20,37 +20,35 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.buffer.UnsignedUtil;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.engine.buffer.UnsignedUtil;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.message.SoeMessageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
+@Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketGroup})
 public class GroupMessageController extends BaseSoeController {
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupMessageController.class);
-
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
 
         while (buffer.remaining() > 3) {
 
-            logger.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
+            LOGGER.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
 
             int length = UnsignedUtil.getUnsignedByte(buffer);
 
-            logger.trace("Length: {}", length);
+            LOGGER.trace("Length: {}", length);
 
             ByteBuffer slicedBuffer = buffer.slice();
             slicedBuffer.limit(length);
 
-            logger.trace("Slice: {} {}", slicedBuffer, BufferUtil.bytesToHex(slicedBuffer));
+            LOGGER.trace("Slice: {} {}", slicedBuffer, BufferUtil.bytesToHex(slicedBuffer));
 
             soeMessageDispatcher.dispatch(connection, slicedBuffer);
 

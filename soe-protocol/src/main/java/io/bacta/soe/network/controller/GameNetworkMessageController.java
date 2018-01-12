@@ -20,10 +20,10 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.network.controller.MessageController;
+import io.bacta.engine.network.controller.MessageController;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 
-public interface GameNetworkMessageController<Data extends GameNetworkMessage> extends MessageController {
-    void handleIncoming(SoeUdpConnection connection, Data message) throws Exception;
+public interface GameNetworkMessageController<Connection extends SoeConnection, Data extends GameNetworkMessage> extends MessageController {
+    void handleIncoming(Connection connection, Data message) throws Exception;
 }

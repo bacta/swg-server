@@ -20,32 +20,27 @@
 
 package io.bacta.soe.network.connection;
 
-import io.bacta.network.ConnectionState;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 
 /**
  * @author kyle
  */
+@Slf4j
 public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuffer> {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
     private final UdpMessageBuilder<ByteBuffer> udpMessageBuilder;
     private final UdpMessageBuilder<ByteBuffer> reliableUdpMessageBuilder;
 
     private final SoeNetworkConfiguration configuration;
-    private final SoeUdpConnection connection;
 
-    public SoeUdpMessageProcessor(final SoeUdpConnection connection, final SoeNetworkConfiguration configuration) {
+    SoeUdpMessageProcessor(final SoeNetworkConfiguration configuration) {
 
-        this.connection = connection;
         this.configuration = configuration;
 
-        reliableUdpMessageBuilder = new ReliableUdpMessageBuilder(connection, configuration);
+        reliableUdpMessageBuilder = new ReliableUdpMessageBuilder(configuration);
         udpMessageBuilder = new SoeUdpMessageBuilder(configuration);
     }
 
@@ -74,21 +69,18 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
         if (message != null && message.remaining() > configuration.getMaxRawPacketSize()) {
             throw new RuntimeException("Sending packet that exceeds " + configuration.getMaxRawPacketSize() + " bytes");
         }
-        
-        if(message != null) {
-            connection.updateLastActivity();
-        }
-        
+
         return message;
     }
 
     @Override
-    public void acknowledge(short reliableSequence) {
-        if(connection.getState() != ConnectionState.ONLINE) {
-            connection.setState(ConnectionState.ONLINE);
-        }
-        connection.updateLastActivity();
-        reliableUdpMessageBuilder.acknowledge(reliableSequence);
+    public void ack(short reliableSequence) {
+        reliableUdpMessageBuilder.ack(reliableSequence);
+    }
+
+    @Override
+    public void ackAll(short reliableSequence) {
+        reliableUdpMessageBuilder.ackAll(reliableSequence);
     }
 
     private void flushReliable() {

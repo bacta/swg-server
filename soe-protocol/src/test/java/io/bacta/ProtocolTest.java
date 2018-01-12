@@ -20,8 +20,8 @@
 
 package io.bacta;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.buffer.UnsignedUtil;
+import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.engine.buffer.UnsignedUtil;
 import io.bacta.soe.network.XOREncryption;
 import org.junit.Test;
 import org.slf4j.Logger;

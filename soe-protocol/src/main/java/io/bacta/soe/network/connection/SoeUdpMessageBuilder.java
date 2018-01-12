@@ -121,7 +121,12 @@ public class SoeUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> {
     }
 
     @Override
-    public void acknowledge(short sequenceNumber) {
+    public void ack(short reliableSequence) {
+
+    }
+
+    @Override
+    public void ackAll(short reliableSequence) {
 
     }
 }

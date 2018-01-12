@@ -22,6 +22,8 @@ package io.bacta.soe.network.controller;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import org.springframework.stereotype.Component;
@@ -42,16 +44,19 @@ public class OrderedController extends BaseSoeController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
 
         short orderedStamp = buffer.getShort();
-        int diff = orderedStamp - connection.getOrderedStampLast();
+        int diff = orderedStamp - incomingMessageProcessor.getOrderedStampLast();
 
         if (diff <= 0) {      // equal here makes it strip dupes too
             diff += 0x10000;
         }
         if (diff < 30000) {
-            connection.setOrderedStampLast(orderedStamp);
+            incomingMessageProcessor.setOrderedStampLast(orderedStamp);
 
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             int opcode = buffer.getInt();

@@ -21,6 +21,7 @@
 package io.bacta.soe.network.dispatch;
 
 import io.bacta.soe.network.connection.ConnectionRole;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import lombok.Getter;
 
@@ -32,11 +33,14 @@ import java.util.List;
 @Getter
 public class GameNetworkMessageControllerData {
     private final GameNetworkMessageController controller;
+    private final Class<? extends SoeConnection> connectionClass;
     private final ConnectionRole[] roles;
 
     public GameNetworkMessageControllerData(final GameNetworkMessageController controller,
+                                            final Class<? extends SoeConnection> connectionClass,
                                             final ConnectionRole[] roles) {
         this.controller = controller;
+        this.connectionClass = connectionClass;
         this.roles = roles;
     }
 
@@ -49,5 +53,10 @@ public class GameNetworkMessageControllerData {
         }
 
         return roles.length == 0;
+    }
+
+    //TODO: Performance?
+    public boolean containsConnectionType(SoeConnection connection) {
+        return connectionClass.isAssignableFrom(connection.getClass());
     }
 }

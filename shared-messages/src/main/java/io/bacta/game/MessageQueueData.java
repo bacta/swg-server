@@ -20,7 +20,7 @@
 
 package io.bacta.game;
 
-import io.bacta.buffer.ByteBufferWritable;
+import io.bacta.engine.buffer.ByteBufferWritable;
 
 /**
  * Created by crush on 5/29/2016.
