@@ -1,5 +1,7 @@
 package io.bacta.soe.network.connection;
 
+import io.bacta.soe.config.SoeNetworkConfiguration;
+
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Map;
@@ -10,11 +12,11 @@ import java.util.TreeMap;
  */
 public class PendingReliablePackets {
 
-    private final int maxInstandingPackets;
+    private final SoeNetworkConfiguration networkConfiguration;
     private final Map<Long, ByteBuffer> pendingMap;
 
-    PendingReliablePackets(int maxInstandingPackets) {
-        this.maxInstandingPackets = maxInstandingPackets;
+    PendingReliablePackets(final SoeNetworkConfiguration networkConfiguration) {
+        this.networkConfiguration = networkConfiguration;
         this.pendingMap = Collections.synchronizedSortedMap(new TreeMap<>());
     }
 
@@ -22,13 +24,16 @@ public class PendingReliablePackets {
        return pendingMap.get(currentReliableId);
     }
 
+    //TODO: Finish logic and metrics
     public void add(long reliableId, ByteBuffer buffer) {
         if(pendingMap.containsKey(reliableId)) {
 //            mStatDuplicatePacketsReceived++;
 //            mUdpConnection->mConnectionStats.duplicatePacketsReceived++;
 //            mUdpConnection->mUdpManager->mManagerStats.duplicatePacketsReceived++;
         } else {
-            pendingMap.put(reliableId, buffer);
+            if(pendingMap.size() < networkConfiguration.getMaxInstandingPackets()) {
+                pendingMap.put(reliableId, buffer);
+            }
         }
     }
 }

@@ -20,27 +20,26 @@
 
 package io.bacta.soe.network.controller;
 
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
+@Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketAckAll1, SoeMessageType.cUdpPacketAckAll2, SoeMessageType.cUdpPacketAckAll3, SoeMessageType.cUdpPacketAckAll4})
 public class AckAllController extends BaseSoeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AckAllController.class);
-
-
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
 
         short sequenceNum = buffer.getShort();
-        connection.ackAllFromClient(sequenceNum);
-        LOGGER.trace("{} Client AckAll for Sequence {} {}", connection.getId(), sequenceNum, buffer.order());
-
+        soeUdpConnection.ackAllFromClient(sequenceNum);
+        LOGGER.trace("{} Client AckAll for Sequence {} {}", soeUdpConnection.getId(), sequenceNum, buffer.order());
     }
 }

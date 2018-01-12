@@ -21,7 +21,8 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.PendingReliablePackets;
+import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
@@ -52,51 +52,55 @@ public class ReliableMessageController extends BaseSoeController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
 
-        AtomicLong nextClientReliableStamp = connection.getReliableStamp();
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
+
+        long nextClientReliableStamp = incomingMessageProcessor.getReliableStamp();
         short reliableStamp = buffer.getShort();
-        long reliableId = getReliableIncomingId(reliableStamp, nextClientReliableStamp.get());
+        long reliableId = getReliableIncomingId(reliableStamp, nextClientReliableStamp);
 
-        if (reliableId >= nextClientReliableStamp.get() + networkConfiguration.getMaxInstandingPackets()) {
+        if (reliableId >= nextClientReliableStamp + networkConfiguration.getMaxInstandingPackets()) {
             return;        // if we do not have buffer space to hold onto this packet, then we simply must pretend like it was lost
         }
 
         ReliablePacketMode mode = ReliablePacketMode.values()[((type.getValue() - SoeMessageType.cUdpPacketReliable1.getValue()) / networkConfiguration.getReliableChannelCount())];
         
-        if (reliableId >= nextClientReliableStamp.get()) {
-
-            PendingReliablePackets pendingReliablePackets = connection.getPendingReliablePackets();
+        if (reliableId >= nextClientReliableStamp) {
 
             // is this the packet we are waiting for
-            if (nextClientReliableStamp.get() == reliableId)  {
+            if (nextClientReliableStamp == reliableId)  {
                 // if so, process it immediately
                 processPacket(mode, connection, buffer);
-                nextClientReliableStamp.incrementAndGet();
+                incomingMessageProcessor.incrementNextReliable();
 
                 // process other packets that have arrived
                 ByteBuffer pendingBuffer;
-                while ((pendingBuffer = pendingReliablePackets.getNext(nextClientReliableStamp.get())) != null) {
+                while ((pendingBuffer = incomingMessageProcessor.nextReliable(nextClientReliableStamp)) != null) {
 
                     SoeMessageType nextType = SoeMessageType.values()[pendingBuffer.get(1)];
                     mode = ReliablePacketMode.values()[((nextType.getValue() - SoeMessageType.cUdpPacketReliable1.getValue()) / networkConfiguration.getReliableChannelCount())];
 
                     processPacket(mode, connection, pendingBuffer);
 
-                    nextClientReliableStamp.incrementAndGet();
+                    incomingMessageProcessor.incrementNextReliable();
                 }
             }
             // not the one we need next, but it is later than the one we need , so store it in our buffer until it's turn comes up
             else {
-                pendingReliablePackets.add(reliableId, buffer);
+                incomingMessageProcessor.addReliable(reliableId, buffer);
             }
         }
         
-        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", connection.getId(), reliableStamp, buffer.order());
-        connection.sendAck(reliableStamp);
+        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", soeUdpConnection.getId(), reliableStamp, buffer.order());
+        soeUdpConnection.ackClient(reliableStamp);
     }
 
-    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer) {
+    private void processPacket(final ReliablePacketMode mode, final SoeConnection connection, final ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
 
         if(mode == ReliablePacketMode.cReliablePacketModeReliable) {
 
@@ -104,7 +108,7 @@ public class ReliableMessageController extends BaseSoeController {
 
         } else if (mode == ReliablePacketMode.cReliablePacketModeFragment) {
 
-            ByteBuffer completeFragment = connection.addIncomingFragment(buffer);
+            ByteBuffer completeFragment = incomingMessageProcessor.addIncomingFragment(buffer);
             if(completeFragment != null) {
                 soeMessageDispatcher.dispatch(connection, buffer);
             }

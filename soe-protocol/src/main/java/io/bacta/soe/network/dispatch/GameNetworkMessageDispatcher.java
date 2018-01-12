@@ -21,9 +21,9 @@
 package io.bacta.soe.network.dispatch;
 
 import gnu.trove.map.TIntObjectMap;
-import io.bacta.network.dispatch.MessageDispatcher;
+import io.bacta.engine.network.dispatch.MessageDispatcher;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
@@ -79,15 +79,20 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
         controllers = controllerLoader.loadControllers();
     }
 
-    public void dispatch(short priority, int gameMessageType, SoeUdpConnection connection, ByteBuffer buffer) {
-        connection.increaseGameNetworkMessageReceived();
+    public void dispatch(short priority, int gameMessageType, SoeConnection connection, ByteBuffer buffer) {
 
         final GameNetworkMessageControllerData controllerData = controllers.get(gameMessageType);
 
         if (controllerData != null) {
             if (!controllerData.containsRoles(connection.getRoles())) {
                 LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
-                LOGGER.error("Connection: " + connection.toString());
+                LOGGER.error("Connection: {}", connection.toString());
+                return;
+            }
+
+            if(!controllerData.containsConnectionType(connection)) {
+                LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
+                LOGGER.error("Connection type mismatch: {} expected {}", connection.getClass().getSimpleName(), controllerData.getConnectionClass().getSimpleName());
                 return;
             }
 

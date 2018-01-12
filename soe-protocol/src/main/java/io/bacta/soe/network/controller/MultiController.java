@@ -20,12 +20,11 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.buffer.UnsignedUtil;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.engine.buffer.UnsignedUtil;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.message.SoeMessageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
@@ -60,22 +59,21 @@ import java.nio.ByteBuffer;
  }
  */
 
+@Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketMulti})
 public class MultiController extends BaseSoeController {
 
-    private static final transient Logger logger = LoggerFactory.getLogger(MultiController.class);
-
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
 
         while (buffer.remaining() > 3) {
             
-            logger.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
+            LOGGER.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
 
             short length = UnsignedUtil.getUnsignedByte(buffer);
 
-            logger.trace("Length: {}", length);
+            LOGGER.trace("Length: {}", length);
 
             if (length == 0xFF) {
 
@@ -88,7 +86,7 @@ public class MultiController extends BaseSoeController {
             ByteBuffer slicedMessage = buffer.slice();
             slicedMessage.limit(length);
 
-            logger.trace("Slice: {} {}", slicedMessage, BufferUtil.bytesToHex(slicedMessage));
+            LOGGER.trace("Slice: {} {}", slicedMessage, BufferUtil.bytesToHex(slicedMessage));
 
             soeMessageDispatcher.dispatch(connection, slicedMessage);
             

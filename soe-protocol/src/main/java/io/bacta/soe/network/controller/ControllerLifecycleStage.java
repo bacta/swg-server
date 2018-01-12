@@ -6,5 +6,6 @@ package io.bacta.soe.network.controller;
 public final class ControllerLifecycleStage {
     public static final String STARTING = "STARTING";
     public static final String RUNNING = "RUNNING";
+    public static final String DISABLED = "DISABLED";
     public static final String SHUTTINGDOWN = "SHUTTINGDOWN";
 }

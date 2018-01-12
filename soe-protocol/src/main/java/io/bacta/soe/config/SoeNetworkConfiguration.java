@@ -20,7 +20,7 @@
 
 package io.bacta.soe.config;
 
-import io.bacta.conf.NetworkConfiguration;
+import io.bacta.engine.conf.NetworkConfiguration;
 
 import java.net.InetAddress;
 import java.util.Collection;

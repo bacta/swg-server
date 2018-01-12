@@ -20,24 +20,26 @@
 
 package io.bacta.soe.network.controller;
 
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
+@Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketAck1, SoeMessageType.cUdpPacketAck2, SoeMessageType.cUdpPacketAck3, SoeMessageType.cUdpPacketAck4})
 public class AckController extends BaseSoeController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AckController.class);
-
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) throws Exception {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) throws Exception {
+
         short sequenceNum = buffer.getShort();
-        connection.sendAck(sequenceNum);
-        LOGGER.trace("{} Client Ack for Sequence {} {}", connection.getId(), sequenceNum, buffer.order());
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+        soeUdpConnection.ackClient(sequenceNum);
+        LOGGER.trace("{} Client Ack for Sequence {} {}", soeUdpConnection.getId(), sequenceNum, buffer.order());
     }
 }

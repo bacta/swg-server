@@ -24,6 +24,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.ConnectionRole;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -35,8 +36,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 
 /**
  * Created by kyle on 4/22/2016.
@@ -83,6 +86,19 @@ public final class GameNetworkMessageControllerLoader implements ApplicationCont
                 connectionRoles = connectionRolesAllowed.value();
             }
 
+            // Find connection type on interface
+            Class<? extends SoeConnection> connectionClass = null;
+            for(Type someInterface : controller.getClass().getGenericInterfaces()) {
+                if (((ParameterizedTypeImpl) someInterface).getRawType().equals(GameNetworkMessageController.class)) {
+                    for (Type myType : ((ParameterizedTypeImpl) someInterface).getActualTypeArguments()) {
+                        if (SoeConnection.class.isAssignableFrom((Class) myType)) {
+                            connectionClass = (Class) myType;
+                            break;
+                        }
+                    }
+                }
+            }
+
             final Class<? extends GameNetworkMessage>[] handledMessageClasses = controllerAnnotation.handles();
 
             for (final Class<? extends GameNetworkMessage> handledMessageClass : handledMessageClasses) {
@@ -90,7 +106,7 @@ public final class GameNetworkMessageControllerLoader implements ApplicationCont
 
                 final String propertyName = Integer.toHexString(hash);
 
-                final GameNetworkMessageControllerData newControllerData = new GameNetworkMessageControllerData(controller, connectionRoles);
+                final GameNetworkMessageControllerData newControllerData = new GameNetworkMessageControllerData(controller, connectionClass, connectionRoles);
 
                 if (!controllers.containsKey(hash)) {
                     LOGGER.debug("Adding Controller {} '{}' 0x{}", controller.getClass().getName(), ClientString.get(propertyName), propertyName);

@@ -20,14 +20,13 @@
 
 package io.bacta.soe.network.message;
 
-import io.bacta.network.Message;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 @Getter
-public abstract class SoeMessage implements Message {
+public abstract class SoeMessage {
 
     protected transient boolean compressed = true;
     protected final byte zeroByte;

@@ -24,7 +24,7 @@ package io.bacta.soe.network.message;
  * Created by kburkhardt on 2/7/15.
  */
 
-import io.bacta.buffer.ByteBufferWritable;
+import io.bacta.engine.buffer.ByteBufferWritable;
 
 import java.nio.ByteBuffer;
 

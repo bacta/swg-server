@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network.connection;
 
-import io.bacta.buffer.BufferUtil;
+import io.bacta.engine.buffer.BufferUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;

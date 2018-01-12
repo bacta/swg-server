@@ -20,7 +20,7 @@
 
 package io.bacta.utils
 
-import io.bacta.buffer.BufferUtil
+import io.bacta.engine.buffer.BufferUtil
 import spock.lang.Specification
 
 import java.nio.ByteBuffer

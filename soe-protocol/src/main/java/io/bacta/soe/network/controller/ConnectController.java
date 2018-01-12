@@ -20,26 +20,23 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.network.ConnectionState;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.config.SoeUdpConfiguration;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.message.ConfirmMessage;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
 import io.bacta.soe.service.SessionKeyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
+@Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketConnect})
 public class ConnectController extends BaseSoeController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectController.class);
 
     private final SoeNetworkConfiguration networkConfiguration;
     private final SessionKeyService keyService;
@@ -52,27 +49,21 @@ public class ConnectController extends BaseSoeController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
 
         int protocolVersion = buffer.getInt();
         
         if(protocolVersion != networkConfiguration.getProtocolVersion()) {
-            connection.terminate(TerminateReason.REFUSED);
-            LOGGER.warn("Client from '{}' attempted to use a non-supported protocol version: {}", connection.getRemoteAddress().getHostString(), protocolVersion);
+            soeUdpConnection.terminate(TerminateReason.REFUSED);
+            LOGGER.warn("Client from '{}' attempted to use a non-supported protocol version: {}", soeUdpConnection.getRemoteAddress().getHostString(), protocolVersion);
             return;
         }
         
         int connectionId = buffer.getInt();
         int maxRawPacketSize = buffer.getInt();
         int encryptCode = keyService.getNextKey();
-
-        SoeUdpConfiguration configuration = connection.getConfiguration();
-        connection.setId(connectionId);
-        
-        configuration.setEncryptCode(encryptCode);
-        configuration.setMaxRawPacketSize(maxRawPacketSize);
-        
-        connection.setState(ConnectionState.ONLINE);
 
         final EncryptMethod encryptMethod1, encryptMethod2;
         if (networkConfiguration.isCompression()) {
@@ -83,15 +74,12 @@ public class ConnectController extends BaseSoeController {
             encryptMethod2 = EncryptMethod.NONE;
         }
 
-        ConfirmMessage response = new ConfirmMessage(
-                networkConfiguration.getCrcBytes(), 
+        soeUdpConnection.doConfirm(
                 connectionId,
                 encryptCode,
+                maxRawPacketSize,
                 encryptMethod1,
-                encryptMethod2,
-                maxRawPacketSize
+                encryptMethod2
         );
-        
-        connection.sendMessage(response);
     }
 }

@@ -22,12 +22,10 @@ package io.bacta.network.udp.netty
 
 import com.codahale.metrics.MetricRegistry
 import io.bacta.Application
-import io.bacta.network.channel.InboundMessageChannel
-import io.bacta.network.udp.UdpConnection
-import io.bacta.network.udp.UdpEmitter
-import io.bacta.network.udp.UdpMetrics
+import io.bacta.engine.network.udp.UdpEmitter
+import io.bacta.engine.network.udp.netty.NettyUdpTransceiver
+import io.netty.channel.socket.DatagramPacket
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
 
 import javax.inject.Inject
@@ -37,49 +35,45 @@ import java.nio.ByteBuffer
  * Created by kyle on 4/11/2017.
  */
 @SpringBootTest(classes = Application.class)
-@TestPropertySource(locations = "/network.properties")
 class UdpTransceiverTest extends Specification {
 
     @Inject
     MetricRegistry metricRegistry;
 
+    def host = InetAddress.getByName("127.0.0.1")
+
     def "IsAvailable"() {
         when:
 
-        def receiverMetrics = new UdpMetrics(metricRegistry,"server");
-        InboundMessageChannel inboundMessageChannel = Mock()
-        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, receiverMetrics, inboundMessageChannel)
-        server.start();
+        def server = new NettyUdpTransceiver(host, 5000, metricRegistry, "test", this.&readIncoming)
 
         then:
-        server.isAvailable()
-        server.destroy()
+        noExceptionThrown()
+        server.isReady()
+        server.stop()
     }
 
     def "SendReceiveMessage"() {
         setup:
 
-        def metrics = new UdpMetrics(metricRegistry,"server");
 
-        InboundMessageChannel serverInboundMessageChannel = Mock()
-        def server = new NettyUdpReceiver(InetAddress.localHost, 5000, metrics, serverInboundMessageChannel)
-        server.start();
-
-        UdpEmitter client = server.udpHandler.udpEmitter;
-
-        UdpConnection serverUdpConnection = Mock()
-        serverUdpConnection.remoteAddress >> new InetSocketAddress(InetAddress.localHost, 5000)
+        def server = new NettyUdpTransceiver(host, 5000, metricRegistry, "test", this.&readIncoming)
+        UdpEmitter client = server.getEmitter();
 
         when:
-        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
-        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
-        client.sendMessage(serverUdpConnection, ByteBuffer.allocate(1))
+        client.sendMessage(new InetSocketAddress(host, 5000), ByteBuffer.allocate(1))
+        client.sendMessage(new InetSocketAddress(host, 5000), ByteBuffer.allocate(1))
+        client.sendMessage(new InetSocketAddress(host, 5000), ByteBuffer.allocate(1))
 
         then:
 
         noExceptionThrown()
-        Thread.sleep(1000)
-        metrics.sentMessages.count == 3
-        metrics.receivedMessages.count == 3
+
+        client.metrics.getSentMessages().getCount() == 3
+        server.receiver.metrics.getReceivedMessages().getCount() == 3
+    }
+
+    public void readIncoming(InetSocketAddress sender, DatagramPacket msg) {
+
     }
 }
