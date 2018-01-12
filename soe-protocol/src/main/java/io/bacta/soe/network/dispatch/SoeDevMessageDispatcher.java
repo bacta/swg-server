@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -44,8 +45,10 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
     private final GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
 
-    public SoeDevMessageDispatcher(final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
+    @Inject
+    public SoeDevMessageDispatcher(final ApplicationContext applicationContext, final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
         this.gameNetworkMessageDispatcher = gameNetworkMessageDispatcher;
+        load(applicationContext);
     }
 
     @Override
