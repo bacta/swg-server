@@ -20,6 +20,7 @@
 
 package io.bacta.conf.ini;
 
+import io.bacta.engine.conf.ini.IniFile;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

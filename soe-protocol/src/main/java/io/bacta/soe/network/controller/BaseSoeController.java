@@ -28,8 +28,8 @@ import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
  */
 public abstract class BaseSoeController implements SoeMessageController {
 
-    protected SoeMessageDispatcher soeMessageDispatcher;
-    protected GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
+    SoeMessageDispatcher soeMessageDispatcher;
+    GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
 
     public void setSoeMessageDispatcher(final SoeMessageDispatcher soeMessageDispatcher) {
         this.soeMessageDispatcher = soeMessageDispatcher;

@@ -20,12 +20,12 @@
 
 package io.bacta.soe.network.handler;
 
-import io.bacta.network.udp.UdpEmitter;
-import io.bacta.soe.network.connection.SoeUdpConnectionCache;
+import io.bacta.engine.network.udp.UdpEmitter;
+import io.bacta.soe.network.connection.SoeConnectionCache;
 
 /**
  * Created by kyle on 7/3/2017.
  */
 public interface SoeUdpSendHandler {
-    void start(final String metricsPrefix, final SoeUdpConnectionCache connectionCache, SoeProtocolHandler soeProtocolHandler, final UdpEmitter udpEmitter);
+    void start(final String metricsPrefix, final SoeConnectionCache connectionCache, SoeProtocolHandler soeProtocolHandler, final UdpEmitter udpEmitter);
 }

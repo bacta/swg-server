@@ -23,12 +23,13 @@ package io.bacta.soe.network.handler;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
-import io.bacta.network.ConnectionState;
-import io.bacta.network.udp.UdpEmitter;
+import io.bacta.engine.network.connection.ConnectionState;
+import io.bacta.engine.network.udp.UdpEmitter;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.event.DisconnectEvent;
+import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.SoeConnectionCache;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.service.PublisherService;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
     private final MetricRegistry metricRegistry;
 
     private UdpEmitter emitter;
-    private SoeUdpConnectionCache connectionCache;
+    private SoeConnectionCache connectionCache;
     private SoeProtocolHandler protocolHandler;
 
     private Histogram sendQueueSizes;
@@ -77,7 +78,7 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
     }
 
     @Override
-    public void start(final String metricPrefix, final SoeUdpConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpEmitter udpEmitter) {
+    public void start(final String metricPrefix, final SoeConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpEmitter udpEmitter) {
         if(!sendThread.isAlive()) {
             sendThread.setName("SendHandler");
             sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
@@ -123,13 +124,19 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
         final List<InetSocketAddress> deadClients = new ArrayList<>();
 
         for (InetSocketAddress inetSocketAddress : connectionList) {
-            final SoeUdpConnection connection = connectionCache.get(inetSocketAddress);
+            final SoeConnection connectionProxy = connectionCache.get(inetSocketAddress);
+
+            if (connectionProxy == null) {
+                continue;
+            }
+
+            final SoeUdpConnection connection = connectionProxy.getSoeUdpConnection();
 
             if (connection == null) {
                 continue;
             }
 
-            if (connection.getState() == ConnectionState.DISCONNECTED) {
+            if (connection.getConnectionState() == ConnectionState.DISCONNECTED) {
                 deadClients.add(inetSocketAddress);
             }
 
@@ -139,16 +146,18 @@ public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
             }
 
             for (final ByteBuffer message : messages) {
-                ByteBuffer encodedMessage = protocolHandler.handleOutgoing(connection, message);
-                emitter.sendMessage(connection, encodedMessage);
+                ByteBuffer encodedMessage = protocolHandler.processOutgoing(connectionProxy, message);
+                emitter.sendMessage(connection.getRemoteAddress(), encodedMessage);
                 LOGGER.info("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
             }
         }
 
         for (InetSocketAddress inetSocketAddress : deadClients) {
-            final SoeUdpConnection connection = connectionCache.remove(inetSocketAddress);
+            final SoeConnection connectionProxy = connectionCache.remove(inetSocketAddress);
+            final SoeUdpConnection connection = connectionProxy.getSoeUdpConnection();
+
             if(connection != null) {
-                publisherService.onEvent(new DisconnectEvent(connection));
+                publisherService.onEvent(new DisconnectEvent(connectionProxy));
 
                 if (networkConfiguration.isReportUdpDisconnects()) {
                     LOGGER.info("Client disconnected: {}  Connection: {}  Reason: {}", connection.getRemoteAddress(), connection.getId(), connection.getTerminateReason().getReason());

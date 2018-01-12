@@ -20,6 +20,7 @@
 
 package io.bacta.collect;
 
+import io.bacta.engine.collect.RelationshipMap;
 import org.junit.Assert;
 import org.junit.Test;
 

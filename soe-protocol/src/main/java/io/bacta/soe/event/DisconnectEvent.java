@@ -20,7 +20,7 @@
 
 package io.bacta.soe.event;
 
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -30,5 +30,5 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class DisconnectEvent implements Event {
-    private final SoeUdpConnection connection;
+    private final SoeConnection connection;
 }

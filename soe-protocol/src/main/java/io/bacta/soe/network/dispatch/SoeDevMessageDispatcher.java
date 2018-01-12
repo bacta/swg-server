@@ -20,8 +20,8 @@
 
 package io.bacta.soe.network.dispatch;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
 import io.bacta.soe.network.message.SoeMessageType;
@@ -30,8 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
@@ -39,8 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
-@Scope("prototype")
+@Service
 public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 
     private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
@@ -51,12 +49,12 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     }
 
     @Override
-    public void dispatch(SoeUdpConnection client, ByteBuffer buffer) {
+    public void dispatch(SoeConnection connection, ByteBuffer buffer) {
 
         byte zeroByte = buffer.get();
         byte type = buffer.get();
         if(type < 0 || type > 0x1E) {
-            throw new RuntimeException("Type out of range: {} {}" + type + " " + buffer.toString() + " " + SoeMessageUtil.bytesToHex(buffer));
+            throw new RuntimeException("Type out of range: " + type + " " + buffer.toString() + " " + SoeMessageUtil.bytesToHex(buffer));
         }
 
         SoeMessageType packetType = SoeMessageType.values()[type];
@@ -72,7 +70,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
         try {
 
             LOGGER.trace("Routing to {} : {}", controller.getClass().getSimpleName(), BufferUtil.bytesToHex(buffer));
-            controller.handleIncoming(zeroByte, packetType, client, buffer);
+            controller.handleIncoming(zeroByte, packetType, connection, buffer);
 
         } catch (Exception e) {
             LOGGER.error("SOE Routing", e);

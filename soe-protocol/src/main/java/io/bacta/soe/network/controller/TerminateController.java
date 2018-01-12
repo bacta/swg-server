@@ -20,7 +20,8 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.buffer.UnsignedUtil;
+import io.bacta.engine.buffer.UnsignedUtil;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
@@ -37,13 +38,15 @@ public class TerminateController extends BaseSoeController {
     private static final Logger logger = LoggerFactory.getLogger(TerminateController.class);
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
 
         long connectionID = UnsignedUtil.getUnsignedInt(buffer);
         TerminateReason terminateReason = TerminateReason.values()[buffer.getShort()];
 
-        if(connectionID == connection.getId()) {
-            connection.terminate(terminateReason, true);
+        if(connectionID == soeUdpConnection.getId()) {
+            soeUdpConnection.terminate(terminateReason, true);
         }
     }
 }

@@ -20,11 +20,10 @@
 
 package io.bacta.soe.network.controller;
 
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
@@ -33,10 +32,9 @@ import java.nio.ByteBuffer;
 @SoeController(handles = {SoeMessageType.cUdpPacketUnreachableConnection})
 public class UnreachableController extends BaseSoeController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UnreachableController.class);
-
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
-        connection.terminate(TerminateReason.OTHERSIDETERMINATED, true);
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+        soeUdpConnection.terminate(TerminateReason.UNREACHABLE, true);
     }
 }

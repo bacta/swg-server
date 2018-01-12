@@ -20,9 +20,9 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.buffer.BufferUtil;
-import io.bacta.soe.config.SoeUdpConfiguration;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,29 +35,24 @@ import java.nio.ByteBuffer;
 public class ConfirmController extends BaseSoeController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte, final SoeMessageType type, final SoeConnection connection, final ByteBuffer buffer) {
+
+        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
 
         int connectionID = buffer.getInt();
         int encryptCode = buffer.getInt();
         byte crcBytes = buffer.get();
-        boolean compression = BufferUtil.getBoolean(buffer);
-        byte cryptMethod = buffer.get();
+        EncryptMethod encryptMethod1 = EncryptMethod.values()[buffer.get()];
+        EncryptMethod encryptMethod2 = EncryptMethod.values()[buffer.get()];
         int maxRawPacketSize = buffer.getInt();
 
-        connection.setId(connectionID);
-
-        SoeUdpConfiguration configuration = new SoeUdpConfiguration(
-                connection.getConfiguration().getProtocolVersion(),
+        soeUdpConnection.confirmed(
+                connectionID,
+                encryptCode,
                 crcBytes,
-                maxRawPacketSize,
-                compression,
-                encryptCode
+                encryptMethod1,
+                encryptMethod2,
+                maxRawPacketSize
         );
-
-        configuration.setEncryptCode(encryptCode);
-
-        connection.setConfiguration(configuration);
-
-        connection.confirm();
     }
 }

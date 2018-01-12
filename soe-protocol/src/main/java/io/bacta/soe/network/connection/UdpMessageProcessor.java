@@ -27,5 +27,7 @@ public interface UdpMessageProcessor<T> {
     boolean addUnreliable(T unreliable);
     boolean addReliable(T reliable);
     T processNext();
-    void acknowledge(short reliableSequence);
+    void ack(short reliableSequence);
+
+    void ackAll(short reliableSequence);
 }

@@ -22,8 +22,7 @@ package io.bacta.soe.network.connection;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.message.ReliableNetworkMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -53,24 +52,21 @@ import java.util.concurrent.atomic.AtomicInteger;
      bool ackDeduping;
  };
  */
-public class ReliableUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> {
 
-    public final static Logger logger = LoggerFactory.getLogger(ReliableUdpMessageBuilder.class);
+@Slf4j
+public class ReliableUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> {
 
     private final SoeNetworkConfiguration configuration;
     private final AtomicInteger sequenceNum = new AtomicInteger();
     private final Set<ReliableNetworkMessage> containerList;
     private final int maxOutstandingPackets;
 
-    private final SoeUdpConnection connection;
-
     private ReliableNetworkMessage pendingContainer;
 
     private final Queue<ReliableNetworkMessage> unacknowledgedQueue;
 
-    public ReliableUdpMessageBuilder(final SoeUdpConnection connection, final SoeNetworkConfiguration configuration) {
+    public ReliableUdpMessageBuilder(final SoeNetworkConfiguration configuration) {
 
-        this.connection = connection;
         this.configuration = configuration;
         
         this.maxOutstandingPackets = configuration.getMaxOutstandingPackets();
@@ -163,8 +159,26 @@ public class ReliableUdpMessageBuilder implements UdpMessageBuilder<ByteBuffer> 
     }
 
     @Override
-    public void acknowledge(short sequenceNumber) {
-        logger.debug("Client Ack: " + sequenceNumber);
+    public void ack(short sequenceNumber) {
+        LOGGER.debug("Client Ack: " + sequenceNumber);
+
+        Iterator<ReliableNetworkMessage> iter = unacknowledgedQueue.iterator();
+        while(iter.hasNext()) {
+            ReliableNetworkMessage message = iter.next();
+
+            if(message.getSequenceNumber() == sequenceNumber) {
+                unacknowledgedQueue.remove(message);
+            }
+
+            if(message.getSequenceNumber() >= sequenceNumber) {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void ackAll(short sequenceNumber) {
+        LOGGER.debug("Client AckAll: " + sequenceNumber);
 
         while (!unacknowledgedQueue.isEmpty() &&
                 (unacknowledgedQueue.peek().getSequenceNumber() <= sequenceNumber)) {

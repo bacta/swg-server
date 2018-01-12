@@ -37,5 +37,6 @@ public interface UdpMessageBuilder<T> {
      */
     T buildNext();
 
-    void acknowledge(short sequenceNumber);
+    void ack(short reliableSequence);
+    void ackAll(short reliableSequence);
 }

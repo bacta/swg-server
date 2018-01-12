@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +31,8 @@ import java.nio.ByteBuffer;
 public class KeepAliveController extends BaseSoeController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
-        connection.updateLastActivity();
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+        connection.getSoeUdpConnection().updateLastClientActivity();
     }
 
 }
