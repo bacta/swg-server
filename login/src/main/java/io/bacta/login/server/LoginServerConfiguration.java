@@ -20,6 +20,7 @@
 
 package io.bacta.login.server;
 
+import akka.actor.ActorSystem;
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.network.connection.ClientConnection;
@@ -27,6 +28,8 @@ import io.bacta.soe.network.handler.SoeInboundMessageChannel;
 import io.bacta.soe.network.handler.SoeUdpSendHandler;
 import io.bacta.soe.network.udp.SoeUdpChannelBuilder;
 import io.bacta.soe.network.udp.SoeUdpTransceiverGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -43,6 +46,7 @@ import javax.inject.Inject;
 @Configuration
 @ConfigurationProperties
 public class LoginServerConfiguration implements ApplicationContextAware {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServerConfiguration.class);
 
     private ApplicationContext applicationContext;
     private final MetricRegistry metricRegistry;
@@ -81,6 +85,14 @@ public class LoginServerConfiguration implements ApplicationContextAware {
         transceiverGroup.registerSendHandler(sendHandler);
 
         return transceiverGroup;
+    }
+
+    @Bean
+    public ActorSystem getLoginActorSystem() {
+        LOGGER.info("Creating actor system.");
+
+        final ActorSystem actorSystem =  ActorSystem.create(LoginServerConstants.ActorSystem);
+        return actorSystem;
     }
 
     @Override
