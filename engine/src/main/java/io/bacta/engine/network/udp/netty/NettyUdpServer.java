@@ -31,12 +31,12 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.DisposableBean;
 
+import javax.annotation.PreDestroy;
 import java.net.InetAddress;
 
 @Slf4j
-final class NettyUdpServer implements Runnable, DisposableBean {
+final class NettyUdpServer implements Runnable {
 
 	private Bootstrap b = null;
 	private ChannelInboundHandlerAdapter[] handlers;
@@ -109,7 +109,7 @@ final class NettyUdpServer implements Runnable, DisposableBean {
 	    return channel.toString();
     }
 
-    @Override
+    @PreDestroy
     public void destroy() throws Exception {
         channel.close();
     }

@@ -21,8 +21,10 @@
 package io.bacta.login.server;
 
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.network.connection.ClientConnection;
 import io.bacta.soe.network.handler.SoeInboundMessageChannel;
+import io.bacta.soe.network.handler.SoeUdpSendHandler;
 import io.bacta.soe.network.udp.SoeUdpChannelBuilder;
 import io.bacta.soe.network.udp.SoeUdpTransceiverGroup;
 import org.springframework.beans.BeansException;
@@ -55,17 +57,28 @@ public class LoginServerConfiguration implements ApplicationContextAware {
 
     @Inject
     @Bean
-    public SoeUdpTransceiverGroup startReceiverGroup(SoeUdpTransceiverGroup transceiverGroup, SoeInboundMessageChannel inboundMessageChannel) {
+    public SoeUdpTransceiverGroup startReceiverGroup(final SoeUdpTransceiverGroup transceiverGroup,
+                                                     final SoeInboundMessageChannel inboundMessageChannel,
+                                                     final SoeUdpSendHandler sendHandler) {
 
-        transceiverGroup.registerChannel(SoeUdpChannelBuilder.newBuilder()
+
+        UdpChannel channel = SoeUdpChannelBuilder.newBuilder()
                 .withMetricsRegistry(metricRegistry)
                 .withMetricsPrefix("login")
                 .withAddress(loginServerProperties.getBindAddress())
                 .withPort(loginServerProperties.getPublicBindPort())
                 .withConnection(ClientConnection.class)
                 .usingInboundChannel(inboundMessageChannel)
-                .build()
-        );
+                .build();
+
+        transceiverGroup.registerChannel(channel);
+
+        sendHandler.start("login",
+                inboundMessageChannel.getConnectionCache(),
+                inboundMessageChannel.getProtocolHandler(),
+                channel);
+
+        transceiverGroup.registerSendHandler(sendHandler);
 
         return transceiverGroup;
     }
