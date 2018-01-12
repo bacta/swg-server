@@ -24,9 +24,6 @@ class SoeTransceiverSpec extends Specification {
     @Inject
     InboundMessageChannel inboundMessageChannel;
 
-    @Inject
-    ConnectionService connectionService;
-
     def host = InetAddress.getByName("127.0.0.1")
     def serverPort = 5000;
     def clientPort = 5001;
