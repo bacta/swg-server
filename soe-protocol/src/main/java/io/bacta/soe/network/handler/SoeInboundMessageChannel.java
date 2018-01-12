@@ -20,9 +20,6 @@
 
 package io.bacta.soe.network.handler;
 
-import co.paralleluniverse.fibers.Fiber;
-import co.paralleluniverse.fibers.SuspendExecution;
-import co.paralleluniverse.strands.SuspendableRunnable;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.engine.network.channel.InboundMessageChannel;
 import io.bacta.engine.network.connection.ConnectionState;
@@ -32,7 +29,6 @@ import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -55,9 +51,6 @@ public class SoeInboundMessageChannel implements InboundMessageChannel<SoeConnec
     private final SoeProtocolHandler protocolHandler;
     private final SoeConnectionFactory connectionProvider;
     private final SoeMessageDispatcher soeMessageDispatcher;
-
-    @Value("${io.bacta.soe.network.handler.useFibers}")
-    private boolean runInFiber;
 
     @Inject
     public SoeInboundMessageChannel(final SoeConnectionCache connectionCache,
@@ -82,68 +75,35 @@ public class SoeInboundMessageChannel implements InboundMessageChannel<SoeConnec
     @Override
     public void receiveMessage(final Class<SoeConnection> connectionClass, final InetSocketAddress sender, final ByteBuffer message) {
 
-        RunnableProcess messageRunnable = new RunnableProcess(connectionClass, sender, message);
+        byte type = message.get(1);
 
-        if(runInFiber) {
-            new Fiber<Void>(messageRunnable).start();
-        } else {
-            try {
-                messageRunnable.run();
-            } catch (SuspendExecution | InterruptedException suspendExecution) {
-                LOGGER.error("Unable to run", suspendExecution);
-            }
-        }
-    }
+        SoeConnection connection = connectionCache.get(sender);
+        SoeMessageType packetType = SoeMessageType.values()[type];
 
-    /**
-     * Internal class to control execution of message handling.
-     */
-    private class RunnableProcess implements SuspendableRunnable {
+        if (type <= 0x1E) {
 
-        private final Class<SoeConnection> connectionClass;
-        private final InetSocketAddress sender;
-        private final ByteBuffer message;
-
-        RunnableProcess(final Class<SoeConnection> connectionClass, final InetSocketAddress sender, final ByteBuffer message) {
-            this.connectionClass = connectionClass;
-            this.sender = sender;
-            this.message = message;
-        }
-
-        @Override
-        public void run() throws SuspendExecution, InterruptedException {
-
-            byte type = message.get(1);
-
-            SoeConnection connection = connectionCache.get(sender);
-            SoeMessageType packetType = SoeMessageType.values()[type];
-
-            if (type <= 0x1E) {
-
-                if (packetType == SoeMessageType.cUdpPacketConnect) {
-                    connection = connectionProvider.newInstance(connectionClass, sender);
-                    connection.setState(ConnectionState.ONLINE);
-                    connectionCache.put(sender, connection);
-                }
-
-                if (connection != null) {
-                    LOGGER.trace("Received raw message from {} {}", sender, SoeMessageUtil.bytesToHex(message));
-
-                    SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-                    SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
-
-                    ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message);
-                    ByteBuffer processedMessage = incomingMessageProcessor.processIncomingProtocol(decodedMessage);
-
-                    if (processedMessage != null) {
-                        soeMessageDispatcher.dispatch(connection, processedMessage);
-                    }
-
-                } else {
-                    LOGGER.debug("Unsolicited Message from {}: {}", sender, BufferUtil.bytesToHex(message));
-                }
+            if (packetType == SoeMessageType.cUdpPacketConnect) {
+                connection = connectionProvider.newInstance(connectionClass, sender);
+                connection.setState(ConnectionState.ONLINE);
+                connectionCache.put(sender, connection);
             }
 
+            if (connection != null) {
+                LOGGER.trace("Received raw message from {} {}", sender, SoeMessageUtil.bytesToHex(message));
+
+                SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+                SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
+
+                ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message);
+                ByteBuffer processedMessage = incomingMessageProcessor.processIncomingProtocol(decodedMessage);
+
+                if (processedMessage != null) {
+                    soeMessageDispatcher.dispatch(connection, processedMessage);
+                }
+
+            } else {
+                LOGGER.debug("Unsolicited Message from {}: {}", sender, BufferUtil.bytesToHex(message));
+            }
         }
     }
 }

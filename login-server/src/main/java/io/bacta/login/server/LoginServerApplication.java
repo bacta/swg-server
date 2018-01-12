@@ -18,8 +18,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.network.dispatch;
+package io.bacta.login.server;
 
-public interface ByteMessageDispatcher<C, D> extends MessageDispatcher {
-	void dispatch(byte opcode, C client, D message);
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
+/**
+ * Created by kburkhardt on 2/14/14.
+ */
+
+@SpringBootApplication
+@EnableAutoConfiguration
+@ComponentScan({
+        "io.bacta.login",
+        "io.bacta.soe"})
+public class LoginServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(LoginServerApplication.class, args);
+    }
+
 }
