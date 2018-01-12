@@ -64,7 +64,7 @@
         <module>engine</module>
         <module>soe-protocol</module>
         <module>messages</module>
-        <module>login-server</module>
+        <module>login</module>
     </modules>
 
     <build>
@@ -163,7 +163,7 @@
             </dependency>
             <dependency>
                 <groupId>com.ocdsoft.bacta</groupId>
-                <artifactId>shared-messages</artifactId>
+                <artifactId>messages</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -207,6 +207,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>5.2.9.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-actor_2.12</artifactId>
+                <version>2.5.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
