@@ -18,38 +18,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.login.server.controller;
 
-import io.bacta.engine.context.ApplicationErrorListener;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 
-/**
- * Created by kburkhardt on 2/14/14.
- */
+import io.bacta.login.message.LoginClientId;
+import io.bacta.login.server.ClientService;
+import io.bacta.soe.network.connection.ClientConnection;
+import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.controller.MessageHandled;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication
-@EnableAutoConfiguration
-@ComponentScan({
-        "io.bacta.login",
-        "io.bacta.soe"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
+import javax.inject.Inject;
 
-})
-public class LoginServerApplication {
+@Component
+@MessageHandled(handles = LoginClientId.class)
+@ConnectionRolesAllowed({})
+public class LoginClientIdController implements GameNetworkMessageController<ClientConnection, LoginClientId> {
+    private final ClientService clientService;
 
-    public static void main(String[] args) {
-
-        new SpringApplicationBuilder(LoginServerApplication.class)
-                .listeners(new ApplicationErrorListener())
-                .run(args);
+    @Inject
+    public LoginClientIdController(final ClientService clientService) {
+        this.clientService = clientService;
     }
 
+    @Override
+    public void handleIncoming(ClientConnection connection, LoginClientId message) throws Exception {
+        //clientService.validateClient(connection.getSoeUdpConnection(), message.getClientVersion(), message.getId(), message.getKey());
+    }
 }
