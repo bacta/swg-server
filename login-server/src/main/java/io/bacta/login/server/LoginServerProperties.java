@@ -20,31 +20,30 @@
 
 package io.bacta.login.server;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import java.net.InetAddress;
 
 /**
- * Created by kburkhardt on 2/14/14.
+ * Created by kyle on 6/29/2017.
  */
-
-@SpringBootApplication
-@EnableAutoConfiguration
-@ComponentScan({
-        "io.bacta.login",
-        "io.bacta.soe"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
-
-})
-public class LoginServerApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(LoginServerApplication.class, args);
-    }
-
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "io.bacta.login.server")
+public class LoginServerProperties {
+    private InetAddress bindAddress;
+    private int publicBindPort;
+    private int privateBindPort;
+    private int maxCharactersPerAccount;
+    private boolean autoGalaxyRegistrationEnabled;
+    private boolean internalBypassOnlineLimitEnabled;
+    private boolean skippingTutorialAllowedForAll;
+    private boolean validateClientVersionEnabled;
+    private int populationExtremelyHeavyThresholdPercent;
+    private int populationVeryHeavyThresholdPercent;
+    private int populationHeavyThresholdPercent;
+    private int populationMediumThresholdPercent;
+    private int populationLightThresholdPercent;
 }
