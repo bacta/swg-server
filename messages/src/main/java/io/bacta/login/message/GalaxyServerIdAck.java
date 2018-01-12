@@ -18,11 +18,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.message;
+package io.bacta.login.message;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
-import io.bacta.login.message.ConnectGalaxyServerAck;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,37 +29,23 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * When a GalaxyServer comes online, it will try to register with a configured LoginServer. The GalaxyServer doesn't know
- * it's own galaxy id, so it just announces its name and some other information. The LoginServer will send back
- * {@link ConnectGalaxyServerAck} informing the GalaxyServer of its galaxy id in the LoginServer cluster.
+ * Created by crush on 7/4/2017.
+ *
+ * LoginServer to GalaxyServer. Tells the GalaxyServer its cluster id according to the LoginServer. This message also
+ * tells the GalaxyServer that the LoginServer has recognized it as a legitimate GalaxyServer in its serviceable network.
  */
 @Getter
 @Priority(0x02)
 @AllArgsConstructor
-public final class ConnectGalaxyServer extends GameNetworkMessage {
-    /**
-     * The name of the galaxy.
-     */
-    private final String galaxyName;
-    /**
-     * The timezone for the galaxy in seconds.
-     */
-    private final int timeZone;
-    /**
-     * The version of the game network that the galaxy is using.
-     */
-    private final String networkVersion;
+public final class GalaxyServerIdAck extends GameNetworkMessage {
+    private final int clusterId;
 
-    public ConnectGalaxyServer(final ByteBuffer buffer) {
-        galaxyName = BufferUtil.getAscii(buffer);
-        timeZone = buffer.getInt();
-        networkVersion = BufferUtil.getAscii(buffer);
+    public GalaxyServerIdAck(final ByteBuffer buffer) {
+        clusterId = buffer.getInt();
     }
 
     @Override
-    public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.put(buffer, galaxyName);
-        BufferUtil.put(buffer, timeZone);
-        BufferUtil.put(buffer, networkVersion);
+    public void writeToBuffer(ByteBuffer buffer) {
+        BufferUtil.put(buffer, clusterId);
     }
 }
