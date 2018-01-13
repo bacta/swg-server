@@ -66,6 +66,8 @@
         <module>messages</module>
         <module>login</module>
         <module>galaxy</module>
+        <module>connection</module>
+        <module>zone</module>
     </modules>
 
     <build>

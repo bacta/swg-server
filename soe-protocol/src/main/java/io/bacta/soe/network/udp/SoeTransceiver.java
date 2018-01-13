@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by kyle on 7/12/2017.
@@ -36,6 +37,10 @@ public class SoeTransceiver {
         this.udpChannel = udpChannel;
         this.inboundMessageChannel = inboundMessageChannel;
         this.sendHandler = sendHandler;
+    }
+
+    public void start(final String name) throws UnknownHostException {
+        start(name, InetAddress.getByName("0.0.0.0"), 0);
     }
 
     public void start(final String name, final InetAddress bindAddress, final int bindPort) {
