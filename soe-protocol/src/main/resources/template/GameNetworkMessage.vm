@@ -1,0 +1,30 @@
+package $packageName;
+
+import GameNetworkMessage;
+import SOECRC32;
+import lombok.Getter;
+import Priority;
+
+import java.nio.ByteBuffer;
+
+/**
+  $messageStruct
+  $messageSimpleName; // $opcode
+  */
+@Getter
+@Priority($priority)
+public final class $messageName extends GameNetworkMessage {
+
+    public $messageName() {
+
+    }
+
+    public $messageName(final ByteBuffer buffer) {
+
+    }
+
+    @Override
+    public void writeToBuffer(ByteBuffer buffer) {
+
+    }
+}

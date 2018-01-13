@@ -1,0 +1,18 @@
+package $packageName;
+
+import com.ocdsoft.bacta.soe.connection.SoeUdpConnection;
+import com.ocdsoft.bacta.swg.server.game.controller.object.QueuesCommand;
+import com.ocdsoft.bacta.swg.server.game.controller.object.CommandQueueController;
+import com.ocdsoft.bacta.swg.server.game.object.ServerObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@QueueCommand("${messageName}")
+public class $className implements QueueCommandController<ServerObject> {
+	private static Logger LOGGER = LoggerFactory.getLogger(${className}.class);
+
+	@Override
+	public void handleCommand(final SoeUdpConnection connection, final ServerObject actor, final ServerObject target, final String params) {
+		LOGGER.warn("This command not implemented");
+	}
+}

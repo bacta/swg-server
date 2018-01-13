@@ -1,0 +1,8 @@
+language: java
+  - oraclejdk8
+  - oraclejdk9
+
+ notifications:
+  slack:
+    rooms:
+      - swgbacta:5M7NhVkfvrjFh0gEJilEyGNC#develop
