@@ -23,7 +23,7 @@ package io.bacta.login.server.controller;
 
 import io.bacta.login.message.RequestExtendedClusterInfo;
 import io.bacta.login.server.GalaxyService;
-import io.bacta.soe.network.connection.LoginServerConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -36,7 +36,7 @@ import javax.inject.Inject;
 @Service
 @MessageHandled(handles = RequestExtendedClusterInfo.class)
 @ConnectionRolesAllowed({})
-public class RequestExtendedClusterInfoController implements GameNetworkMessageController<LoginServerConnection, RequestExtendedClusterInfo> {
+public class RequestExtendedClusterInfoController implements GameNetworkMessageController<SoeConnection, RequestExtendedClusterInfo> {
 
     private final GalaxyService galaxyService;
 
@@ -46,7 +46,7 @@ public class RequestExtendedClusterInfoController implements GameNetworkMessageC
     }
 
     @Override
-    public void handleIncoming(LoginServerConnection connection, RequestExtendedClusterInfo message) throws Exception {
+    public void handleIncoming(SoeConnection connection, RequestExtendedClusterInfo message) throws Exception {
     }
 
 //    @Override

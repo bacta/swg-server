@@ -22,13 +22,12 @@ package io.bacta.login.server;
 
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.network.udp.UdpChannel;
-import io.bacta.soe.network.connection.ClientConnection;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.handler.SoeInboundMessageChannel;
 import io.bacta.soe.network.handler.SoeUdpSendHandler;
 import io.bacta.soe.network.udp.SoeUdpChannelBuilder;
 import io.bacta.soe.network.udp.SoeUdpTransceiverGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -44,8 +43,8 @@ import javax.inject.Inject;
 
 @Configuration
 @ConfigurationProperties
+@Slf4j
 public class LoginServerConfiguration implements ApplicationContextAware {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginServerConfiguration.class);
 
     private ApplicationContext applicationContext;
     private final MetricRegistry metricRegistry;
@@ -70,7 +69,7 @@ public class LoginServerConfiguration implements ApplicationContextAware {
                 .withMetricsPrefix("login")
                 .withAddress(loginServerProperties.getBindAddress())
                 .withPort(loginServerProperties.getPublicBindPort())
-                .withConnection(ClientConnection.class)
+                .withConnection(SoeConnection.class)
                 .usingInboundChannel(inboundMessageChannel)
                 .build();
 
