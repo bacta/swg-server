@@ -20,8 +20,10 @@
 
 package io.bacta.engine.network.udp;
 
+import io.bacta.engine.network.channel.InboundMessageChannel;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
@@ -29,7 +31,8 @@ import java.nio.ByteBuffer;
  * Created by kyle on 6/11/2017.
  */
 public interface UdpChannel {
+    void start(final String name, final InetAddress bindAddress, final int bindPort, final InboundMessageChannel messageChannel);
+    void stop();
     void readIncoming(InetSocketAddress sender, DatagramPacket msg);
     void writeOutgoing(InetSocketAddress destination, ByteBuffer message);
-    void destroy();
 }

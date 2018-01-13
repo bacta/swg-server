@@ -29,6 +29,7 @@ import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -44,8 +45,9 @@ import java.nio.ByteBuffer;
  */
 @Slf4j
 @Component
+@Scope("prototype")
 @Getter
-public class SoeInboundMessageChannel implements InboundMessageChannel<SoeConnection> {
+public class SoeInboundMessageChannel implements InboundMessageChannel {
 
     private final SoeConnectionCache connectionCache;
     private final SoeProtocolHandler protocolHandler;
@@ -68,12 +70,11 @@ public class SoeInboundMessageChannel implements InboundMessageChannel<SoeConnec
      * Receives {@link ByteBuffer} message with contextual information about the {@link io.bacta.engine.network.connection.Connection}
      * type based on the raw channel the message was received on.
      *
-     * @param connectionClass type of connection this message is associated with
      * @param sender remote address of this message
      * @param message {@link ByteBuffer} representation of sent message
      */
     @Override
-    public void receiveMessage(final Class<SoeConnection> connectionClass, final InetSocketAddress sender, final ByteBuffer message) {
+    public void receiveMessage(final InetSocketAddress sender, final ByteBuffer message) {
 
         byte type = message.get(1);
 
@@ -83,7 +84,7 @@ public class SoeInboundMessageChannel implements InboundMessageChannel<SoeConnec
         if (type <= 0x1E) {
 
             if (packetType == SoeMessageType.cUdpPacketConnect) {
-                connection = connectionProvider.newInstance(connectionClass, sender);
+                connection = connectionProvider.newInstance(sender);
                 connection.setState(ConnectionState.ONLINE);
                 connectionCache.put(sender, connection);
             }

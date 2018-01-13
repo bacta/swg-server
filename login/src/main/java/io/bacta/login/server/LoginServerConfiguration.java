@@ -20,18 +20,9 @@
 
 package io.bacta.login.server;
 
-import com.codahale.metrics.MetricRegistry;
-import io.bacta.engine.network.udp.UdpChannel;
-import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.handler.SoeInboundMessageChannel;
-import io.bacta.soe.network.handler.SoeUdpSendHandler;
-import io.bacta.soe.network.udp.SoeUdpChannelBuilder;
-import io.bacta.soe.network.udp.SoeUdpTransceiverGroup;
+import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,49 +35,19 @@ import javax.inject.Inject;
 @Configuration
 @ConfigurationProperties
 @Slf4j
-public class LoginServerConfiguration implements ApplicationContextAware {
+public class LoginServerConfiguration {
 
-    private ApplicationContext applicationContext;
-    private final MetricRegistry metricRegistry;
     private final LoginServerProperties loginServerProperties;
 
     @Inject
-    public LoginServerConfiguration(final MetricRegistry metricRegistry,
-                                    final LoginServerProperties loginServerProperties) {
-        this.metricRegistry = metricRegistry;
+    public LoginServerConfiguration(final LoginServerProperties loginServerProperties) {
         this.loginServerProperties = loginServerProperties;
     }
 
     @Inject
-    @Bean
-    public SoeUdpTransceiverGroup startReceiverGroup(final SoeUdpTransceiverGroup transceiverGroup,
-                                                     final SoeInboundMessageChannel inboundMessageChannel,
-                                                     final SoeUdpSendHandler sendHandler) {
-
-
-        UdpChannel channel = SoeUdpChannelBuilder.newBuilder()
-                .withMetricsRegistry(metricRegistry)
-                .withMetricsPrefix("login")
-                .withAddress(loginServerProperties.getBindAddress())
-                .withPort(loginServerProperties.getPublicBindPort())
-                .withConnection(SoeConnection.class)
-                .usingInboundChannel(inboundMessageChannel)
-                .build();
-
-        transceiverGroup.registerChannel(channel);
-
-        sendHandler.start("login",
-                inboundMessageChannel.getConnectionCache(),
-                inboundMessageChannel.getProtocolHandler(),
-                channel);
-
-        transceiverGroup.registerSendHandler(sendHandler);
-
-        return transceiverGroup;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+    @Bean(name = "LoginTransceiver")
+    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
+        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getPublicBindPort());
+        return soeTransceiver;
     }
 }

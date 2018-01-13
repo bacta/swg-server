@@ -1,11 +1,7 @@
 package io.bacta.network.message
 
-import com.codahale.metrics.MetricRegistry
 import io.bacta.Application
-import io.bacta.engine.network.channel.InboundMessageChannel
-import io.bacta.soe.network.connection.SoeConnection
-import io.bacta.soe.network.udp.SoeUdpChannelBuilder
-import io.bacta.soe.network.udp.SoeUdpTransceiverGroup
+import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
@@ -15,13 +11,11 @@ import javax.inject.Inject
 class SoeTransceiverSpec extends Specification {
 
     @Inject
-    MetricRegistry metricRegistry;
+    SoeTransceiver soeServer;
 
     @Inject
-    SoeUdpTransceiverGroup soeUdpTransceiverGroup;
+    SoeTransceiver soeClient;
 
-    @Inject
-    InboundMessageChannel inboundMessageChannel;
 
     def host = InetAddress.getByName("127.0.0.1")
     def serverPort = 5000;
@@ -31,25 +25,8 @@ class SoeTransceiverSpec extends Specification {
 
         when:
 
-        soeUdpTransceiverGroup.registerChannel(SoeUdpChannelBuilder.newBuilder()
-                .withMetricsRegistry(metricRegistry)
-                .withMetricsPrefix("io.bacta.test.client")
-                .withAddress(host)
-                .withPort(clientPort)
-                .withConnection(SoeConnection.class)
-                .usingInboundChannel(inboundMessageChannel)
-                .build()
-        );
-
-        soeUdpTransceiverGroup.registerChannel(SoeUdpChannelBuilder.newBuilder()
-                .withMetricsRegistry(metricRegistry)
-                .withMetricsPrefix("io.bacta.test.server")
-                .withAddress(host)
-                .withPort(serverPort)
-                .withConnection(SoeConnection.class)
-                .usingInboundChannel(inboundMessageChannel)
-                .build()
-        );
+        soeServer.start("test.client", host, serverPort)
+        soeClient.start("test.server", host, clientPort)
 
         then:
         noExceptionThrown()

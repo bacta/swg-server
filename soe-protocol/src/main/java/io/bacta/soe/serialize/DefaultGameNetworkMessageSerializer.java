@@ -37,7 +37,6 @@ import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -56,8 +55,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Scope("prototype")
-public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSerializer, ApplicationContextAware {
+public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer, ApplicationContextAware {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
     private final IntObjectHashMap<Constructor<? extends GameNetworkMessage>> messageConstructorMap;
@@ -67,7 +65,7 @@ public class GameNetworkMessageSerializerImpl implements GameNetworkMessageSeria
     private ApplicationContext context;
 
     @Inject
-    public GameNetworkMessageSerializerImpl(final MetricRegistry metricRegistry, final ObjControllerMessageSerializer objControllerMessageSerializer) {
+    public DefaultGameNetworkMessageSerializer(final MetricRegistry metricRegistry, final ObjControllerMessageSerializer objControllerMessageSerializer) {
 
         this.objControllerMessageSerializer = objControllerMessageSerializer;
         this.histogram = metricRegistry.histogram("GameNetworkMessageBufferAllocations");

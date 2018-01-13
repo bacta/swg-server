@@ -22,7 +22,7 @@ package io.bacta.network.message
 
 import bacta.io.soe.network.controller.*
 import io.bacta.engine.conf.ini.IniBactaConfiguration
-import io.bacta.soe.config.SoeNetworkConfigurationImpl
+import io.bacta.soe.config.DefaultSoeNetworkConfiguration
 import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
 import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
@@ -53,7 +53,7 @@ class MultiPacketSpec extends Specification {
     List<ByteBuffer> processedPackets
 
     @Shared
-    def networkConfig = new SoeNetworkConfigurationImpl()
+    def networkConfig = new DefaultSoeNetworkConfiguration()
 
     def setupSpec() {
 

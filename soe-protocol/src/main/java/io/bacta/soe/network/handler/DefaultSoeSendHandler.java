@@ -51,7 +51,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @Scope("prototype")
-public class DefaultSoeSendHandler implements SoeUdpSendHandler, Runnable {
+public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
     private final PublisherService publisherService;

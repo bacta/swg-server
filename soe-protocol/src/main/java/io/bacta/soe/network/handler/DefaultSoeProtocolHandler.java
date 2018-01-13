@@ -27,6 +27,7 @@ import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ import java.nio.ByteOrder;
  */
 @Slf4j
 @Component
+@Scope("prototype")
 public final class DefaultSoeProtocolHandler implements SoeProtocolHandler {
 
     private final SoeEncryption encryption;
