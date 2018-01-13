@@ -3,6 +3,7 @@ package io.bacta.soe.network.connection;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import java.util.Random;
  * This factory creates the underlying UDP connection
  */
 @Component
+@Scope("prototype")
 @Slf4j
 class SoeUdpConnectionFactory {
 

@@ -20,8 +20,6 @@
 
 package io.bacta.engine.network.channel;
 
-import io.bacta.engine.network.connection.Connection;
-
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
@@ -32,6 +30,6 @@ import java.nio.ByteBuffer;
  * @author Kyle Burkhardt
  * @since 1.0
  */
-public interface InboundMessageChannel<T extends Connection> {
-    void receiveMessage(Class<T> connectionClass, InetSocketAddress sender, ByteBuffer message);
+public interface InboundMessageChannel {
+    void receiveMessage(InetSocketAddress sender, ByteBuffer message);
 }
