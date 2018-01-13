@@ -61,8 +61,8 @@ public final class GalaxyService {
         this.galaxies = new TIntObjectHashMap<>();
     }
 
-    @Scheduled(initialDelay = 0, fixedRate = 500)
+    @Scheduled(initialDelay = 0, fixedRate = 10000)
     private void refreshGalaxyServerList() {
-        LOGGER.info("Refreshing galaxy server list from repository.");
+        LOGGER.trace("Refreshing galaxy server list from repository.");
     }
 }

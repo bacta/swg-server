@@ -3,27 +3,36 @@ package io.bacta.login.server.data;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.*;
+
 /**
  * Represents a galaxy in the login server's database.
  */
 @Data
+@Entity
+@Table(name = "clusters")
 @RequiredArgsConstructor
 public final class GalaxyRecord {
     /**
      * Unique identifier for this galaxy. No other galaxy should share this id.
      */
-    private final int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private final Integer id;
     /**
      * The name of the galaxy. This may be changed by the galaxy itself when it identifies.
      */
+    @Column(unique = true, nullable = false)
     private String name;
     /**
      * The address from which this login server may expect the galaxy to identify.
      */
+    @Column(nullable = false)
     private String address;
     /**
      * The port that goes with the address of the galaxy server.
      */
+    @Column(nullable = false)
     private int port;
     /**
      * The timezone within which this galaxy is located. This is the offset from GMT.
