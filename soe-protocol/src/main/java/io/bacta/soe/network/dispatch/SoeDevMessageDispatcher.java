@@ -48,7 +48,9 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     @Inject
     public SoeDevMessageDispatcher(final ApplicationContext applicationContext, final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
         this.gameNetworkMessageDispatcher = gameNetworkMessageDispatcher;
-        load(applicationContext);
+        if(applicationContext != null) {
+            load(applicationContext);
+        }
     }
 
     @Override
