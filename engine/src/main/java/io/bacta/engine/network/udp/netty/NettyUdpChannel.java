@@ -22,11 +22,13 @@ package io.bacta.engine.network.udp.netty;
 
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.network.channel.InboundMessageChannel;
-import io.bacta.engine.network.connection.Connection;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -35,27 +37,29 @@ import java.nio.ByteBuffer;
  * Created by kyle on 6/11/2017.
  */
 @Slf4j
+@Component
+@Scope("prototype")
 public class NettyUdpChannel implements UdpChannel {
 
-    private final InboundMessageChannel messageChannel;
-    private final NettyUdpTransceiver udpTransceiver;
-    private final Class<? extends Connection> connectionClass;
+    private final MetricRegistry metricRegistry;
+    private NettyUdpTransceiver udpTransceiver;
+    private InboundMessageChannel messageChannel;
+    private String name;
 
-    public NettyUdpChannel(final InetAddress bindAddress,
-                           final int bindPort,
-                           final InboundMessageChannel messageChannel,
-                           final MetricRegistry metricRegistry,
-                           final String metricsName,
-                           final Class<? extends Connection> connectionClass) {
+    @Inject
+    public NettyUdpChannel(final MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+    }
 
-        LOGGER.info("Channel Starting for - {}", connectionClass.getSimpleName());
+    @Override
+    public void start(final String name, final InetAddress bindAddress, final int bindPort, final InboundMessageChannel messageChannel) {
         this.messageChannel = messageChannel;
-        this.connectionClass = connectionClass;
+        this.name = name;
         this.udpTransceiver = new NettyUdpTransceiver(
                 bindAddress,
                 bindPort,
                 metricRegistry,
-                metricsName,
+                name,
                 this::readIncoming);
     }
 
@@ -67,7 +71,7 @@ public class NettyUdpChannel implements UdpChannel {
         msg.content().getBytes(0, buffer);
         buffer.rewind();
 
-        messageChannel.receiveMessage(connectionClass, sender, buffer);
+        messageChannel.receiveMessage(sender, buffer);
     }
 
     @Override
@@ -76,9 +80,9 @@ public class NettyUdpChannel implements UdpChannel {
     }
 
     @Override
-    public void destroy() {
+    public void stop() {
         try {
-            LOGGER.info("Channel Shutting down - {}", connectionClass.getSimpleName());
+            LOGGER.info("Channel Shutting down - {}", name);
             this.udpTransceiver.stop();
         } catch (Exception e) {
             LOGGER.error("Error stopping channel", e);

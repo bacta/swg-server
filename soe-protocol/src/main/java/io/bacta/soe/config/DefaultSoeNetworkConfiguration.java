@@ -35,7 +35,7 @@ import java.util.Set;
 @Component
 @Data
 @ConfigurationProperties(prefix = "bacta.network.shared")
-public final class SoeNetworkConfigurationImpl implements SoeNetworkConfiguration {
+public final class DefaultSoeNetworkConfiguration implements SoeNetworkConfiguration {
 
     private InetAddress bindAddress;
     private int bindPort;
