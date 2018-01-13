@@ -18,31 +18,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.zone.server;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import io.bacta.engine.context.ApplicationErrorListener;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
-import java.net.InetAddress;
+@SpringBootApplication
+@EnableAutoConfiguration
+@ComponentScan({
+        "io.bacta.zone",
+        "io.bacta.soe",
+        "io.bacta.engine"})
+@PropertySources({
+        @PropertySource("classpath:soenetworking.properties"),
+        @PropertySource("classpath:application.properties")
 
-/**
- * Created by kyle on 6/29/2017.
- */
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "io.bacta.login.server")
-public class LoginServerProperties {
-    private InetAddress bindAddress;
-    private int bindPort;
-    private int maxCharactersPerAccount;
-    private boolean autoGalaxyRegistrationEnabled;
-    private boolean internalBypassOnlineLimitEnabled;
-    private boolean skippingTutorialAllowedForAll;
-    private boolean validateClientVersionEnabled;
-    private int populationExtremelyHeavyThresholdPercent;
-    private int populationVeryHeavyThresholdPercent;
-    private int populationHeavyThresholdPercent;
-    private int populationMediumThresholdPercent;
-    private int populationLightThresholdPercent;
+})
+public class ZoneServerApplication {
+    public static void main(String[] args) {
+
+        new SpringApplicationBuilder(ZoneServerApplication.class)
+                .listeners(new ApplicationErrorListener())
+                .run(args);
+    }
 }
