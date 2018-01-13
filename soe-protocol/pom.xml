@@ -3,20 +3,25 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>swg-server</artifactId>
         <groupId>com.ocdsoft.bacta</groupId>
+        <artifactId>swg-server</artifactId>
         <version>1.0.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ocdsoft.bacta.swg</groupId>
+    <groupId>com.ocdsoft.bacta.soe</groupId>
     <artifactId>soe-protocol</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>server-engine</artifactId>
+            <artifactId>engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>messages</artifactId>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
@@ -27,13 +32,18 @@
             <artifactId>velocity</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-modeler</groupId>
+            <artifactId>commons-modeler</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jzlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-modeler</groupId>
-            <artifactId>commons-modeler</artifactId>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>messages</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>
