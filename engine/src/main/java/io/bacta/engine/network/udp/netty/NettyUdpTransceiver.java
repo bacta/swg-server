@@ -18,6 +18,7 @@ class NettyUdpTransceiver implements UdpTransceiver {
 
     private final NettyUdpReceiver udpReceiver;
     private final NettyUdpEmitter udpEmitter;
+    private final UdpMetrics metrics;
 
     NettyUdpTransceiver(final InetAddress bindAddress,
                         final int bindPort,
@@ -25,7 +26,7 @@ class NettyUdpTransceiver implements UdpTransceiver {
                         final String metricsPrefix,
                         final BiConsumer<InetSocketAddress, DatagramPacket> receiveMethod) {
 
-        UdpMetrics metrics = new UdpMetrics(metricRegistry, metricsPrefix);
+        this.metrics = new UdpMetrics(metricRegistry, metricsPrefix);
 
         this.udpEmitter = new NettyUdpEmitter(metrics);
         this.udpReceiver = new NettyUdpReceiver(

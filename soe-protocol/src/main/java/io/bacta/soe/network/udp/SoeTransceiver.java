@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
@@ -52,8 +51,9 @@ public class SoeTransceiver {
         return new WeakReference<>(newConnection);
     }
 
-    @PreDestroy
     public void stop() throws Exception {
-        LOGGER.info("Shutting down SoeTransceiver {}", name);
+        LOGGER.info("Shutting down SoeTransceiver({})", name);
+        udpChannel.stop();
+        sendHandler.stop();
     }
 }
