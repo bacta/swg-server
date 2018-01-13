@@ -16,6 +16,9 @@ import java.nio.ByteBuffer;
 @Priority(0x02)
 @RequiredArgsConstructor
 public final class LoginServerOnline extends GameNetworkMessage {
+    public LoginServerOnline(ByteBuffer buffer) {
+    }
+
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
     }
