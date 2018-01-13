@@ -65,6 +65,7 @@
         <module>soe-protocol</module>
         <module>messages</module>
         <module>login</module>
+        <module>galaxy</module>
     </modules>
 
     <build>
