@@ -47,7 +47,7 @@ public class LoginServerConfiguration {
     @Inject
     @Bean(name = "LoginTransceiver")
     public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getPublicBindPort());
+        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
         return soeTransceiver;
     }
 }

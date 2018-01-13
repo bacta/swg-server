@@ -3,9 +3,11 @@ package io.bacta.galaxy.server
 import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
+import io.bacta.engine.util.AwaitUtil
 import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
@@ -22,13 +24,12 @@ class GalaxyServerApplicationSpecIT extends Specification {
     @Qualifier("soeTransceiver")
     SoeTransceiver soeClient;
 
-    static String serverHost = "127.0.0.1"
-    static int serverPort = 44463
-    static String clientHost = "0.0.0.0"
-    static int clientPort = 53174
+    String serverHost = "127.0.0.1"
+    @Value('${io.bacta.galaxy.server.bindPort}')
+    int serverPort
 
     void setup() {
-        soeClient.start("Client", InetAddress.getByName(clientHost), clientPort)
+        soeClient.start("Client")
     }
 
     void cleanup() {
@@ -45,31 +46,9 @@ class GalaxyServerApplicationSpecIT extends Specification {
         when:
 
         connection.connect({udpConnection -> log.info("I connected")})
-        while(!connection.isConnected()) {
-            Thread.sleep(100)
-        }
-
-        then:
-        Thread.sleep(1000)
-        noExceptionThrown()
-        connection.isConnected()
-    }
-
-    def "TestClientID"() {
-
-        setup:
-
-        SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, serverPort)).get()
-
-        when:
-
-        connection.connect({ udpConnection -> log.info("I connected")})
-        while(!connection.isConnected()) {
-            Thread.sleep(100)
-        }
 
         then:
         noExceptionThrown()
-        connection.isConnected()
+        AwaitUtil.awaitTrue(connection.&isConnected, 5)
     }
 }

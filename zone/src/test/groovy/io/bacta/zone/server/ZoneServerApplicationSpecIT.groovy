@@ -1,4 +1,4 @@
-package io.bacta.login.server
+package io.bacta.zone.server
 
 import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @Slf4j
 @SpringBootTest(classes = Application.class)
-class LoginServerApplicationSpecIT extends Specification {
+class ZoneServerApplicationSpecIT extends Specification {
 
     @Inject
     MetricRegistry metricRegistry;
@@ -25,7 +25,7 @@ class LoginServerApplicationSpecIT extends Specification {
     SoeTransceiver soeClient;
 
     String serverHost = "127.0.0.1"
-    @Value('${io.bacta.login.server.bindPort}')
+    @Value('${io.bacta.zone.server.bindPort}')
     int serverPort
 
     void setup() {

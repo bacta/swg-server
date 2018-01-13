@@ -18,31 +18,33 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.connection.server;
 
-import lombok.Data;
+import io.bacta.soe.network.udp.SoeTransceiver;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.InetAddress;
+import javax.inject.Inject;
 
-/**
- * Created by kyle on 6/29/2017.
- */
-@Data
+
 @Configuration
-@ConfigurationProperties(prefix = "io.bacta.login.server")
-public class LoginServerProperties {
-    private InetAddress bindAddress;
-    private int bindPort;
-    private int maxCharactersPerAccount;
-    private boolean autoGalaxyRegistrationEnabled;
-    private boolean internalBypassOnlineLimitEnabled;
-    private boolean skippingTutorialAllowedForAll;
-    private boolean validateClientVersionEnabled;
-    private int populationExtremelyHeavyThresholdPercent;
-    private int populationVeryHeavyThresholdPercent;
-    private int populationHeavyThresholdPercent;
-    private int populationMediumThresholdPercent;
-    private int populationLightThresholdPercent;
+@ConfigurationProperties
+@Slf4j
+public class ConnectionServerConfiguration {
+
+    private final ConnectionServerProperties connectionServerProperties;
+
+    @Inject
+    public ConnectionServerConfiguration(final ConnectionServerProperties connectionServerProperties) {
+        this.connectionServerProperties = connectionServerProperties;
+    }
+
+    @Inject
+    @Bean(name = "ConnectionTransceiver")
+    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
+        soeTransceiver.start("conn", connectionServerProperties.getBindAddress(), connectionServerProperties.getBindPort());
+        return soeTransceiver;
+    }
 }
