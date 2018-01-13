@@ -36,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -51,7 +50,7 @@ import java.util.Set;
 @Slf4j
 @Component
 @Scope("prototype")
-public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
+class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
     private final PublisherService publisherService;
@@ -65,6 +64,7 @@ public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
     private Gauge<Integer> sizeGauge;
 
     private final Thread sendThread;
+    private String metricPrefix;
 
     @Inject
     public DefaultSoeSendHandler(final SoeNetworkConfiguration networkConfiguration,
@@ -80,8 +80,10 @@ public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
 
     @Override
     public void start(final String metricPrefix, final SoeConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpChannel udpChannel) {
+
         if (!sendThread.isAlive()) {
-            sendThread.setName("SendHandler");
+            this.metricPrefix = metricPrefix;
+            sendThread.setName(metricPrefix + "-Send");
             sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
             metricRegistry.register(metricPrefix, (Gauge<Integer>) () -> connectionCache.getConnectionCount());
             this.connectionCache = connectionCache;
@@ -91,7 +93,6 @@ public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
         }
     }
 
-    @PreDestroy
     public void stop() {
         sendThread.interrupt();
     }
@@ -154,7 +155,9 @@ public class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
             for (final ByteBuffer message : messages) {
                 ByteBuffer encodedMessage = protocolHandler.processOutgoing(connectionProxy, message);
                 udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
-                LOGGER.info("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
+                if(LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
+                }
             }
         }
 

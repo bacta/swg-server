@@ -65,7 +65,7 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
     @Override
     public void put(final InetSocketAddress remoteAddress, final SoeConnection connection) {
         connectionMap.put(remoteAddress, connection);
-        LOGGER.debug("New soe from {}.  Total clients: {}",
+        LOGGER.debug("New connection from {}.  Total clients: {}",
                 remoteAddress,
                 getConnectionCount());
     }
