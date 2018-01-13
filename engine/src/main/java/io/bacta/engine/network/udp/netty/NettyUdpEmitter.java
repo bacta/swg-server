@@ -23,8 +23,10 @@ package io.bacta.engine.network.udp.netty;
 import io.bacta.engine.network.udp.UdpEmitter;
 import io.bacta.engine.network.udp.UdpMetrics;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -32,6 +34,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by kyle on 6/11/2017.
  */
+@Slf4j
 class NettyUdpEmitter implements UdpEmitter {
 
     private final UdpMetrics metrics;
@@ -54,6 +57,10 @@ class NettyUdpEmitter implements UdpEmitter {
     public void sendMessage(final InetSocketAddress destination, final ByteBuffer msg) {
         metrics.sendMessage();
         DatagramPacket datagramPacket = new DatagramPacket(Unpooled.wrappedBuffer(msg), destination);
-        ctx.writeAndFlush(datagramPacket);
+        ChannelFuture future = ctx.writeAndFlush(datagramPacket);
+        future.awaitUninterruptibly();
+        if(!future.isSuccess()) {
+            LOGGER.error("Send error", future.cause());
+        }
     }
 }

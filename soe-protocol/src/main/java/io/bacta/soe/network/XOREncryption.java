@@ -70,7 +70,9 @@ public final class XOREncryption implements SoeEncryption {
 		if(verifyMessage(seed, data, offset)) {
 
 			decrypt(seed, data, offset);
-            LOGGER.info("Message: " + BufferUtil.bytesToHex(data));
+			if(LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Message: " + BufferUtil.bytesToHex(data));
+            }
 
 			if(data.get(data.limit() - 3) == 1) {
 				data = decompress(data, offset);
