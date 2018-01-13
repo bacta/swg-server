@@ -1,4 +1,4 @@
-/*
+package io.bacta.login.server;/*
  * Copyright 2017. Bacta
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
@@ -18,32 +18,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server.controller;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
+@SpringBootApplication
+@EnableAutoConfiguration
+@EnableConfigurationProperties
+@ComponentScan({
+        "io.bacta.login",
+        "io.bacta.soe"})
+@PropertySources({
+        @PropertySource("classpath:soenetworking.properties"),
+        @PropertySource("classpath:application.properties")
 
-import io.bacta.login.message.LoginClientId;
-import io.bacta.login.server.ClientService;
-import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.controller.ConnectionRolesAllowed;
-import io.bacta.soe.network.controller.GameNetworkMessageController;
-import io.bacta.soe.network.controller.MessageHandled;
-import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
-
-@Component
-@MessageHandled(handles = LoginClientId.class)
-@ConnectionRolesAllowed({})
-public class LoginClientIdController implements GameNetworkMessageController<SoeConnection, LoginClientId> {
-    private final ClientService clientService;
-
-    @Inject
-    public LoginClientIdController(final ClientService clientService) {
-        this.clientService = clientService;
-    }
-
-    @Override
-    public void handleIncoming(SoeConnection connection, LoginClientId message) throws Exception {
-        //clientService.validateClient(connection.getSoeUdpConnection(), message.getClientVersion(), message.getId(), message.getKey());
+})
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 }

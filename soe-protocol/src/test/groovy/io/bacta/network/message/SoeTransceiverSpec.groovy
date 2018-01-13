@@ -3,8 +3,7 @@ package io.bacta.network.message
 import com.codahale.metrics.MetricRegistry
 import io.bacta.Application
 import io.bacta.engine.network.channel.InboundMessageChannel
-import io.bacta.soe.network.connection.ClientConnection
-import io.bacta.soe.network.connection.GameServerConnection
+import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.udp.SoeUdpChannelBuilder
 import io.bacta.soe.network.udp.SoeUdpTransceiverGroup
 import org.springframework.boot.test.context.SpringBootTest
@@ -37,7 +36,7 @@ class SoeTransceiverSpec extends Specification {
                 .withMetricsPrefix("io.bacta.test.client")
                 .withAddress(host)
                 .withPort(clientPort)
-                .withConnection(ClientConnection.class)
+                .withConnection(SoeConnection.class)
                 .usingInboundChannel(inboundMessageChannel)
                 .build()
         );
@@ -47,7 +46,7 @@ class SoeTransceiverSpec extends Specification {
                 .withMetricsPrefix("io.bacta.test.server")
                 .withAddress(host)
                 .withPort(serverPort)
-                .withConnection(GameServerConnection.class)
+                .withConnection(SoeConnection.class)
                 .usingInboundChannel(inboundMessageChannel)
                 .build()
         );

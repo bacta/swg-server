@@ -8,12 +8,13 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by kyle on 7/9/2017.
  */
 @Getter
-public abstract class SoeConnection implements Connection {
+public final class SoeConnection implements Connection {
 
     private final SoeUdpConnection soeUdpConnection;
 
@@ -73,5 +74,13 @@ public abstract class SoeConnection implements Connection {
 
     public void setState(ConnectionState state) {
         soeUdpConnection.setConnectionState(state);
+    }
+
+    public void connect(Consumer<SoeUdpConnection> connectCallback) {
+        soeUdpConnection.connect(connectCallback);
+    }
+
+    public boolean isConnected() {
+        return getState() == ConnectionState.ONLINE;
     }
 }
