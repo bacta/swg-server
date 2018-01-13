@@ -130,9 +130,21 @@
                         <!-- Oddly enough for Groovy files, *Spec.groovy does not work, but *Spec.java does -->
                         <include>**/*Test.java</include>
                         <include>**/*Spec.java</include>
-                        <include>**/*SpecIT.java</include>
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.20.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
