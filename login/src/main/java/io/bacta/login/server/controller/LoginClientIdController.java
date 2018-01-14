@@ -22,7 +22,7 @@ package io.bacta.login.server.controller;
 
 
 import io.bacta.login.message.LoginClientId;
-import io.bacta.login.server.ClientService;
+import io.bacta.login.server.service.ClientService;
 import io.bacta.soe.network.connection.ClientConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
