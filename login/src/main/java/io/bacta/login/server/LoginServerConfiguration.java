@@ -47,16 +47,18 @@ public class LoginServerConfiguration {
         this.loginServerProperties = loginServerProperties;
     }
 
-    @Inject
-    @Bean(name = "LoginTransceiver")
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
-        return soeTransceiver;
+    @Bean(name = "LoginConnectionMap")
+    public ConnectionMap getConnectionCache() {
+        return new DefaultConnectionMap();
     }
 
     @Inject
-    @Bean(name = "LoginConnectionMap")
-    public ConnectionMap getConnectionCache(@Qualifier("LoginTransceiver") final SoeTransceiver soeTransceiver) {
-        return new DefaultConnectionMap(soeTransceiver::getConnection);
+    @Bean(name = "LoginTransceiver")
+    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver, @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
+        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
+        connectionMap.setGetConnectionMethod(soeTransceiver::getConnection);
+        return soeTransceiver;
     }
+
+
 }
