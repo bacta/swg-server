@@ -1,21 +1,10 @@
 package io.bacta.login.server.service;
 
-import com.google.common.collect.ImmutableList;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.galaxy.message.GalaxyServerId;
-import io.bacta.login.message.LoginServerOnline;
-import io.bacta.login.server.LoginServerProperties;
+import io.bacta.galaxy.message.GalaxyServerStatus;
+import io.bacta.login.message.GalaxyServerIdAck;
 import io.bacta.login.server.data.GalaxyRecord;
-import io.bacta.login.server.repository.GalaxyRepository;
-import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
-import java.net.InetSocketAddress;
 import java.util.Collection;
 
 /**
@@ -55,101 +44,101 @@ import java.util.Collection;
  * <b>This mechanism is meant for local development servers only because it allows any galaxy server to register itself
  * without approval.</b> It is highly advisable to disable this setting in a production environment or run the risk of
  * untrusted galaxies registering with your galaxy cluster. If you are running a local LAN server with no external port
- * mapping rules to your login server, then you can safely leave this option enabled.
+ * mapper rules to your login server, then you can safely leave this option enabled.
  */
-@Slf4j
-@Service
-public final class GalaxyService {
-    private final GalaxyRepository galaxyRepository;
-    private final LoginServerProperties loginServerProperties;
-    private final ConnectionMap connectionMap;
+public interface GalaxyService {
     /**
-     * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
-     * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
-     */
-    private final TIntObjectMap<GalaxyRecord> galaxies;
-
-    public GalaxyService(GalaxyRepository galaxyRepository,
-                         LoginServerProperties loginServerProperties,
-                         @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
-        this.galaxyRepository = galaxyRepository;
-        this.loginServerProperties = loginServerProperties;
-        this.galaxies = new TIntObjectHashMap<>();
-        this.connectionMap = connectionMap;
-    }
-
-    /**
-     * This method runs on a schedule and looks for new galaxies that aren't in memory. If a new galaxy was somehow
-     * added directly to the database, then it would get loaded this way. At startup, it will load all trusted
-     * galaxies and send each a {@link LoginServerOnline} message to tell them that the login server is online and
-     * waiting for their {@link GalaxyServerId} message.
-     */
-    @Scheduled(initialDelay = 0, fixedRate = 10000)
-    private void refreshGalaxyServerList() {
-        final Iterable<GalaxyRecord> records = galaxyRepository.findAll();
-
-        for (GalaxyRecord record : records) {
-            //We want to look if this galaxy is already in our map. If so, then ignore it.
-            if (galaxies.containsKey(record.getId())) {
-                continue;
-            }
-
-            LOGGER.debug("Loading galaxy {}({}) with address {}:{}.",
-                    record.getName(),
-                    record.getId(),
-                    record.getAddress(),
-                    record.getPort());
-
-            //We want to send this galaxy the LoginServerOnline message so that it knows we are online and waiting
-            //for it to identify with us. First, we need to get a connection to it.
-            final InetSocketAddress galaxyAddress = new InetSocketAddress(record.getAddress(), record.getPort());
-            final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
-
-            if (galaxyConnection != null) {
-                final LoginServerOnline onlineMessage = new LoginServerOnline();
-                galaxyConnection.sendMessage(onlineMessage);
-            }
-
-            //Add the galaxy to our memory map.
-            galaxies.put(record.getId(), record);
-        }
-    }
-
-    public Collection<GalaxyRecord> getGalaxies() {
-        return ImmutableList.copyOf(galaxies.valueCollection());
-    }
-
-    public GalaxyRecord getGalaxyById(int id) {
-        return galaxies.get(id);
-    }
-
-    /**
-     * First time registration with the login server by a galaxy. This method shouldn't be called directly. It gets
-     * called as a result of other processes. For example, if a galaxy sends a {@link GalaxyServerId} message, the
-     * login server doesn't yet trust the galaxy, but AutoGalaxyRegistration is enabled, then this method would get
-     * called.
+     * Gets all galaxies in the galaxy cluster.
      *
-     * Likewise, it may get called by the Rest service when an authorized user requests to create a galaxy there.
-     *
-     * @param name The name of the galaxy that is registering.
-     * @param address The host or ip address where the galaxy server may be reached.
-     * @param port The port the galaxy server is operating on at the provided address.
-     * @param timeZone The timezone in which the galaxy server resides. This is the offset from GMT.
-     * @return A new galaxy record with a galaxy id if it was successfully registered.
-     * @throws GalaxyRegistrationFailedException If a galaxy with the same address and port is already registered.
+     * @return A collection of galaxies in the cluster. If none exist, then an empty collection is returned. The
+     * collection is immutable.
      */
-    public GalaxyRecord registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException {
-        //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
-        GalaxyRecord existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
+    Collection<GalaxyRecord> getGalaxies();
 
-        if (existingGalaxy != null) {
-            LOGGER.error("Attempted to register galaxy, but found galaxy with same address and port already registered.");
-            throw new GalaxyRegistrationFailedException(name, address, port, "A galaxy with this address and port is already registered.");
-        }
+    /**
+     * Gets a galaxy by its unique identifier.
+     *
+     * @param id The id of the galaxy.
+     * @return A galaxy record if found. Otherwise, returns null.
+     */
+    GalaxyRecord getGalaxyById(int id);
 
-        GalaxyRecord galaxyRecord = new GalaxyRecord(name, address, port, timeZone);
-        galaxyRecord = galaxyRepository.save(galaxyRecord);
+    /**
+     * Adds a galaxy to the galaxy cluster. This makes the galaxy "trusted" which means that the login server will
+     * communicate with the galaxy and offer connections to the galaxy when it is available. The galaxy is registered
+     * with default settings, but it can update those settings by issuing a {@link io.bacta.galaxy.message.GalaxyServerStatus}
+     * message to the login server after having identified with a {@link io.bacta.galaxy.message.GalaxyServerId} message.
+     *
+     * @param name     The name of the galaxy.
+     * @param address  The address to contact the galaxy server.
+     * @param port     The port to contact the galaxy server.
+     * @param timeZone The timezone as an offset of GMT.
+     * @return
+     * @throws GalaxyRegistrationFailedException If a galaxy already exists with the same address and port.
+     */
+    GalaxyRecord registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException;
 
-        return galaxyRecord;
-    }
+    /**
+     * Removes a galaxy from the galaxy cluster.
+     *
+     * @param id The id of the galaxy which should be removed.
+     */
+    void unregisterGalaxy(int id);
+
+    /**
+     * A galaxy is attempting to identify with the login server. If the login server trusts the galaxy that is identifying
+     * then it will respond with a {@link GalaxyServerIdAck} message. If the galaxy is untrusted by the login server, but
+     * {@link io.bacta.login.server.LoginServerProperties#autoGalaxyRegistrationEnabled} is enabled, then the galaxy will
+     * be registered first.
+     *
+     * @param galaxyConnection The connection of the galaxy that is identifying.
+     * @param name             The name of the galaxy that is identifying. This is required in case its an unknown galaxy
+     *                         but auto reg is enabled.
+     * @param timeZone         The timezone offset of the server relative to GMT.
+     */
+    void identifyGalaxy(SoeConnection galaxyConnection, String name, int timeZone);
+
+    /**
+     * Allows a galaxy server to update its own status. Although it is possible to change the galaxy with this method - it
+     * is not recommended for galaxy servers to change their name.
+     *
+     * @param galaxyConnection The connection that sent the status update.
+     * @param message          The message containing the details of the status update.
+     */
+    void updateGalaxyStatus(SoeConnection galaxyConnection, GalaxyServerStatus message);
+
+    /**
+     * Sends the enumeration of all known galaxies in the cluster, even if they are offline. This takes into account
+     * the permissions of the connection. For example, secret galaxies will not be sent to a client that is not on
+     * the local network.
+     *
+     * @param connection The connection which will receive the message.
+     */
+    void sendClusterEnum(SoeConnection connection);
+
+    /**
+     * Sends a list of any galaxies that have disabled character creation.
+     *
+     * @param connection The connection which will receive the message.
+     */
+    void sendDisabledCharacterCreationServers(SoeConnection connection);
+
+    /**
+     * Sends the status of all active galaxies to a specific connection.
+     * @param connection The connection which will receive the message.
+     */
+    void sendClusterStatus(SoeConnection connection);
+
+    /**
+     * Sends out the cluster status message to all connections that are currently connected to the login server. This
+     * allows the clients real time updates on the available galaxies.
+     */
+    void broadcastClusterStatus();
+
+    /**
+     * Sends extended status of all active galaxies to specific connection.
+     *
+     * @param connection The connection which will receive the message.
+     */
+    void sendExtendedClusterStatus(SoeConnection connection);
 }

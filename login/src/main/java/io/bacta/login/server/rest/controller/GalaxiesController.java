@@ -51,11 +51,11 @@ public final class GalaxiesController {
 //        return ResponseEntity.ok(galaxy);
 //    }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteGalaxy(@PathVariable int id) {
-//        return ResponseEntity.ok().build();
-//    }
-//
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteGalaxy(@PathVariable int id) {
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping
     public ResponseEntity<?> createGalaxy(@RequestBody CreateGalaxyRequest galaxy) throws GalaxyRegistrationFailedException {
         LOGGER.info("Creating galaxy {}", galaxy.getName());

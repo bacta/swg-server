@@ -1,18 +1,19 @@
 package io.bacta.login.server.data;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Represents a galaxy in the login server's database.
  */
 @Data
 @Entity
-@Table(name = "clusters")
-@RequiredArgsConstructor
+@Table(name = "galaxies")
+@NoArgsConstructor
 public final class GalaxyRecord {
     /**
      * Unique identifier for this galaxy. No other galaxy should share this id.
@@ -62,26 +63,66 @@ public final class GalaxyRecord {
      */
     private int onlineFreeTrialLimit;
     /**
+     * Whether or not to allow character creation for any accounts.
+     */
+    private boolean allowingCharacterCreation;
+    /**
      * Whether or not to allow character creation for free trial accounts.
      */
-    private boolean allowFreeTrialCharacterCreation;
+    private boolean allowingFreeTrialCharacterCreation;
     /**
-     * The number of players who are currently on this galaxy.
+     * The branch for the current code base of the galaxy.
      */
-    private transient int totalPlayers;
+    private String branch;
     /**
-     * Whether or not this galaxy is shown to normal players. God clients should still be able to see the galaxy.
+     * The last change set for the galaxy.
+     */
+    private int changeList;
+    /**
+     * The version of the network protocol the galaxy is running.
+     */
+    private String networkVersion;
+
+
+    //Transient Data - set after read from database.
+
+    /**
+     * Signals that this galaxy has identified. This means it is essentially online, or connected.
+     */
+    private transient boolean identified;
+    /**
+     * The galaxy is ready for clients to start connecting. If it is also in a locked state, then only privileged
+     * clients can connect.
+     */
+    private transient boolean acceptingConnections;
+    /**
+     * The galaxy will not be available to clients that are outside of the local network.
      */
     private transient boolean secret;
     /**
-     * Whether or not the galaxy has indicated that it is ready for players to start connecting.
-     */
-    private transient boolean ready;
-    /**
-     * Whether or not the galaxy is currently locked to connecting players.
+     * The galaxy is accepting connections, but is in a locked state. Only privileged clients may connect.
      */
     private transient boolean locked;
-    private transient SortedSet<ConnectionServerEntry> connectionServers;
+    /**
+     * Connection servers for this galaxy. To get the total number of players for this server, will get need tally up
+     * all these connection servers player totals.
+     */
+    private final transient SortedSet<ConnectionServerEntry> connectionServers
+            = new TreeSet<>(new ConnectionServerEntry.LeastPopulationComparator());
+    /**
+     * How many players were last reported by the galaxy server. Notice, this may be different than the totals from the
+     * connection servers for the same galaxy. It is more of a rough estimate, and is not updated on every successful
+     * connection.
+     */
+    private transient int onlinePlayers;
+    /**
+     * How many players were last reported in the tutorial area of the galaxy server.
+     */
+    private transient int onlineTutorialPlayers;
+    /**
+     * How many players were last reported as being free trial players.
+     */
+    private transient int onlineFreeTrialPlayers;
 
     public GalaxyRecord(String name, String address, int port, int timeZone) {
         this.name = name;
