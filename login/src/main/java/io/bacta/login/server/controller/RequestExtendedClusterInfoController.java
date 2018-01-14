@@ -22,7 +22,7 @@ package io.bacta.login.server.controller;
 
 
 import io.bacta.login.message.RequestExtendedClusterInfo;
-import io.bacta.login.server.GalaxyService;
+import io.bacta.login.server.service.GalaxyService;
 import io.bacta.soe.network.connection.LoginServerConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
