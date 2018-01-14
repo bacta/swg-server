@@ -58,7 +58,8 @@ class LoginServerApplicationSpecIT extends Specification {
 
         setup:
 
-        ConnectionMap connectionMap = new DefaultConnectionMap(soeClient.&getConnection)
+        ConnectionMap connectionMap = new DefaultConnectionMap()
+        connectionMap.setGetConnectionMethod(soeClient.&getConnection)
         SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, serverPort));
 
         when:

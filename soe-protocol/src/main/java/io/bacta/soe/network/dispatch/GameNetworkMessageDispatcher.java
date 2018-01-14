@@ -32,6 +32,8 @@ import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import io.bacta.soe.util.ObjectControllerNames;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -48,6 +50,8 @@ import java.nio.ByteBuffer;
  */
 
 @Slf4j
+@Component
+@Scope("prototype")
 public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
     private final static int OBJECT_CONTROLLER_MESSAGE = 0x80CE5E46;
