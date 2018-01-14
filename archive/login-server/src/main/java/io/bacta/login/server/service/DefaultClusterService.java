@@ -183,7 +183,7 @@ public final class DefaultClusterService implements ClusterService {
 
     private ClusterListEntry registerCluster(String clusterName, String address, short port) {
         LOGGER.info("Registering new galaxy {} at address {}:{}.", clusterName, address, port);
-        //TODO: The mapping could use some work still.
+        //TODO: The mapper could use some work still.
         ClusterEntity clusterEntity = new ClusterEntity(clusterName, address, port);
         clusterEntity = clusterRepository.save(clusterEntity);
 
