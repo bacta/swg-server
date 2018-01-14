@@ -37,6 +37,7 @@ import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -55,6 +56,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@Scope("prototype")
 public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer, ApplicationContextAware {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
