@@ -41,7 +41,7 @@ class ConnectionServerApplicationSpecIT extends Specification {
 
         setup:
 
-        SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, serverPort)).get()
+        SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, serverPort))
 
         when:
 
