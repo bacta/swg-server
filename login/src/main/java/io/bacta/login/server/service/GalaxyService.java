@@ -3,13 +3,19 @@ package io.bacta.login.server.service;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.galaxy.message.GalaxyServerId;
+import io.bacta.login.message.LoginServerOnline;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.net.InetSocketAddress;
 import java.util.Collection;
 
 /**
@@ -56,29 +62,94 @@ import java.util.Collection;
 public final class GalaxyService {
     private final GalaxyRepository galaxyRepository;
     private final LoginServerProperties loginServerProperties;
+    private final SoeTransceiver loginTransceiver;
     /**
      * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
      * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
      */
-    private final TIntObjectMap<GalaxyRecord> onlineGalaxies;
+    private final TIntObjectMap<GalaxyRecord> galaxies;
 
-    public GalaxyService(GalaxyRepository galaxyRepository, LoginServerProperties loginServerProperties) {
+    public GalaxyService(GalaxyRepository galaxyRepository,
+                         LoginServerProperties loginServerProperties,
+                         @Qualifier("LoginTransceiver") SoeTransceiver loginTransceiver) {
         this.galaxyRepository = galaxyRepository;
         this.loginServerProperties = loginServerProperties;
-        this.onlineGalaxies = new TIntObjectHashMap<>();
+        this.galaxies = new TIntObjectHashMap<>();
+        this.loginTransceiver = loginTransceiver;
     }
 
+    /**
+     * This method runs on a schedule and looks for new galaxies that aren't in memory. If a new galaxy was somehow
+     * added directly to the database, then it would get loaded this way. At startup, it will load all trusted
+     * galaxies and send each a {@link LoginServerOnline} message to tell them that the login server is online and
+     * waiting for their {@link GalaxyServerId} message.
+     */
     @Scheduled(initialDelay = 0, fixedRate = 10000)
     private void refreshGalaxyServerList() {
-        LOGGER.trace("Refreshing galaxy server list from repository.");
+        final Iterable<GalaxyRecord> records = galaxyRepository.findAll();
+
+        for (GalaxyRecord record : records) {
+            //We want to look if this galaxy is already in our map. If so, then ignore it.
+            if (galaxies.containsKey(record.getId())) {
+                continue;
+            }
+
+            LOGGER.debug("Loading galaxy {}({}) with address {}:{}.",
+                    record.getName(),
+                    record.getId(),
+                    record.getAddress(),
+                    record.getPort());
+
+            //We want to send this galaxy the LoginServerOnline message so that it knows we are online and waiting
+            //for it to identify with us. First, we need to get a connection to it.
+            final InetSocketAddress galaxyAddress = new InetSocketAddress(record.getAddress(), record.getPort());
+            final SoeConnection galaxyConnection = loginTransceiver.getConnection(galaxyAddress).get();
+
+            if (galaxyConnection != null) {
+                final LoginServerOnline onlineMessage = new LoginServerOnline();
+                galaxyConnection.sendMessage(onlineMessage);
+            }
+
+            //Add the galaxy to our memory map.
+            galaxies.put(record.getId(), record);
+        }
     }
 
     public Collection<GalaxyRecord> getGalaxies() {
-        return ImmutableList.copyOf(onlineGalaxies.valueCollection());
+        return ImmutableList.copyOf(galaxies.valueCollection());
     }
 
-    public void registerGalaxy(String name, String address, int port) {
-        //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
+    public GalaxyRecord getGalaxyById(int id) {
+        return galaxies.get(id);
+    }
 
+    /**
+     * First time registration with the login server by a galaxy. This method shouldn't be called directly. It gets
+     * called as a result of other processes. For example, if a galaxy sends a {@link GalaxyServerId} message, the
+     * login server doesn't yet trust the galaxy, but AutoGalaxyRegistration is enabled, then this method would get
+     * called.
+     *
+     * Likewise, it may get called by the Rest service when an authorized user requests to create a galaxy there.
+     *
+     * @param name The name of the galaxy that is registering.
+     * @param address The host or ip address where the galaxy server may be reached.
+     * @param port The port the galaxy server is operating on at the provided address.
+     * @param timeZone The timezone in which the galaxy server resides. This is the offset from GMT.
+     * @return A new galaxy record with a galaxy id if it was successfully registered.
+     * @throws GalaxyRegistrationFailedException If a galaxy with the same address and port is already registered.
+     */
+    public GalaxyRecord registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException {
+        //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
+        GalaxyRecord existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
+
+        if (existingGalaxy != null) {
+            LOGGER.error("Attempted to register galaxy, but found galaxy with same address and port already registered.");
+            throw new GalaxyRegistrationFailedException(name, address, port, "A galaxy with this address and port is already registered.");
+        }
+
+        GalaxyRecord galaxyRecord = new GalaxyRecord(name, address, port, timeZone);
+        galaxyRecord = galaxyRepository.save(galaxyRecord);
+
+        return galaxyRecord;
     }
 }

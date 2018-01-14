@@ -19,7 +19,7 @@ public final class GalaxyRecord {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Integer id;
+    private Integer id;
     /**
      * The name of the galaxy. This may be changed by the galaxy itself when it identifies.
      */
@@ -81,6 +81,12 @@ public final class GalaxyRecord {
      * Whether or not the galaxy is currently locked to connecting players.
      */
     private transient boolean locked;
-
     private transient SortedSet<ConnectionServerEntry> connectionServers;
+
+    public GalaxyRecord(String name, String address, int port, int timeZone) {
+        this.name = name;
+        this.address = address;
+        this.port = port;
+        this.timeZone = timeZone;
+    }
 }
