@@ -22,10 +22,6 @@ package io.bacta.soe;
 
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
-import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
@@ -44,15 +40,5 @@ public class SoeConfiguration {
                             final SoeNetworkConfiguration networkConfiguration) {
         this.metricRegistry = metricRegistry;
         this.networkConfiguration = networkConfiguration;
-    }
-
-    @Bean
-    @Inject
-    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader classpathControllerLoader, final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
-        return new GameNetworkMessageDispatcher(
-                classpathControllerLoader,
-                gameNetworkMessageSerializer,
-                null
-        );
     }
 }
