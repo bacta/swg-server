@@ -1,8 +1,9 @@
-package io.bacta.login.server;
+package io.bacta.login.server.service;
 
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
+import io.bacta.login.server.LoginServerProperties;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
