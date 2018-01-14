@@ -191,6 +191,26 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>connection</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>login</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>zone</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta.swg</groupId>
+                <artifactId>galaxy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>0.9.10</version>

@@ -17,5 +17,26 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-io.bacta.galaxy.server.bindAddress=0.0.0.0
-io.bacta.galaxy.server.bindPort=44460
+spring:
+  jmx:
+    default-domain: agentservice
+
+endpoints:
+  jmx:
+    domain: agentservice
+    unique-names: true
+
+io:
+  bacta:
+    galaxy:
+      server:
+        bindAddress: "0.0.0.0"
+        bindPort: 44460
+        connectionServers:
+          - type: "internal"
+            port: 44463
+        zoneServers:
+          - name: "tatooine"
+            iffPath: "/some/iff/path"
+          - name: "naboo"
+            iffPath: "/some/iff/path"
