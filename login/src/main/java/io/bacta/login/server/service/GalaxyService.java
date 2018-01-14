@@ -8,8 +8,8 @@ import io.bacta.login.message.LoginServerOnline;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -62,7 +62,7 @@ import java.util.Collection;
 public final class GalaxyService {
     private final GalaxyRepository galaxyRepository;
     private final LoginServerProperties loginServerProperties;
-    private final SoeTransceiver loginTransceiver;
+    private final ConnectionMap connectionMap;
     /**
      * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
      * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
@@ -71,11 +71,11 @@ public final class GalaxyService {
 
     public GalaxyService(GalaxyRepository galaxyRepository,
                          LoginServerProperties loginServerProperties,
-                         @Qualifier("LoginTransceiver") SoeTransceiver loginTransceiver) {
+                         @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
         this.galaxyRepository = galaxyRepository;
         this.loginServerProperties = loginServerProperties;
         this.galaxies = new TIntObjectHashMap<>();
-        this.loginTransceiver = loginTransceiver;
+        this.connectionMap = connectionMap;
     }
 
     /**
@@ -103,7 +103,7 @@ public final class GalaxyService {
             //We want to send this galaxy the LoginServerOnline message so that it knows we are online and waiting
             //for it to identify with us. First, we need to get a connection to it.
             final InetSocketAddress galaxyAddress = new InetSocketAddress(record.getAddress(), record.getPort());
-            final SoeConnection galaxyConnection = loginTransceiver.getConnection(galaxyAddress).get();
+            final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
 
             if (galaxyConnection != null) {
                 final LoginServerOnline onlineMessage = new LoginServerOnline();
