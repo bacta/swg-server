@@ -18,6 +18,9 @@ import java.nio.ByteBuffer;
 public final class GalaxyServerStatus extends GameNetworkMessage {
     private final String name;
     private final int timeZone;
+    private final int onlinePlayers;
+    private final int onlineTutorialPlayers;
+    private final int onlineFreeTrialPlayers;
     private final int maxCharacters;
     private final int maxCharactersPerAccount;
     private final int onlinePlayerLimit;
@@ -28,6 +31,9 @@ public final class GalaxyServerStatus extends GameNetworkMessage {
     public GalaxyServerStatus(final ByteBuffer buffer) {
         this.name = BufferUtil.getAscii(buffer);
         this.timeZone = buffer.getInt();
+        this.onlinePlayers = buffer.getInt();
+        this.onlineTutorialPlayers = buffer.getInt();
+        this.onlineFreeTrialPlayers = buffer.getInt();
         this.maxCharacters = buffer.getInt();
         this.maxCharactersPerAccount = buffer.getInt();
         this.onlinePlayerLimit = buffer.getInt();
@@ -40,6 +46,9 @@ public final class GalaxyServerStatus extends GameNetworkMessage {
     public void writeToBuffer(ByteBuffer buffer) {
         BufferUtil.putAscii(buffer, name);
         BufferUtil.put(buffer, timeZone);
+        BufferUtil.put(buffer, onlinePlayers);
+        BufferUtil.put(buffer, onlineTutorialPlayers);
+        BufferUtil.put(buffer, onlineFreeTrialPlayers);
         BufferUtil.put(buffer, maxCharacters);
         BufferUtil.put(buffer, maxCharactersPerAccount);
         BufferUtil.put(buffer, onlinePlayerLimit);
