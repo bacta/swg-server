@@ -20,6 +20,7 @@
 
 package io.bacta.galaxy.server;
 
+import io.bacta.galaxy.server.monitor.ConnectionServerMonitor;
 import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -46,5 +47,10 @@ public class GalaxyServerConfiguration {
     public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
         soeTransceiver.start("galaxy", galaxyServerProperties.getBindAddress(), galaxyServerProperties.getBindPort());
         return soeTransceiver;
+    }
+
+    @Inject
+    public ConnectionServerMonitor getConnectionServerMonitor(final ConnectionServerMonitor connectionServerMonitor) {
+        return connectionServerMonitor;
     }
 }

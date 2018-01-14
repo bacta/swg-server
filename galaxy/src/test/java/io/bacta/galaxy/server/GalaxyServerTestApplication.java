@@ -26,21 +26,23 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableConfigurationProperties
+@EnableScheduling
 @ComponentScan({
         "io.bacta.galaxy",
         "io.bacta.soe",
         "io.bacta.engine"})
 @PropertySources({
         @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
+        @PropertySource("classpath:application.yml")
 
 })
-public class Application {
+public class GalaxyServerTestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(GalaxyServerTestApplication.class, args);
     }
 }
