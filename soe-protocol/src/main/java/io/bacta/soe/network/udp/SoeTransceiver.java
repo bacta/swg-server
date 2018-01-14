@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -49,11 +48,14 @@ public class SoeTransceiver {
         this.sendHandler.start(name, inboundMessageChannel.getConnectionCache(), inboundMessageChannel.getProtocolHandler(), udpChannel);
     }
 
-    public WeakReference<SoeConnection> getConnection(final InetSocketAddress address) {
-        SoeConnection newConnection = inboundMessageChannel.getConnectionProvider().newInstance(address);
-        inboundMessageChannel.getConnectionCache().put(address, newConnection);
+    public SoeConnection getConnection(final InetSocketAddress address) {
+        SoeConnection connection = inboundMessageChannel.getConnectionCache().get(address);
+        if(connection == null) {
+            connection = inboundMessageChannel.getConnectionProvider().newInstance(address);
+            inboundMessageChannel.getConnectionCache().put(address, connection);
+        }
 
-        return new WeakReference<>(newConnection);
+        return connection;
     }
 
     public void stop() throws Exception {
