@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
+import java.util.SortedSet;
 
 /**
  * Represents a galaxy in the login server's database.
@@ -64,4 +65,22 @@ public final class GalaxyRecord {
      * Whether or not to allow character creation for free trial accounts.
      */
     private boolean allowFreeTrialCharacterCreation;
+    /**
+     * The number of players who are currently on this galaxy.
+     */
+    private transient int totalPlayers;
+    /**
+     * Whether or not this galaxy is shown to normal players. God clients should still be able to see the galaxy.
+     */
+    private transient boolean secret;
+    /**
+     * Whether or not the galaxy has indicated that it is ready for players to start connecting.
+     */
+    private transient boolean ready;
+    /**
+     * Whether or not the galaxy is currently locked to connecting players.
+     */
+    private transient boolean locked;
+
+    private transient SortedSet<ConnectionServerEntry> connectionServers;
 }

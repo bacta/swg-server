@@ -1,12 +1,16 @@
-package io.bacta.login.server;
+package io.bacta.login.server.service;
 
+import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.login.server.data.GalaxyListEntry;
+import io.bacta.login.server.LoginServerProperties;
+import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.repository.GalaxyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 /**
  * Curates a list of galaxies that this LoginServer can service.
@@ -52,17 +56,29 @@ import org.springframework.stereotype.Service;
 public final class GalaxyService {
     private final GalaxyRepository galaxyRepository;
     private final LoginServerProperties loginServerProperties;
-    private final TIntObjectMap<GalaxyListEntry> galaxies;
+    /**
+     * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
+     * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
+     */
+    private final TIntObjectMap<GalaxyRecord> onlineGalaxies;
 
     public GalaxyService(GalaxyRepository galaxyRepository, LoginServerProperties loginServerProperties) {
         this.galaxyRepository = galaxyRepository;
         this.loginServerProperties = loginServerProperties;
-
-        this.galaxies = new TIntObjectHashMap<>();
+        this.onlineGalaxies = new TIntObjectHashMap<>();
     }
 
     @Scheduled(initialDelay = 0, fixedRate = 10000)
     private void refreshGalaxyServerList() {
         LOGGER.trace("Refreshing galaxy server list from repository.");
+    }
+
+    public Collection<GalaxyRecord> getGalaxies() {
+        return ImmutableList.copyOf(onlineGalaxies.valueCollection());
+    }
+
+    public void registerGalaxy(String name, String address, int port) {
+        //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
+
     }
 }

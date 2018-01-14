@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GalaxyRepository extends CrudRepository<GalaxyRecord, Integer> {
     GalaxyRecord findByName(String name);
+    GalaxyRecord findByAddressAndPort(String address, int port);
 }
