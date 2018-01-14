@@ -1,9 +1,15 @@
 package io.bacta.login.server.rest.controller;
 
+import io.bacta.login.server.data.GalaxyRecord;
+import io.bacta.login.server.rest.model.CreateGalaxyRequest;
+import io.bacta.login.server.service.GalaxyRegistrationFailedException;
 import io.bacta.login.server.service.GalaxyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @Slf4j
 @RestController
@@ -32,7 +38,11 @@ public final class GalaxiesController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> galaxy(@PathVariable int id) {
-        //GalaxyListEntry galaxy = galaxyService.getGalaxyById
+        final GalaxyRecord galaxy = galaxyService.getGalaxyById(id);
+
+        if (galaxy == null)
+            return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(null);
     }
 
@@ -41,23 +51,24 @@ public final class GalaxiesController {
 //        return ResponseEntity.ok(galaxy);
 //    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteGalaxy(@PathVariable int id) {
-        return ResponseEntity.ok().build();
-    }
-//
-//    @PostMapping
-//    public ResponseEntity<?> createGalaxy(@RequestBody CreateGalaxyRequest galaxy) {
-//        LOGGER.info("Creating galaxy {}", galaxy.getName());
-//
-//        GalaxyListEntry result = new GalaxyListEntry(1, galaxy.getName());
-//
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(result.getId())
-//                .toUri();
-//
-//        return ResponseEntity.created(location).body(result);
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteGalaxy(@PathVariable int id) {
+//        return ResponseEntity.ok().build();
 //    }
+//
+    @PostMapping
+    public ResponseEntity<?> createGalaxy(@RequestBody CreateGalaxyRequest galaxy) throws GalaxyRegistrationFailedException {
+        LOGGER.info("Creating galaxy {}", galaxy.getName());
+
+        final GalaxyRecord createdGalaxy = galaxyService.registerGalaxy(
+                galaxy.getName(), galaxy.getAddress(), galaxy.getPort(), galaxy.getTimeZone());
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdGalaxy.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createdGalaxy);
+    }
 }
