@@ -26,7 +26,7 @@ import io.bacta.chat.ChatAvatarId;
  * Created by crush on 6/25/2017.
  * <p>
  * The avatar service is responsible for maintaining a list of what players have connected to the chat service, as well
- * as maintaining a mapping between their GameServer character networkId and their chat server avatarId. Other chat
+ * as maintaining a mapper between their GameServer character networkId and their chat server avatarId. Other chat
  * services rely on the AvatarService for resolving networkId and avatarId relationships.
  * <p>
  * When a new player logs in, they should connect with the chat service, registering that they are ready to participate
