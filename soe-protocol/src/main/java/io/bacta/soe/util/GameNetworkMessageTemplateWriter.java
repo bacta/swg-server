@@ -27,8 +27,11 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.io.BufferedWriter;
@@ -40,6 +43,8 @@ import java.nio.ByteBuffer;
  * Created by kburkhardt on 1/31/15.
  */
 @Slf4j
+@Component
+@Scope("prototype")
 public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
 
     private final VelocityEngine ve;
@@ -64,8 +69,13 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
     private final String tangibleClassPath;
 
+    @Value("${bacta.network.template.path}")
+    private String baseMessagePath;
+
     @Inject
-    public GameNetworkMessageTemplateWriter(final String baseMessagePath) {
+    public GameNetworkMessageTemplateWriter() {
+
+        baseMessagePath = "";
 
         ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, LOGGER);
