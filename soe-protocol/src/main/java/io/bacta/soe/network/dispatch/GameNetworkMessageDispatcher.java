@@ -32,7 +32,10 @@ import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import io.bacta.soe.util.ObjectControllerNames;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
@@ -47,6 +50,8 @@ import java.nio.ByteBuffer;
  */
 
 @Slf4j
+@Component
+@Scope("prototype")
 public class GameNetworkMessageDispatcher implements MessageDispatcher {
 
     private final static int OBJECT_CONTROLLER_MESSAGE = 0x80CE5E46;
@@ -54,7 +59,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
     /**
      * Map of controller data to dispatch messages
      */
-    private final TIntObjectMap<GameNetworkMessageControllerData> controllers;
+    private TIntObjectMap<GameNetworkMessageControllerData> controllers;
 
     /**
      * Creates the {@link GameNetworkMessage} to be passed to the appropriate controller
@@ -68,14 +73,20 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
     private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
 
+    private GameNetworkMessageControllerLoader controllerLoader;
+
     @Inject
     public GameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
                                         final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                         final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
+        this.controllerLoader = controllerLoader;
         this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
         this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
+    }
 
+    @PostConstruct
+    private void initialize() {
         controllers = controllerLoader.loadControllers();
     }
 
