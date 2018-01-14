@@ -9,9 +9,10 @@ import java.util.function.Function;
  */
 public class DefaultConnectionMap implements ConnectionMap {
 
-    private final Function<InetSocketAddress, SoeConnection> getConnectionMethod;
+    private Function<InetSocketAddress, SoeConnection> getConnectionMethod;
 
-    public DefaultConnectionMap(Function<InetSocketAddress, SoeConnection> getConnectionMethod) {
+    @Override
+    public void setGetConnectionMethod(Function<InetSocketAddress, SoeConnection> getConnectionMethod) {
         this.getConnectionMethod = getConnectionMethod;
     }
 
