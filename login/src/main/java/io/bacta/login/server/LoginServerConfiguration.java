@@ -20,8 +20,11 @@
 
 package io.bacta.login.server;
 
+import io.bacta.soe.network.connection.ConnectionMap;
+import io.bacta.soe.network.connection.DefaultConnectionMap;
 import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,5 +52,11 @@ public class LoginServerConfiguration {
     public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
         soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
         return soeTransceiver;
+    }
+
+    @Inject
+    @Bean(name = "LoginConnectionMap")
+    public ConnectionMap getConnectionCache(@Qualifier("LoginTransceiver") final SoeTransceiver soeTransceiver) {
+        return new DefaultConnectionMap(soeTransceiver::getConnection);
     }
 }
