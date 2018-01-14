@@ -4,6 +4,8 @@ import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
+import io.bacta.soe.network.connection.ConnectionMap
+import io.bacta.soe.network.connection.DefaultConnectionMap
 import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.beans.factory.annotation.Qualifier
@@ -42,6 +44,22 @@ class LoginServerApplicationSpecIT extends Specification {
         setup:
 
         SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, serverPort));
+
+        when:
+
+        connection.connect({udpConnection -> log.info("I connected")})
+
+        then:
+        noExceptionThrown()
+        AwaitUtil.awaitTrue(connection.&isConnected, 5)
+    }
+
+    def "TestConnect with ConnectionMap"() {
+
+        setup:
+
+        ConnectionMap connectionMap = new DefaultConnectionMap(soeClient.&getConnection)
+        SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, serverPort));
 
         when:
 
