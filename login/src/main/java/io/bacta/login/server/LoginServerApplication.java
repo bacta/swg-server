@@ -24,6 +24,7 @@ import io.bacta.engine.context.ApplicationErrorListener;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
@@ -48,6 +49,7 @@ public class LoginServerApplication {
 
         new SpringApplicationBuilder(LoginServerApplication.class)
                 .listeners(new ApplicationErrorListener())
+                .listeners(new ApplicationPidFileWriter())
                 .run(args);
     }
 }
