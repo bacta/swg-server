@@ -20,6 +20,7 @@
 
 package io.bacta.soe.network.connection;
 
+import io.bacta.shared.GameNetworkMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -98,6 +99,7 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
     public SoeConnection remove(final InetSocketAddress inetSocketAddress) {
         final SoeConnection connection = connectionMap.remove(inetSocketAddress);
 
+        // TODO: WTF is this for?
         if(connection != null) {
             Queue<SoeConnection> connectionQueue = connectedAccountCache.get(connection.getBactaId());
             if (connectionQueue != null) {
@@ -110,6 +112,18 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
         }
 
         return connection;
+    }
+
+    @Override
+    public void broadcast(GameNetworkMessage message) {
+        connectionMap.forEach((key, connection) -> {
+            if (!connection.isPrivileged()) {
+                if(LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Broadcasting message to {}", key);
+                }
+                connection.sendMessage(message);
+            }
+        });
     }
 
     /**

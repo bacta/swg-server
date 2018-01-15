@@ -37,6 +37,9 @@ public final class SoeConnection implements Connection {
 
     public void addRole(ConnectionRole role) {
         roles.add(role);
+        if(role != ConnectionRole.AUTHENTICATED && role != ConnectionRole.UNAUTHENTICATED) {
+            roles.add(ConnectionRole.PRIVILEGED);
+        }
     }
 
     public boolean hasRole(ConnectionRole role) {
@@ -50,6 +53,10 @@ public final class SoeConnection implements Connection {
 
     public boolean isGod() {
         return hasRole(ConnectionRole.GOD);
+    }
+
+    public boolean isPrivileged() {
+        return hasRole(ConnectionRole.PRIVILEGED);
     }
 
     /**
