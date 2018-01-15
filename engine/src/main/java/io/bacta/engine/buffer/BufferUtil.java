@@ -120,6 +120,18 @@ public class BufferUtil {
         return buffer.get() == 1;
     }
 
+    public static byte[] getByteArray(ByteBuffer buffer) {
+        int length = buffer.getInt();
+        byte[] bytes = new byte[length];
+        buffer.get(bytes);
+        return bytes;
+    }
+
+    public static void putByteArray(ByteBuffer buffer, byte[] bytes) {
+        buffer.putInt(bytes.length);
+        buffer.put(bytes);
+    }
+
     public static String getAscii(ByteBuffer buffer) {
         short length = buffer.getShort();
         byte[] bytes = new byte[length];

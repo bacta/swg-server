@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>messages</artifactId>
+    <artifactId>shared</artifactId>
     <packaging>jar</packaging>
 
     <url>http://maven.apache.org</url>
