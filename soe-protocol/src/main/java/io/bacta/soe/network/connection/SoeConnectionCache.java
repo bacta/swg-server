@@ -1,5 +1,7 @@
 package io.bacta.soe.network.connection;
 
+import io.bacta.shared.GameNetworkMessage;
+
 import java.net.InetSocketAddress;
 import java.util.Set;
 
@@ -9,4 +11,5 @@ public interface SoeConnectionCache {
     SoeConnection get(InetSocketAddress sender);
     Set<InetSocketAddress> keySet();
     SoeConnection remove(InetSocketAddress inetSocketAddress);
+    void broadcast(GameNetworkMessage message);
 }
