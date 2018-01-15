@@ -1,9 +1,13 @@
 package io.bacta.login.server.service;
 
+import io.bacta.game.message.ErrorMessage;
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
+import io.bacta.login.server.session.Session;
+import io.bacta.login.server.session.SessionException;
+import io.bacta.login.server.session.SessionService;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +24,20 @@ import javax.inject.Inject;
 @Service
 public final class DefaultClientService implements ClientService {
     private final LoginServerProperties loginServerProperties;
+    private final SessionService sessionService;
     private final CharacterService characterService;
     private final GalaxyService galaxyService;
     private final String requiredClientVersion;
 
     @Inject
     public DefaultClientService(LoginServerProperties loginServerProperties,
+                                SessionService sessionService,
                                 CharacterService characterService,
                                 GalaxyService galaxyService,
                                 @Value("${bacta.network.shared.requiredClientVersion}")
                                  String requiredClientVersion) {
         this.loginServerProperties = loginServerProperties;
+        this.sessionService = sessionService;
         this.characterService = characterService;
         this.galaxyService = galaxyService;
         this.requiredClientVersion = requiredClientVersion;
@@ -49,7 +56,9 @@ public final class DefaultClientService implements ClientService {
         if (!validateClientVersion(connection, clientVersion))
             return;
 
-        establishSessionMode(connection, id, key);
+        try {
+
+            establishSessionMode(connection, id, key);
 
         /*
         switch (loginServerProperties.getSessionMode()) {
@@ -69,8 +78,15 @@ public final class DefaultClientService implements ClientService {
         }
         */
 
-        connection.addRole(ConnectionRole.AUTHENTICATED);
-        connection.addRole(ConnectionRole.LOGIN_CLIENT);
+            connection.addRole(ConnectionRole.AUTHENTICATED);
+            connection.addRole(ConnectionRole.LOGIN_CLIENT);
+        } catch (SessionException ex) {
+            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
+
+            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
+            connection.sendMessage(message);
+            connection.disconnect();
+        }
     }
 
 
@@ -79,7 +95,7 @@ public final class DefaultClientService implements ClientService {
         //implement admin
 
         //Create a key with:
-        //If they logged in with a session, then the key is comprised of the sessionId + accountId
+        //If they logged in with a session, then the key will contain of the sessionId + accountId
         //Otherwise, the key is comprised of the accountId, if they are connecting with god client, and username
         //Encrypt the key before sending to client (not sure why, we've already exposed the sessionId as plain text)
 
@@ -97,13 +113,15 @@ public final class DefaultClientService implements ClientService {
         connection.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeConnection connection, String username, String password) {
-        //final Session session = sessionClient.establish(username, password);
+    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
+        final Session session = sessionService.establish(username, password);
+
         clientValidated(connection, 1, username, password, false, 0, 0);
     }
 
     private void validateSessionMode(SoeConnection connection, String sessionKey) {
-        //final Session session = sessionClient.validate(sessionKey);
+        //final Session session = sessionService.validate(sessionKey);
+        //ErrorMessage err(
     }
 
     private void discoverSessionMode(SoeConnection connection, String id, String key) {
@@ -112,7 +130,7 @@ public final class DefaultClientService implements ClientService {
     private boolean validateClientVersion(SoeConnection connection, String clientVersion) {
         //TODO: In the future, we might want to change up how versions are validated.
         if (loginServerProperties.isValidateClientVersionEnabled()
-                && requiredClientVersion.equals(clientVersion)) {
+                && !requiredClientVersion.equals(clientVersion)) {
 
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
                     connection.getSoeUdpConnection().getRemoteAddress(),
