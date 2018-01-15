@@ -1,9 +1,11 @@
-package io.bacta.login.server;
+package io.bacta.login.server.service;
 
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.login.server.LoginServerProperties;
+import io.bacta.soe.network.connection.ConnectionRole;
+import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,29 +18,30 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public final class ClientService {
+public final class DefaultClientService implements ClientService {
     private final LoginServerProperties loginServerProperties;
     private final CharacterService characterService;
     private final GalaxyService galaxyService;
     private final String requiredClientVersion;
 
     @Inject
-    public ClientService(LoginServerProperties loginServerProperties,
-                         CharacterService characterService,
-                         GalaxyService galaxyService,
-                         @Value("${bacta.network.shared.requiredClientVersion}")
-                         String requiredClientVersion) {
+    public DefaultClientService(LoginServerProperties loginServerProperties,
+                                CharacterService characterService,
+                                GalaxyService galaxyService,
+                                @Value("${bacta.network.shared.requiredClientVersion}")
+                                 String requiredClientVersion) {
         this.loginServerProperties = loginServerProperties;
         this.characterService = characterService;
         this.galaxyService = galaxyService;
         this.requiredClientVersion = requiredClientVersion;
     }
 
-    public void validateClient(SoeUdpConnection connection, String clientVersion, String id, String key) {
+    @Override
+    public void validateClient(SoeConnection connection, String clientVersion, String id, String key) {
         //Client wants to know the difference in time between the server and client.
         final int epoch = (int) (System.currentTimeMillis() / 1000);
 
-        LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getRemoteAddress());
+        LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getSoeUdpConnection().getRemoteAddress());
 
         final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
         connection.sendMessage(serverEpoch);
@@ -66,11 +69,13 @@ public final class ClientService {
         }
         */
 
-        //connection.addRole(ConnectionRole.AUTHENTICATED);
+        connection.addRole(ConnectionRole.AUTHENTICATED);
+        connection.addRole(ConnectionRole.LOGIN_CLIENT);
     }
 
 
-    public void clientValidated(SoeUdpConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
+    @Override
+    public void clientValidated(SoeConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
         //implement admin
 
         //Create a key with:
@@ -81,36 +86,36 @@ public final class ClientService {
         final String token = "hello world";
         sendLoginClientToken(connection, token, bactaId, username);
 
-        //galaxyService.sendClusterEnum(connection);
-        //galaxyService.sendDisabledCharacterCreationServers(connection);
-        //characterService.sendEnumerateCharacters(connection, bactaId);
-        //galaxyService.sendClusterStatus(connection);
+        galaxyService.sendClusterEnum(connection);
+        galaxyService.sendDisabledCharacterCreationServers(connection);
+        characterService.sendEnumerateCharacters(connection, bactaId);
+        galaxyService.sendClusterStatus(connection);
     }
 
-    private void sendLoginClientToken(SoeUdpConnection connection, String token, int bactaId, String username) {
+    private void sendLoginClientToken(SoeConnection connection, String token, int bactaId, String username) {
         final LoginClientToken message = new LoginClientToken(token, bactaId, username);
         connection.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeUdpConnection connection, String username, String password) {
+    private void establishSessionMode(SoeConnection connection, String username, String password) {
         //final Session session = sessionClient.establish(username, password);
         clientValidated(connection, 1, username, password, false, 0, 0);
     }
 
-    private void validateSessionMode(SoeUdpConnection connection, String sessionKey) {
+    private void validateSessionMode(SoeConnection connection, String sessionKey) {
         //final Session session = sessionClient.validate(sessionKey);
     }
 
-    private void discoverSessionMode(SoeUdpConnection connection, String id, String key) {
+    private void discoverSessionMode(SoeConnection connection, String id, String key) {
     }
 
-    private boolean validateClientVersion(SoeUdpConnection connection, String clientVersion) {
+    private boolean validateClientVersion(SoeConnection connection, String clientVersion) {
         //TODO: In the future, we might want to change up how versions are validated.
         if (loginServerProperties.isValidateClientVersionEnabled()
                 && requiredClientVersion.equals(clientVersion)) {
 
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
-                    connection.getRemoteAddress(),
+                    connection.getSoeUdpConnection().getRemoteAddress(),
                     clientVersion,
                     requiredClientVersion);
 

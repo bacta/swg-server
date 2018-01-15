@@ -22,7 +22,7 @@ package io.bacta.login.server.controller;
 
 
 import io.bacta.login.message.LoginClientId;
-import io.bacta.login.server.ClientService;
+import io.bacta.login.server.service.ClientService;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -44,6 +44,6 @@ public class LoginClientIdController implements GameNetworkMessageController<Soe
 
     @Override
     public void handleIncoming(SoeConnection connection, LoginClientId message) throws Exception {
-        //clientService.validateClient(connection.getSoeUdpConnection(), message.getClientVersion(), message.getId(), message.getKey());
+        clientService.validateClient(connection, message.getClientVersion(), message.getId(), message.getKey());
     }
 }
