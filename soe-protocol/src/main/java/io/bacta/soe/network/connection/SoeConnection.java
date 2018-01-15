@@ -4,6 +4,7 @@ import io.bacta.engine.network.connection.Connection;
 import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.message.SoeMessage;
+import io.bacta.soe.network.message.TerminateReason;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -85,6 +86,10 @@ public final class SoeConnection implements Connection {
 
     public void connect(Consumer<SoeUdpConnection> connectCallback) {
         soeUdpConnection.connect(connectCallback);
+    }
+
+    public void disconnect() {
+        soeUdpConnection.terminate(TerminateReason.NONE);
     }
 
     public boolean isConnected() {
