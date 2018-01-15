@@ -39,10 +39,6 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jzlib</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>messages</artifactId>
-        </dependency>
 
     </dependencies>
 
