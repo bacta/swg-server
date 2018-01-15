@@ -63,7 +63,7 @@
     <modules>
         <module>engine</module>
         <module>soe-protocol</module>
-        <module>messages</module>
+        <module>shared</module>
         <module>login</module>
         <module>galaxy</module>
         <module>connection</module>
@@ -211,7 +211,7 @@
             </dependency>
             <dependency>
                 <groupId>com.ocdsoft.bacta</groupId>
-                <artifactId>messages</artifactId>
+                <artifactId>shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -18,40 +18,42 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.message;
+package io.bacta.game.message;
 
+import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
-/**
- * Created by kyle on 5/24/2016.
- */
 @Getter
-@Priority(0x05)
-@AllArgsConstructor
-public class GameServerAuthenticate extends GameNetworkMessage {
+@Priority(0x3)
+public final class ErrorMessage extends GameNetworkMessage {
+    private final String errorName;
+    private final String description;
+    private final boolean fatal;
 
-    private final byte[] serverName;
-    private final byte[] serverKey;
+    public ErrorMessage(String errorName, String description) {
+        this(errorName, description, false);
+    }
 
-    public GameServerAuthenticate(final ByteBuffer buffer) {
-        this.serverName = new byte[buffer.getShort()];
-        buffer.get(this.serverName);
+    public ErrorMessage(String errorName, String description, boolean fatal) {
+        this.errorName = errorName;
+        this.description = description;
+        this.fatal = fatal;
+    }
 
-        this.serverKey = new byte[buffer.getShort()];
-        buffer.get(this.serverKey);
+    public ErrorMessage(final ByteBuffer buffer) {
+        this.errorName = BufferUtil.getAscii(buffer);
+        this.description = BufferUtil.getAscii(buffer);
+        this.fatal = BufferUtil.getBoolean(buffer);
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        buffer.putShort((short) serverName.length);
-        buffer.put(serverName);
-
-        buffer.putShort((short) serverKey.length);
-        buffer.put(serverKey);
+        BufferUtil.putAscii(buffer, errorName);
+        BufferUtil.putAscii(buffer, description);
+        BufferUtil.put(buffer, fatal);
     }
 }

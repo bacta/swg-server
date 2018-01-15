@@ -43,7 +43,7 @@ public final class GalaxiesController {
         if (galaxy == null)
             return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(galaxy);
     }
 
 //    @PutMapping("/{id}")
@@ -53,6 +53,7 @@ public final class GalaxiesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteGalaxy(@PathVariable int id) {
+        galaxyService.unregisterGalaxy(id);
         return ResponseEntity.ok().build();
     }
 
