@@ -55,8 +55,10 @@ public class LoginServerConfiguration {
     @Inject
     @Bean(name = "LoginTransceiver")
     public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver, @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
+        LOGGER.info("Starting LoginTransceiver");
         soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
         connectionMap.setGetConnectionMethod(soeTransceiver::getConnection);
+        connectionMap.setBroadcastMethod(soeTransceiver::broadcast);
         return soeTransceiver;
     }
 
