@@ -26,6 +26,8 @@ class LoginServerApplicationSpecIT extends Specification {
     @Qualifier("soeTransceiver")
     SoeTransceiver soeClient;
 
+
+
     String serverHost = "127.0.0.1"
     @Value('${io.bacta.login.server.bindPort}')
     int serverPort
@@ -70,4 +72,22 @@ class LoginServerApplicationSpecIT extends Specification {
         noExceptionThrown()
         AwaitUtil.awaitTrue(connection.&isConnected, 5)
     }
+
+//    def "Test Broadcast"() {
+//
+//        setup:
+//
+//        ConnectionMap connectionMap = new DefaultConnectionMap()
+//        connectionMap.setGetConnectionMethod(soeClient.&getConnection)
+//        connectionMap.setBroadcastMethod(soeClient.&broadcast)
+//        SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, serverPort));
+//
+//        when:
+//
+//        connection.connect({udpConnection -> connectionMap.broadcast(new LoginServerOnline())})
+//
+//        then:
+//        noExceptionThrown()
+//        AwaitUtil.awaitTrue(connection.&isConnected, 5)
+//    }
 }
