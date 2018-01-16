@@ -1,7 +1,7 @@
 package io.bacta.login.message;
 
-import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.shared.crypto.KeyShare;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +13,14 @@ import java.nio.ByteBuffer;
 @Data
 @RequiredArgsConstructor
 public final class GalaxyEncryptionKey extends GameNetworkMessage {
-    private final String key;
+    private final KeyShare.Key key;
 
     public GalaxyEncryptionKey(ByteBuffer buffer) {
-        this.key = BufferUtil.getAscii(buffer);
+        this.key = new KeyShare.Key(buffer);
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.putAscii(buffer, key);
+        key.writeToBuffer(buffer);
     }
 }
