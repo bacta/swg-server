@@ -20,6 +20,19 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.0.2</version>
             </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>../dist</directory>
+                            <includes>
+                                <include>lib/${project.name}/**</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

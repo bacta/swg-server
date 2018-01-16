@@ -4,8 +4,7 @@ import io.bacta.galaxy.server.GalaxyServerProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -15,8 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-@Component
-@Scope("prototype")
+@Service
 public class ConnectionServerMonitor {
 
     @Inject
@@ -37,15 +35,15 @@ public class ConnectionServerMonitor {
     }
 
     private void startConnectionServers() {
-        properties.getConnectionServers().forEach(connectionServer -> {
-            if(connectionServer.getType().equalsIgnoreCase(GalaxyServerProperties.ConnectionServer.LOCAL)) {
-                startLocalServer(connectionServer);
-            } else if(connectionServer.getType().equalsIgnoreCase(GalaxyServerProperties.ConnectionServer.LOCAL)) {
-                startRemoteServer(connectionServer);
-            } else {
-                startInternalServer(connectionServer);
-            }
-        });
+//        properties.getConnectionServers().forEach(connectionServer -> {
+//            if(connectionServer.getType().equalsIgnoreCase(GalaxyServerProperties.ConnectionServer.LOCAL)) {
+//                startLocalServer(connectionServer);
+//            } else if(connectionServer.getType().equalsIgnoreCase(GalaxyServerProperties.ConnectionServer.LOCAL)) {
+//                startRemoteServer(connectionServer);
+//            } else {
+//                startInternalServer(connectionServer);
+//            }
+//        });
     }
 
     private void startInternalServer(GalaxyServerProperties.ConnectionServer connectionServer) {
@@ -66,7 +64,7 @@ public class ConnectionServerMonitor {
 
             LocalProcessMonitor pm = applicationContext.getBean(LocalProcessMonitor.class);
             connectionServerMonitorSet.add(pm);
-            pm.start("");
+            pm.start("", "");
 
             connectionServerMonitorSet.add(pm);
 

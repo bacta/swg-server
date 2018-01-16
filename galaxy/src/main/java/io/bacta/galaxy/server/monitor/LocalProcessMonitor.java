@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,21 +29,29 @@ public class LocalProcessMonitor implements ProcessMonitor {
 
     private boolean stopped;
 
+    private String homeDir;
+
     @Inject
     public LocalProcessMonitor() {
         startCount = new AtomicInteger();
         stopped = true;
+        homeDir = null;
     }
 
     @Override
-    public void start(String... args) throws IOException {
-        commands = args;
+    public void start(String homeDir, String... args) throws IOException {
+        this.homeDir = homeDir;
+        this.commands = args;
         restart();
     }
 
     private void restart() throws IOException {
         LOGGER.info("Starting process");
         ProcessBuilder build = new ProcessBuilder(commands);
+
+        if(homeDir != null) {
+            build.directory(new File(homeDir));
+        }
 
         process = build.redirectOutput(ProcessBuilder.Redirect.INHERIT)
                         .redirectError(ProcessBuilder.Redirect.INHERIT)
@@ -82,5 +91,4 @@ public class LocalProcessMonitor implements ProcessMonitor {
     public int getStartCount() {
         return startCount.get();
     }
-
 }

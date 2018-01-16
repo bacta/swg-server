@@ -14,15 +14,6 @@
     <artifactId>soe-protocol</artifactId>
     <packaging>jar</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
