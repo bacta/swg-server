@@ -1,21 +1,49 @@
 package io.bacta.login.server.session;
 
 /**
- * Sessions are used by external programs to initiate a login session. For example, the classic SWG launchpad would
- * allow a player to login with HTTPS, obtain a session token, and then pass that token to the SWG client. Now, instead
- * of forcing the player to supply credentials again, the client would automatically send this session token for
- * authentication.
+ * Sessions are used to track active accounts and various properties about those users. For example, a session allows us
+ * to track active game time for an account. It also allows us to set special features for an account.
  * <p>
- * EstablishMode is the process of obtaining a session token by providing a username and password. This is the mode the
- * Launchpad would use to obtain the session token as described above. If no session token is passed to the SWG client,
- * it will use EstablishMode to attempt to obtain a session token.
- * <p>
- * ValidationMode is the process of using an already configured session token to authenticate with the login server.
- * <p>
- * DiscoveryMode will attempt to decide which mode to use by inspecting the id and key provided.
+ * Once established, a session has a set time to live (TTL). Once that TTL expires, the session is no longer good, and
+ * a user who is using that session may have to establish a new session to continue using a service.
  */
 public interface SessionService {
-    Session establish(String username, String password) throws SessionException;
+    /**
+     * Establishes a new session for the account authenticated with the provided credentials.
+     *
+     * @param username The username identifying the account.
+     * @param password The password identifying the account.
+     * @return A new session representing the established session.
+     * @throws SessionCredentialsInvalidException If the username or password was incorrect.
+     */
+    Session establish(String username, String password) throws
+            SessionCredentialsInvalidException;
 
-    Session validate(String sessionKey);
+    /**
+     * Validates a session key to ensure that is is valid and was issued for the given account id.
+     *
+     * @param sessionKey The key for the session.
+     * @param accountId  The id of the account of which the session is supposed to belong.
+     * @return Returns the existing session information if validation succeeds.
+     * @throws SessionInvalidException If the session is invalid with the provided information.
+     * @throws SessionExpiredException If the session is valid but expired.
+     */
+    Session validate(String sessionKey, int accountId) throws
+            SessionInvalidException,
+            SessionExpiredException;
+
+    /**
+     * Touches the session, extending its time to live on the session server.
+     *
+     * @param sessionKey The key for the session that is being extended.
+     */
+    void touch(String sessionKey) throws
+            SessionExpiredException;
+
+    /**
+     * Terminates a session.
+     *
+     * @param sessionKey The key identifying the session to terminate.
+     */
+    void logout(String sessionKey);
 }

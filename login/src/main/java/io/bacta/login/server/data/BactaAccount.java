@@ -21,15 +21,15 @@ public final class BactaAccount {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private ZonedDateTime created;
+    private ZonedDateTime created = ZonedDateTime.now();
 
     @Column(nullable = false, unique = true)
     private String username;
 
-    private String password;
+    private String encodedPassword;
 
-    public BactaAccount(String username, String password) {
+    public BactaAccount(String username, String encodedPassword) {
         this.username = username;
-        this.password = password;
+        this.encodedPassword = encodedPassword;
     }
 }

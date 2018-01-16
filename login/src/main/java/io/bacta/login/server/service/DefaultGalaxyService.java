@@ -11,6 +11,8 @@ import io.bacta.login.server.data.ConnectionServerEntry;
 import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.mapper.GalaxyRecordMapper;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.shared.GameNetworkMessage;
+import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +39,11 @@ import java.util.stream.Collectors;
 @Service
 public final class DefaultGalaxyService implements GalaxyService {
     private static final long GALAXY_LIST_REFRESH_INTERVAL = 10000; //10 seconds
-    private static final long GALAXY_KEY_UPDATE_INTERVAL = 60000; // 60 seconds
 
     private final LoginServerProperties loginServerProperties;
     private final GalaxyRepository galaxyRepository;
     private final ConnectionMap connectionMap;
+    private final KeyShare keyShare;
     /**
      * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
      * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
@@ -50,11 +52,14 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     public DefaultGalaxyService(LoginServerProperties loginServerProperties,
                                 GalaxyRepository galaxyRepository,
-                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
+                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap,
+                                KeyShare keyShare) {
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
-        this.galaxies = new TIntObjectHashMap<>();
         this.connectionMap = connectionMap;
+        this.keyShare = keyShare;
+
+        this.galaxies = new TIntObjectHashMap<>();
     }
 
 
@@ -278,6 +283,30 @@ public final class DefaultGalaxyService implements GalaxyService {
         connection.sendMessage(message);
     }
 
+    @Override
+    public void sendToGalaxy(int galaxyId, GameNetworkMessage message) {
+        final GalaxyRecord galaxy = galaxies.get(galaxyId);
+
+        if (galaxy == null)
+            throw new IllegalArgumentException("Galaxy is not loaded.");
+
+        sendToGalaxy(galaxy, message);
+    }
+
+    private void sendToGalaxy(GalaxyRecord galaxy, GameNetworkMessage message) {
+        final InetSocketAddress galaxyAddress = new InetSocketAddress(galaxy.getAddress(), galaxy.getPort());
+        final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
+
+        galaxyConnection.sendMessage(message);
+    }
+
+    @Override
+    public void sendToAllGalaxies(GameNetworkMessage message) {
+        for (final GalaxyRecord galaxy : galaxies.valueCollection()) {
+            sendToGalaxy(galaxy, message);
+        }
+    }
+
     private LoginClusterStatus.ClusterData.PopulationStatus determineGalaxyPopulationStatus(GalaxyRecord record) {
         final LoginClusterStatus.ClusterData.PopulationStatus populationStatus;
 
@@ -374,21 +403,5 @@ public final class DefaultGalaxyService implements GalaxyService {
             //Add the galaxy to our memory map.
             galaxies.put(record.getId(), record);
         }
-    }
-
-    @Scheduled(fixedRate = GALAXY_KEY_UPDATE_INTERVAL)
-    private void updateGalaxyKeys() {
-//        LOGGER.debug("Sending new encryption keys to all galaxies.");
-//
-//        keyShareService.updateKeys();
-//
-//        for (final GalaxyRecord galaxy : galaxies.valueCollection()) {
-//            final Key key = keyShareService.getOrCreateGalaxyKey(galaxy.getId());
-//            final InetSocketAddress galaxyAddress = new InetSocketAddress(galaxy.getAddress(), galaxy.getPort());
-//            final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
-//
-//            final GalaxyEncryptionKey encryptionKey = new GalaxyEncryptionKey(key.toString());
-//            galaxyConnection.sendMessage(encryptionKey);
-//        }
     }
 }

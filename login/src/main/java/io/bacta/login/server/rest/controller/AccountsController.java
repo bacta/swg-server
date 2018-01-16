@@ -5,6 +5,7 @@ import io.bacta.login.server.repository.BactaAccountRepository;
 import io.bacta.login.server.rest.model.CreateAccountRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,12 +16,14 @@ import java.net.URI;
 @RestController
 @RequestMapping("/accounts")
 public final class AccountsController {
-    //Can we make this AccountService<?> or something?
     private final BactaAccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Inject
-    public AccountsController(BactaAccountRepository accountRepository) {
+    public AccountsController(BactaAccountRepository accountRepository,
+                              PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -48,7 +51,9 @@ public final class AccountsController {
     public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequest request) {
         LOGGER.info("Creating account {}", request.getUsername());
 
-        BactaAccount account = new BactaAccount(request.getUsername(), request.getPassword());
+        final String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        BactaAccount account = new BactaAccount(request.getUsername(), encodedPassword);
         account = accountRepository.save(account);
 
         URI location = ServletUriComponentsBuilder
