@@ -9,7 +9,7 @@ class ProcessMonitorTest extends Specification {
 
     def "Start"() {
         when:
-        procMon.start("java", "-version");
+        procMon.start(".", "java", "-version");
         AwaitUtil.awaitFalse(procMon.&isRunning, 5)
         procMon.checkProcess()
 
