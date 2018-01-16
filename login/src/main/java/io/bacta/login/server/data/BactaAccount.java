@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -21,7 +22,7 @@ public final class BactaAccount {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private ZonedDateTime created = ZonedDateTime.now();
+    private ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
 
     @Column(nullable = false, unique = true)
     private String username;

@@ -118,11 +118,13 @@ public final class BactaSessionService implements SessionService {
 
     @Scheduled(fixedRate = CLEANUP_INTERVAL)
     private void cleanup() {
-        LOGGER.info("Cleaning up sessions.");
+        if (sessionMap.size() > 0) {
+            LOGGER.debug("Cleaning up sessions.");
 
-        for (final Session session : sessionMap) {
-            if (session.isExpired())
-                sessionMap.remove(session);
+            for (final Session session : sessionMap) {
+                if (session.isExpired())
+                    sessionMap.remove(session);
+            }
         }
     }
 }
