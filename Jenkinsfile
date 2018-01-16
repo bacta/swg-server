@@ -20,7 +20,7 @@ pipeline {
                 script {
                     try {
                         notifySlack()
-                        sh "mvn -Dmaven.test.failure.ignore=true install"
+                        sh "mvn test install verify"
 
                     } catch (e) {
                         currentBuild.result = 'FAILURE'
