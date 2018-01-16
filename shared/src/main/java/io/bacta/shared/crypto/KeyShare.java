@@ -81,6 +81,17 @@ public final class KeyShare {
         this.keys.add(key);
     }
 
+    public Key getKey(int index) {
+        int i = 0;
+        for (final Key key : keys) {
+            if (i == index)
+                return key;
+            ++i;
+        }
+
+        throw new IndexOutOfBoundsException();
+    }
+
     public void clearKeys() {
         this.keys.clear();
     }

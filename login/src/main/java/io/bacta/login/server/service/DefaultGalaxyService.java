@@ -128,8 +128,13 @@ public final class DefaultGalaxyService implements GalaxyService {
         if (trusted) {
             galaxyRecord.setIdentified(true);
 
+            //Acknowledge that they are trusted.
             final GalaxyServerIdAck ack = new GalaxyServerIdAck(galaxyRecord.getId());
             galaxyConnection.sendMessage(ack);
+
+            //Go ahead and send the current key too.
+            final GalaxyEncryptionKey keyMessage = new GalaxyEncryptionKey(keyShare.getKey(0));
+            galaxyConnection.sendMessage(keyMessage);
         }
     }
 
@@ -394,11 +399,12 @@ public final class DefaultGalaxyService implements GalaxyService {
             final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
 
             if (galaxyConnection != null) {
+                if (!galaxyConnection.isConnected())
+                    galaxyConnection.connect(null);
+
                 final LoginServerOnline onlineMessage = new LoginServerOnline();
                 galaxyConnection.sendMessage(onlineMessage);
             }
-
-            //Create a key for this galaxy.
 
             //Add the galaxy to our memory map.
             galaxies.put(record.getId(), record);

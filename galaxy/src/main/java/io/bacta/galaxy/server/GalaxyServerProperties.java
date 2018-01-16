@@ -33,4 +33,5 @@ import java.net.InetAddress;
 public class GalaxyServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
+    private String galaxyName;
 }
