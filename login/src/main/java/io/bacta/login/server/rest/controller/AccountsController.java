@@ -2,6 +2,7 @@ package io.bacta.login.server.rest.controller;
 
 import io.bacta.login.server.data.BactaAccount;
 import io.bacta.login.server.repository.BactaAccountRepository;
+import io.bacta.login.server.rest.model.AccountListEntry;
 import io.bacta.login.server.rest.model.CreateAccountRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.inject.Inject;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,7 +31,18 @@ public final class AccountsController {
 
     @GetMapping
     public ResponseEntity<?> accounts() {
-        return ResponseEntity.ok(accountRepository.findAll());
+        final List<AccountListEntry> list = new ArrayList<>();
+
+        for (final BactaAccount account : accountRepository.findAll()) {
+            final AccountListEntry entry = new AccountListEntry(
+                    account.getId(),
+                    account.getUsername(),
+                    account.getCreated());
+
+            list.add(entry);
+        }
+
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +52,12 @@ public final class AccountsController {
         if (account == null)
             return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(account);
+        final AccountListEntry model = new AccountListEntry(
+                account.getId(),
+                account.getUsername(),
+                account.getCreated());
+
+        return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{id}")
