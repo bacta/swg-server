@@ -126,6 +126,11 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
         });
     }
 
+    @Override
+    public boolean contains(InetSocketAddress address) {
+        return connectionMap.containsKey(address);
+    }
+
     /**
      * Add new soe.  This method will disconnect any non-authenticated soe or a soe without associated BactaId
      * @param connection

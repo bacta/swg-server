@@ -55,7 +55,7 @@ public class SoeTransceiver {
     public SoeConnection getConnection(final InetSocketAddress address) {
         SoeConnection connection = soeConnectionCache.get(address);
         if(connection == null) {
-            connection = inboundMessageChannel.getConnectionProvider().newInstance(address);
+            connection = inboundMessageChannel.getConnectionProvider().newOutgoingInstance(address);
             soeConnectionCache.put(address, connection);
         }
 
