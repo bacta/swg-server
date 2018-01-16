@@ -3,96 +3,46 @@ package io.bacta.soe.network.connection;
 import io.bacta.engine.network.connection.Connection;
 import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessage;
-import io.bacta.soe.network.message.TerminateReason;
-import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Created by kyle on 7/9/2017.
- */
-@Getter
-public final class SoeConnection implements Connection {
+public interface SoeConnection extends Connection {
+    List<ConnectionRole> getRoles();
 
-    private final SoeUdpConnection soeUdpConnection;
+    void addRole(ConnectionRole role);
 
-    private int bactaId;
-    private String bactaUsername;
+    boolean hasRole(ConnectionRole role);
 
-    private final List<ConnectionRole> roles;
+    boolean isGod();
 
-    private long currentNetworkId;
-    private String currentCharName;
+    boolean isPrivileged();
 
-    public SoeConnection(final SoeUdpConnection soeUdpConnection) {
-        this.soeUdpConnection = soeUdpConnection;
-        this.roles = new ArrayList<>();
-    }
+    void sendMessage(SoeMessage message);
 
-    public List<ConnectionRole> getRoles() {
-        return roles;
-    }
+    void sendMessage(GameNetworkMessage message);
 
-    public void addRole(ConnectionRole role) {
-        roles.add(role);
-        if(role != ConnectionRole.AUTHENTICATED && role != ConnectionRole.UNAUTHENTICATED) {
-            roles.add(ConnectionRole.PRIVILEGED);
-        }
-    }
+    ConnectionState getState();
 
-    public boolean hasRole(ConnectionRole role) {
-        for (int i = 0, size = roles.size(); i < size; ++i) {
-            if (roles.get(i) == role)
-                return true;
-        }
+    void setState(ConnectionState state);
 
-        return false;
-    }
+    void connect(Consumer<SoeUdpConnection> connectCallback);
 
-    public boolean isGod() {
-        return hasRole(ConnectionRole.GOD);
-    }
+    void disconnect();
 
-    public boolean isPrivileged() {
-        return hasRole(ConnectionRole.PRIVILEGED);
-    }
+    boolean isConnected();
 
-    /**
-     * Send SOE protocol layer message
-     * @param message {@link SoeMessage} to send
-     */
-    public final void sendMessage(SoeMessage message) {
-        this.soeUdpConnection.sendMessage(message);
-    }
+    void confirmed(int connectionID, int encryptCode, byte crcBytes, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2, int maxRawPacketSize);
 
-    /**
-     * Send game protocol layer message
-     * @param message {@link GameNetworkMessage} to send
-     */
-    public final void sendMessage(GameNetworkMessage message) {
-        this.soeUdpConnection.sendMessage(message);
-    }
+    SoeUdpConnection getSoeUdpConnection();
 
-    public ConnectionState getState() {
-        return soeUdpConnection.getConnectionState();
-    }
+    int getBactaId();
 
-    public void setState(ConnectionState state) {
-        soeUdpConnection.setConnectionState(state);
-    }
+    String getBactaUsername();
 
-    public void connect(Consumer<SoeUdpConnection> connectCallback) {
-        soeUdpConnection.connect(connectCallback);
-    }
+    long getCurrentNetworkId();
 
-    public void disconnect() {
-        soeUdpConnection.terminate(TerminateReason.NONE);
-    }
-
-    public boolean isConnected() {
-        return getState() == ConnectionState.ONLINE;
-    }
+    String getCurrentCharName();
 }

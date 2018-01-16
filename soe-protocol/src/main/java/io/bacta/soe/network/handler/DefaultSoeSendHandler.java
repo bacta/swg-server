@@ -27,6 +27,7 @@ import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.event.DisconnectEvent;
+import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeConnectionCache;
 import io.bacta.soe.network.connection.SoeUdpConnection;
@@ -144,7 +145,9 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
             }
 
             if (connection.getConnectionState() == ConnectionState.DISCONNECTED) {
-                deadClients.add(inetSocketAddress);
+                if(!connectionProxy.hasRole(ConnectionRole.PRIVILEGED)) {
+                    deadClients.add(inetSocketAddress);
+                }
             }
 
             final List<ByteBuffer> messages = connection.getPendingMessages();
