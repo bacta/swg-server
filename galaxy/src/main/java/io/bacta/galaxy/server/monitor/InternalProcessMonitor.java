@@ -29,7 +29,7 @@ public class InternalProcessMonitor implements ProcessMonitor {
     }
 
     @Override
-    public void start(String... args) throws IOException {
+    public void start(String homeDir, String... args) throws IOException {
         this.port = args[0];
         restart();
     }
