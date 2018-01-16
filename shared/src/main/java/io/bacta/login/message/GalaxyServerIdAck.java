@@ -38,14 +38,14 @@ import java.nio.ByteBuffer;
 @Priority(0x02)
 @AllArgsConstructor
 public final class GalaxyServerIdAck extends GameNetworkMessage {
-    private final int clusterId;
+    private final int galaxyId;
 
     public GalaxyServerIdAck(final ByteBuffer buffer) {
-        clusterId = buffer.getInt();
+        galaxyId = buffer.getInt();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-        BufferUtil.put(buffer, clusterId);
+        BufferUtil.put(buffer, galaxyId);
     }
 }

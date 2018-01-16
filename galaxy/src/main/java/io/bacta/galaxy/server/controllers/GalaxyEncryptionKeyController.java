@@ -1,6 +1,6 @@
 package io.bacta.galaxy.server.controllers;
 
-import io.bacta.login.message.GalaxyServerIdAck;
+import io.bacta.login.message.GalaxyEncryptionKey;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@MessageHandled(handles = GalaxyServerIdAck.class)
+@MessageHandled(handles = GalaxyEncryptionKey.class)
 @ConnectionRolesAllowed({})
-public class GalaxyServerIdAckController implements GameNetworkMessageController<SoeConnection, GalaxyServerIdAck> {
+public final class GalaxyEncryptionKeyController implements GameNetworkMessageController<SoeConnection, GalaxyEncryptionKey> {
     @Override
-    public void handleIncoming(SoeConnection connection, GalaxyServerIdAck message) throws Exception {
-        LOGGER.info("Received ack message with galaxy id {}", message.getGalaxyId());
+    public void handleIncoming(SoeConnection connection, GalaxyEncryptionKey message) throws Exception {
+        LOGGER.info("Received encryption key.");
     }
 }
