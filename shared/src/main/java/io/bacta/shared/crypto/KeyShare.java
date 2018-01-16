@@ -33,6 +33,8 @@ import java.util.Arrays;
 //TODO: Allow people to specify their own algorithms.
 @Slf4j
 public final class KeyShare {
+    private static final int DEFAULT_KEY_COUNT = 2;
+
     private static final MessageDigest messageDigest;
     private static final KeyGenerator keyGenerator;
     private static final Cipher encryptCipher;
@@ -46,8 +48,8 @@ public final class KeyShare {
 
     static {
         try {
-            messageDigest = MessageDigest.getInstance("AES");
-            keyGenerator = KeyGenerator.getInstance("MD5");
+            messageDigest = MessageDigest.getInstance("MD5");
+            keyGenerator = KeyGenerator.getInstance("AES");
             encryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             decryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         } catch (GeneralSecurityException ex) {
@@ -57,6 +59,10 @@ public final class KeyShare {
     }
 
     private final EvictingQueue<Key> keys;
+
+    public KeyShare() {
+        this(DEFAULT_KEY_COUNT);
+    }
 
     public KeyShare(int keyCount) {
         if (keyCount < 1)
@@ -79,7 +85,7 @@ public final class KeyShare {
         this.keys.clear();
     }
 
-    public Key generateKey() {
+    public static Key generateKey() {
         final SecretKey secretKey = keyGenerator.generateKey();
         return new Key(secretKey.getEncoded());
     }

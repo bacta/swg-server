@@ -10,10 +10,14 @@ public final class Session {
 
     private final String key;
     private final int accountId;
-    private final long created = System.currentTimeMillis();
+    private long lastTouched = System.currentTimeMillis();
 
     public boolean isExpired() {
         final long now = System.currentTimeMillis();
-        return now > created + SESSION_TIME_TO_LIVE;
+        return now > lastTouched + SESSION_TIME_TO_LIVE;
+    }
+
+    public void touch() {
+        lastTouched = System.currentTimeMillis();
     }
 }
