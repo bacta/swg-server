@@ -29,9 +29,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.inject.Inject;
+import java.util.concurrent.Executor;
 
 /**
  * Created by kyle on 4/12/2016.
@@ -63,6 +65,11 @@ public class LoginServerConfiguration {
         connectionMap.setGetConnectionMethod(soeTransceiver::getConnection);
         connectionMap.setBroadcastMethod(soeTransceiver::broadcast);
         return soeTransceiver;
+    }
+
+    @Bean
+    public Executor taskExecutor() {
+        return new SimpleAsyncTaskExecutor();
     }
 
     @Bean
