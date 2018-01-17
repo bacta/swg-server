@@ -20,6 +20,7 @@
 
 package io.bacta.login.server;
 
+import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.DefaultConnectionMap;
 import io.bacta.soe.network.udp.SoeTransceiver;
@@ -28,16 +29,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.inject.Inject;
+import java.util.concurrent.Executor;
 
 /**
  * Created by kyle on 4/12/2016.
  */
 
-@Configuration
-@ConfigurationProperties
 @Slf4j
+@Configuration
+@EnableScheduling
+@ConfigurationProperties
 public class LoginServerConfiguration {
 
     private final LoginServerProperties loginServerProperties;
@@ -62,5 +67,14 @@ public class LoginServerConfiguration {
         return soeTransceiver;
     }
 
+    @Bean
+    public Executor taskExecutor() {
+        return new SimpleAsyncTaskExecutor();
+    }
 
+    @Bean
+    public KeyShare getKeyShare() {
+        LOGGER.info("Creating key share.");
+        return new KeyShare();
+    }
 }

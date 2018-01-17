@@ -20,13 +20,9 @@
 
 package io.bacta.network.message
 
-import bacta.io.soe.network.controller.*
 import io.bacta.engine.conf.ini.IniBactaConfiguration
 import io.bacta.soe.config.DefaultSoeNetworkConfiguration
-import io.bacta.soe.network.connection.SoeConnection
-import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
-import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
-import io.bacta.soe.network.connection.SoeUdpConnection
+import io.bacta.soe.network.connection.*
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
@@ -81,7 +77,7 @@ class MultiPacketSpec extends Specification {
         def messageSerializer = Mock(GameNetworkMessageSerializer)
 
         def soeUdpConnection = new SoeUdpConnection(null, null, 0, networkConfig, new SoeIncomingMessageProcessor(networkConfig), new SoeOutgoingMessageProcessor(networkConfig, messageSerializer))
-        def SoeConnection = new SoeConnection(soeUdpConnection)
+        def SoeConnection = new IncomingSoeConnection(soeUdpConnection)
 
         when:
         for(List<Byte> array : multiList) {

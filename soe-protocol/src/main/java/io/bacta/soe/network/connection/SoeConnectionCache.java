@@ -12,4 +12,5 @@ public interface SoeConnectionCache {
     Set<InetSocketAddress> keySet();
     SoeConnection remove(InetSocketAddress inetSocketAddress);
     void broadcast(GameNetworkMessage message);
+    boolean contains(InetSocketAddress address);
 }

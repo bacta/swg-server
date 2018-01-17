@@ -1,9 +1,15 @@
 package io.bacta.login.server.service;
 
+import io.bacta.game.message.ErrorMessage;
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
+import io.bacta.login.message.SetSessionKey;
 import io.bacta.login.server.LoginServerProperties;
+import io.bacta.login.server.session.Session;
+import io.bacta.login.server.session.SessionException;
+import io.bacta.login.server.session.SessionService;
+import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +26,24 @@ import javax.inject.Inject;
 @Service
 public final class DefaultClientService implements ClientService {
     private final LoginServerProperties loginServerProperties;
+    private final KeyShare keyShare;
+    private final SessionService sessionService;
     private final CharacterService characterService;
     private final GalaxyService galaxyService;
     private final String requiredClientVersion;
 
     @Inject
     public DefaultClientService(LoginServerProperties loginServerProperties,
+                                SessionService sessionService,
                                 CharacterService characterService,
+                                KeyShare keyShare,
                                 GalaxyService galaxyService,
                                 @Value("${bacta.network.shared.requiredClientVersion}")
                                  String requiredClientVersion) {
         this.loginServerProperties = loginServerProperties;
+        this.sessionService = sessionService;
         this.characterService = characterService;
+        this.keyShare = keyShare;
         this.galaxyService = galaxyService;
         this.requiredClientVersion = requiredClientVersion;
     }
@@ -49,7 +61,8 @@ public final class DefaultClientService implements ClientService {
         if (!validateClientVersion(connection, clientVersion))
             return;
 
-        establishSessionMode(connection, id, key);
+        try {
+            establishSessionMode(connection, id, key);
 
         /*
         switch (loginServerProperties.getSessionMode()) {
@@ -69,8 +82,15 @@ public final class DefaultClientService implements ClientService {
         }
         */
 
-        connection.addRole(ConnectionRole.AUTHENTICATED);
-        connection.addRole(ConnectionRole.LOGIN_CLIENT);
+            connection.addRole(ConnectionRole.AUTHENTICATED);
+            connection.addRole(ConnectionRole.LOGIN_CLIENT);
+        } catch (SessionException ex) {
+            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
+
+            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
+            connection.sendMessage(message);
+            connection.disconnect();
+        }
     }
 
 
@@ -78,12 +98,18 @@ public final class DefaultClientService implements ClientService {
     public void clientValidated(SoeConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
         //implement admin
 
+        //Session key login: sessionId + accountId
+        //Otherwise: accountId + isSecure + username
+
         //Create a key with:
-        //If they logged in with a session, then the key is comprised of the sessionId + accountId
+        //If they logged in with a session, then the key will contain of the sessionId + accountId
         //Otherwise, the key is comprised of the accountId, if they are connecting with god client, and username
         //Encrypt the key before sending to client (not sure why, we've already exposed the sessionId as plain text)
 
-        final String token = "hello world";
+        //The token
+        byte[] data = new byte[10];
+
+        final KeyShare.Token token = keyShare.cipherToken(data);
         sendLoginClientToken(connection, token, bactaId, username);
 
         galaxyService.sendClusterEnum(connection);
@@ -92,18 +118,24 @@ public final class DefaultClientService implements ClientService {
         galaxyService.sendClusterStatus(connection);
     }
 
-    private void sendLoginClientToken(SoeConnection connection, String token, int bactaId, String username) {
+    private void sendLoginClientToken(SoeConnection connection, KeyShare.Token token, int bactaId, String username) {
         final LoginClientToken message = new LoginClientToken(token, bactaId, username);
         connection.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeConnection connection, String username, String password) {
-        //final Session session = sessionClient.establish(username, password);
-        clientValidated(connection, 1, username, password, false, 0, 0);
+    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
+        final Session session = sessionService.establish(username, password);
+
+        //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
+        final SetSessionKey message = new SetSessionKey(session.getKey());
+        connection.sendMessage(message);
+
+        clientValidated(connection, session.getAccountId(), username, session.getKey(), false, 0, 0);
     }
 
     private void validateSessionMode(SoeConnection connection, String sessionKey) {
-        //final Session session = sessionClient.validate(sessionKey);
+        //final Session session = sessionService.validate(sessionKey);
+        //ErrorMessage err(
     }
 
     private void discoverSessionMode(SoeConnection connection, String id, String key) {
@@ -112,7 +144,7 @@ public final class DefaultClientService implements ClientService {
     private boolean validateClientVersion(SoeConnection connection, String clientVersion) {
         //TODO: In the future, we might want to change up how versions are validated.
         if (loginServerProperties.isValidateClientVersionEnabled()
-                && requiredClientVersion.equals(clientVersion)) {
+                && !requiredClientVersion.equals(clientVersion)) {
 
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
                     connection.getSoeUdpConnection().getRemoteAddress(),
