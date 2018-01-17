@@ -112,4 +112,9 @@ public class IncomingSoeConnection implements SoeConnection {
     public void confirmed(int connectionID, int encryptCode, byte crcBytes, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2, int maxRawPacketSize) {
         this.soeUdpConnection.confirmed(connectionID, encryptCode, crcBytes, encryptMethod1, encryptMethod2, maxRawPacketSize);
     }
+
+    @Override
+    public void logReceivedMessage(GameNetworkMessage incomingMessage) {
+        soeUdpConnection.logReceivedMessage(incomingMessage);
+    }
 }

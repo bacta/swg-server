@@ -25,6 +25,7 @@ import io.bacta.engine.network.udp.UdpConnection;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.message.*;
+import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -250,7 +251,11 @@ public final class SoeUdpConnection implements UdpConnection, SoeUdpConnectionMB
         return incomingMessageProcessor.getIncomingProtocolMessageCount();
     }
 
-
+    public void logReceivedMessage(GameNetworkMessage incomingMessage) {
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("{} received {} {}", objectName, incomingMessage.getClass().getSimpleName(), SoeMessageUtil.bytesToHex(incomingMessage));
+        }
+    }
 
 
 //    013CA650	UdpManager::UdpManager(UdpManager::Params const *)

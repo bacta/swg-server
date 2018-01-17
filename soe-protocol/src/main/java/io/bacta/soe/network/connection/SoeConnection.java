@@ -45,4 +45,6 @@ public interface SoeConnection extends Connection {
     long getCurrentNetworkId();
 
     String getCurrentCharName();
+
+    void logReceivedMessage(GameNetworkMessage incomingMessage);
 }

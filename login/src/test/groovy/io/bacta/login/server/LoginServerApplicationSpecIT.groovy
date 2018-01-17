@@ -4,7 +4,6 @@ import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
-import io.bacta.galaxy.message.GalaxyServerId
 import io.bacta.soe.network.connection.ConnectionMap
 import io.bacta.soe.network.connection.DefaultConnectionMap
 import io.bacta.soe.network.connection.SoeConnection
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
 import javax.inject.Inject
-import java.time.ZonedDateTime
 
 @Slf4j
 @SpringBootTest(classes = Application.class)
@@ -83,16 +81,20 @@ class LoginServerApplicationSpecIT extends Specification {
         connectionMap.setGetConnectionMethod(soeClient.&getConnection)
         SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, serverPort));
         def startingReceivedReliables = connection.soeUdpConnection.incomingMessageProcessor.gameNetworkMessagesReceived.get()
+        def startingSequence = connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get()
 
         when:
 
-        connection.sendMessage(new GalaxyServerId("test", ZonedDateTime.now().getOffset().getTotalSeconds(), ""))
+        connection.sendMessage(new ImplicitConnectionTestMessage())
 
         then:
         noExceptionThrown()
         startingReceivedReliables == 0
+        startingSequence == 0
         AwaitUtil.awaitTrue(connection.&isConnected, 5)
-        connection.soeUdpConnection.incomingMessageProcessor.gameNetworkMessagesReceived.get() == 1
+        connection.soeUdpConnection.outgoingMessageProcessor.gameNetworkMessagesSent.get() == 1
+        //connection.soeUdpConnection.incomingMessageProcessor.pendingReliablePackets.pendingMap.size() == 0
+        connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get() == 1
     }
 
 //    def "Test Broadcast"() {
