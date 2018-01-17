@@ -25,8 +25,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 
 /**
@@ -41,7 +39,6 @@ import java.net.InetSocketAddress;
 public class DefaultSoeConnectionFactory implements SoeConnectionFactory {
 
     private final SoeUdpConnectionFactory udpConnectionFactory;
-    private final Constructor<SoeConnection> connectionConstructor;
 
     /**
      * Constructor that takes the {@link SoeUdpConnectionFactory}
@@ -50,30 +47,30 @@ public class DefaultSoeConnectionFactory implements SoeConnectionFactory {
     @Inject
     public DefaultSoeConnectionFactory(final SoeUdpConnectionFactory udpConnectionFactory) throws NoSuchMethodException {
         this.udpConnectionFactory = udpConnectionFactory;
-        this.connectionConstructor = SoeConnection.class.getConstructor(SoeUdpConnection.class);
     }
 
     /**
      * Creates new instance of the provided connection class
      *
      * @param sender remote address of connection for future routing
-     * @return new {@link SoeConnection}
+     * @return new {@link IncomingSoeConnection}
      */
     @Override
     public SoeConnection newInstance(final InetSocketAddress sender) {
-
         final SoeUdpConnection udpConnection = udpConnectionFactory.newInstance(sender);
+        return new IncomingSoeConnection(udpConnection);
+    }
 
-        SoeConnection connection = null;
-        try {
+    /**
+     * Creates new instance of the provided connection class
+     *
+     * @param sender remote address of connection for future routing
+     * @return new {@link OutgoingSoeConnection}
+     */
+    @Override
+    public SoeConnection newOutgoingInstance(final InetSocketAddress sender) {
+        final SoeUdpConnection udpConnection = udpConnectionFactory.newInstance(sender);
+        return new OutgoingSoeConnection(udpConnection);
 
-            connection = connectionConstructor.newInstance(udpConnection);
-
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            LOGGER.error("Unhandle exception creating connection", e);
-
-        }
-
-        return connection;
     }
 }

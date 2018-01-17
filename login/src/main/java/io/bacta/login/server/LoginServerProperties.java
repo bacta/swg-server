@@ -37,6 +37,7 @@ public class LoginServerProperties {
     private int bindPort;
     private int maxCharactersPerAccount;
     private boolean autoGalaxyRegistrationEnabled;
+    private boolean autoAccountRegistrationEnabled;
     private boolean internalBypassOnlineLimitEnabled;
     private boolean skippingTutorialAllowedForAll;
     private boolean validateClientVersionEnabled;

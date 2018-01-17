@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>messages</artifactId>
+            <artifactId>shared</artifactId>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>

@@ -73,6 +73,30 @@ class LoginServerApplicationSpecIT extends Specification {
         AwaitUtil.awaitTrue(connection.&isConnected, 5)
     }
 
+    def "Test Implicit connect"() {
+
+        setup:
+
+        ConnectionMap connectionMap = new DefaultConnectionMap()
+        connectionMap.setGetConnectionMethod(soeClient.&getConnection)
+        SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, serverPort));
+        def startingReceivedReliables = connection.soeUdpConnection.incomingMessageProcessor.gameNetworkMessagesReceived.get()
+        def startingSequence = connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get()
+
+        when:
+
+        connection.sendMessage(new ImplicitConnectionTestMessage())
+
+        then:
+        noExceptionThrown()
+        startingReceivedReliables == 0
+        startingSequence == 0
+        AwaitUtil.awaitTrue(connection.&isConnected, 5)
+        connection.soeUdpConnection.outgoingMessageProcessor.gameNetworkMessagesSent.get() == 1
+        //connection.soeUdpConnection.incomingMessageProcessor.pendingReliablePackets.pendingMap.size() == 0
+        connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get() == 1
+    }
+
 //    def "Test Broadcast"() {
 //
 //        setup:

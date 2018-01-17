@@ -11,6 +11,8 @@ import io.bacta.login.server.data.ConnectionServerEntry;
 import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.mapper.GalaxyRecordMapper;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.shared.GameNetworkMessage;
+import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -36,59 +38,30 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public final class DefaultGalaxyService implements GalaxyService {
-    private final GalaxyRepository galaxyRepository;
+    private static final long GALAXY_LIST_REFRESH_INTERVAL = 10000; //10 seconds
+
     private final LoginServerProperties loginServerProperties;
+    private final GalaxyRepository galaxyRepository;
     private final ConnectionMap connectionMap;
+    private final KeyShare keyShare;
     /**
      * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
      * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
      */
     private final TIntObjectMap<GalaxyRecord> galaxies;
 
-    public DefaultGalaxyService(GalaxyRepository galaxyRepository,
-                                LoginServerProperties loginServerProperties,
-                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
-        this.galaxyRepository = galaxyRepository;
+    public DefaultGalaxyService(LoginServerProperties loginServerProperties,
+                                GalaxyRepository galaxyRepository,
+                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap,
+                                KeyShare keyShare) {
         this.loginServerProperties = loginServerProperties;
-        this.galaxies = new TIntObjectHashMap<>();
+        this.galaxyRepository = galaxyRepository;
         this.connectionMap = connectionMap;
+        this.keyShare = keyShare;
+
+        this.galaxies = new TIntObjectHashMap<>();
     }
 
-    /**
-     * This method runs on a schedule and looks for new galaxies that aren't in memory. If a new galaxy was somehow
-     * added directly to the database, then it would get loaded this way. At startup, it will load all trusted
-     * galaxies and send each a {@link LoginServerOnline} message to tell them that the login server is online and
-     * waiting for their {@link GalaxyServerId} message.
-     */
-    @Scheduled(initialDelay = 0, fixedRate = 10000)
-    private void refreshGalaxyServerList() {
-        final Iterable<GalaxyRecord> records = galaxyRepository.findAll();
-
-        for (final GalaxyRecord record : records) {
-            //We want to look if this galaxy is already in our map. If so, then ignore it.
-            if (galaxies.containsKey(record.getId()))
-                continue;
-
-            LOGGER.debug("Loading galaxy {}({}) with address {}:{}.",
-                    record.getName(),
-                    record.getId(),
-                    record.getAddress(),
-                    record.getPort());
-
-            //We want to send this galaxy the LoginServerOnline message so that it knows we are online and waiting
-            //for it to identify with us. First, we need to get a connection to it.
-            final InetSocketAddress galaxyAddress = new InetSocketAddress(record.getAddress(), record.getPort());
-            final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
-
-            if (galaxyConnection != null) {
-                final LoginServerOnline onlineMessage = new LoginServerOnline();
-                galaxyConnection.sendMessage(onlineMessage);
-            }
-
-            //Add the galaxy to our memory map.
-            galaxies.put(record.getId(), record);
-        }
-    }
 
     @Override
     public Collection<GalaxyRecord> getGalaxies() {
@@ -155,8 +128,13 @@ public final class DefaultGalaxyService implements GalaxyService {
         if (trusted) {
             galaxyRecord.setIdentified(true);
 
+            //Acknowledge that they are trusted.
             final GalaxyServerIdAck ack = new GalaxyServerIdAck(galaxyRecord.getId());
             galaxyConnection.sendMessage(ack);
+
+            //Go ahead and send the current key too.
+            final GalaxyEncryptionKey keyMessage = new GalaxyEncryptionKey(keyShare.getKey(0));
+            galaxyConnection.sendMessage(keyMessage);
         }
     }
 
@@ -310,6 +288,30 @@ public final class DefaultGalaxyService implements GalaxyService {
         connection.sendMessage(message);
     }
 
+    @Override
+    public void sendToGalaxy(int galaxyId, GameNetworkMessage message) {
+        final GalaxyRecord galaxy = galaxies.get(galaxyId);
+
+        if (galaxy == null)
+            throw new IllegalArgumentException("Galaxy is not loaded.");
+
+        sendToGalaxy(galaxy, message);
+    }
+
+    private void sendToGalaxy(GalaxyRecord galaxy, GameNetworkMessage message) {
+        final InetSocketAddress galaxyAddress = new InetSocketAddress(galaxy.getAddress(), galaxy.getPort());
+        final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
+
+        galaxyConnection.sendMessage(message);
+    }
+
+    @Override
+    public void sendToAllGalaxies(GameNetworkMessage message) {
+        for (final GalaxyRecord galaxy : galaxies.valueCollection()) {
+            sendToGalaxy(galaxy, message);
+        }
+    }
+
     private LoginClusterStatus.ClusterData.PopulationStatus determineGalaxyPopulationStatus(GalaxyRecord record) {
         final LoginClusterStatus.ClusterData.PopulationStatus populationStatus;
 
@@ -367,5 +369,45 @@ public final class DefaultGalaxyService implements GalaxyService {
 
         return status;
         //return LoginClusterStatus.ClusterData.Status.UP;
+    }
+
+
+    /**
+     * This method runs on a schedule and looks for new galaxies that aren't in memory. If a new galaxy was somehow
+     * added directly to the database, then it would get loaded this way. At startup, it will load all trusted
+     * galaxies and send each a {@link LoginServerOnline} message to tell them that the login server is online and
+     * waiting for their {@link GalaxyServerId} message.
+     */
+    @Scheduled(initialDelay = 0, fixedRate = GALAXY_LIST_REFRESH_INTERVAL)
+    private void refreshGalaxyServerList() {
+        final Iterable<GalaxyRecord> records = galaxyRepository.findAll();
+
+        for (final GalaxyRecord record : records) {
+            //We want to look if this galaxy is already in our map. If so, then ignore it.
+            if (galaxies.containsKey(record.getId()))
+                continue;
+
+            LOGGER.debug("Loading galaxy {}({}) with address {}:{}.",
+                    record.getName(),
+                    record.getId(),
+                    record.getAddress(),
+                    record.getPort());
+
+            //We want to send this galaxy the LoginServerOnline message so that it knows we are online and waiting
+            //for it to identify with us. First, we need to get a connection to it.
+            final InetSocketAddress galaxyAddress = new InetSocketAddress(record.getAddress(), record.getPort());
+            final SoeConnection galaxyConnection = connectionMap.getOrCreate(galaxyAddress);
+
+            if (galaxyConnection != null) {
+                if (!galaxyConnection.isConnected())
+                    galaxyConnection.connect(null);
+
+                final LoginServerOnline onlineMessage = new LoginServerOnline();
+                galaxyConnection.sendMessage(onlineMessage);
+            }
+
+            //Add the galaxy to our memory map.
+            galaxies.put(record.getId(), record);
+        }
     }
 }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -55,7 +56,7 @@ public class SoeTransceiver {
     public SoeConnection getConnection(final InetSocketAddress address) {
         SoeConnection connection = soeConnectionCache.get(address);
         if(connection == null) {
-            connection = inboundMessageChannel.getConnectionProvider().newInstance(address);
+            connection = inboundMessageChannel.getConnectionProvider().newOutgoingInstance(address);
             soeConnectionCache.put(address, connection);
         }
 
@@ -66,6 +67,7 @@ public class SoeTransceiver {
         soeConnectionCache.broadcast(message);
     }
 
+    @PreDestroy
     public void stop() throws Exception {
         LOGGER.info("Shutting down SoeTransceiver({})", name);
         udpChannel.stop();
