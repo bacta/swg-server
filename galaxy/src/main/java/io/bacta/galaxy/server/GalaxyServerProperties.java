@@ -34,6 +34,7 @@ import java.util.List;
 public class GalaxyServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
+    private String galaxyName;
     private List<ConnectionServer> connectionServers;
     private List<ZoneServer> zoneServers;
 

@@ -3,6 +3,7 @@ package io.bacta.login.server.service;
 import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.message.GalaxyServerIdAck;
 import io.bacta.login.server.data.GalaxyRecord;
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeConnection;
 
 import java.util.Collection;
@@ -141,4 +142,8 @@ public interface GalaxyService {
      * @param connection The connection which will receive the message.
      */
     void sendExtendedClusterStatus(SoeConnection connection);
+
+    void sendToGalaxy(int galaxyId, GameNetworkMessage message);
+
+    void sendToAllGalaxies(GameNetworkMessage message);
 }

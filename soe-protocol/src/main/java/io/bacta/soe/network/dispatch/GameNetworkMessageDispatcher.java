@@ -111,6 +111,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
                 final GameNetworkMessageController controller = controllerData.getController();
                 final GameNetworkMessage incomingMessage = gameNetworkMessageSerializer.readFromBuffer(gameMessageType, buffer);
 
+                connection.logReceivedMessage(incomingMessage);
                 LOGGER.trace("received {}", incomingMessage.getClass().getSimpleName());
 
                 LOGGER.debug("Routing to " + controller.getClass().getSimpleName());
