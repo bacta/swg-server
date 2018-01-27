@@ -17,30 +17,28 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.bacta.connection.server;
+package io.bacta.galaxy.server;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableConfigurationProperties
+@EnableScheduling
 @ComponentScan({
-        "io.bacta.connection",
+        "io.bacta.galaxy",
         "io.bacta.soe",
         "io.bacta.engine"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
-
-})
-public class Application {
+@PropertySource("classpath:soenetworking.properties")
+public class GalaxyServerTestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        new SpringApplicationBuilder(GalaxyServerTestApplication.class)
+                .run(args);
     }
 }

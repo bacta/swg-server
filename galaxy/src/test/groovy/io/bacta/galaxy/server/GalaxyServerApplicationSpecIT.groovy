@@ -14,7 +14,7 @@ import spock.lang.Specification
 import javax.inject.Inject
 
 @Slf4j
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = GalaxyServerTestApplication.class)
 class GalaxyServerApplicationSpecIT extends Specification {
 
     @Inject
