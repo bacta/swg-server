@@ -27,7 +27,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
@@ -37,11 +36,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "io.bacta.galaxy",
         "io.bacta.soe",
         "io.bacta.engine"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.yml")
-
-})
+@PropertySource("classpath:soenetworking.properties")
 public class GalaxyServerApplication {
     public static void main(String[] args) {
 

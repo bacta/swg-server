@@ -17,20 +17,26 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 package io.bacta.connection.server;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 
-import java.net.InetAddress;
-
-
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "io.bacta.connection.server")
-public class ConnectionServerProperties {
-    private InetAddress bindAddress;
-    private int bindPort;
+@SpringBootApplication
+@EnableAutoConfiguration
+@EnableConfigurationProperties
+@ComponentScan({
+        "io.bacta.connection",
+        "io.bacta.soe",
+        "io.bacta.engine"})
+@PropertySource("classpath:soenetworking.properties")
+public class ConnectionServerTestApplication {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(ConnectionServerTestApplication.class)
+                .run(args);
+    }
 }

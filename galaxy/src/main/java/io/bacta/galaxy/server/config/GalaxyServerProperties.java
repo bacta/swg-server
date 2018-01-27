@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.server;
+package io.bacta.galaxy.server.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -35,16 +35,13 @@ public class GalaxyServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
     private String galaxyName;
-    private List<ConnectionServer> connectionServers;
+    private Akka akka;
+    private boolean connectionServer;
     private List<ZoneServer> zoneServers;
 
     @Data
-    public static class ConnectionServer {
-        public static final String LOCAL = "local";
-        public static final String REMOTE = "remote";
-        private String type;
-        private String ipAddress;
-        private String port;
+    public static class Akka {
+        private String config;
     }
 
     @Data

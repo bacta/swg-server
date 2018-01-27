@@ -18,11 +18,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.connection.server;
+package io.bacta.connection.server.config;
 
-import io.bacta.soe.network.udp.SoeTransceiver;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.bacta.connection.server.actor.ConnectionServerManager;
+import io.bacta.engine.SpringAkkaExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,16 +41,32 @@ import javax.inject.Inject;
 public class ConnectionServerConfiguration {
 
     private final ConnectionServerProperties connectionServerProperties;
+    private final SpringAkkaExtension ext;
 
     @Inject
-    public ConnectionServerConfiguration(final ConnectionServerProperties connectionServerProperties) {
+    public ConnectionServerConfiguration(final ConnectionServerProperties connectionServerProperties, final SpringAkkaExtension ext) {
         this.connectionServerProperties = connectionServerProperties;
+        this.ext = ext;
+    }
+
+
+
+    @Inject
+    @Bean
+    public ActorSystem getActorSystem(final ApplicationContext context){
+        // Create an Akka system
+        ActorSystem system = ActorSystem.create("GalaxyCluster", akkaConfiguration());
+        ext.initialize(context);
+        return system;
+    }
+
+    private Config akkaConfiguration() {
+        return ConfigFactory.load(connectionServerProperties.getAkka().getConfig());
     }
 
     @Inject
-    @Bean(name = "ConnectionTransceiver")
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        soeTransceiver.start("conn", connectionServerProperties.getBindAddress(), connectionServerProperties.getBindPort());
-        return soeTransceiver;
+    public ActorRef getGalaxyManager(final ActorSystem actorSystem) {
+        return actorSystem.actorOf(ext.props(ConnectionServerManager.class), "connectionServerManager");
     }
+
 }

@@ -18,11 +18,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.server;
+package io.bacta.galaxy.server.config;
 
-import io.bacta.soe.network.udp.SoeTransceiver;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.galaxy.server.actor.GalaxyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,16 +41,29 @@ import javax.inject.Inject;
 public class GalaxyServerConfiguration {
 
     private final GalaxyServerProperties galaxyServerProperties;
+    private final SpringAkkaExtension ext;
 
     @Inject
-    public GalaxyServerConfiguration(final GalaxyServerProperties galaxyServerProperties) {
+    public GalaxyServerConfiguration(final GalaxyServerProperties galaxyServerProperties, final SpringAkkaExtension ext) {
         this.galaxyServerProperties = galaxyServerProperties;
+        this.ext = ext;
     }
 
     @Inject
-    @Bean(name = "GalaxyTransceiver")
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        soeTransceiver.start("galaxy", galaxyServerProperties.getBindAddress(), galaxyServerProperties.getBindPort());
-        return soeTransceiver;
+    @Bean
+    public ActorSystem getActorSystem(final ApplicationContext context){
+        // Create an Akka system
+        ActorSystem system = ActorSystem.create("GalaxyCluster", akkaConfiguration());
+        ext.initialize(context);
+        return system;
+    }
+
+    private Config akkaConfiguration() {
+        return ConfigFactory.load(galaxyServerProperties.getAkka().getConfig());
+    }
+
+    @Inject
+    public ActorRef getGalaxyManager(final ActorSystem actorSystem) {
+        return actorSystem.actorOf(ext.props(GalaxyManager.class), "galaxyManager");
     }
 }
