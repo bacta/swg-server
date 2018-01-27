@@ -35,4 +35,5 @@ public interface UdpChannel {
     void stop();
     void readIncoming(InetSocketAddress sender, DatagramPacket msg);
     void writeOutgoing(InetSocketAddress destination, ByteBuffer message);
+    InetSocketAddress getAddress();
 }

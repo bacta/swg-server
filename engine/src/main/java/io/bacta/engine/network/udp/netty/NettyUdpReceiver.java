@@ -47,6 +47,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
     private final UdpMetrics metrics;
 
     private final NettyUdpHandler udpHandler;
+    private final NettyUdpServer udpServer;
 
 	public NettyUdpReceiver(final InetAddress bindAddress,
                             final int bindPort,
@@ -57,7 +58,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
         this.metrics = metrics;
 
         this.udpHandler = new NettyUdpHandler(this::receiveMessage, channelHandlerContextConsumer);
-        NettyUdpServer udpServer = new NettyUdpServer(bindAddress, bindPort, udpHandler);
+        this.udpServer = new NettyUdpServer(bindAddress, bindPort, udpHandler);
         this.thread = new Thread(udpServer);
         thread.setDaemon(true);
         thread.setName("UdpReceiver-" + metrics.getNamePrefix());
@@ -94,5 +95,9 @@ public final class NettyUdpReceiver implements UdpReceiver {
 
     public void destroy() throws Exception {
         thread.interrupt();
+    }
+
+    public InetSocketAddress getAddress() {
+        return udpServer.getAddress();
     }
 }

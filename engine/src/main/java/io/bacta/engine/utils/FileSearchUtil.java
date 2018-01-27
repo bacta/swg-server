@@ -1,14 +1,16 @@
 package io.bacta.engine.utils;
 
-import java.io.File;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 public class FileSearchUtil {
 
     /**
@@ -16,27 +18,45 @@ public class FileSearchUtil {
      * and will only descend down the specified number of subfolders.  This will
      * search all the files and will throw and exception if there are multiple
      * matching files.
-     * @param fileRegex Regex expression to match filename
-     * @param depth number of folders levels to recurse into
      * @return
      */
-    public static File getSingleMatch(String fileRegex, int depth) throws IOException {
-        return getSingleMatch(Paths.get("."), fileRegex, depth);
+    public static Path findSoftwareRoot() throws IOException {
+
+        Path workingPath = Paths.get(System.getProperty("user.dir"));
+        return getSoftwareRoot(workingPath.getParent(), 3);
     }
 
-    public static File getSingleMatch(Path path, String fileRegex, int depth) throws IOException {
-        List<Path> discoveredFiles = Files.walk(path, depth, FileVisitOption.FOLLOW_LINKS)
-                .filter(thisPath -> thisPath.toFile().getName().matches(fileRegex))
-                .collect(Collectors.toList());
+    private static Path getSoftwareRoot(Path path, int depth) throws IOException {
 
-        if(discoveredFiles.size() == 1) {
-            return discoveredFiles.get(0).toFile();
+        List<String> filesToFind = new ArrayList<>();
+        filesToFind.add("galaxy.bat");
+        filesToFind.add("login.bat");
+        filesToFind.add("windows-kill.exe");
+        filesToFind.add("lib");
+
+        LOGGER.trace("Searching path: {}", path);
+
+        List<Path> paths = new ArrayList<>();
+
+        Files.walk(path, depth, FileVisitOption.FOLLOW_LINKS).forEach(currentPath ->  {
+
+            if(paths.isEmpty()) {
+                String fileName = currentPath.toFile().getName();
+                LOGGER.trace("Checking file: {} {}", currentPath, fileName);
+                if (filesToFind.contains(fileName)) {
+                    filesToFind.remove(fileName);
+                }
+
+                if (filesToFind.isEmpty()) {
+                    paths.add(currentPath.getParent());
+                }
+            }
+        });
+
+        if(!paths.isEmpty()) {
+            return paths.get(0);
         }
 
-        if(discoveredFiles.isEmpty()) {
-            throw new IOException("Unable to find matching file");
-        }
-
-        throw new IOException("Found multiple files: " + discoveredFiles.toString());
+        throw new IOException("Unable to find software root.  If you are debugging, you may need to package files before running this");
     }
 }

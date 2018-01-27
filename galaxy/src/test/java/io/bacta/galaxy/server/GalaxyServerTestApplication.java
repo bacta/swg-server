@@ -19,13 +19,12 @@
  */
 package io.bacta.galaxy.server;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
@@ -36,13 +35,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "io.bacta.galaxy",
         "io.bacta.soe",
         "io.bacta.engine"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.yml")
-
-})
+@PropertySource("classpath:soenetworking.properties")
 public class GalaxyServerTestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GalaxyServerTestApplication.class, args);
+        new SpringApplicationBuilder(GalaxyServerTestApplication.class)
+                .run(args);
     }
 }
