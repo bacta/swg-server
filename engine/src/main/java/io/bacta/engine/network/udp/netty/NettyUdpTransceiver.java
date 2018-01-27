@@ -56,4 +56,8 @@ class NettyUdpTransceiver implements UdpTransceiver {
     public void stop() throws Exception {
         udpReceiver.destroy();
     }
+
+    public InetSocketAddress getAddress() {
+        return udpReceiver.getAddress();
+    }
 }

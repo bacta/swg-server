@@ -9,6 +9,6 @@ public class ApplicationErrorListener implements ApplicationListener<Application
 
     @Override
     public void onApplicationEvent(ApplicationContextEvent event) {
-        LOGGER.error("Context Event: {}", event.getSource());
+        LOGGER.info("Context Event: {}", event.getSource());
     }
 }
