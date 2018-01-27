@@ -18,20 +18,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.galaxy.server;
+package io.bacta.galaxy.server.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.util.List;
 
 
 @Data
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "io.bacta.galaxy.server")
 public class GalaxyServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
     private String galaxyName;
+    private Akka akka;
+    private boolean connectionServer;
+    private List<ZoneServer> zoneServers;
+
+    @Data
+    public static class Akka {
+        private String config;
+    }
+
+    @Data
+    public static class ZoneServer {
+        private String name;
+        private String iffPath;
+    }
 }
+
+

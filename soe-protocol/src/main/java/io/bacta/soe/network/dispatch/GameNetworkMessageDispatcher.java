@@ -114,7 +114,7 @@ public class GameNetworkMessageDispatcher implements MessageDispatcher {
                 connection.logReceivedMessage(incomingMessage);
                 LOGGER.trace("received {}", incomingMessage.getClass().getSimpleName());
 
-                LOGGER.debug("Routing to " + controller.getClass().getSimpleName());
+                LOGGER.debug("Routing to {}", controller.getClass().getSimpleName());
                 controller.handleIncoming(connection, incomingMessage); //Can't fix this one yet.
 
 

@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PreDestroy;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 @Slf4j
 final class NettyUdpServer implements Runnable {
@@ -45,8 +46,7 @@ final class NettyUdpServer implements Runnable {
     private final int port;
     private Channel channel;
 
-
-	NettyUdpServer(InetAddress bindAddress, int port, ChannelInboundHandlerAdapter... handlers) {
+    NettyUdpServer(InetAddress bindAddress, int port, ChannelInboundHandlerAdapter... handlers) {
 		this.bindAddress = bindAddress;
         this.port = port;
 		this.handlers = handlers;
@@ -57,7 +57,7 @@ final class NettyUdpServer implements Runnable {
 
 		try {
 
-            LOGGER.info("Receiver Starting");
+            LOGGER.info("Receiver Starting {} {}", bindAddress, port);
 
             b = new Bootstrap();
 
@@ -113,5 +113,9 @@ final class NettyUdpServer implements Runnable {
     @PreDestroy
     public void destroy() throws Exception {
         channel.close();
+    }
+
+    public InetSocketAddress getAddress() {
+        return (InetSocketAddress) channel.localAddress();
     }
 }

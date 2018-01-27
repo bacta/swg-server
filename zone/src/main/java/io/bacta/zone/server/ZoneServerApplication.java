@@ -45,7 +45,7 @@ public class ZoneServerApplication {
 
         new SpringApplicationBuilder(ZoneServerApplication.class)
                 .listeners(new ApplicationErrorListener())
-                .listeners(new ApplicationPidFileWriter())
+                .listeners(new ApplicationPidFileWriter("zone.pid"))
                 .run(args);
     }
 }
