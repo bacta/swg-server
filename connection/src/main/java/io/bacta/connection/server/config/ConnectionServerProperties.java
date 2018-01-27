@@ -17,30 +17,27 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.bacta.galaxy.server;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+package io.bacta.connection.server.config;
 
-@SpringBootApplication
-@EnableAutoConfiguration
-@EnableConfigurationProperties
-@ComponentScan({
-        "io.bacta.galaxy",
-        "io.bacta.soe",
-        "io.bacta.engine"})
-@PropertySources({
-        @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-})
-public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+import java.net.InetAddress;
+
+
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "io.bacta.connection.server")
+public class ConnectionServerProperties {
+    private String name;
+    private InetAddress bindAddress;
+    private int bindPort;
+    private Akka akka;
+
+    @Data
+    public static class Akka {
+        private String config;
     }
 }

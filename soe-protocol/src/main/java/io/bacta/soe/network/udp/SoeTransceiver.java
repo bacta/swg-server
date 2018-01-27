@@ -31,6 +31,7 @@ public class SoeTransceiver {
     private final SoeConnectionCache soeConnectionCache;
 
     private String name = "";
+    private boolean started;
 
     @Inject
     public SoeTransceiver(final UdpChannel udpChannel,
@@ -41,16 +42,28 @@ public class SoeTransceiver {
         this.inboundMessageChannel = inboundMessageChannel;
         this.sendHandler = sendHandler;
         this.soeConnectionCache = inboundMessageChannel.getConnectionCache();
+        this.started = false;
+    }
+
+    public InetSocketAddress getAddress() {
+        return udpChannel.getAddress();
     }
 
     public void start(final String name) throws UnknownHostException {
         start(name, InetAddress.getByName("0.0.0.0"), 0);
     }
 
-    public void start(final String name, final InetAddress bindAddress, final int bindPort) {
+    public void start(final String name, final InetAddress bindAddress, final int bindPort) throws TransceiverAlreadyStartedException {
+
+        if(started) {
+            throw new TransceiverAlreadyStartedException();
+        }
+
         this.name = name;
+        this.started = true;
         this.udpChannel.start(name, bindAddress, bindPort, inboundMessageChannel);
         this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
+
     }
 
     public SoeConnection getConnection(final InetSocketAddress address) {

@@ -80,6 +80,11 @@ public class NettyUdpChannel implements UdpChannel {
     }
 
     @Override
+    public InetSocketAddress getAddress() {
+        return udpTransceiver.getAddress();
+    }
+
+    @Override
     public void stop() {
         try {
             LOGGER.info("Channel Shutting down - {}", name);

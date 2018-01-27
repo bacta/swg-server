@@ -49,7 +49,7 @@ public class LoginServerApplication {
 
         new SpringApplicationBuilder(LoginServerApplication.class)
                 .listeners(new ApplicationErrorListener())
-                .listeners(new ApplicationPidFileWriter())
+                .listeners(new ApplicationPidFileWriter("login.pid"))
                 .run(args);
     }
 }
