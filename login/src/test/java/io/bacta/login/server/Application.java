@@ -35,8 +35,7 @@ import org.springframework.context.annotation.PropertySources;
         "io.bacta.engine"})
 @PropertySources({
         @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
-
+        @PropertySource("classpath:login.properties")
 })
 public class Application {
     public static void main(String[] args) {

@@ -263,9 +263,9 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>0.9.10</version>
+                <groupId>io.github.lukehutch</groupId>
+                <artifactId>fast-classpath-scanner</artifactId>
+                <version>LATEST</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
@@ -358,7 +358,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>23.6-jre</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

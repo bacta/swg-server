@@ -1,29 +1,34 @@
 package io.bacta.connection.server.actor;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorSelection;
 import akka.actor.Address;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.cluster.Member;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import io.bacta.connection.message.ConnectionServerReady;
+import io.bacta.engine.utils.SenderUtil;
 import io.bacta.shared.MemberConstants;
+import io.bacta.shared.message.SoeTransceiverStarted;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.net.InetSocketAddress;
 
 @Component
 @Scope("prototype")
 public class GalaxyDelegate extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-    private final Cluster cluster = Cluster.get(getContext().getSystem());
-    private final Set<Member> galaxyServers;
+    private final Cluster cluster = Cluster.get(getContext().system());
+    private Member galaxyServer;
+    private InetSocketAddress transceiverAddress;
+
 
     public GalaxyDelegate() {
-        galaxyServers = new HashSet<>();
+
     }
 
     //subscribe to cluster changes
@@ -45,7 +50,7 @@ public class GalaxyDelegate extends AbstractActor {
                 .match(ClusterEvent.MemberUp.class, mUp -> {
                     log.info("Member is Up: {} with Roles {}", mUp.member(), mUp.member().getRoles());
                     if(mUp.member().hasRole(MemberConstants.GALAXY_SERVER)) {
-                        registerWithGalaxy(mUp.member());
+                        registerGalaxy(mUp.member());
                     }
                 })
                 .match(ClusterEvent.UnreachableMember.class, mDown -> {
@@ -60,6 +65,10 @@ public class GalaxyDelegate extends AbstractActor {
                         unregisterGalaxy(mRemoved.member());
                     }
                 })
+                .match(SoeTransceiverStarted.class,  s -> SenderUtil.isPrivileged(getSender()), started -> {
+                    this.transceiverAddress = started.getAddress();
+                    messageGalaxyManager(new ConnectionServerReady(started.getAddress()));
+                })
                 .match(String.class, s -> {
                     log.info("Received String message: {}", s);
                 })
@@ -67,14 +76,17 @@ public class GalaxyDelegate extends AbstractActor {
                 .build();
     }
 
-    private void unregisterGalaxy(Member member) {
-        galaxyServers.remove(member);
+    private void messageGalaxyManager(Object message) {
+        Address address = galaxyServer.address();
+        ActorSelection selection = getContext().getSystem().actorSelection(address.toString() + "/user/galaxyManager");
+        selection.tell(message, getContext().self());
     }
 
-    private void registerWithGalaxy(Member member) {
-        Address address = member.address();
-        galaxyServers.add(member);
-//        ActorSelection selection = getContext().getSystem().actorSelection(address.toString() + "/user/galaxyManager");
-//        selection.tell("Hello", getContext().self());
+    private void unregisterGalaxy(Member member) {
+        galaxyServer = null;
+    }
+
+    private void registerGalaxy(Member member) {
+        galaxyServer = member;
     }
 }

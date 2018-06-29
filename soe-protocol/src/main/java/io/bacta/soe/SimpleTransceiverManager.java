@@ -3,6 +3,7 @@ package io.bacta.soe;
 import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import akka.japi.pf.ReceiveBuilder;
 import io.bacta.shared.message.SoeTransceiverStart;
 import io.bacta.shared.message.SoeTransceiverStarted;
 import io.bacta.shared.message.SoeTransceiverStop;
@@ -15,13 +16,13 @@ import javax.inject.Inject;
 
 @Component
 @Scope("prototype")
-public class TransceiverSupervisor extends AbstractActor {
+public class SimpleTransceiverManager extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), TransceiverSupervisor.class.getSimpleName());
-    private final SoeTransceiver soeTransceiver;
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), SimpleTransceiverManager.class.getSimpleName());
+    protected final SoeTransceiver soeTransceiver;
 
     @Inject
-    public TransceiverSupervisor(final SoeTransceiver soeTransceiver) {
+    public SimpleTransceiverManager(final SoeTransceiver soeTransceiver) {
         this.soeTransceiver = soeTransceiver;
     }
 
@@ -34,6 +35,10 @@ public class TransceiverSupervisor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
+        return getBasicBuilder().build();
+    }
+
+    protected ReceiveBuilder getBasicBuilder() {
         return receiveBuilder()
                 .match(SoeTransceiverStart.class, start -> {
                     log.info("Starting Transceiver");
@@ -44,8 +49,7 @@ public class TransceiverSupervisor extends AbstractActor {
                     log.info("Stopping Transceiver");
                     soeTransceiver.stop();
                     getSender().tell(new SoeTransceiverStopped(), getSelf());
-                })
-                .build();
+                });
     }
 
 }
