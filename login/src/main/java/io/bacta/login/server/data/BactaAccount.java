@@ -1,7 +1,6 @@
 package io.bacta.login.server.data;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -14,7 +13,6 @@ import java.time.ZonedDateTime;
 @Data
 @Entity
 @Table(name = "accounts", indexes = {@Index(name = "IDX_USERNAME", columnList = "username", unique = true)})
-@NoArgsConstructor
 public final class BactaAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
