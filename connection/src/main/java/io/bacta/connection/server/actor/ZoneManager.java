@@ -1,4 +1,4 @@
-package io.bacta.galaxy.server.actor;
+package io.bacta.connection.server.actor;
 
 import akka.actor.AbstractActor;
 import akka.cluster.Cluster;
@@ -17,14 +17,14 @@ import java.util.Set;
 
 @Component
 @Scope("prototype")
-public class ClusterListener extends AbstractActor {
+public class ZoneManager extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ClusterListener.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ZoneManager.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
-    private final Set<Member> onlineConnectionServers;
+    private final Set<Member> onlineZoneServers;
 
-    public ClusterListener() {
-        onlineConnectionServers = new HashSet<>();
+    public ZoneManager() {
+        onlineZoneServers = new HashSet<>();
     }
 
     //subscribe to cluster changes
@@ -46,26 +46,30 @@ public class ClusterListener extends AbstractActor {
         return receiveBuilder()
                 .match(ClusterEvent.MemberUp.class, mUp -> {
                     log.info("Member is Up: {} with Roles {}", mUp.member(), mUp.member().getRoles());
-                    if(mUp.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-                        onlineConnectionServers.add(mUp.member());
+                    if(mUp.member().hasRole(MemberConstants.ZONE_SERVER)) {
+                        registerZoneServer(mUp.member());
                     }
                 })
-                .match(ClusterEvent.UnreachableMember.class, mDown -> {
+                .match(UnreachableMember.class, mDown -> {
                     log.info("Member is Unreachable: {} with Roles {}", mDown.member(), mDown.member().getRoles());
-                    if(mDown.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-                        connectionServerDown(mDown.member());
+                    if(mDown.member().hasRole(MemberConstants.ZONE_SERVER)) {
+                        unregisterZoneServer(mDown.member());
                     }
                 })
                 .match(ClusterEvent.MemberRemoved.class, mRemoved -> {
                     log.info("Member is removed: {} with Roles {}", mRemoved.member(), mRemoved.member().getRoles());
-                    if(mRemoved.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-                        connectionServerDown(mRemoved.member());
+                    if(mRemoved.member().hasRole(MemberConstants.ZONE_SERVER)) {
+                        unregisterZoneServer(mRemoved.member());
                     }
                 })
                 .build();
     }
 
-    private void connectionServerDown(Member member) {
-        onlineConnectionServers.remove(member);
+    private void registerZoneServer(Member member) {
+        onlineZoneServers.add(member);
+    }
+
+    private void unregisterZoneServer(Member member) {
+        onlineZoneServers.remove(member);
     }
 }

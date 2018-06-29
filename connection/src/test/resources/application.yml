@@ -49,6 +49,7 @@ io:
   bacta:
     connection:
       server:
+        name: connection1
         bindAddress: "0.0.0.0"
         bindPort: 44463
         akka:

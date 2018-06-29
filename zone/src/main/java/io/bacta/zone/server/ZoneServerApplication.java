@@ -37,8 +37,6 @@ import org.springframework.context.annotation.PropertySources;
         "io.bacta.engine"})
 @PropertySources({
         @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:application.properties")
-
 })
 public class ZoneServerApplication {
     public static void main(String[] args) {

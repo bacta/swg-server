@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 
@@ -42,6 +43,7 @@ public class GalaxyServerConfiguration {
 
     private final GalaxyServerProperties galaxyServerProperties;
     private final SpringAkkaExtension ext;
+    private ActorSystem actorSystem;
 
     @Inject
     public GalaxyServerConfiguration(final GalaxyServerProperties galaxyServerProperties, final SpringAkkaExtension ext) {
@@ -53,9 +55,9 @@ public class GalaxyServerConfiguration {
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context){
         // Create an Akka system
-        ActorSystem system = ActorSystem.create("GalaxyCluster", akkaConfiguration());
+        actorSystem = ActorSystem.create("GalaxyCluster", akkaConfiguration());
         ext.initialize(context);
-        return system;
+        return actorSystem;
     }
 
     private Config akkaConfiguration() {
@@ -65,5 +67,11 @@ public class GalaxyServerConfiguration {
     @Inject
     public ActorRef getGalaxyManager(final ActorSystem actorSystem) {
         return actorSystem.actorOf(ext.props(GalaxyManager.class), "galaxyManager");
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        LOGGER.info("Shutting down actor system {}", actorSystem.name());
+        actorSystem.terminate();
     }
 }
