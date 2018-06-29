@@ -2,8 +2,8 @@ package io.bacta.login.server.session;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.jetbrains.annotations.NotNull;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
