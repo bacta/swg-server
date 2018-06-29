@@ -1,7 +1,6 @@
 package io.bacta.login.server.data;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.SortedSet;
@@ -13,7 +12,6 @@ import java.util.TreeSet;
 @Data
 @Entity
 @Table(name = "galaxies")
-@NoArgsConstructor
 public final class GalaxyRecord {
     /**
      * Unique identifier for this galaxy. No other galaxy should share this id.

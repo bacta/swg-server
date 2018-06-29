@@ -24,7 +24,7 @@ import io.bacta.engine.context.ApplicationErrorListener;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.system.ApplicationPidFileWriter;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 
