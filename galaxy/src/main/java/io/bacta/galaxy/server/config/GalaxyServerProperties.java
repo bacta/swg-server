@@ -36,6 +36,7 @@ public class GalaxyServerProperties {
     private int bindPort;
     private String galaxyName;
     private Akka akka;
+    private boolean loginServer;
     private boolean connectionServer;
     private List<ZoneServer> zoneServers;
 
@@ -48,6 +49,7 @@ public class GalaxyServerProperties {
     public static class ZoneServer {
         private String name;
         private String iffPath;
+        private int port;
     }
 }
 

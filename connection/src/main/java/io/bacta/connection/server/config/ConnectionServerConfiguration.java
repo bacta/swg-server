@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 
@@ -42,6 +43,7 @@ public class ConnectionServerConfiguration {
 
     private final ConnectionServerProperties connectionServerProperties;
     private final SpringAkkaExtension ext;
+    private ActorSystem actorSystem;
 
     @Inject
     public ConnectionServerConfiguration(final ConnectionServerProperties connectionServerProperties, final SpringAkkaExtension ext) {
@@ -49,15 +51,13 @@ public class ConnectionServerConfiguration {
         this.ext = ext;
     }
 
-
-
     @Inject
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context){
         // Create an Akka system
-        ActorSystem system = ActorSystem.create("GalaxyCluster", akkaConfiguration());
+        actorSystem = ActorSystem.create("GalaxyCluster", akkaConfiguration());
         ext.initialize(context);
-        return system;
+        return actorSystem;
     }
 
     private Config akkaConfiguration() {
@@ -69,4 +69,9 @@ public class ConnectionServerConfiguration {
         return actorSystem.actorOf(ext.props(ConnectionServerManager.class), "connectionServerManager");
     }
 
+    @PreDestroy
+    private void shutdown() {
+        LOGGER.info("Shutting down actor system {}", actorSystem.name());
+        actorSystem.terminate();
+    }
 }

@@ -63,6 +63,10 @@
         </dependency>
         <dependency>
             <groupId>com.ocdsoft.bacta.swg</groupId>
+            <artifactId>login</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ocdsoft.bacta.swg</groupId>
             <artifactId>connection</artifactId>
         </dependency>
         <dependency>

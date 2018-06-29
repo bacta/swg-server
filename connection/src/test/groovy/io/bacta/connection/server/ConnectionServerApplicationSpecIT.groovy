@@ -6,7 +6,6 @@ import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
 import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.udp.SoeTransceiver
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
@@ -21,7 +20,6 @@ class ConnectionServerApplicationSpecIT extends Specification {
     MetricRegistry metricRegistry;
 
     @Inject
-    @Qualifier("soeTransceiver")
     SoeTransceiver soeClient;
 
     String serverHost = "127.0.0.1"
