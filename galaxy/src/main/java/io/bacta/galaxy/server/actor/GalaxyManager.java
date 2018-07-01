@@ -10,12 +10,13 @@ import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.utils.SenderUtil;
 import io.bacta.galaxy.message.GalaxyServerOnline;
 import io.bacta.galaxy.server.config.GalaxyServerProperties;
-import io.bacta.login.server.LoginServerApplication;
 import io.bacta.shared.message.SoeTransceiverStart;
 import io.bacta.shared.message.SoeTransceiverStarted;
 import io.bacta.zone.server.ZoneServerApplication;
 import org.springframework.boot.Banner;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +29,14 @@ public class GalaxyManager extends AbstractActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxyManager.class.getSimpleName());
     private final SpringAkkaExtension ext;
     private final GalaxyServerProperties properties;
+    private final ApplicationContext context;
     private ActorRef transRef;
 
     @Inject
-    public GalaxyManager(final SpringAkkaExtension ext, final GalaxyServerProperties properties) {
+    public GalaxyManager(final SpringAkkaExtension ext, final GalaxyServerProperties properties, final ApplicationContext context) {
         this.ext = ext;
         this.properties = properties;
+        this.context = context;
     }
 
     @Override
@@ -48,18 +51,18 @@ public class GalaxyManager extends AbstractActor {
             new SpringApplicationBuilder(ConnectionServerApplication.class)
                     .bannerMode(Banner.Mode.CONSOLE)
                     .logStartupInfo(true)
-                    .web(false)
+                    .web(WebApplicationType.NONE)
                     .properties("spring.config.name=connection")
                     .run();
         }
 
-        if(properties.isLoginServer()) {
-            new SpringApplicationBuilder(LoginServerApplication.class)
-                    .bannerMode(Banner.Mode.CONSOLE)
-                    .logStartupInfo(false)
-                    .properties("spring.config.name=login")
-                    .run();
-        }
+//        if(properties.isLoginServer()) {
+//            new SpringApplicationBuilder(LoginServerApplication.class)
+//                    .bannerMode(Banner.Mode.CONSOLE)
+//                    .logStartupInfo(false)
+//                    .properties("spring.config.name=login")
+//                    .run();
+//        }
 
         if(properties.getZoneServers() != null) {
             properties.getZoneServers().forEach(zoneServer -> {
