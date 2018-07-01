@@ -91,7 +91,7 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     @Override
     public void unregisterGalaxy(int id) {
-        galaxyRepository.delete(id);
+        galaxyRepository.deleteById(id);
     }
 
     @Override
