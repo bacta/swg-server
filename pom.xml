@@ -23,7 +23,7 @@
         <java.version>1.8</java.version>
         <spock.version>1.1-groovy-2.4</spock.version>
         <akka.version>2.5.13</akka.version>
-        <spring.data.version>1.4.6.RELEASE</spring.data.version>
+        <spring.data.version>Kay-RELEASE</spring.data.version>
         <spring.security.version>5.0.6.RELEASE</spring.security.version>
     </properties>
 
