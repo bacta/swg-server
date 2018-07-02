@@ -21,6 +21,7 @@
 package io.bacta.galaxy.server;
 
 import io.bacta.engine.context.ApplicationErrorListener;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -43,6 +44,7 @@ public class GalaxyServerApplication {
         new SpringApplicationBuilder(GalaxyServerApplication.class)
                 .listeners(new ApplicationErrorListener())
                 .listeners(new ApplicationPidFileWriter())
+                .web(WebApplicationType.NONE)
                 .run(args);
     }
 }
