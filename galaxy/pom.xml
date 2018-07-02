@@ -79,18 +79,6 @@
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.12</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.ocdsoft.bacta.swg</groupId>-->
-            <!--<artifactId>login</artifactId>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
-            <artifactId>connection</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
-            <artifactId>zone</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
