@@ -24,6 +24,8 @@
         <spock.version>1.1-groovy-2.4</spock.version>
         <akka.version>2.5.13</akka.version>
         <spring.security.version>5.0.6.RELEASE</spring.security.version>
+        <spring.security.oauth2.version>2.3.3.RELEASE</spring.security.oauth2.version>
+        <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
     </properties>
 
     <issueManagement>
@@ -290,6 +292,16 @@
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-crypto</artifactId>
                 <version>${spring.security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${spring.security.oauth2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>${spring.security.jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
