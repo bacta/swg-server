@@ -53,8 +53,8 @@ logging:
   file: logs/galaxy.log
   level:
     org:
-      springframework: WARN
+      springframework: INFO
     com:
       typesafe:
-        akka: WARN
-    akka: WARN
+        akka: INFO
+    akka: INFO
