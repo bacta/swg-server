@@ -67,7 +67,6 @@ public class GalaxyDelegate extends AbstractActor {
                 })
                 .match(SoeTransceiverStarted.class,  s -> SenderUtil.isPrivileged(getSender()), started -> {
                     this.transceiverAddress = started.getAddress();
-                    messageGalaxyManager(new ConnectionServerReady(started.getAddress()));
                 })
                 .match(String.class, s -> {
                     log.info("Received String message: {}", s);
@@ -88,5 +87,6 @@ public class GalaxyDelegate extends AbstractActor {
 
     private void registerGalaxy(Member member) {
         galaxyServer = member;
+        messageGalaxyManager(new ConnectionServerReady(transceiverAddress));
     }
 }
