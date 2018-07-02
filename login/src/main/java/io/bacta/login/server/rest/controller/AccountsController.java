@@ -6,6 +6,7 @@ import io.bacta.login.server.rest.model.AccountListEntry;
 import io.bacta.login.server.rest.model.CreateAccountRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,13 +22,11 @@ import java.util.Optional;
 @RequestMapping("/accounts")
 public final class AccountsController {
     private final BactaAccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Inject
-    public AccountsController(BactaAccountRepository accountRepository,
-                              PasswordEncoder passwordEncoder) {
+    public AccountsController(BactaAccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
