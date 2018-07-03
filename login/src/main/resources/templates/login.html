@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Bacta : Register Account</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+          integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}" type="text/css">
+</head>
+<body>
+<div class="card bg-dark mt-10">
+    <div class="card-header text-center"><img th:src="@{/img/bacta-dark-sm.png}"></div>
+    <div class="card-body text-light">
+        <p class="card-text">Enter your BactaNetwork credentials below to access the network.</p>
+        <form method="post" th:action="@{/login}">
+            <fieldset>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </span>
+                    </div>
+                    <input name="username" type="text" class="form-control" placeholder="Username" autofocus required>
+                </div>
+
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <span class="fas fa-key"></span>
+                        </span>
+                    </div>
+                    <input name="password" type="password" class="form-control" placeholder="Password" required>
+                </div>
+
+            </fieldset>
+            <div class="row">
+                <div class="col-9 text-left">
+                    <p class="mb-0">Don't have an account? <a th:href="@{/register}">Register</a></p>
+                    <p class="mb-0"><a th:href="@{/forgot-password}">Forgot password?</a></p>
+                </div>
+                <div class="col-3 text-right">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
