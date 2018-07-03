@@ -1,0 +1,44 @@
+html,body { height: 100%; }
+
+body {
+    background: radial-gradient(#45dfe6, #1e5561);
+}
+
+.card {
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0 20px;
+    max-width: 400px;
+    margin: 6rem auto !important;
+}
+
+.card-header {
+    background-color: #222;
+}
+
+.input-group-text {
+    min-width: 3rem;
+    display: inline-block;
+    background-color: #35d4d9;
+    border-color: #35d4d9;
+    color: #fff;
+}
+
+a {
+    color: #35d4d9;
+}
+
+a:hover {
+    color: #4edde6;
+}
+
+.btn-primary:not(:disabled):not(.disabled).active,
+.btn-primary:not(:disabled):not(.disabled):active,
+.show>.btn-primary.dropdown-toggle,
+.btn-primary {
+    background-color: #35d4d9;
+    border-color: #35d4d9;
+}
+
+.btn-primary:hover {
+    background-color: #4edde6;
+    border-color: #4edde6;
+}
