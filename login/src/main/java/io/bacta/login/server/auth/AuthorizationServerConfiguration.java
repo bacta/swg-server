@@ -27,7 +27,7 @@ import java.security.NoSuchAlgorithmException;
 @Configuration
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@Import(WebSecurityConfiguration.class)
+@Import(WebSecurityConfig.class)
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
     @Autowired
     @Qualifier("authenticationManagerBean")
@@ -50,9 +50,11 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("rest")
+                .withClient("Bacta Admin Console")
                 .authorizedGrantTypes("implicit")
-                .autoApprove(true)
+                //.autoApprove(true)
+                .redirectUris("http://localhost:4200/callback")
+                .scopes("all")
 
                 .and()
 
