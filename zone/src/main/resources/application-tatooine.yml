@@ -32,8 +32,11 @@ io:
   bacta:
     zone:
       server:
+        name: "tatooine"
         bindAddress: 0.0.0.0
         bindPort: 44470
+        akka:
+          config: "akka-tatooine.conf"
 
 logging:
   file: "logs/tatooine.log"
