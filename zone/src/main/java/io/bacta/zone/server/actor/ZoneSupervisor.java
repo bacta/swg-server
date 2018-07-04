@@ -1,58 +1,47 @@
-package io.bacta.connection.server.actor;
+package io.bacta.zone.server.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
-import akka.actor.PoisonPill;
+import akka.actor.ActorSelection;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import io.bacta.connection.server.config.ConnectionServerProperties;
+import akka.japi.pf.ReceiveBuilder;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.utils.SenderUtil;
+import io.bacta.game.message.ZoneSupervisorReady;
 import io.bacta.shared.message.SoeTransceiverStart;
 import io.bacta.shared.message.SoeTransceiverStarted;
 import io.bacta.soe.SimpleTransceiverManager;
+import io.bacta.zone.server.ZoneServerProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 @Component
 @Scope("prototype")
-public class ConnectionServerManager extends AbstractActor {
+public class ZoneSupervisor extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ConnectionServerManager.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ZoneSupervisor.class.getSimpleName());
     private final SpringAkkaExtension ext;
-    private final ConnectionServerProperties properties;
+    private final ZoneServerProperties properties;
+    private final ApplicationContext context;
     private ActorRef transRef;
-    private ActorRef delegateRef;
-    private ActorRef zoneManagerRef;
 
     @Inject
-    public ConnectionServerManager(final SpringAkkaExtension ext, final ConnectionServerProperties properties) {
+    public ZoneSupervisor(final SpringAkkaExtension ext, final ZoneServerProperties properties, final ApplicationContext context) {
         this.ext = ext;
         this.properties = properties;
-    }
-
-    @PreDestroy
-    private void shutdown() {
-        log.info("Sending PoisonPill");
-        getSelf().tell(new PoisonPill() {
-            @Override
-            public int hashCode() {
-                return super.hashCode();
-            }
-        }, getSelf());
+        this.context = context;
     }
 
     @Override
     public void preStart() throws Exception {
 
         log.info("Starting up");
-        delegateRef = getContext().actorOf(ext.props(GalaxyDelegate.class), "galaxyDelegate");
         transRef = getContext().actorOf(ext.props(SimpleTransceiverManager.class), "transceiverSupervisor");
         transRef.tell(new SoeTransceiverStart(properties.getName(), properties.getBindAddress(), properties.getBindPort()), getSelf());
-        zoneManagerRef = getContext().actorOf(ext.props(ZoneManagerSupervisor.class), "zoneManager");
         super.preStart();
     }
 
@@ -63,16 +52,13 @@ public class ConnectionServerManager extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder()
+        return new ReceiveBuilder()
+        // When a connection server has registered and is ready to receive traffic
                 .match(SoeTransceiverStarted.class, s -> SenderUtil.isPrivileged(getSender()), started -> {
-                    delegateRef.tell(started, getSelf());
-                })
-                .match(String.class, s -> {
-                    log.info("Received String message: {}", s);
+                    ActorSelection selection = getContext().getSystem().actorSelection(started.getAddress().toString() + "/user/galaxyManager");
+                    selection.tell(new ZoneSupervisorReady(properties.getName(), started.getAddress()), getContext().self());
                 })
                 .matchAny(o -> log.info("received unknown message", o))
                 .build();
     }
-
-
 }

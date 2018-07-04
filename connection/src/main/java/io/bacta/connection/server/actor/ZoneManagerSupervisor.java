@@ -8,6 +8,7 @@ import akka.cluster.ClusterEvent.UnreachableMember;
 import akka.cluster.Member;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import io.bacta.game.message.ZoneSupervisorReady;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,13 +18,13 @@ import java.util.Set;
 
 @Component
 @Scope("prototype")
-public class ZoneManager extends AbstractActor {
+public class ZoneManagerSupervisor extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ZoneManager.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), ZoneManagerSupervisor.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final Set<Member> onlineZoneServers;
 
-    public ZoneManager() {
+    public ZoneManagerSupervisor() {
         onlineZoneServers = new HashSet<>();
     }
 
@@ -61,6 +62,9 @@ public class ZoneManager extends AbstractActor {
                     if(mRemoved.member().hasRole(MemberConstants.ZONE_SERVER)) {
                         unregisterZoneServer(mRemoved.member());
                     }
+                })
+                .match(ZoneSupervisorReady.class, zoneSupervisorReady -> {
+                    log.info("Zone Supervisor is ready: {} {}", zoneSupervisorReady.getName(), zoneSupervisorReady.getAddress());
                 })
                 .build();
     }

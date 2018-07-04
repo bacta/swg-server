@@ -20,12 +20,19 @@
 
 package io.bacta.zone.server;
 
-import io.bacta.soe.network.udp.SoeTransceiver;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.zone.server.actor.ZoneSupervisor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 
@@ -35,16 +42,36 @@ import javax.inject.Inject;
 public class ZoneServerConfiguration {
 
     private final ZoneServerProperties zoneServerProperties;
+    private final SpringAkkaExtension ext;
+    private ActorSystem actorSystem;
 
     @Inject
-    public ZoneServerConfiguration(final ZoneServerProperties zoneServerProperties) {
+    public ZoneServerConfiguration(final ZoneServerProperties zoneServerProperties, final SpringAkkaExtension ext) {
         this.zoneServerProperties = zoneServerProperties;
+        this.ext = ext;
     }
 
     @Inject
-    @Bean(name = "ZoneTransceiver")
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        soeTransceiver.start("zone", zoneServerProperties.getBindAddress(), zoneServerProperties.getBindPort());
-        return soeTransceiver;
+    @Bean
+    public ActorSystem getActorSystem(final ApplicationContext context){
+        // Create an Akka system
+        actorSystem = ActorSystem.create("GalaxyCluster", akkaConfiguration());
+        ext.initialize(context);
+        return actorSystem;
+    }
+
+    private Config akkaConfiguration() {
+        return ConfigFactory.load(zoneServerProperties.getAkka().getConfig());
+    }
+
+    @Inject
+    public ActorRef getZoneSupervisor(final ActorSystem actorSystem) {
+        return actorSystem.actorOf(ext.props(ZoneSupervisor.class), "zoneSupervisor");
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        LOGGER.info("Shutting down actor system {}", actorSystem.name());
+        actorSystem.terminate();
     }
 }
