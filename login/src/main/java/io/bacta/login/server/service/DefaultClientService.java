@@ -1,14 +1,9 @@
 package io.bacta.login.server.service;
 
-import io.bacta.game.message.ErrorMessage;
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
-import io.bacta.login.message.SetSessionKey;
 import io.bacta.login.server.LoginServerProperties;
-import io.bacta.login.server.session.Session;
-import io.bacta.login.server.session.SessionException;
-import io.bacta.login.server.session.SessionService;
 import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
@@ -26,24 +21,18 @@ import javax.inject.Inject;
 @Service
 public final class DefaultClientService implements ClientService {
     private final LoginServerProperties loginServerProperties;
-    private final KeyShare keyShare;
-    private final SessionService sessionService;
     private final CharacterService characterService;
     private final GalaxyService galaxyService;
     private final String requiredClientVersion;
 
     @Inject
     public DefaultClientService(LoginServerProperties loginServerProperties,
-                                SessionService sessionService,
                                 CharacterService characterService,
-                                KeyShare keyShare,
                                 GalaxyService galaxyService,
-                                @Value("${bacta.network.shared.requiredClientVersion}")
-                                 String requiredClientVersion) {
+                                @Value("${bacta.network.shared.requiredClientVersion}") String requiredClientVersion) {
+
         this.loginServerProperties = loginServerProperties;
-        this.sessionService = sessionService;
         this.characterService = characterService;
-        this.keyShare = keyShare;
         this.galaxyService = galaxyService;
         this.requiredClientVersion = requiredClientVersion;
     }
@@ -58,11 +47,11 @@ public final class DefaultClientService implements ClientService {
         final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
         connection.sendMessage(serverEpoch);
 
-        if (!validateClientVersion(connection, clientVersion))
-            return;
-
-        try {
-            establishSessionMode(connection, id, key);
+//        if (!validateClientVersion(connection, clientVersion))
+//            return;
+//
+//        try {
+//            establishSessionMode(connection, id, key);
 
         /*
         switch (loginServerProperties.getSessionMode()) {
@@ -84,13 +73,13 @@ public final class DefaultClientService implements ClientService {
 
             connection.addRole(ConnectionRole.AUTHENTICATED);
             connection.addRole(ConnectionRole.LOGIN_CLIENT);
-        } catch (SessionException ex) {
-            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
-
-            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
-            connection.sendMessage(message);
-            connection.disconnect();
-        }
+//        } catch (SessionException ex) {
+//            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
+//
+//            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
+//            connection.sendMessage(message);
+//            connection.disconnect();
+//        }
     }
 
 
@@ -109,8 +98,8 @@ public final class DefaultClientService implements ClientService {
         //The token
         byte[] data = new byte[10];
 
-        final KeyShare.Token token = keyShare.cipherToken(data);
-        sendLoginClientToken(connection, token, bactaId, username);
+//        final KeyShare.Token token = keyShare.cipherToken(data);
+//        sendLoginClientToken(connection, token, bactaId, username);
 
         galaxyService.sendClusterEnum(connection);
         galaxyService.sendDisabledCharacterCreationServers(connection);
@@ -123,15 +112,15 @@ public final class DefaultClientService implements ClientService {
         connection.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
-        final Session session = sessionService.establish(username, password);
-
-        //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
-        final SetSessionKey message = new SetSessionKey(session.getKey());
-        connection.sendMessage(message);
-
-        clientValidated(connection, session.getAccountId(), username, session.getKey(), false, 0, 0);
-    }
+//    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
+//        final Session session = sessionService.establish(username, password);
+//
+//        //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
+//        final SetSessionKey message = new SetSessionKey(session.getKey());
+//        connection.sendMessage(message);
+//
+//        clientValidated(connection, session.getAccountId(), username, session.getKey(), false, 0, 0);
+//    }
 
     private void validateSessionMode(SoeConnection connection, String sessionKey) {
         //final Session session = sessionService.validate(sessionKey);
