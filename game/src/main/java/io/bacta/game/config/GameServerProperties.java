@@ -18,27 +18,38 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.soe;
+package io.bacta.game.config;
 
-import com.codahale.metrics.MetricRegistry;
-import io.bacta.soe.config.SoeNetworkConfiguration;
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
+import java.net.InetAddress;
+import java.util.List;
 
-/**
- * Created by kyle on 7/2/2017.
- */
-@Configuration
-public class SoeConfiguration {
 
-    private final MetricRegistry metricRegistry;
-    private final SoeNetworkConfiguration networkConfiguration;
+@Data
+@Component
+@ConfigurationProperties(prefix = "io.bacta.game")
+public class GameServerProperties {
+    private InetAddress bindAddress;
+    private int bindPort;
+    private String galaxyName;
+    private String requiredClientVersion;
+    private Akka akka;
+    private List<ZoneServer> zoneServers;
 
-    @Inject
-    public SoeConfiguration(final MetricRegistry metricRegistry,
-                            final SoeNetworkConfiguration networkConfiguration) {
-        this.metricRegistry = metricRegistry;
-        this.networkConfiguration = networkConfiguration;
+    @Data
+    public static class Akka {
+        private String config;
+    }
+
+    @Data
+    public static class ZoneServer {
+        private String name;
+        private String iffPath;
+        private int port;
     }
 }
+
+
