@@ -36,7 +36,7 @@ import javax.inject.Inject;
 @Service
 @MessageHandled(handles = RequestExtendedClusterInfo.class)
 @ConnectionRolesAllowed({})
-public class RequestExtendedClusterInfoController implements GameNetworkMessageController<SoeConnection, RequestExtendedClusterInfo> {
+public class RequestExtendedClusterInfoController implements GameNetworkMessageController<RequestExtendedClusterInfo> {
 
     private final GalaxyService galaxyService;
 

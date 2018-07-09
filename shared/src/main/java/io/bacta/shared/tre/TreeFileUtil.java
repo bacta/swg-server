@@ -1,28 +1,15 @@
-/*
- * Copyright 2017. Bacta
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
- * is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+package io.bacta.shared.tre;
+
+import com.jcraft.jzlib.JZlib;
+import com.jcraft.jzlib.ZStream;
+
+import java.nio.ByteBuffer;
+
+/**
+ * Created by crush on 1/14/2015.
  */
-
-package io.bacta.soe.util;
-
-public class SOECRC32 {
-
-    private static int[] crc_table = new int[]{
+final class TreeFileUtil {
+    private static int[] crctable = new int[]{
             0x0000000,
             0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B,
             0x1A864DB2, 0x1E475005, 0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6,
@@ -74,51 +61,74 @@ public class SOECRC32 {
             0xF0A5BD1D, 0xF464A0AA, 0xF9278673, 0xFDE69BC4, 0x89B8FD09,
             0x8D79E0BE, 0x803AC667, 0x84FBDBD0, 0x9ABC8BD5, 0x9E7D9662,
             0x933EB0BB, 0x97FFAD0C, 0xAFB010B1, 0xAB710D06, 0xA6322BDF,
-            0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4,
+            0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4
     };
-       /* for (int i = 0; i < 256; i++)
-        {
-            UInt32 entry = (UInt32)i;
-            for (int j = 0; j < 8; j++)
-                if ((entry & 1) == 1)
-                    entry = (entry >> 1) ^ polynomial;
-                else
-                    entry = entry >> 1;
-            createTable[i] = entry;
-        }*/
 
-//
-//
-//        return createTable;
-//    }
-
-    private SOECRC32() {
-
+    public static int calculateCrc(final String value) {
+        return calculateCrc(value.getBytes());
     }
 
-    static public final int Null = SOECRC32.hashCode("");
-    static public final int Init = 0xFFFFFFFF;
-
-
-    static public int hashCode(String value) {
-        return SOECRC32.hashCode(value.getBytes());
+    public static int calculateCrc(byte[] bytes) {
+        return updateBytesStatic(0xFFFFFFFF, bytes, 0, bytes.length);
     }
 
-    static public int hashCode(byte[] bytes) {
-        return SOECRC32.updateBytesStatic(Init, bytes, 0, bytes.length);
-    }
-
-    static private int updateBytesStatic(int seed, byte[] buffer, int off, int len) {
-        int crc = Init;// seed;
+    private static int updateBytesStatic(int seed, byte[] buffer, int off, int len) {
+        int crc = 0xFFFFFFFF;// seed;
 
         for (int i = off; i < len; i++) {
-            //crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
-            crc = crc_table[buffer[i] ^ (crc >>> 24)] ^ (crc << 8);
+            crc = crctable[buffer[i] ^ (crc >>> 24)] ^ (crc << 8);
         }
         return ~crc;
     }
 
-    public static int[] getCRC32Table() {
-        return crc_table;
+    public static final int makeId(final String id) {
+        final byte[] bytes = id.getBytes();
+        return ((bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]));
+    }
+
+    public static final String getNameForId(final int id) {
+        return new String(ByteBuffer.allocate(4).putInt(id).array());
+    }
+
+    public static final String readNullTerminatedString(final ByteBuffer buffer) {
+        return readNullTerminatedString(buffer, buffer.position());
+    }
+
+    public static final String readNullTerminatedString(final ByteBuffer buffer, int offset) {
+        buffer.position(offset);
+
+        final StringBuilder builder = new StringBuilder();
+        byte b = 0;
+
+        while ((b = buffer.get()) != 0)
+            builder.append((char) b);
+
+        return builder.toString();
+    }
+
+    public static void expand(ByteBuffer buffer, ByteBuffer dst, int compressor, int deflatedSize) {
+        byte[] src = new byte[deflatedSize];
+        buffer.get(src);
+
+        //TODO can we optimize this somehow?
+        if (compressor == 0) {
+            dst.put(src);
+            dst.rewind();
+            return;
+        }
+
+        ZStream zstream = new ZStream();
+        zstream.avail_in = 0;
+        zstream.inflateInit();
+        zstream.next_in = src;
+        zstream.next_in_index = 0;
+        zstream.avail_in = src.length;
+        zstream.next_out = dst.array();
+        zstream.next_out_index = 0;
+        zstream.avail_out = dst.array().length;
+        zstream.inflate(JZlib.Z_FINISH);
+        zstream.inflateEnd();
+
+        dst.rewind();
     }
 }

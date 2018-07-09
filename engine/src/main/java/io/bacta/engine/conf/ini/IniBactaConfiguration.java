@@ -22,28 +22,20 @@ package io.bacta.engine.conf.ini;
 
 import io.bacta.engine.conf.BactaConfiguration;
 
-import javax.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
  * Created by crush on 3/21/14.
  */
 
-@Singleton
+
 public class IniBactaConfiguration implements BactaConfiguration {
     private final IniFile iniFile;
 
-    public IniBactaConfiguration() throws URISyntaxException {
-        InputStream configStream = IniBactaConfiguration.class.getResourceAsStream("/conf/config.ini");
-        if(configStream == null) {
-            configStream = IniBactaConfiguration.class.getResourceAsStream("/config.ini");
-        }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(configStream));
-        iniFile = new IniFile(reader);
+    public IniBactaConfiguration(final Path iniPath) throws FileNotFoundException {
+        iniFile = new IniFile(iniPath.toString());
     }
 
     @Override
@@ -324,5 +316,10 @@ public class IniBactaConfiguration implements BactaConfiguration {
     @Override
     public Collection<Double> getDoubleCollection(String sectionName, String propertyName) {
         return iniFile.getDoubleCollection(sectionName, propertyName);
+    }
+
+    @Override
+    public Path getPath() {
+        return iniFile.getPath();
     }
 }

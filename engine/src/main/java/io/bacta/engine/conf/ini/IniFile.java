@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -608,6 +609,11 @@ public class IniFile implements IniReader {
             collection.add(convertStringToDouble(entry));
 
         return collection;
+    }
+
+    @Override
+    public Path getPath() {
+        return Paths.get(baseDirectory);
     }
 
     public void load(final String filePath) {

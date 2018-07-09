@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = LoginClientId.class)
 @ConnectionRolesAllowed({})
-public class TestGameController implements GameNetworkMessageController<SoeConnection, LoginClientId> {
+public class TestGameController implements GameNetworkMessageController<LoginClientId> {
 
     @Override
     public void handleIncoming(SoeConnection connection, LoginClientId message) throws Exception {

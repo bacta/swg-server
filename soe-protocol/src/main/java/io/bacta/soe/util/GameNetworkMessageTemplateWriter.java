@@ -20,6 +20,7 @@
 
 package io.bacta.soe.util;
 
+import io.bacta.shared.util.SOECRC32;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -69,7 +70,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
     private final String tangibleClassPath;
 
-    @Value("${bacta.network.template.path}")
+    @Value("${io.bacta.network.template.path}")
     private String baseMessagePath;
 
     @Inject
