@@ -1,6 +1,5 @@
 package io.bacta.galaxy.server.controllers;
 
-import io.bacta.login.message.GalaxyEncryptionKey;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;

@@ -1,8 +1,6 @@
 package io.bacta.login.server.rest.controller;
 
-import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.rest.model.CreateGalaxyRequest;
-import io.bacta.login.server.service.GalaxyRegistrationFailedException;
 import io.bacta.login.server.service.GalaxyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +11,11 @@ import java.net.URI;
 
 @Slf4j
 @RestController
-@RequestMapping("/galaxies")
+@RequestMapping("/api/galaxies")
 public final class GalaxiesController {
     private final GalaxyService galaxyService;
 
-    public GalaxiesController(GalaxyService galaxyService) {
+    public GalaxiesController(final GalaxyService galaxyService) {
         this.galaxyService = galaxyService;
     }
 

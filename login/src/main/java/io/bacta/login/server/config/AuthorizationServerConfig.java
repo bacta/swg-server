@@ -1,4 +1,4 @@
-package io.bacta.login.server.auth;
+package io.bacta.login.server.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
 @EnableAuthorizationServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Import(WebSecurityConfig.class)
-public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
@@ -84,7 +84,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() throws NoSuchAlgorithmException {
         final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        final KeyPair keyPair = getKeyPair();
+        final KeyPair keyPair = keyPair();
 
         converter.setKeyPair(keyPair);
 
@@ -108,7 +108,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private static final String KEY_FILENAME = "login.key";
     private static final int KEY_SIZE = 512;
 
-    private KeyPair getKeyPair() throws NoSuchAlgorithmException {
+    @Bean
+    public KeyPair keyPair() throws NoSuchAlgorithmException {
 
 //        final Path keyPath = Paths.get(CONFIG_DIRECTORY, KEY_FILENAME);
 //        final File keyFile = keyPath.toFile();
