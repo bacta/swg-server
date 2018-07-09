@@ -1,9 +1,7 @@
 package io.bacta.login.server.service;
 
-import io.bacta.galaxy.message.GalaxyServerStatus;
-import io.bacta.login.message.GalaxyServerIdAck;
-import io.bacta.login.server.data.GalaxyRecord;
-import io.bacta.shared.GameNetworkMessage;
+import io.bacta.login.server.model.Galaxy;
+import io.bacta.login.server.model.GalaxyStatusUpdate;
 import io.bacta.soe.network.connection.SoeConnection;
 
 import java.util.Collection;
@@ -54,7 +52,7 @@ public interface GalaxyService {
      * @return A collection of galaxies in the cluster. If none exist, then an empty collection is returned. The
      * collection is immutable.
      */
-    Collection<GalaxyRecord> getGalaxies();
+    Collection<Galaxy> getGalaxies();
 
     /**
      * Gets a galaxy by its unique identifier.
@@ -62,7 +60,7 @@ public interface GalaxyService {
      * @param id The id of the galaxy.
      * @return A galaxy record if found. Otherwise, returns null.
      */
-    GalaxyRecord getGalaxyById(int id);
+    Galaxy getGalaxyById(int id);
 
     /**
      * Adds a galaxy to the galaxy cluster. This makes the galaxy "trusted" which means that the login server will
@@ -77,7 +75,7 @@ public interface GalaxyService {
      * @return
      * @throws GalaxyRegistrationFailedException If a galaxy already exists with the same address and port.
      */
-    GalaxyRecord registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException;
+    Galaxy registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException;
 
     /**
      * Removes a galaxy from the galaxy cluster.
@@ -87,26 +85,16 @@ public interface GalaxyService {
     void unregisterGalaxy(int id);
 
     /**
-     * A galaxy is attempting to identify with the login server. If the login server trusts the galaxy that is identifying
-     * then it will respond with a {@link GalaxyServerIdAck} message. If the galaxy is untrusted by the login server, but
-     * {@link io.bacta.login.server.LoginServerProperties#autoGalaxyRegistrationEnabled} is enabled, then the galaxy will
-     * be registered first.
-     *
-     * @param galaxyConnection The connection of the galaxy that is identifying.
-     * @param name             The name of the galaxy that is identifying. This is required in case its an unknown galaxy
-     *                         but auto reg is enabled.
-     * @param timeZone         The timezone offset of the server relative to GMT.
+     * A status update from a galaxy.
+     * @param statusUpdate The update from the galaxy.
      */
-    void identifyGalaxy(SoeConnection galaxyConnection, String name, int timeZone);
+    void handleGalaxyStatusUpdate(GalaxyStatusUpdate statusUpdate);
 
     /**
-     * Allows a galaxy server to update its own status. Although it is possible to change the galaxy with this method - it
-     * is not recommended for galaxy servers to change their name.
-     *
-     * @param galaxyConnection The connection that sent the status update.
-     * @param message          The message containing the details of the status update.
+     * The login server will go out and request the latest status for the galaxy.
+     * @param galaxyId The id of the galaxy from which to request the latest status.
      */
-    void updateGalaxyStatus(SoeConnection galaxyConnection, GalaxyServerStatus message);
+    void requestGalaxyStatusUpdate(int galaxyId);
 
     /**
      * Sends the enumeration of all known galaxies in the cluster, even if they are offline. This takes into account
@@ -142,8 +130,4 @@ public interface GalaxyService {
      * @param connection The connection which will receive the message.
      */
     void sendExtendedClusterStatus(SoeConnection connection);
-
-    void sendToGalaxy(int galaxyId, GameNetworkMessage message);
-
-    void sendToAllGalaxies(GameNetworkMessage message);
 }

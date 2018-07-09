@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server.data;
+package io.bacta.login.server.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

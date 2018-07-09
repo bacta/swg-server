@@ -1,4 +1,4 @@
-package io.bacta.login.server.auth;
+package io.bacta.login.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

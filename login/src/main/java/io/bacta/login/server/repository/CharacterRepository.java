@@ -1,6 +1,5 @@
 package io.bacta.login.server.repository;
 
-import io.bacta.login.server.data.CharacterRecord;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
