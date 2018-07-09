@@ -50,10 +50,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("Bacta Admin Console")
+                .withClient("rest")
                 .authorizedGrantTypes("implicit")
                 //.autoApprove(true)
-                .redirectUris("http://localhost:4200/callback")
+                .redirectUris("http://localhost:4200/authorized")
                 .scopes("all")
 
                 .and()
@@ -83,8 +83,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() throws NoSuchAlgorithmException {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-
+        final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         final KeyPair keyPair = getKeyPair();
 
         converter.setKeyPair(keyPair);
