@@ -1,6 +1,5 @@
 package io.bacta.login.server.service;
 
-import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
@@ -108,8 +107,8 @@ public final class DefaultClientService implements ClientService {
     }
 
     private void sendLoginClientToken(SoeConnection connection, KeyShare.Token token, int bactaId, String username) {
-        final LoginClientToken message = new LoginClientToken(token, bactaId, username);
-        connection.sendMessage(message);
+        //final LoginClientToken message = new LoginClientToken(token, bactaId, username);
+        //connection.sendMessage(message);
     }
 
 //    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {

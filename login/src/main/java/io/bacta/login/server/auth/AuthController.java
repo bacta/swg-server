@@ -2,8 +2,7 @@ package io.bacta.login.server.auth;
 
 import io.bacta.login.server.auth.model.ForgotPasswordRequest;
 import io.bacta.login.server.auth.model.UserRegistrationRequest;
-import io.bacta.login.server.data.BactaAccount;
-import io.bacta.login.server.repository.BactaAccountRepository;
+import io.bacta.login.server.repository.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
     @Autowired
-    private BactaAccountRepository repository;
+    private AccountRepository repository;
 
     @Autowired
     private PasswordEncoder userPasswordEncoder;

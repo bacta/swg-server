@@ -23,7 +23,6 @@ package io.bacta.login.message;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.crypto.KeyShare;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;
@@ -31,19 +30,19 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 @Priority(0x4)
 public final class LoginClientToken extends GameNetworkMessage {
-    private final KeyShare.Token authToken;
+    private final String authToken;
     private final int bactaId;
     private final String username;
 
     public LoginClientToken(final ByteBuffer buffer) {
-        authToken = new KeyShare.Token(buffer);
+        authToken = BufferUtil.getAscii(buffer);
         bactaId = buffer.getInt();
         username = BufferUtil.getAscii(buffer);
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        authToken.writeToBuffer(buffer);
+        BufferUtil.putAscii(buffer, authToken);
         buffer.putInt(bactaId);
         BufferUtil.putAscii(buffer, username);
     }

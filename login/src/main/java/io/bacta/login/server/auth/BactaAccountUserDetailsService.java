@@ -1,8 +1,8 @@
 package io.bacta.login.server.auth;
 
 import com.google.common.collect.Lists;
-import io.bacta.login.server.data.BactaAccount;
-import io.bacta.login.server.repository.BactaAccountRepository;
+import io.bacta.login.server.model.Account;
+import io.bacta.login.server.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public final class BactaAccountUserDetailsService implements UserDetailsService {
     @Autowired
-    private BactaAccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     private PasswordEncoder userPasswordEncoder;
@@ -25,7 +25,7 @@ public final class BactaAccountUserDetailsService implements UserDetailsService 
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         LOGGER.trace("Looking up user with username {}.", username);
 
-        final BactaAccount account = accountRepository.findByUsername(username);
+        final Account account = accountRepository.findByUsername(username);
 
         if (account == null) {
             LOGGER.trace("Did not find user with username {}.", username);

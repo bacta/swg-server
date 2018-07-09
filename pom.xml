@@ -26,6 +26,7 @@
         <spring.security.version>5.0.6.RELEASE</spring.security.version>
         <spring.security.oauth2.version>2.3.3.RELEASE</spring.security.oauth2.version>
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
+        <reactor.spring.version>1.0.1.RELEASE</reactor.spring.version>
     </properties>
 
     <issueManagement>
@@ -327,6 +328,11 @@
                 <groupId>com.typesafe.akka</groupId>
                 <artifactId>akka-cluster-metrics_2.12</artifactId>
                 <version>${akka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectreactor</groupId>
+                <artifactId>reactor-spring</artifactId>
+                <version>${reactor.spring.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -1,7 +1,6 @@
 package io.bacta.login.server.rest.controller;
 
-import io.bacta.login.server.data.BactaAccount;
-import io.bacta.login.server.repository.BactaAccountRepository;
+import io.bacta.login.server.repository.AccountRepository;
 import io.bacta.login.server.rest.model.AccountListEntry;
 import io.bacta.login.server.rest.model.CreateAccountRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +18,13 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
 public final class AccountsController {
-    private final BactaAccountRepository accountRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Inject
-    public AccountsController(BactaAccountRepository accountRepository) {
+    public AccountsController(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
