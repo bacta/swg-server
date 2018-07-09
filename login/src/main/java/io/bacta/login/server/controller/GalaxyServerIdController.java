@@ -13,7 +13,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = GalaxyServerId.class)
 @ConnectionRolesAllowed({})
-public final class GalaxyServerIdController implements GameNetworkMessageController<SoeConnection, GalaxyServerId> {
+public final class GalaxyServerIdController implements GameNetworkMessageController<GalaxyServerId> {
     private final GalaxyService galaxyService;
 
     @Inject

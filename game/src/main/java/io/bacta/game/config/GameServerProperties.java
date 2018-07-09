@@ -36,6 +36,8 @@ public class GameServerProperties {
     private int bindPort;
     private String galaxyName;
     private String requiredClientVersion;
+    private String clientPath;
+    private String clientIniFile;
     private Akka akka;
     private List<ZoneServer> zoneServers;
 

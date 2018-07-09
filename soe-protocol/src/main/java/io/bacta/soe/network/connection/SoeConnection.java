@@ -40,7 +40,11 @@ public interface SoeConnection extends Connection {
 
     int getBactaId();
 
+    void setBactaId(final int id);
+
     String getBactaUsername();
+
+    void setBactaUsername(final String username);
 
     long getCurrentNetworkId();
 

@@ -66,9 +66,7 @@
         <module>soe-protocol</module>
         <module>shared</module>
         <module>login</module>
-        <module>galaxy</module>
-        <module>connection</module>
-        <module>zone</module>
+        <module>game</module>
     </modules>
 
     <build>

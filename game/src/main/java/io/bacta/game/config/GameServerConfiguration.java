@@ -25,6 +25,8 @@ import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.engine.conf.BactaConfiguration;
+import io.bacta.engine.conf.ini.IniBactaConfiguration;
 import io.bacta.game.actor.GalaxySupervisor;
 import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
@@ -39,6 +41,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 
 
 @Configuration
@@ -80,6 +85,11 @@ public class GameServerConfiguration {
                                                                         final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
         return new DefaultGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
+    }
+
+    @Bean
+    public BactaConfiguration getBactaConfiguration() throws FileNotFoundException {
+        return new IniBactaConfiguration(Paths.get(gameServerProperties.getClientPath() + File.separator + gameServerProperties.getClientIniFile()));
     }
 
     @PreDestroy

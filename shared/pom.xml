@@ -21,5 +21,10 @@
             <groupId>com.ocdsoft.bacta</groupId>
             <artifactId>engine</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jzlib</artifactId>
+        </dependency>
     </dependencies>
+
 </project>

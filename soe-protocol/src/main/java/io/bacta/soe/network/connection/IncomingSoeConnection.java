@@ -6,6 +6,7 @@ import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessage;
 import io.bacta.soe.network.message.TerminateReason;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,10 @@ public class IncomingSoeConnection implements SoeConnection {
 
     private final SoeUdpConnection soeUdpConnection;
 
+    @Setter
     private int bactaId;
+
+    @Setter
     private String bactaUsername;
 
     private final List<ConnectionRole> roles;
