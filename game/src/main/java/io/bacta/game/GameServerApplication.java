@@ -35,6 +35,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan({
         "io.bacta.game",
         "io.bacta.soe",
+        "io.bacta.shared",
         "io.bacta.engine"})
 public class GameServerApplication {
     public static void main(String[] args) {

@@ -20,7 +20,7 @@ pipeline {
                 script {
                     try {
                         notifySlack()
-                        sh "mvn clean install verify"
+                        sh "mvn test install verify"
 
                     } catch (e) {
                         currentBuild.result = 'FAILURE'

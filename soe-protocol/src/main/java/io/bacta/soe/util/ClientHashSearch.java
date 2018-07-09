@@ -20,6 +20,7 @@
 
 package io.bacta.soe.util;
 
+import io.bacta.shared.util.SOECRC32;
 import lombok.Getter;
 
 import java.io.*;

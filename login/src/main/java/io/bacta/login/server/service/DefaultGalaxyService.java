@@ -12,6 +12,7 @@ import io.bacta.login.server.data.GalaxyRecord;
 import io.bacta.login.server.mapper.GalaxyRecordMapper;
 import io.bacta.login.server.repository.GalaxyRepository;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public final class DefaultGalaxyService implements GalaxyService {
     private final LoginServerProperties loginServerProperties;
     private final GalaxyRepository galaxyRepository;
     private final ConnectionMap connectionMap;
+    private final KeyShare keyShare;
     /**
      * This is a map of galaxies that are currently "online" meaning that they have identified with the login server
      * via the {@link io.bacta.galaxy.message.GalaxyServerId} message.
@@ -50,10 +52,12 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     public DefaultGalaxyService(LoginServerProperties loginServerProperties,
                                 GalaxyRepository galaxyRepository,
-                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
+                                @Qualifier("LoginConnectionMap") ConnectionMap connectionMap,
+                                KeyShare keyShare) {
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
         this.connectionMap = connectionMap;
+        this.keyShare = keyShare;
 
         this.galaxies = new TIntObjectHashMap<>();
     }
@@ -129,8 +133,8 @@ public final class DefaultGalaxyService implements GalaxyService {
             galaxyConnection.sendMessage(ack);
 
             //Go ahead and send the current key too.
-//            final GalaxyEncryptionKey keyMessage = new GalaxyEncryptionKey(keyShare.getKey(0));
-//            galaxyConnection.sendMessage(keyMessage);
+            final GalaxyEncryptionKey keyMessage = new GalaxyEncryptionKey(keyShare.getKey(0));
+            galaxyConnection.sendMessage(keyMessage);
         }
     }
 
