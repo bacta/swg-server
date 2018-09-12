@@ -264,9 +264,9 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.lukehutch</groupId>
-                <artifactId>fast-classpath-scanner</artifactId>
-                <version>LATEST</version>
+                <groupId>io.github.classgraph</groupId>
+                <artifactId>classgraph</artifactId>
+                <version>4.1.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
