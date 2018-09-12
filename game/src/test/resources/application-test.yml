@@ -28,7 +28,7 @@ endpoints:
 
 io:
   bacta:
-    galaxy:
+    game:
       server:
         bindAddress: "0.0.0.0"
         bindPort: 44460
