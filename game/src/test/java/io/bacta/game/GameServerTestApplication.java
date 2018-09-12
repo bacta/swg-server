@@ -22,20 +22,17 @@ package io.bacta.game;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@EnableConfigurationProperties
 @EnableScheduling
 @ComponentScan({
-        "io.bacta.galaxy",
+        "io.bacta.game",
         "io.bacta.soe",
+        "io.bacta.shared",
         "io.bacta.engine"})
-@PropertySource("classpath:soenetworking.properties")
 public class GameServerTestApplication {
     public static void main(String[] args) {
         new SpringApplicationBuilder(GameServerTestApplication.class)
