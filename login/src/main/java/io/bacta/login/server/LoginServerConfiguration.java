@@ -20,7 +20,6 @@
 
 package io.bacta.login.server;
 
-import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.DefaultConnectionMap;
 import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
@@ -84,11 +83,5 @@ public class LoginServerConfiguration {
     @Bean
     public Executor taskExecutor() {
         return new SimpleAsyncTaskExecutor();
-    }
-
-    @Bean
-    public KeyShare getKeyShare() {
-        LOGGER.info("Creating key share.");
-        return new KeyShare();
     }
 }
