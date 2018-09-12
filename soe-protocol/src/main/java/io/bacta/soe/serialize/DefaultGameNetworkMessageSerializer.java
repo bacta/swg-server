@@ -29,8 +29,9 @@ import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.shared.util.SOECRC32;
 import io.bacta.soe.util.MessageHashUtil;
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.matchprocessor.SubclassMatchProcessor;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,6 +49,7 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,21 +79,15 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
 
     @PostConstruct
     private void loadMessages() {
-
-        final FastClasspathScanner fastClasspathScanner = new FastClasspathScanner("io.bacta");
-        fastClasspathScanner.matchSubclassesOf(
-                GameNetworkMessage.class,
-                (SubclassMatchProcessor<GameNetworkMessage>) this::loadMessageClass
-        ).scan();
-
-        //final Reflections reflections = new Reflections("io.bacta");
-        //final Set<Class<? extends GameNetworkMessage>> subTypes = reflections.getSubTypesOf(GameNetworkMessage.class);
-
-//        String[] messageBeanNames = context.getBeanNamesForType(GameNetworkMessage.class);
-//        for(String messageName : messageBeanNames) {
-//            GameNetworkMessage message = (GameNetworkMessage) context.getBean(messageName);
-//            loadMessageClass(message.getClass());
-//        }
+        try (ScanResult scanResult =
+                     new ClassGraph()
+                             .enableAllInfo()
+                             .whitelistPackages("io.bacta")
+                             .scan()) {
+            ClassInfoList controlClasses = scanResult.getSubclasses("io.bacta.shared.GameNetworkMessage");
+            List<Class<GameNetworkMessage>> controlClassRefs = controlClasses.loadClasses(GameNetworkMessage.class);
+            controlClassRefs.forEach(this::loadMessageClass);
+        }
     }
 
     public void loadMessageClass( Class<? extends GameNetworkMessage> messageClass) {
