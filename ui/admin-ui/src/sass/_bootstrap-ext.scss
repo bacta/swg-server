@@ -1,0 +1,12 @@
+.card-collapse .card a[data-toggle=collapse].expanded i,
+.card-collapse .card a[data-toggle=collapse][aria-expanded=true] i,
+.dropdown-toggle[aria-expanded=true]:after,
+a[data-toggle=collapse][aria-expanded=true] .caret {
+    transform: rotate(180deg);
+}
+
+.bootstrap-switch-label:before,
+.caret,
+.dropdown-toggle:after {
+transition: all .15s ease 0s;
+}
