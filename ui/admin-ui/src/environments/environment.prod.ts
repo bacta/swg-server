@@ -1,5 +1,11 @@
 export const environment = {
   production: true,
-  //Set this to your production endpoint for the api.
-  api: 'localhost:8080/api/'
+  //Set these to your production endpoints for oauth and api.
+  auth: {
+    url: 'http://localhost:8080/oauth',
+    clientId: 'rest'
+  },
+  api: {
+    url: 'http://localhost:8080/api'
+  }
 };
