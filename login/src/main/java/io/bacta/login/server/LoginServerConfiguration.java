@@ -23,7 +23,12 @@ package io.bacta.login.server;
 import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.DefaultConnectionMap;
+import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
+import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
+import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
 import io.bacta.soe.network.udp.SoeTransceiver;
+import io.bacta.soe.serialize.GameNetworkMessageSerializer;
+import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -55,6 +60,15 @@ public class LoginServerConfiguration {
     @Bean(name = "LoginConnectionMap")
     public ConnectionMap getConnectionCache() {
         return new DefaultConnectionMap();
+    }
+
+    @Inject
+    @Bean
+    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
+                                                                        final GameNetworkMessageSerializer gameNetworkMessageSerializer,
+                                                                        final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
+
+        return new DefaultGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
     }
 
     @Inject
