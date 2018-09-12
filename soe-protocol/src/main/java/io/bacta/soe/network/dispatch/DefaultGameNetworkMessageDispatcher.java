@@ -99,12 +99,6 @@ public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDi
                 return;
             }
 
-            if(!controllerData.containsConnectionType(connection)) {
-                LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
-                LOGGER.error("Connection type mismatch: {} expected {}", connection.getClass().getSimpleName(), controllerData.getConnectionClass().getSimpleName());
-                return;
-            }
-
             try {
                 final GameNetworkMessageController controller = controllerData.getController();
                 final GameNetworkMessage incomingMessage = gameNetworkMessageSerializer.readFromBuffer(gameMessageType, buffer);
