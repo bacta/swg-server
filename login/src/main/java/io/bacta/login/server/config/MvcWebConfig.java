@@ -44,10 +44,12 @@ public class MvcWebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
-                .allowedOrigins(
-                        "http://localhost:4200",
-                        "http://*.bacta.io");
+                .allowedMethods("OPTIONS", "HEAD", "GET", "PUT", "POST", "DELETE", "PATCH")
+                .allowedOrigins("*")
+                .allowCredentials(true);
+                //.allowedOrigins(
+//                        "http://localhost:4200",
+//                        "http://*.bacta.io");
     }
 
     @Override

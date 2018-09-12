@@ -1,5 +1,6 @@
 package io.bacta.login.server.service;
 
+import com.sun.tools.javac.util.List;
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
@@ -9,6 +10,12 @@ import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
+import org.springframework.security.oauth2.common.AuthenticationScheme;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -125,15 +132,33 @@ public final class DefaultClientService implements ClientService {
 
     private void establishSessionMode(SoeConnection connection, String username, String password) {
         //Get a session from the auth server for the username/password.
+
+        //TODO: Move this to a "session client" or "session service" class.
+        final String url = "http://localhost:8080/oauth/token";
+
+        final ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
+        resource.setAccessTokenUri(url);
+        resource.setClientId("login");
+        resource.setClientSecret("login");
+        resource.setGrantType("password");
+        resource.setScope(List.of("all"));
+        resource.setUsername(username);
+        resource.setPassword(password);
+        resource.setClientAuthenticationScheme(AuthenticationScheme.header);
+
+        final OAuth2RestOperations restTemplate = new OAuth2RestTemplate(resource, new DefaultOAuth2ClientContext());
+        final OAuth2AccessToken token =  restTemplate.getAccessToken();
+        final String sessionKey = token.getValue();
+
         //Set that session on the client with the SetSessionKey message.
         //final String sessionKey = session.getKey();
-        final String sessionKey = "test1234";
+        //final String sessionKey = "test1234";
         //final int accountId = session.getAccountId();
         final int accountId = 1;
 
         //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
         final SetSessionKey message = new SetSessionKey(sessionKey);
-        connection.sendMessage(message);
+        //connection.sendMessage(message);
 
         //TODO: game bits, subscription bits, is secure? Do we care?
 
