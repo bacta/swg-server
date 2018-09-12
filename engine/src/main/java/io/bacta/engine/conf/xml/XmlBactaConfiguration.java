@@ -25,6 +25,8 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 
 import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 public class XmlBactaConfiguration implements BactaConfiguration {
@@ -317,5 +319,10 @@ public class XmlBactaConfiguration implements BactaConfiguration {
     @Override
     public Collection<Double> getDoubleCollection(String sectionName, String propertyName) {
         return null;
+    }
+
+    @Override
+    public Path getPath() {
+        return Paths.get(config.getBasePath());
     }
 }

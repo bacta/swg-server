@@ -20,6 +20,7 @@
 
 package io.bacta.engine.conf.ini;
 
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
@@ -137,4 +138,6 @@ public interface IniReader {
     double getDoubleLastWithDefault(String sectionName, String propertyName, double defaultValue);
 
     Collection<Double> getDoubleCollection(String sectionName, String propertyName);
+
+    Path getPath();
 }

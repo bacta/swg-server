@@ -20,8 +20,7 @@
 
 package io.bacta.network.message
 
-import io.bacta.engine.conf.ini.IniBactaConfiguration
-import io.bacta.soe.config.DefaultSoeNetworkConfiguration
+import io.bacta.soe.config.SoeNetworkConfiguration
 import io.bacta.soe.network.connection.*
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher
@@ -49,12 +48,13 @@ class MultiPacketSpec extends Specification {
     List<ByteBuffer> processedPackets
 
     @Shared
-    def networkConfig = new DefaultSoeNetworkConfiguration()
+    def networkConfig = new SoeNetworkConfiguration()
 
     def setupSpec() {
 
         networkConfig.setMaxInstandingPackets(400)
         networkConfig.setMaxOutstandingPackets(400)
+        networkConfig.setReliableChannelCount(4)
 
         processedPackets = new ArrayList<ByteBuffer>()
 
@@ -73,7 +73,6 @@ class MultiPacketSpec extends Specification {
         
         setup:
         def multiList = SoeMessageUtil.readTextPacketDump(new File(this.getClass().getResource("/multipackets.txt").getFile()))
-        def bactaConfig = new IniBactaConfiguration()
         def messageSerializer = Mock(GameNetworkMessageSerializer)
 
         def soeUdpConnection = new SoeUdpConnection(null, null, 0, networkConfig, new SoeIncomingMessageProcessor(networkConfig), new SoeOutgoingMessageProcessor(networkConfig, messageSerializer))

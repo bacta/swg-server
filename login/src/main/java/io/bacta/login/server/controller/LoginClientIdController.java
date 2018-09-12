@@ -34,7 +34,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = LoginClientId.class)
 @ConnectionRolesAllowed({})
-public class LoginClientIdController implements GameNetworkMessageController<SoeConnection, LoginClientId> {
+public class LoginClientIdController implements GameNetworkMessageController<LoginClientId> {
     private final ClientService clientService;
 
     @Inject
