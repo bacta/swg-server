@@ -52,7 +52,7 @@ public class ConnectionServerManager extends AbstractActor {
         delegateRef = getContext().actorOf(ext.props(GalaxyDelegate.class), "galaxyDelegate");
         transRef = getContext().actorOf(ext.props(SimpleTransceiverManager.class), "transceiverSupervisor");
         transRef.tell(new SoeTransceiverStart(properties.getName(), properties.getBindAddress(), properties.getBindPort()), getSelf());
-        zoneManagerRef = getContext().actorOf(ext.props(ZoneManager.class), "zoneManager");
+        zoneManagerRef = getContext().actorOf(ext.props(ZoneManagerSupervisor.class), "zoneManager");
         super.preStart();
     }
 

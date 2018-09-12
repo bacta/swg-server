@@ -21,6 +21,10 @@
 package io.bacta.soe.config;
 
 import io.bacta.engine.conf.NetworkConfiguration;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -29,84 +33,87 @@ import java.util.Set;
 /**
  * Created by kyle on 6/28/2017.
  */
-public interface SoeNetworkConfiguration extends NetworkConfiguration {
 
-    default int getHardMaxOutstandingPackets() {
-        return 30000;
+@Component
+@Data
+@PropertySource("classpath:soenetworking.properties")
+@ConfigurationProperties(prefix = "io.bacta.network")
+public class SoeNetworkConfiguration implements NetworkConfiguration {
+    private InetAddress bindAddress;
+    private int bindPort;
+
+    private InetAddress publicAddress;
+    private Collection<String> trustedClients;
+    private boolean compression;
+    private int protocolVersion;
+
+    private boolean logAllNetworkTraffic;
+    private byte crcBytes;
+    private int hashTableSize;
+    private int incomingBufferSize;
+    private int outgoingBufferSize;
+    private int maxConnections;
+    private int maxRawPacketSize;
+    private int maxInstandingPackets;
+    private int maxOutstandingBytes;
+    private int maxOutstandingPackets;
+    private boolean processOnSend;
+    private boolean processIcmpErrors;
+    private int fragmentSize;
+    private int pooledPacketMax;
+    private int pooledPacketSize;
+    private int packetHistoryMax;
+    private int oldestUnacknowledgedTimeout;
+    private int overflowLimit;
+    private int reportStatisticsInterval;
+    private int packetSizeWarnThreshold;
+    private int packetCountWarnThreshold;
+    private int byteCountWarnThreshold;
+    private boolean reportMessages;
+    private int congestionWindowMinimum;
+    private int stallReportDelay;
+    private boolean enableFlushAndConfirmAllData;
+    private boolean fatalOnConnectionClosed;
+    private int logBackloggedPacketThreshold;
+    private boolean useNetworkThread;
+    private int networkThreadSleepTimeMs;
+    private int keepAliveDelay;
+    private int pooledPacketInitial;
+    private int maxDataHoldTime;
+    private int resendDelayAdjust;
+    private int resendDelayPercent;
+    private int networkThreadPriority;
+    private int noDataTimeout;
+    private int reliableOverflowBytes;
+    private int icmpErrorRetryPeriod;
+    private int maxDataHoldSize;
+    private boolean allowPortRemapping;
+    private boolean useTcp;
+    private int tcpMinimumFrame;
+    private boolean reportUdpDisconnects;
+    private boolean reportTcpDisconnects;
+    private boolean logConnectionConstructionDestruction;
+    private boolean logConnectionOpenedClosed;
+    private boolean logConnectionDeferredMessagesWarning;
+    private int logConnectionDeferredMessagesWarningInterval;
+    private int maxTCPRetries;
+    private boolean logSendingTooMuchData;
+    private Set<Integer> reservedPorts;
+    private boolean networkHandlerDispatchThrottle;
+    private int networkHandlerDispatchThrottleTimeMilliseconds;
+    private int networkHandlerDispatchQueueSize;
+
+    public final int getMaxReliablePayload() {
+        return maxRawPacketSize - crcBytes - 5;
     }
 
-    default int getReliableChannelCount() {
-        return 4;
-    }
+    private boolean multiSoeMessages;
+    private boolean multiGameMessages;
+    private int connectionsPerAccount;
+    private String requiredClientVersion;
+    private String metricsPrefix;
+    private String baseMessageClassPath;
 
-    InetAddress getPublicAddress();
-    Collection<String> getTrustedClients();
-    boolean isCompression();
-    int getProtocolVersion();
-    int getMaxReliablePayload();
-
-    int getMaxRawPacketSize();
-    int getNetworkThreadSleepTimeMs();
-    boolean isReportUdpDisconnects();
-    int getResendDelayAdjust();
-    int getResendDelayPercent();
-    int getNoDataTimeout();
-    int getMaxInstandingPackets();
-    int getMaxOutstandingPackets();
-
-    boolean isLogAllNetworkTraffic();
-    byte getCrcBytes();
-    int getHashTableSize();
-    int getIncomingBufferSize();
-    int getOutgoingBufferSize();
-    int getMaxConnections();
-    int getMaxOutstandingBytes();
-    boolean isProcessOnSend();
-    boolean isProcessIcmpErrors();
-    int getFragmentSize();
-    int getPooledPacketMax();
-    int getPooledPacketSize();
-    int getPacketHistoryMax();
-    int getOldestUnacknowledgedTimeout();
-    int getOverflowLimit();
-    int getReportStatisticsInterval();
-    int getPacketSizeWarnThreshold();
-    int getPacketCountWarnThreshold();
-    int getByteCountWarnThreshold();
-    boolean isReportMessages();
-    int getCongestionWindowMinimum();
-    int getStallReportDelay();
-    boolean isEnableFlushAndConfirmAllData();
-    boolean isFatalOnConnectionClosed();
-    int getLogBackloggedPacketThreshold();
-    boolean isUseNetworkThread();
-    int getKeepAliveDelay();
-    int getPooledPacketInitial();
-    int getMaxDataHoldTime();
-    int getNetworkThreadPriority();
-    int getReliableOverflowBytes();
-    int getIcmpErrorRetryPeriod();
-    int getMaxDataHoldSize();
-    boolean isAllowPortRemapping();
-    boolean isUseTcp();
-    int getTcpMinimumFrame();
-    boolean isReportTcpDisconnects();
-    boolean isLogConnectionConstructionDestruction();
-    boolean isLogConnectionOpenedClosed();
-    boolean isLogConnectionDeferredMessagesWarning();
-    int getLogConnectionDeferredMessagesWarningInterval();
-    int getMaxTCPRetries();
-    boolean isLogSendingTooMuchData();
-    Set<Integer> getReservedPorts();
-    boolean isNetworkHandlerDispatchThrottle();
-    int getNetworkHandlerDispatchThrottleTimeMilliseconds();
-    int getNetworkHandlerDispatchQueueSize();
-
-    boolean isMultiGameMessages();
-    boolean isMultiSoeMessages();
-    int getConnectionsPerAccount();
-    String getRequiredClientVersion();
-    String getMetricsPrefix();
-
-    String getBaseMessageClassPath();
+    private int reliableChannelCount;
+    private int hardMaxOutstandingPackets;
 }

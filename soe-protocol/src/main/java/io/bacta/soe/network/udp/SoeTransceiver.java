@@ -81,7 +81,7 @@ public class SoeTransceiver {
     }
 
     @PreDestroy
-    public void stop() throws Exception {
+    public void stop() {
         LOGGER.info("Shutting down SoeTransceiver({})", name);
         udpChannel.stop();
         sendHandler.stop();

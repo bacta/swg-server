@@ -33,6 +33,24 @@
                     </filesets>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <configuration>
+                    <imageName>${project.artifactId}</imageName>
+                    <baseImage>openjdk:8-jre-alpine</baseImage>
+                    <entryPoint>["java", "-jar", "/opt/${project.build.finalName}.jar"]</entryPoint>
+                    <serverId>docker-hub</serverId>
+                    <resources>
+                        <resource>
+                            <targetPath>/opt</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -60,18 +78,6 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_2.12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
-            <artifactId>login</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
-            <artifactId>connection</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ocdsoft.bacta.swg</groupId>
-            <artifactId>zone</artifactId>
         </dependency>
     </dependencies>
 
