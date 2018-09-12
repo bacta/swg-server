@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark site-navbar">
+    <a routerLink="/dashboard" class="navbar-brand">
+        <img src="/assets/img/bacta-dark-sm.png" height="40" />
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" routerLinkActive="active">
+                <a routerLink="/accounts" class="nav-link">Accounts</a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+                <a routerLink="/galaxies" class="nav-link">Galaxies</a>
+            </li>
+        </ul>
+
+        <div class="navbar-nav user-profile">
+            <div class="nav-item" ngbDropdown placement="bottom-right">
+                <a class="nav-link user-profile-link" href="javascript:void(0)" id="navbarUserProfileMenuLink" ngbDropdownToggle>
+                    <span class="fas fa-user-circle"></span>
+                </a>
+                <div ngbDropdownMenu aria-labelledby="navbarUserProfileMenuLink">
+                    <a routerLink="/users/1" class="dropdown-item">User Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a routerLink="/logout" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<router-outlet></router-outlet>

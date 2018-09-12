@@ -1,0 +1,63 @@
+<div class="container-fluid">
+  <div class="row my-4">
+    <div class="col text-right">
+      <button type="button" class="btn btn-primary" (click)="beginRegisteringGalaxy()">Register Galaxy</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <form #registerGalaxyForm (ngSubmit)="onSubmit(registerGalaxyForm)" (reset)="cancelRegisteringGalaxy()">
+        <table class="table table-striped table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col" style="width: 50%">Name</th>
+              <th scope="col" style="width: 20%">Address</th>
+              <th scope="col" style="width: 1%; white-space: nowrap">Status</th>
+              <th scope="col" style="width: 1%; white-space: nowrap">Online Count</th>
+              <th scope="col" style="width: 1%; white-space: nowrap">Actions</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="registeringGalaxy">
+            <tr>
+              <td>
+                <input type="text" id="galaxyNameInput" name="galaxy-name" class="form-control" placeholder="Name">
+              </td>
+              <td>
+                <div class="input-group">
+                  <input type="text" name="galaxy-address" class="form-control" maxlength="64" style="min-width: 60%" placeholder="Address">
+
+                  <div class="input-group-prepend input-group-append">
+                    <span class="input-group-text">:</span>
+                  </div>
+
+                  <input type="text" name="galaxy-port" class="form-control" maxlength="5" placeholder="Port">
+                </div>
+              </td>
+              <td colspan="3">
+                <button type="submit" class="btn btn-primary mr-2">Register</button>
+                <button type="reset" class="btn btn-secondary">Cancel</button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr *ngFor="let galaxy of galaxies">
+              <td class="align-middle">{{galaxy.name}}</td>
+              <td class="align-middle">{{galaxy.address}}:{{galaxy.port}}</td>
+              <td class="align-middle" style="white-space: nowrap">{{GalaxyStatus[galaxy.status]}}</td>
+              <td class="align-middle" style="white-space: nowrap">{{galaxy.onlineCount}}</td>
+              <td class="align-middle" style="white-space: nowrap">
+                <button type="button" class="btn btn-secondary btn-sm ml-1"><span class="fas fa-edit"></span> Edit</button>
+                <button type="button" class="btn btn-danger btn-sm ml-1" (click)="deleteGalaxy(galaxy.id)"><span class="fas fa-trash"></span> Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="!galaxies.length">
+              <td class="text-center" colspan="5">
+                No galaxies have been registered with the login cluster.
+                <a href="javascript:void(0)" (click)="beginRegisteringGalaxy()">Click here</a> to register a new galaxy.</td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>

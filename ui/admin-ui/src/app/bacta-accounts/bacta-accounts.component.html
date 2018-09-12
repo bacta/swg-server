@@ -1,0 +1,8 @@
+<div class="bacta-accounts">
+  <h2>Bacta Accounts</h2>
+
+  <div class="bacta-account" *ngFor="let account of accounts" [class.selected]="account === selectedAccount" (click)="onSelect(account)">
+    {{account.name}}
+    <app-bacta-account [account]="account" *ngIf="account === selectedAccount"></app-bacta-account>
+  </div>
+</div>
