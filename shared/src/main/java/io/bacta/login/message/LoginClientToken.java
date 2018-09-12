@@ -42,7 +42,8 @@ public final class LoginClientToken extends GameNetworkMessage {
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
-        BufferUtil.putAscii(buffer, authToken);
+        //BufferUtil.putAscii(buffer, authToken);
+        BufferUtil.putBinaryString(buffer, authToken);
         buffer.putInt(bactaId);
         BufferUtil.putAscii(buffer, username);
     }
