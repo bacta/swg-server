@@ -1,4 +1,4 @@
-import { environment } from "../../environments/environment.prod";
+import { environment } from "../../environments/environment";
 
 export class UrlHelper {
     /**
@@ -7,7 +7,7 @@ export class UrlHelper {
      * @param endpoint The endpoint to concatenate to the base path.
      * @param base     The base path to use. Defaults to <code>environment.api</code>.
      */
-    static build(endpoint: string, base: string = environment.api): string {
+    static build(endpoint: string, base: string = environment.api.url): string {
         if (!endpoint.startsWith('/'))
             endpoint = '/' + endpoint;
 

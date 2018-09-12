@@ -4,7 +4,13 @@
 
 export const environment = {
   production: false,
-  api: 'localhost:8080/api/'
+  auth: {
+    url: 'http://localhost:8080/oauth',
+    clientId: 'rest'
+  },
+  api: {
+    url: 'http://localhost:8080/api'
+  }
 };
 
 /*
