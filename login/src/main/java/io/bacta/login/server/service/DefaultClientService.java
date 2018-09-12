@@ -1,10 +1,12 @@
 package io.bacta.login.server.service;
 
+import io.bacta.game.message.ErrorMessage;
 import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.message.SetSessionKey;
 import io.bacta.login.server.LoginServerProperties;
+import io.bacta.login.server.session.SessionException;
 import io.bacta.login.server.session.SessionToken;
 import io.bacta.login.server.session.SessionTokenProvider;
 import io.bacta.soe.network.connection.ConnectionRole;
@@ -74,12 +76,13 @@ public final class DefaultClientService implements ClientService {
             connection.addRole(ConnectionRole.AUTHENTICATED);
             connection.addRole(ConnectionRole.LOGIN_CLIENT);
 
-//        } catch (SessionException ex) {
-//            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
-//
-//            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
-//            connection.sendMessage(message);
-//            connection.disconnect();
+        } catch (SessionException ex) {
+            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
+
+            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your credentials were rejected by the server.");
+            connection.sendMessage(message);
+            //connection.disconnect();
+
         } catch (InvalidClientException ex) {
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
                     connection.getSoeUdpConnection().getRemoteAddress(),
@@ -128,7 +131,8 @@ public final class DefaultClientService implements ClientService {
         connection.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeConnection connection, String username, String password) {
+    private void establishSessionMode(SoeConnection connection, String username, String password)
+            throws SessionException {
         final SessionToken sessionToken = sessionTokenProvider.Provide(username, password);
 
         //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
