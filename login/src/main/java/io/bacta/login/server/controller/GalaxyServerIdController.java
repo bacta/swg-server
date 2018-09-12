@@ -23,6 +23,6 @@ public final class GalaxyServerIdController implements GameNetworkMessageControl
 
     @Override
     public void handleIncoming(SoeConnection connection, GalaxyServerId message) throws Exception {
-        this.galaxyService.identifyGalaxy(connection, message.getGalaxyName(), message.getTimeZone());
+        //this.galaxyService.identifyGalaxy(connection, message.getGalaxyName(), message.getTimeZone());
     }
 }

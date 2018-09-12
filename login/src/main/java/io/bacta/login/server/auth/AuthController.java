@@ -2,6 +2,7 @@ package io.bacta.login.server.auth;
 
 import io.bacta.login.server.auth.model.ForgotPasswordRequest;
 import io.bacta.login.server.auth.model.UserRegistrationRequest;
+import io.bacta.login.server.model.Account;
 import io.bacta.login.server.repository.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public RedirectView register(UserRegistrationRequest request) {
-        BactaAccount account = repository.findByUsername(request.getUsername());
+        Account account = repository.findByUsername(request.getUsername());
 
         if (account != null) {
             return new RedirectView("/register?error=username-exists");
@@ -43,7 +44,7 @@ public class AuthController {
         }
 
         final String encodedPassword = userPasswordEncoder.encode(request.getPassword());
-        account = new BactaAccount(request.getUsername(), encodedPassword);
+        account = new Account(request.getUsername(), encodedPassword);
 
         account = repository.save(account);
 

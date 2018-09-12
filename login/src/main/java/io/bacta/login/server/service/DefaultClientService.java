@@ -28,7 +28,7 @@ public final class DefaultClientService implements ClientService {
     public DefaultClientService(LoginServerProperties loginServerProperties,
                                 CharacterService characterService,
                                 GalaxyService galaxyService,
-                                @Value("${bacta.network.shared.requiredClientVersion}") String requiredClientVersion) {
+                                @Value("${io.bacta.network.requiredClientVersion}") String requiredClientVersion) {
 
         this.loginServerProperties = loginServerProperties;
         this.characterService = characterService;
