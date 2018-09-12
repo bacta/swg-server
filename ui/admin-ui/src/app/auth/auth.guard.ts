@@ -22,7 +22,13 @@ export class AuthGuard implements CanActivate {
     private router: Router) { }
 
   canActivate(): Observable<boolean> | boolean {
-    //TODO: More work needed here.
-    return this.authService.isLoggedIn();
+    if (this.authService.isLoggedIn()) {
+      return true;
+    } else {
+      //If they are not logged in, log them out, and redirect them to the login page with a referrer of the current page.
+      let url = this.router.url;
+      this.authService.logout(url);
+      return false;
+    }
   }
 }

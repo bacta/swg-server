@@ -1,16 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '../services/authentication.service';
+import { Component } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
-  selector: 'app-authorized',
-  templateUrl: './authorized.component.html',
-  styleUrls: ['./authorized.component.scss']
+  template: ''
 })
-export class AuthorizedComponent implements OnInit {
-
-  constructor(private authService: AuthenticationService) { }
-
-  ngOnInit() {
-    this.authService.authorized();
+export class AuthorizedComponent {
+  constructor(authService: AuthService) {
+    authService.authorized();
   }
 }
