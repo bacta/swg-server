@@ -3,7 +3,6 @@ package io.bacta.login.server.service;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
 import io.bacta.login.server.LoginServerProperties;
-import io.bacta.shared.crypto.KeyShare;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -106,10 +105,10 @@ public final class DefaultClientService implements ClientService {
         galaxyService.sendClusterStatus(connection);
     }
 
-    private void sendLoginClientToken(SoeConnection connection, KeyShare.Token token, int bactaId, String username) {
+    //private void sendLoginClientToken(SoeConnection connection, KeyShare.Token token, int bactaId, String username) {
         //final LoginClientToken message = new LoginClientToken(token, bactaId, username);
         //connection.sendMessage(message);
-    }
+    //}
 
 //    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
 //        final Session session = sessionService.establish(username, password);
