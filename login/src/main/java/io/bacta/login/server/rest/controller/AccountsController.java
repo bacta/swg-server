@@ -1,5 +1,6 @@
 package io.bacta.login.server.rest.controller;
 
+import io.bacta.login.server.model.Account;
 import io.bacta.login.server.repository.AccountRepository;
 import io.bacta.login.server.rest.model.AccountListEntry;
 import io.bacta.login.server.rest.model.CreateAccountRequest;
@@ -32,7 +33,7 @@ public final class AccountsController {
     public ResponseEntity<?> accounts() {
         final List<AccountListEntry> list = new ArrayList<>();
 
-        for (final BactaAccount account : accountRepository.findAll()) {
+        for (final Account account : accountRepository.findAll()) {
             final AccountListEntry entry = new AccountListEntry(
                     account.getId(),
                     account.getUsername(),
@@ -46,7 +47,7 @@ public final class AccountsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> account(@PathVariable int id) {
-        final Optional<BactaAccount> account = accountRepository.findById(id);
+        final Optional<Account> account = accountRepository.findById(id);
 
         if (!account.isPresent())
             return ResponseEntity.notFound().build();
@@ -71,7 +72,7 @@ public final class AccountsController {
 
         final String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        BactaAccount account = new BactaAccount(request.getUsername(), encodedPassword);
+        Account account = new Account(request.getUsername(), encodedPassword);
         account = accountRepository.save(account);
 
         URI location = ServletUriComponentsBuilder
