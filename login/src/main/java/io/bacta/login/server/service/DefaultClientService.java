@@ -1,7 +1,9 @@
 package io.bacta.login.server.service;
 
+import io.bacta.login.message.LoginClientToken;
 import io.bacta.login.message.LoginIncorrectClientId;
 import io.bacta.login.message.ServerNowEpochTime;
+import io.bacta.login.message.SetSessionKey;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
@@ -37,47 +39,53 @@ public final class DefaultClientService implements ClientService {
 
     @Override
     public void validateClient(SoeConnection connection, String clientVersion, String id, String key) {
-        //Client wants to know the difference in time between the server and client.
-        final int epoch = (int) (System.currentTimeMillis() / 1000);
+        try {
+            //Client wants to know the difference in time between the server and client.
+            final int epoch = (int) (System.currentTimeMillis() / 1000);
 
-        LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getSoeUdpConnection().getRemoteAddress());
+            LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getSoeUdpConnection().getRemoteAddress());
 
-        final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
-        connection.sendMessage(serverEpoch);
+            final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
+            connection.sendMessage(serverEpoch);
 
-//        if (!validateClientVersion(connection, clientVersion))
-//            return;
-//
-//        try {
-//            establishSessionMode(connection, id, key);
+            //Make sure the client version is correct. If not, then we will catch that and send them a message.
+            ensureClientVersion(clientVersion);
 
-        /*
-        switch (loginServerProperties.getSessionMode()) {
-            case ESTABLISH: {
-                establishSessionMode(connection, id, key);
-                break;
+            switch (loginServerProperties.getSessionMode()) {
+                case ESTABLISH:
+                    establishSessionMode(connection, id, key);
+                    break;
+                case VALIDATE:
+                    validateSessionMode(connection, id, key);
+                    break;
+                case DISCOVER:
+                default: {
+                    discoverSessionMode(connection, id, key);
+                    break;
+                }
             }
-            case VALIDATE: {
-                validateSessionMode(connection, key);
-                break;
-            }
-            case DISCOVER:
-            default: {
-                discoverSessionMode(connection, id, key);
-                break;
-            }
-        }
-        */
 
+            //If they got to this point, then they've been authenticated. Set their connection roles.
             connection.addRole(ConnectionRole.AUTHENTICATED);
             connection.addRole(ConnectionRole.LOGIN_CLIENT);
+
 //        } catch (SessionException ex) {
 //            LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
 //
 //            final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your station Id was not valid. Wrong password? Account closed?");
 //            connection.sendMessage(message);
 //            connection.disconnect();
-//        }
+        } catch (InvalidClientException ex) {
+            LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
+                    connection.getSoeUdpConnection().getRemoteAddress(),
+                    ex.getClientVersion(),
+                    requiredClientVersion);
+
+            final String serverApplicationVersion = ""; //SOE only sent this in debug mode. Not sure we care to send it at all.
+
+            final LoginIncorrectClientId incorrectId = new LoginIncorrectClientId(requiredClientVersion, serverApplicationVersion);
+            connection.sendMessage(incorrectId);
+        }
     }
 
 
@@ -94,10 +102,15 @@ public final class DefaultClientService implements ClientService {
         //Encrypt the key before sending to client (not sure why, we've already exposed the sessionId as plain text)
 
         //The token
-        byte[] data = new byte[10];
+        //byte[] data = new byte[10];
 
 //        final KeyShare.Token token = keyShare.cipherToken(data);
 //        sendLoginClientToken(connection, token, bactaId, username);
+
+        //Ignore the above since we are doing session with JWT now.
+        //Using JWT, we don't have to cipher any tokens. We can pass it straight to the game server.
+
+        sendLoginClientToken(connection, sessionKey, bactaId, username);
 
         galaxyService.sendClusterEnum(connection);
         galaxyService.sendDisabledCharacterCreationServers(connection);
@@ -105,45 +118,42 @@ public final class DefaultClientService implements ClientService {
         galaxyService.sendClusterStatus(connection);
     }
 
-    //private void sendLoginClientToken(SoeConnection connection, KeyShare.Token token, int bactaId, String username) {
-        //final LoginClientToken message = new LoginClientToken(token, bactaId, username);
-        //connection.sendMessage(message);
-    //}
+    private void sendLoginClientToken(SoeConnection connection, String token, int bactaId, String username) {
+        final LoginClientToken message = new LoginClientToken(token, bactaId, username);
+        connection.sendMessage(message);
+    }
 
-//    private void establishSessionMode(SoeConnection connection, String username, String password) throws SessionException {
-//        final Session session = sessionService.establish(username, password);
-//
-//        //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
-//        final SetSessionKey message = new SetSessionKey(session.getKey());
-//        connection.sendMessage(message);
-//
-//        clientValidated(connection, session.getAccountId(), username, session.getKey(), false, 0, 0);
-//    }
+    private void establishSessionMode(SoeConnection connection, String username, String password) {
+        //Get a session from the auth server for the username/password.
+        //Set that session on the client with the SetSessionKey message.
+        //final String sessionKey = session.getKey();
+        final String sessionKey = "test1234";
+        //final int accountId = session.getAccountId();
+        final int accountId = 1;
 
-    private void validateSessionMode(SoeConnection connection, String sessionKey) {
-        //final Session session = sessionService.validate(sessionKey);
-        //ErrorMessage err(
+        //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
+        final SetSessionKey message = new SetSessionKey(sessionKey);
+        connection.sendMessage(message);
+
+        //TODO: game bits, subscription bits, is secure? Do we care?
+
+        clientValidated(connection, accountId, username, sessionKey, false, 0, 0);
+    }
+
+    private void validateSessionMode(SoeConnection connection, String id, String sessionKey) {
+        //Communicate with auth server and check if the session key validates, and is issued by the correct issuer, etc.
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     private void discoverSessionMode(SoeConnection connection, String id, String key) {
+        //first try validate key, then try establish if that fails.
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
-    private boolean validateClientVersion(SoeConnection connection, String clientVersion) {
-        //TODO: In the future, we might want to change up how versions are validated.
-        if (loginServerProperties.isValidateClientVersionEnabled()
-                && !requiredClientVersion.equals(clientVersion)) {
-
-            LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
-                    connection.getSoeUdpConnection().getRemoteAddress(),
-                    clientVersion,
-                    requiredClientVersion);
-
-            final LoginIncorrectClientId incorrectId = new LoginIncorrectClientId("", "");
-            connection.sendMessage(incorrectId);
-
-            return false;
+    private void ensureClientVersion(final String clientVersion) throws InvalidClientException {
+        if (loginServerProperties.isValidateClientVersionEnabled() &&
+                !requiredClientVersion.equals(clientVersion)) {
+            throw new InvalidClientException(clientVersion);
         }
-
-        return true;
     }
 }

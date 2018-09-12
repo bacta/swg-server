@@ -46,4 +46,5 @@ public class LoginServerProperties {
     private int populationHeavyThresholdPercent;
     private int populationMediumThresholdPercent;
     private int populationLightThresholdPercent;
+    private LoginSessionMode sessionMode;
 }
