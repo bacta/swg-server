@@ -51,9 +51,9 @@ public final class DefaultCharacterService implements CharacterService {
     @Override
     public void sendEnumerateCharacters(SoeConnection connection, int bactaId) {
 //        final Set<EnumerateCharacterId.CharacterData> characterDataSet = new HashSet<>();
-//        final List<CharacterRecord> accountCharacters = characterRepository.findByBactaId(bactaId);
+//        final List<Character> accountCharacters = characterRepository.findByBactaId(bactaId);
 //
-//        for (final CharacterRecord character : accountCharacters) {
+//        for (final Character character : accountCharacters) {
 //            final EnumerateCharacterId.CharacterData data = new EnumerateCharacterId.CharacterData(
 //                    character.getName(),
 //                    character.getObjectTemplateId(),

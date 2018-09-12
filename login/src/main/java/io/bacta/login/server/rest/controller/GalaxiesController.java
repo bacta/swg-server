@@ -1,6 +1,8 @@
 package io.bacta.login.server.rest.controller;
 
+import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.rest.model.CreateGalaxyRequest;
+import io.bacta.login.server.service.GalaxyRegistrationFailedException;
 import io.bacta.login.server.service.GalaxyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +38,7 @@ public final class GalaxiesController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> galaxy(@PathVariable int id) {
-        final GalaxyRecord galaxy = galaxyService.getGalaxyById(id);
+        final Galaxy galaxy = galaxyService.getGalaxyById(id);
 
         if (galaxy == null)
             return ResponseEntity.notFound().build();
@@ -59,7 +61,7 @@ public final class GalaxiesController {
     public ResponseEntity<?> createGalaxy(@RequestBody CreateGalaxyRequest galaxy) throws GalaxyRegistrationFailedException {
         LOGGER.info("Creating galaxy {}", galaxy.getName());
 
-        final GalaxyRecord createdGalaxy = galaxyService.registerGalaxy(
+        final Galaxy createdGalaxy = galaxyService.registerGalaxy(
                 galaxy.getName(), galaxy.getAddress(), galaxy.getPort(), galaxy.getTimeZone());
 
         URI location = ServletUriComponentsBuilder

@@ -24,6 +24,6 @@ public final class GalaxyServerStatusController implements GameNetworkMessageCon
 
     @Override
     public void handleIncoming(SoeConnection connection, GalaxyServerStatus message) throws Exception {
-        this.galaxyService.updateGalaxyStatus(connection, message);
+        //this.galaxyService.updateGalaxyStatus(connection, message);
     }
 }
