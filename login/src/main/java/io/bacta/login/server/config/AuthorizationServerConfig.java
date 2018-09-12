@@ -58,6 +58,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
                 .and()
 
+                .withClient("login")
+                .authorizedGrantTypes("password")
+                .autoApprove(true)
+                .secret(oauthClientPasswordEncoder.encode("login"))
+                .scopes("all")
+
+                .and()
+
                 //TODO: We will want to add a new client for each galaxy.
                 //This client type is for game->login communication.
                 .withClient("game")

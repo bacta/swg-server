@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyPair;
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity()
@@ -51,10 +50,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://*.bacta.io"));
-        configuration.setAllowedMethods(ImmutableList.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://*.bacta.io"));
+        configuration.addAllowedOrigin("*");
+        configuration.setAllowedMethods(ImmutableList.of("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));
+        //configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));
+        configuration.addAllowedHeader("*");
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -64,15 +65,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-//                .requestMatchers()
-//                    .antMatchers("/api/**")
-//                    .and()
-
                 .authorizeRequests()
                     .antMatchers("/login").permitAll()
                     .antMatchers("/register*/**").permitAll()
                     .antMatchers("/forgot-password").permitAll()
                     .antMatchers("/oauth/token/revokeById/**").permitAll()
+                    .antMatchers("/oauth/token").permitAll()
                     .antMatchers("/tokens/**").permitAll()
                     .antMatchers("/img/**", "/css/**", "/lib/**").permitAll()
                     .anyRequest().authenticated()
