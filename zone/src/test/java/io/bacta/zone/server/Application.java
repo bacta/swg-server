@@ -36,7 +36,7 @@ import org.springframework.context.annotation.PropertySources;
         "io.bacta.engine"})
 @PropertySources({
         @PropertySource("classpath:soenetworking.properties"),
-        @PropertySource("classpath:tatooine.yml")
+        @PropertySource("classpath:application-tatooine.yml")
 
 })
 public class Application {

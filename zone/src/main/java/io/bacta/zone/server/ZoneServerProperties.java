@@ -31,6 +31,13 @@ import java.net.InetAddress;
 @Configuration
 @ConfigurationProperties(prefix = "io.bacta.zone.server")
 public class ZoneServerProperties {
+    private String name;
     private InetAddress bindAddress;
     private int bindPort;
+    private Akka akka;
+
+    @Data
+    public static class Akka {
+        private String config;
+    }
 }

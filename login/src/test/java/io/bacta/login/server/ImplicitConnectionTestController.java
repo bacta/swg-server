@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = ImplicitConnectionTestMessage.class)
 @ConnectionRolesAllowed({})
-public final class ImplicitConnectionTestController implements GameNetworkMessageController<SoeConnection, ImplicitConnectionTestMessage> {
+public final class ImplicitConnectionTestController implements GameNetworkMessageController<ImplicitConnectionTestMessage> {
 
     @Override
     public void handleIncoming(SoeConnection connection, ImplicitConnectionTestMessage message) throws Exception {
