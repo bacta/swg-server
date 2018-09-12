@@ -20,6 +20,8 @@
 
 package io.bacta.login.server;
 
+import io.bacta.login.server.session.OAuth2SessionTokenProvider;
+import io.bacta.login.server.session.SessionTokenProvider;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.DefaultConnectionMap;
 import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
@@ -30,6 +32,7 @@ import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,5 +86,16 @@ public class LoginServerConfiguration {
     @Bean
     public Executor taskExecutor() {
         return new SimpleAsyncTaskExecutor();
+    }
+
+    @Bean
+    public SessionTokenProvider getSessionTokenProvider(
+            @Value("${io.bacta.login.server.oauth.base}") String baseUri,
+            @Value("${io.bacta.login.server.oauth.token}") String tokenUri,
+            @Value("${io.bacta.login.server.oauth.client_id}") String clientId,
+            @Value("${io.bacta.login.server.oauth.client_secret}") String clientSecret) {
+        final String tokenEndpoint = baseUri + tokenUri; //TODO: Make this more robust - take separators into account.
+
+        return new OAuth2SessionTokenProvider(tokenEndpoint, clientId, clientSecret);
     }
 }
