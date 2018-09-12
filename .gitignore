@@ -32,3 +32,6 @@ build.properties
 
 # H2 DB files
 *.db
+
+#hide npm modules
+node_modules/
