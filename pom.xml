@@ -70,6 +70,7 @@
         <module>shared</module>
         <module>login</module>
         <module>game</module>
+        <module>ui</module>
     </modules>
 
     <build>
