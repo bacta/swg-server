@@ -21,10 +21,8 @@ public class OAuth2SessionTokenProvider implements SessionTokenProvider {
 
     @Override
     public SessionToken Provide(String username, String password) {
-        final String url = "http://localhost:8080/oauth/token";
-
         final ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
-        resource.setAccessTokenUri(url);
+        resource.setAccessTokenUri(tokenUri);
         resource.setClientId(clientId);
         resource.setClientSecret(clientSecret);
         resource.setGrantType("password");
