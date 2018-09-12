@@ -29,7 +29,7 @@ public class GameDataSupervisor extends AbstractActor {
     @Override
     public void preStart() throws Exception {
 
-        log.info("Object Supervisor starting");
+        log.info("Game Data Supervisor starting");
         super.preStart();
         getContext().actorOf(ext.props(TreeFileSupervisor.class), "treFile");
     }
