@@ -7,12 +7,14 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.galaxy.message.GalaxyServerOnline;
 import io.bacta.game.config.GameServerProperties;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.net.InetSocketAddress;
 import java.util.Optional;
 
 @Component
@@ -66,7 +68,7 @@ public class GalaxySupervisor extends AbstractActor {
                     }
                     if(mUp.member().hasRole(MemberConstants.LOGIN_SERVER)) {
                         ActorRef login = getContext().actorFor("akka.tcp://Galaxy@0.0.0.0:2561/user/login");
-                        login.tell("Hey there Login, it's Game Server", getSelf());
+                        login.tell(new GalaxyServerOnline(new InetSocketAddress(properties.getBindAddress(), properties.getBindPort())), getSelf());
                     }
                 })
                 .match(ClusterEvent.UnreachableMember.class, mDown -> {
