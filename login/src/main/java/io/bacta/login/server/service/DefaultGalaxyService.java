@@ -8,7 +8,6 @@ import io.bacta.login.message.LoginClusterStatus;
 import io.bacta.login.message.LoginClusterStatusEx;
 import io.bacta.login.message.LoginEnumCluster;
 import io.bacta.login.server.LoginServerProperties;
-import io.bacta.login.server.model.ConnectionServerEntry;
 import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyStatusUpdate;
 import io.bacta.login.server.repository.GalaxyRepository;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -43,7 +41,7 @@ public final class DefaultGalaxyService implements GalaxyService {
      */
     private final GalaxyRepository galaxyRepository;
     /**
-     * Galaxies here have their transient data set.
+     * Galaxies here have their transient data set and continuously updated.
      */
     private final TIntObjectMap<Galaxy> loadedGalaxies;
 
@@ -54,7 +52,6 @@ public final class DefaultGalaxyService implements GalaxyService {
         this.galaxyRepository = galaxyRepository;
         this.loadedGalaxies = new TIntObjectHashMap<>(INITIAL_GALAXIES_CAPACITY);
     }
-
 
     @Override
     public Collection<Galaxy> getGalaxies() {
@@ -104,21 +101,23 @@ public final class DefaultGalaxyService implements GalaxyService {
     @Override
     public void requestGalaxyStatusUpdate(int galaxyId) {
         final Galaxy galaxy = getGalaxyById(galaxyId);
-
-        //final WebClient webClient = WebClient.builder();
     }
 
     /**
      * Loads the galaxy into the loadedGalaxy map, and queues up a request to fetch its latest status information.
+     *
      * @param galaxyId The galaxy id of the galaxy to load.
      */
     private void loadGalaxy(int galaxyId) {
         final Galaxy galaxy = galaxyRepository.findById(galaxyId).get();
         this.loadedGalaxies.put(galaxyId, galaxy);
+
+        //Send message to galaxy to get its status info.
     }
 
     /**
      * Unloads a galaxy from the loadedGalaxy map.
+     *
      * @param galaxyId The galaxy id of the galaxy to unload.
      */
     private void unloadGalaxy(int galaxyId) {
@@ -180,27 +179,34 @@ public final class DefaultGalaxyService implements GalaxyService {
         final Set<LoginClusterStatus.ClusterData> clusterData = new TreeSet<>();
 
         for (final Galaxy galaxy : galaxies) {
-            final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
+            //final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
 
             //Only send status for galaxies that have identified and have at least one connection server.
-            if (galaxy.isIdentified()
-                    && !connectionServers.isEmpty()
-                    && (privateClient || !galaxy.isSecret())) {
+            if (/*galaxy.isIdentified()*/
+                //!connectionServers.isEmpty()
+                    (privateClient || !galaxy.isSecret())) {
 
                 //This will use the configured comparator to select the connection server for this connection to use.
-                final ConnectionServerEntry connectionServer = connectionServers.first();
+                //final ConnectionServerEntry connectionServer = connectionServers.first();
 
                 final LoginClusterStatus.ClusterData data = new LoginClusterStatus.ClusterData(
                         galaxy.getId(),
-                        connectionServer.getClientServiceAddress(),
-                        connectionServer.getClientServicePortPublic(),
-                        connectionServer.getPingPort(),
+                        //connectionServer.getClientServiceAddress(),
+                        //connectionServer.getClientServicePortPublic(),
+                        //connectionServer.getPingPort(),
+
+                        //TODO: Work this out when we start sending status from galaxy on identify.
+                        galaxy.getAddress(),
+                        (short) galaxy.getPort(),
+                        (short) 44464,
+
                         privateClient ? galaxy.getOnlinePlayers() : -1,
                         determineGalaxyPopulationStatus(galaxy),
                         galaxy.getMaxCharactersPerAccount(),
                         galaxy.getTimeZone(),
                         determineGalaxyStatus(galaxy, freeTrialAccount, privateClient),
-                        true, //TODO: Discuss what should make a galaxy recommended or not.
+
+                        false, //TODO: Discuss what should make a galaxy recommended or not.
                         //(record.isNotRecommendedCentral() || record.isNotRecommendedDatabase()),
                         galaxy.getOnlinePlayerLimit(),
                         galaxy.getOnlineFreeTrialLimit()
@@ -209,8 +215,12 @@ public final class DefaultGalaxyService implements GalaxyService {
                 LOGGER.debug("Sending cluster status for {}({}) with connection server {}:{}. Online players {}/{} with status {}.",
                         galaxy.getName(),
                         galaxy.getId(),
-                        connectionServer.getClientServiceAddress(),
-                        connectionServer.getClientServicePortPublic(),
+
+                        galaxy.getAddress(),
+                        galaxy.getPort(),
+                        //connectionServer.getClientServiceAddress(),
+                        //connectionServer.getClientServicePortPublic(),
+
                         galaxy.getOnlinePlayers(),
                         galaxy.getOnlinePlayerLimit(),
                         data.getStatus());
@@ -254,6 +264,10 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     private LoginClusterStatus.ClusterData.PopulationStatus determineGalaxyPopulationStatus(Galaxy galaxy) {
         final LoginClusterStatus.ClusterData.PopulationStatus populationStatus;
+
+        //If the limit is 0 or less, then the server is full by default.
+        if (galaxy.getOnlinePlayerLimit() <= 0)
+            return LoginClusterStatus.ClusterData.PopulationStatus.FULL;
 
         final int percentFull = galaxy.getOnlinePlayers() * 100 / galaxy.getOnlinePlayerLimit();
 
@@ -308,17 +322,18 @@ public final class DefaultGalaxyService implements GalaxyService {
         }
 
         return status;
-        //return LoginClusterStatus.ClusterData.Status.UP;
     }
 
 
     /**
-     * This method runs on a schedule and looks for new galaxies that aren't in memory. If a new galaxy was somehow
-     * added directly to the database, then it would get loaded this way. At startup, it will load all trusted
-     * galaxies and attempt to poll them for their status.
+     * This method runs on a schedule and looks for new galaxies in the data store that aren't already in memory. If a
+     * new galaxy was somehow added directly to the data store, then it would get loaded this way. At startup, the server
+     * will load all trusted galaxies and attempt to poll them for their status.
      */
     @Scheduled(initialDelay = 0, fixedRate = GALAXY_LIST_STATUS_POLL_INTERVAL)
     private void refreshGalaxyServerList() {
+        LOGGER.trace("Refreshing galaxy server list.");
+
         final Iterable<Galaxy> records = galaxyRepository.findAll();
 
         for (final Galaxy record : records) {
