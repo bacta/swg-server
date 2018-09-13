@@ -1,14 +1,14 @@
-package io.bacta.game.actor;
+package io.bacta.login.server.actor;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.config.GameServerProperties;
+import io.bacta.login.server.LoginServerProperties;
 import io.bacta.shared.MemberConstants;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,33 +17,32 @@ import java.util.Optional;
 
 @Component
 @Scope("prototype")
-public class GalaxySupervisor extends AbstractActor {
+public class LoginSupervisor extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxySupervisor.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), LoginSupervisor.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final SpringAkkaExtension ext;
-    private final GameServerProperties properties;
+    private final LoginServerProperties properties;
+    private final ApplicationContext context;
 
     @Inject
-    public GalaxySupervisor(final SpringAkkaExtension ext, final GameServerProperties properties) {
+    public LoginSupervisor(final SpringAkkaExtension ext, final LoginServerProperties properties, final ApplicationContext context) {
         this.ext = ext;
         this.properties = properties;
+        this.context = context;
     }
 
     @Override
     public void preStart() throws Exception {
 
-        log.info("Galaxy starting");
+        log.info("Login starting");
         cluster.subscribe(getSelf(),
                 ClusterEvent.initialStateAsEvents(),
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
         super.preStart();
-        getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
-        getContext().actorOf(ext.props(ObjectSupervisor.class), "object");
-        getContext().actorOf(ext.props(ZoneSupervisor.class), "zone");
-        getContext().actorOf(ext.props(ConnectionSupervisor.class), "connection");
+       // getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
     }
 
     @Override
@@ -64,10 +63,6 @@ public class GalaxySupervisor extends AbstractActor {
                     if(mUp.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
 
                     }
-                    if(mUp.member().hasRole(MemberConstants.LOGIN_SERVER)) {
-                        ActorRef login = getContext().actorFor("akka.tcp://Galaxy@0.0.0.0:2561/user/login");
-                        login.tell("Hey there Login, it's Game Server", getSelf());
-                    }
                 })
                 .match(ClusterEvent.UnreachableMember.class, mDown -> {
                     log.info("Member is Unreachable: {} with Roles {}", mDown.member(), mDown.member().getRoles());
@@ -81,7 +76,6 @@ public class GalaxySupervisor extends AbstractActor {
 
                     }
                 })
-
                 .match(String.class, s -> {
                     log.info("Received String message: {}", s);
                 })

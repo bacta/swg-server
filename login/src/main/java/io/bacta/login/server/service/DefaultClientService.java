@@ -11,6 +11,7 @@ import io.bacta.login.server.session.SessionToken;
 import io.bacta.login.server.session.SessionTokenProvider;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -74,14 +75,13 @@ public final class DefaultClientService implements ClientService {
 
             //If they got to this point, then they've been authenticated. Set their connection roles.
             connection.addRole(ConnectionRole.AUTHENTICATED);
-            connection.addRole(ConnectionRole.LOGIN_CLIENT);
 
         } catch (SessionException ex) {
             LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
 
             final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your credentials were rejected by the server.");
             connection.sendMessage(message);
-            //connection.disconnect(false);
+            connection.disconnect(TerminateReason.REFUSED, false);
 
         } catch (InvalidClientException ex) {
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",

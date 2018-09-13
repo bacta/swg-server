@@ -206,11 +206,11 @@ public final class SoeUdpConnection implements UdpConnection, SoeUdpConnectionMB
     }
 
     public void terminate(TerminateReason reason) {
-        terminate(reason, false);
+        terminate(reason, true);
     }
 
-    public void terminate(TerminateReason reason, boolean silent) {
-        if(!silent) {
+    public void terminate(TerminateReason reason, boolean sendTerminate) {
+        if(sendTerminate) {
             Terminate terminate = new Terminate(this.getId(), reason);
             sendMessage(terminate);
         }
