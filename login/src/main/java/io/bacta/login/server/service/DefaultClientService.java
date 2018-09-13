@@ -81,7 +81,7 @@ public final class DefaultClientService implements ClientService {
 
             final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your credentials were rejected by the server.");
             connection.sendMessage(message);
-            //connection.disconnect();
+            //connection.disconnect(false);
 
         } catch (InvalidClientException ex) {
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
