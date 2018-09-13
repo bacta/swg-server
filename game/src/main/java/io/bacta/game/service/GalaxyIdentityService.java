@@ -1,6 +1,5 @@
 package io.bacta.game.service;
 
-import io.bacta.galaxy.message.GalaxyServerId;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +28,7 @@ public final class GalaxyIdentityService {
     public void sendGalaxyServerId(SoeConnection connection) {
         LOGGER.info("Sending GalaxyServerId message to login server.");
 
-        final GalaxyServerId msg = new GalaxyServerId(galaxyName, timeZoneOffset.getTotalSeconds(), networkVersion);
-        connection.sendMessage(msg);
+        //final GalaxyServerId msg = new GalaxyServerId(galaxyName, timeZoneOffset.getTotalSeconds(), networkVersion);
+        //connection.sendMessage(msg);
     }
 }
