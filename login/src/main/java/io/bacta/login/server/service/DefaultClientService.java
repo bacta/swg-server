@@ -122,8 +122,10 @@ public final class DefaultClientService implements ClientService {
 
         galaxyService.sendClusterEnum(connection);
         galaxyService.sendDisabledCharacterCreationServers(connection);
-        characterService.sendEnumerateCharacters(connection, bactaId);
         galaxyService.sendClusterStatus(connection);
+        galaxyService.sendExtendedClusterStatus(connection);
+
+        characterService.sendEnumerateCharacters(connection, bactaId);
     }
 
     private void sendLoginClientToken(SoeConnection connection, String token, int bactaId, String username) {
