@@ -6,6 +6,7 @@ import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.galaxy.message.GalaxyServerOnline;
 import io.bacta.game.config.GameServerProperties;
@@ -67,7 +68,7 @@ public class GalaxySupervisor extends AbstractActor {
 
                     }
                     if(mUp.member().hasRole(MemberConstants.LOGIN_SERVER)) {
-                        ActorRef login = getContext().actorFor("akka.tcp://Galaxy@0.0.0.0:2561/user/login");
+                        ActorRef login = getContext().actorFor("akka.tcp://Galaxy@0.0.0.0:2561/user/" + ActorConstants.LOGIN_SUPERVISOR);
                         login.tell(new GalaxyServerOnline(new InetSocketAddress(properties.getBindAddress(), properties.getBindPort())), getSelf());
                     }
                 })
