@@ -117,12 +117,10 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
     @Override
     public void broadcast(GameNetworkMessage message) {
         connectionMap.forEach((key, connection) -> {
-            if (!connection.isPrivileged()) {
-                if(LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Broadcasting message to {}", key);
-                }
-                connection.sendMessage(message);
+            if(LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Broadcasting message to {}", key);
             }
+            connection.sendMessage(message);
         });
     }
 

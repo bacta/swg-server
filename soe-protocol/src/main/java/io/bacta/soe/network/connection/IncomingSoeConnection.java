@@ -44,9 +44,6 @@ public class IncomingSoeConnection implements SoeConnection {
     @Override
     public void addRole(ConnectionRole role) {
         roles.add(role);
-        if(role != ConnectionRole.AUTHENTICATED && role != ConnectionRole.UNAUTHENTICATED) {
-            roles.add(ConnectionRole.PRIVILEGED);
-        }
     }
 
     @Override
@@ -62,11 +59,6 @@ public class IncomingSoeConnection implements SoeConnection {
     @Override
     public boolean isGod() {
         return hasRole(ConnectionRole.GOD);
-    }
-
-    @Override
-    public boolean isPrivileged() {
-        return hasRole(ConnectionRole.PRIVILEGED);
     }
 
     /**
@@ -103,8 +95,13 @@ public class IncomingSoeConnection implements SoeConnection {
     }
 
     @Override
-    public void disconnect() {
-        soeUdpConnection.terminate(TerminateReason.NONE);
+    public void disconnect(TerminateReason reason) {
+        soeUdpConnection.terminate(reason, true);
+    }
+
+    @Override
+    public void disconnect(TerminateReason reason, boolean sendTerminate) {
+        soeUdpConnection.terminate(reason, sendTerminate);
     }
 
     @Override

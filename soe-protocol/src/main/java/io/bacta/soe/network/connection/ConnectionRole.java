@@ -27,8 +27,5 @@ public enum ConnectionRole {
     WHITELISTED,
     AUTHENTICATED,
     UNAUTHENTICATED,
-    GOD,
-    GAME_SERVER,
-    LOGIN_CLIENT,
-    PRIVILEGED;
+    GOD;
 }

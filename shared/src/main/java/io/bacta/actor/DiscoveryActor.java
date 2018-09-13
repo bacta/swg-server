@@ -1,4 +1,4 @@
-package io.bacta.game.actor;
+package io.bacta.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -7,43 +7,32 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.config.GameServerProperties;
 import io.bacta.shared.MemberConstants;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
-@Component
-@Scope("prototype")
-public class GalaxySupervisor extends AbstractActor {
+public class DiscoveryActor extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxySupervisor.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), DiscoveryActor.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final SpringAkkaExtension ext;
-    private final GameServerProperties properties;
 
     @Inject
-    public GalaxySupervisor(final SpringAkkaExtension ext, final GameServerProperties properties) {
+    public DiscoveryActor(final SpringAkkaExtension ext) {
         this.ext = ext;
-        this.properties = properties;
     }
 
     @Override
     public void preStart() throws Exception {
 
-        log.info("Galaxy starting");
+        log.info("Discovery starting");
         cluster.subscribe(getSelf(),
                 ClusterEvent.initialStateAsEvents(),
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
         super.preStart();
-        getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
-        getContext().actorOf(ext.props(ObjectSupervisor.class), "object");
-        getContext().actorOf(ext.props(ZoneSupervisor.class), "zone");
-        getContext().actorOf(ext.props(ConnectionSupervisor.class), "connection");
     }
 
     @Override
@@ -57,7 +46,7 @@ public class GalaxySupervisor extends AbstractActor {
     }
 
     @Override
-    public Receive createReceive() {
+    public AbstractActor.Receive createReceive() {
         return receiveBuilder()
                 .match(ClusterEvent.MemberUp.class, mUp -> {
                     log.info("Member is Up: {} with Roles {}", mUp.member(), mUp.member().getRoles());
