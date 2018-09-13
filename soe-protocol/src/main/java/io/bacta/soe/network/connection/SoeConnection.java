@@ -5,6 +5,7 @@ import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessage;
+import io.bacta.soe.network.message.TerminateReason;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -18,8 +19,6 @@ public interface SoeConnection extends Connection {
 
     boolean isGod();
 
-    boolean isPrivileged();
-
     void sendMessage(SoeMessage message);
 
     void sendMessage(GameNetworkMessage message);
@@ -30,7 +29,9 @@ public interface SoeConnection extends Connection {
 
     void connect(Consumer<SoeUdpConnection> connectCallback);
 
-    void disconnect();
+    void disconnect(TerminateReason reason);
+
+    void disconnect(TerminateReason reason, boolean sendTerminate);
 
     boolean isConnected();
 

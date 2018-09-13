@@ -47,4 +47,10 @@ public class LoginServerProperties {
     private int populationMediumThresholdPercent;
     private int populationLightThresholdPercent;
     private LoginSessionMode sessionMode;
+    private Akka akka;
+
+    @Data
+    public static class Akka {
+        private String config;
+    }
 }

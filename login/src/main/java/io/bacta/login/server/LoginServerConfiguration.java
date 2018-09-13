@@ -20,6 +20,13 @@
 
 package io.bacta.login.server;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import io.bacta.actor.ActorConstants;
+import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.login.server.actor.LoginSupervisor;
 import io.bacta.login.server.session.OAuth2SessionTokenProvider;
 import io.bacta.login.server.session.SessionTokenProvider;
 import io.bacta.soe.network.connection.ConnectionMap;
@@ -34,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -53,11 +61,32 @@ import java.util.concurrent.Executor;
 public class LoginServerConfiguration {
 
     private final LoginServerProperties loginServerProperties;
+    private final SpringAkkaExtension ext;
+    private ActorSystem actorSystem;
+    private ActorRef loginSupervisor;
 
     @Inject
-    public LoginServerConfiguration(final LoginServerProperties loginServerProperties) {
+    public LoginServerConfiguration(final LoginServerProperties loginServerProperties, final SpringAkkaExtension ext) {
         this.loginServerProperties = loginServerProperties;
+        this.ext = ext;
     }
+
+    @Inject
+    @Bean
+    public ActorSystem getActorSystem(final ApplicationContext context){
+        // Create an Akka system
+        actorSystem = ActorSystem.create("Galaxy", akkaConfiguration());
+        ext.initialize(context);
+
+        // Start root actor
+        loginSupervisor = actorSystem.actorOf(ext.props(LoginSupervisor.class), ActorConstants.LOGIN_SUPERVISOR);
+        return actorSystem;
+    }
+
+    private Config akkaConfiguration() {
+        return ConfigFactory.load(loginServerProperties.getAkka().getConfig());
+    }
+
 
     @Bean(name = "LoginConnectionMap")
     public ConnectionMap getConnectionCache() {
