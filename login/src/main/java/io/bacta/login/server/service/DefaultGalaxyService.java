@@ -35,10 +35,16 @@ import java.util.stream.Collectors;
 @Service
 public final class DefaultGalaxyService implements GalaxyService {
     private static final long GALAXY_LIST_STATUS_POLL_INTERVAL = 10000; //10 seconds
+    private static final int INITIAL_GALAXIES_CAPACITY = 100;
 
     private final LoginServerProperties loginServerProperties;
+    /**
+     * Repository for saving and reading galaxies to data store.
+     */
     private final GalaxyRepository galaxyRepository;
-
+    /**
+     * Galaxies here have their transient data set.
+     */
     private final TIntObjectMap<Galaxy> loadedGalaxies;
 
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
@@ -46,9 +52,7 @@ public final class DefaultGalaxyService implements GalaxyService {
 
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
-
-        //TODO: At what capacity should this be initialized?
-        this.loadedGalaxies = new TIntObjectHashMap<>(100);
+        this.loadedGalaxies = new TIntObjectHashMap<>(INITIAL_GALAXIES_CAPACITY);
     }
 
 
@@ -69,20 +73,20 @@ public final class DefaultGalaxyService implements GalaxyService {
     @Override
     public Galaxy registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException {
         //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
-        Galaxy existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
+        final Galaxy existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
 
         if (existingGalaxy != null) {
             LOGGER.error("Attempted to register galaxy, but found galaxy with same address and port already registered.");
             throw new GalaxyRegistrationFailedException(name, address, port, "A galaxy with this address and port is already registered.");
         }
 
-        Galaxy galaxy = new Galaxy(name, address, port, timeZone);
-        galaxy = galaxyRepository.save(galaxy);
+        Galaxy registeredGalaxy = new Galaxy(name, address, port, timeZone);
+        registeredGalaxy = galaxyRepository.save(registeredGalaxy);
 
         //Attempt to load the galaxy.
-        loadGalaxy(galaxy.getId());
+        loadGalaxy(registeredGalaxy.getId());
 
-        return galaxy;
+        return registeredGalaxy;
     }
 
     @Override
@@ -109,7 +113,8 @@ public final class DefaultGalaxyService implements GalaxyService {
      * @param galaxyId The galaxy id of the galaxy to load.
      */
     private void loadGalaxy(int galaxyId) {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        final Galaxy galaxy = galaxyRepository.findById(galaxyId).get();
+        this.loadedGalaxies.put(galaxyId, galaxy);
     }
 
     /**
