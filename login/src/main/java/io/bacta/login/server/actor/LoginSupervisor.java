@@ -6,6 +6,8 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.galaxy.message.GalaxyServerOnline;
+import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.ApplicationContext;
@@ -58,6 +60,12 @@ public class LoginSupervisor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+                .match(GalaxyServerOnline.class, msg -> {
+                    log.info("Galaxy server signaled that it is online with address {}", msg.getAddress().toString());
+                })
+                .match(GalaxyServerStatus.class, msg -> {
+                    log.info("Galaxy server sent its latest status.");
+                })
                 .match(ClusterEvent.MemberUp.class, mUp -> {
                     log.info("Member is Up: {} with Roles {}", mUp.member(), mUp.member().getRoles());
                     if(mUp.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
