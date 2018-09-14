@@ -67,6 +67,7 @@ public class GalaxySupervisor extends AbstractActor {
                     if(mUp.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
 
                     }
+                    
                     if(mUp.member().hasRole(MemberConstants.LOGIN_SERVER)) {
                         ActorRef login = getContext().actorFor("akka.tcp://Galaxy@0.0.0.0:2561/user/" + ActorConstants.LOGIN_SUPERVISOR);
                         login.tell(new GalaxyServerOnline(new InetSocketAddress(properties.getBindAddress(), properties.getBindPort())), getSelf());
