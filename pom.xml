@@ -28,6 +28,7 @@
         <spring.security.oauth2.version>2.3.3.RELEASE</spring.security.oauth2.version>
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
         <reactor.spring.version>1.0.1.RELEASE</reactor.spring.version>
+        <bouncycastle.pkix.version>1.60</bouncycastle.pkix.version>
     </properties>
 
     <issueManagement>
@@ -340,6 +341,11 @@
                 <groupId>org.projectreactor</groupId>
                 <artifactId>reactor-spring</artifactId>
                 <version>${reactor.spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.pkix.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
