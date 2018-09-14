@@ -32,6 +32,16 @@ public class Galaxy {
     @Column(nullable = false)
     private int port;
     /**
+     * The private key for decrypting communication from the galaxy.
+     */
+    @Column(nullable = false, length = 512)
+    private byte[] privateKey;
+    /**
+     * The public key for encrypting communications from the galaxy.
+     */
+    @Column(nullable = false, length = 512)
+    private byte[] publicKey;
+    /**
      * The timezone within which this galaxy is located. This is the offset from GMT.
      */
     private int timeZone;
@@ -60,7 +70,7 @@ public class Galaxy {
     /**
      * Whether or not to allow character creation for any accounts.
      */
-    private boolean characterCreationEnabled;
+    private boolean characterCreationDisabled;
 
     private String branch;
     private String networkVersion;
@@ -108,10 +118,12 @@ public class Galaxy {
      */
     private transient int onlineFreeTrialPlayers;
 
-    public Galaxy(final String name, final String address, int port, int timeZone) {
+    public Galaxy(final String name, final String address, int port, int timeZone, byte[] privateKey, byte[] publicKey) {
         this.name = name;
         this.address = address;
         this.port = port;
         this.timeZone = timeZone;
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 }
