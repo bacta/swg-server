@@ -1,9 +1,12 @@
 package io.bacta.login.server.service;
 
 import io.bacta.login.server.model.Galaxy;
+import io.bacta.login.server.model.GalaxyPopulationStatus;
+import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.model.GalaxyStatusUpdate;
 import io.bacta.soe.network.connection.SoeConnection;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
@@ -57,10 +60,29 @@ public interface GalaxyService {
     /**
      * Gets a galaxy by its unique identifier.
      *
-     * @param id The id of the galaxy.
-     * @return A galaxy record if found. Otherwise, returns null.
+     * @param name The name of the galaxy.
+     * @return Returns the galaxy with the given name.
+     * @throws GalaxyNotFoundException If the galaxy was not found.
      */
-    Galaxy getGalaxyById(int id);
+    Galaxy getGalaxy(String name) throws GalaxyNotFoundException;
+
+    /**
+     * Dynamically calculates the availability status based on the current data for the galaxy.
+     *
+     * @param galaxy             The galaxy for which to determine status.
+     * @param accountIsFreeTrial If the account is a free trial account.
+     * @param clientIsPrivate    If the client being used is private (internal).
+     * @return A status enum value.
+     */
+    GalaxyStatus determineGalaxyStatus(Galaxy galaxy, boolean accountIsFreeTrial, boolean clientIsPrivate);
+
+    /**
+     * Dynamically calculates the population status based on the current data for the galaxy.
+     *
+     * @param galaxy The galaxy for which to determine population status.
+     * @return A population status enum value.
+     */
+    GalaxyPopulationStatus determineGalaxyPopulationStatus(Galaxy galaxy);
 
     /**
      * Adds a galaxy to the galaxy cluster. This makes the galaxy "trusted" which means that the login server will
@@ -73,28 +95,30 @@ public interface GalaxyService {
      * @param port     The port to contact the galaxy server.
      * @param timeZone The timezone as an offset of GMT.
      * @return
+     * @throws GalaxyNotFoundException           If the galaxy could not be found for loading after being registered.
      * @throws GalaxyRegistrationFailedException If a galaxy already exists with the same address and port.
+     * @throws NoSuchAlgorithmException          If the required algorithms were not present for generating keys.
      */
-    Galaxy registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException;
+    Galaxy registerGalaxy(String name, String address, int port, int timeZone)
+            throws GalaxyNotFoundException, GalaxyRegistrationFailedException, NoSuchAlgorithmException;
 
     /**
      * Removes a galaxy from the galaxy cluster.
      *
-     * @param id The id of the galaxy which should be removed.
+     * @param name The name of the galaxy which should be removed.
      */
-    void unregisterGalaxy(int id);
+    void unregisterGalaxy(String name);
 
     /**
      * A status update from a galaxy.
+     *
+     * @param galaxyName   The galaxy name to lookup. This may be different than what's in the update.
      * @param statusUpdate The update from the galaxy.
+     * @throws GalaxyNotFoundException If the galaxy was not found.
+     * @throws GalaxyRegistrationFailedException If the galaxy name in the status update is already taken.
      */
-    void handleGalaxyStatusUpdate(GalaxyStatusUpdate statusUpdate);
-
-    /**
-     * The login server will go out and request the latest status for the galaxy.
-     * @param galaxyId The id of the galaxy from which to request the latest status.
-     */
-    void requestGalaxyStatusUpdate(int galaxyId);
+    void updateGalaxyStatus(String galaxyName, GalaxyStatusUpdate statusUpdate)
+            throws GalaxyNotFoundException, GalaxyRegistrationFailedException;
 
     /**
      * Sends the enumeration of all known galaxies in the cluster, even if they are offline. This takes into account
@@ -114,6 +138,7 @@ public interface GalaxyService {
 
     /**
      * Sends the status of all active galaxies to a specific connection.
+     *
      * @param connection The connection which will receive the message.
      */
     void sendClusterStatus(SoeConnection connection);

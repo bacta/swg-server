@@ -1,24 +1,23 @@
 package io.bacta.login.server.service;
 
 import com.google.common.collect.ImmutableList;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import io.bacta.login.message.CharacterCreationDisabled;
 import io.bacta.login.message.LoginClusterStatus;
 import io.bacta.login.message.LoginClusterStatusEx;
 import io.bacta.login.message.LoginEnumCluster;
 import io.bacta.login.server.LoginServerProperties;
-import io.bacta.login.server.model.Galaxy;
-import io.bacta.login.server.model.GalaxyStatusUpdate;
+import io.bacta.login.server.model.*;
 import io.bacta.login.server.repository.GalaxyRepository;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +33,8 @@ import java.util.stream.Collectors;
 public final class DefaultGalaxyService implements GalaxyService {
     private static final long GALAXY_LIST_STATUS_POLL_INTERVAL = 10000; //10 seconds
     private static final int INITIAL_GALAXIES_CAPACITY = 100;
+    private static final String KEY_ALGORITHM = "RSA";
+    private static final int KEY_SIZE = 512;
 
     private final LoginServerProperties loginServerProperties;
     /**
@@ -43,85 +44,156 @@ public final class DefaultGalaxyService implements GalaxyService {
     /**
      * Galaxies here have their transient data set and continuously updated.
      */
-    private final TIntObjectMap<Galaxy> loadedGalaxies;
+    private final Map<String, Galaxy> loadedGalaxies;
 
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
                                 final GalaxyRepository galaxyRepository) {
 
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
-        this.loadedGalaxies = new TIntObjectHashMap<>(INITIAL_GALAXIES_CAPACITY);
+        this.loadedGalaxies = new ConcurrentHashMap<>(INITIAL_GALAXIES_CAPACITY);
     }
 
     @Override
     public Collection<Galaxy> getGalaxies() {
-        return ImmutableList.copyOf(loadedGalaxies.valueCollection());
+        return ImmutableList.copyOf(loadedGalaxies.values());
     }
 
     @Override
-    public Galaxy getGalaxyById(int id) {
-        if (!this.loadedGalaxies.containsKey(id)) {
-            this.loadGalaxy(id);
+    public Galaxy getGalaxy(String name) throws GalaxyNotFoundException {
+        //If it hasn't been loaded, try to load it.
+        if (!loadedGalaxies.containsKey(name))
+            loadGalaxy(name);
+
+        //We only want to return galaxies that have been loaded in memory at this point.
+        //If load galaxy failed, then an exception should've been thrown.
+        return loadedGalaxies.get(name);
+    }
+
+    @Override
+    public Galaxy registerGalaxy(String name, String address, int port, int timeZone)
+            throws GalaxyNotFoundException, GalaxyRegistrationFailedException, NoSuchAlgorithmException {
+
+        //Check if any other galaxies exist with this name.
+        Galaxy existingGalaxy = galaxyRepository.findByName(name);
+
+        if (existingGalaxy != null) {
+            LOGGER.error("Attempted to register galaxy, but found galaxy with same name already registered.");
+            throw new GalaxyRegistrationFailedException(name, address, port, "A galaxy with this name is already registered.");
         }
 
-        return this.loadedGalaxies.get(id);
-    }
-
-    @Override
-    public Galaxy registerGalaxy(String name, String address, int port, int timeZone) throws GalaxyRegistrationFailedException {
-        //We need to check if any other galaxies exist with the same address:port. If so, we can't register this one.
-        final Galaxy existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
+        //Check if any other galaxies exist with the same address:port. If so, we can't register this one.
+        existingGalaxy = galaxyRepository.findByAddressAndPort(address, port);
 
         if (existingGalaxy != null) {
             LOGGER.error("Attempted to register galaxy, but found galaxy with same address and port already registered.");
             throw new GalaxyRegistrationFailedException(name, address, port, "A galaxy with this address and port is already registered.");
         }
 
-        Galaxy registeredGalaxy = new Galaxy(name, address, port, timeZone);
+        //We need to generate a key pair.
+        //TODO: Should we create an instance every time or keep one only?
+        final KeyPairGenerator keygen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
+        keygen.initialize(KEY_SIZE);
+
+        final KeyPair keyPair = keygen.generateKeyPair();
+
+        Galaxy registeredGalaxy = new Galaxy(name, address, port, timeZone, keyPair.getPrivate().getEncoded(), keyPair.getPublic().getEncoded());
         registeredGalaxy = galaxyRepository.save(registeredGalaxy);
 
-        //Attempt to load the galaxy.
-        loadGalaxy(registeredGalaxy.getId());
+        //Load the galaxy into memory.
+        loadGalaxy(registeredGalaxy.getName());
 
         return registeredGalaxy;
     }
 
     @Override
-    public void unregisterGalaxy(int id) {
-        galaxyRepository.deleteById(id);
+    public void unregisterGalaxy(String name) {
+        final Galaxy galaxy = galaxyRepository.findByName(name);
+        galaxyRepository.delete(galaxy);
 
-        unloadGalaxy(id);
+        //Unload it from memory if it exists there.
+        unloadGalaxy(name);
     }
 
     @Override
-    public void handleGalaxyStatusUpdate(GalaxyStatusUpdate statusUpdate) {
+    public void updateGalaxyStatus(String galaxyName, GalaxyStatusUpdate statusUpdate)
+            throws GalaxyNotFoundException, GalaxyRegistrationFailedException {
+        final Galaxy galaxy = getGalaxy(galaxyName);
 
-    }
+        //If we are changing the name of the galaxy, we need to:
+        //- Ensure no other galaxy already has that name.
+        //- Log that we are changing it.
+        if (!galaxyName.equals(statusUpdate.getName())) {
+            final Galaxy existingGalaxy = this.galaxyRepository.findByName(statusUpdate.getName());
 
-    @Override
-    public void requestGalaxyStatusUpdate(int galaxyId) {
-        final Galaxy galaxy = getGalaxyById(galaxyId);
+            if (existingGalaxy != null) {
+                LOGGER.error("Could not update galaxy because name is taken by another galaxy.");
+
+                throw new GalaxyRegistrationFailedException(
+                        statusUpdate.getName(),
+                        statusUpdate.getAddress(),
+                        statusUpdate.getPort(),
+                        "A galaxy with the requested name already exists.");
+            }
+
+            LOGGER.info("Updating galaxy {} with new name {}.",
+                    galaxyName,
+                    statusUpdate.getName());
+        }
+
+        //Mark that the galaxy has updated itself.
+        galaxy.setIdentified(true);
+
+        //Meta information.
+        galaxy.setName(statusUpdate.getName());
+        galaxy.setAddress(statusUpdate.getAddress());
+        galaxy.setPort(statusUpdate.getPort());
+        galaxy.setTimeZone(statusUpdate.getTimeZone());
+        galaxy.setBranch(statusUpdate.getBranch());
+        galaxy.setNetworkVersion(statusUpdate.getNetworkVersion());
+        galaxy.setChangeList(statusUpdate.getChangeList());
+
+        //Metrics information.
+        galaxy.setMaxCharacters(statusUpdate.getMaxCharacters());
+        galaxy.setMaxCharactersPerAccount(statusUpdate.getMaxCharactersPerAccount());
+        galaxy.setOnlinePlayerLimit(statusUpdate.getOnlinePlayerLimit());
+        galaxy.setOnlineTutorialLimit(statusUpdate.getOnlineTutorialLimit());
+        galaxy.setOnlineFreeTrialLimit(statusUpdate.getOnlineFreeTrialLimit());
+
+        //Status information.
+        galaxy.setCharacterCreationDisabled(galaxy.isCharacterCreationDisabled());
+        galaxy.setAcceptingConnections(statusUpdate.isAcceptingConnections());
+        galaxy.setSecret(statusUpdate.isSecret());
+        galaxy.setLocked(statusUpdate.isLocked());
+
+        //Connection Servers...this may be a naive way to do this.
+        galaxy.getConnectionServers().clear();
+        galaxy.getConnectionServers().addAll(statusUpdate.getConnectionServers());
+
+        galaxyRepository.save(galaxy);
     }
 
     /**
-     * Loads the galaxy into the loadedGalaxy map, and queues up a request to fetch its latest status information.
+     * Loads the galaxy into the loadedGalaxy map.
      *
-     * @param galaxyId The galaxy id of the galaxy to load.
+     * @param name The name of the galaxy to load.
      */
-    private void loadGalaxy(int galaxyId) {
-        final Galaxy galaxy = galaxyRepository.findById(galaxyId).get();
-        this.loadedGalaxies.put(galaxyId, galaxy);
+    private void loadGalaxy(String name) throws GalaxyNotFoundException {
+        final Galaxy galaxy = galaxyRepository.findByName(name);
 
-        //Send message to galaxy to get its status info.
+        if (galaxy == null)
+            throw new GalaxyNotFoundException(name);
+
+        this.loadedGalaxies.put(name, galaxy);
     }
 
     /**
      * Unloads a galaxy from the loadedGalaxy map.
      *
-     * @param galaxyId The galaxy id of the galaxy to unload.
+     * @param name The name of the galaxy to unload.
      */
-    private void unloadGalaxy(int galaxyId) {
-        this.loadedGalaxies.remove(galaxyId);
+    private void unloadGalaxy(String name) {
+        this.loadedGalaxies.remove(name);
     }
 
     @Override
@@ -160,7 +232,7 @@ public final class DefaultGalaxyService implements GalaxyService {
         //Should we curate a set rather than keep it on the record and look it up?
         //This method allows for database character creation disabling.
         final Set<String> disabledGalaxies = galaxies.stream()
-                .filter(galaxy -> !galaxy.isCharacterCreationEnabled())
+                .filter(Galaxy::isCharacterCreationDisabled)
                 .map(Galaxy::getName)
                 .collect(Collectors.toSet());
 
@@ -179,32 +251,27 @@ public final class DefaultGalaxyService implements GalaxyService {
         final Set<LoginClusterStatus.ClusterData> clusterData = new TreeSet<>();
 
         for (final Galaxy galaxy : galaxies) {
-            //final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
+            final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
 
             //Only send status for galaxies that have identified and have at least one connection server.
-            if (/*galaxy.isIdentified()*/
-                //!connectionServers.isEmpty()
+            if (galaxy.isIdentified() &&
+                    !connectionServers.isEmpty() &&
                     (privateClient || !galaxy.isSecret())) {
 
                 //This will use the configured comparator to select the connection server for this connection to use.
-                //final ConnectionServerEntry connectionServer = connectionServers.first();
+                final ConnectionServerEntry connectionServer = connectionServers.first();
 
                 final LoginClusterStatus.ClusterData data = new LoginClusterStatus.ClusterData(
                         galaxy.getId(),
-                        //connectionServer.getClientServiceAddress(),
-                        //connectionServer.getClientServicePortPublic(),
-                        //connectionServer.getPingPort(),
-
-                        //TODO: Work this out when we start sending status from galaxy on identify.
-                        galaxy.getAddress(),
-                        (short) galaxy.getPort(),
-                        (short) 44464,
+                        connectionServer.getClientServiceAddress(),
+                        connectionServer.getClientServicePortPublic(),
+                        connectionServer.getPingPort(),
 
                         privateClient ? galaxy.getOnlinePlayers() : -1,
-                        determineGalaxyPopulationStatus(galaxy),
+                        determineGalaxyPopulationStatus(galaxy).toClusterStatusPopulation(),
                         galaxy.getMaxCharactersPerAccount(),
                         galaxy.getTimeZone(),
-                        determineGalaxyStatus(galaxy, freeTrialAccount, privateClient),
+                        determineGalaxyStatus(galaxy, freeTrialAccount, privateClient).toClusterDataStatus(),
 
                         false, //TODO: Discuss what should make a galaxy recommended or not.
                         //(record.isNotRecommendedCentral() || record.isNotRecommendedDatabase()),
@@ -215,12 +282,8 @@ public final class DefaultGalaxyService implements GalaxyService {
                 LOGGER.debug("Sending cluster status for {}({}) with connection server {}:{}. Online players {}/{} with status {}.",
                         galaxy.getName(),
                         galaxy.getId(),
-
-                        galaxy.getAddress(),
-                        galaxy.getPort(),
-                        //connectionServer.getClientServiceAddress(),
-                        //connectionServer.getClientServicePortPublic(),
-
+                        connectionServer.getClientServiceAddress(),
+                        connectionServer.getClientServicePortPublic(),
                         galaxy.getOnlinePlayers(),
                         galaxy.getOnlinePlayerLimit(),
                         data.getStatus());
@@ -261,69 +324,72 @@ public final class DefaultGalaxyService implements GalaxyService {
         connection.sendMessage(message);
     }
 
-
-    private LoginClusterStatus.ClusterData.PopulationStatus determineGalaxyPopulationStatus(Galaxy galaxy) {
-        final LoginClusterStatus.ClusterData.PopulationStatus populationStatus;
+    @Override
+    public GalaxyPopulationStatus determineGalaxyPopulationStatus(Galaxy galaxy) {
+        final GalaxyPopulationStatus populationStatus;
 
         //If the limit is 0 or less, then the server is full by default.
         if (galaxy.getOnlinePlayerLimit() <= 0)
-            return LoginClusterStatus.ClusterData.PopulationStatus.FULL;
+            return GalaxyPopulationStatus.FULL;
 
         final int percentFull = galaxy.getOnlinePlayers() * 100 / galaxy.getOnlinePlayerLimit();
 
         if (percentFull >= 100) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.FULL;
+            populationStatus = GalaxyPopulationStatus.FULL;
         } else if (percentFull >= loginServerProperties.getPopulationExtremelyHeavyThresholdPercent()) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.EXTREMELY_HEAVY;
+            populationStatus = GalaxyPopulationStatus.EXTREMELY_HEAVY;
         } else if (percentFull >= loginServerProperties.getPopulationVeryHeavyThresholdPercent()) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.VERY_HEAVY;
+            populationStatus = GalaxyPopulationStatus.VERY_HEAVY;
         } else if (percentFull >= loginServerProperties.getPopulationHeavyThresholdPercent()) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.HEAVY;
+            populationStatus = GalaxyPopulationStatus.HEAVY;
         } else if (percentFull >= loginServerProperties.getPopulationMediumThresholdPercent()) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.MEDIUM;
+            populationStatus = GalaxyPopulationStatus.MEDIUM;
         } else if (percentFull >= loginServerProperties.getPopulationLightThresholdPercent()) {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.LIGHT;
+            populationStatus = GalaxyPopulationStatus.LIGHT;
         } else {
-            populationStatus = LoginClusterStatus.ClusterData.PopulationStatus.VERY_LIGHT;
+            populationStatus = GalaxyPopulationStatus.VERY_LIGHT;
         }
 
         return populationStatus;
     }
 
-    private LoginClusterStatus.ClusterData.Status determineGalaxyStatus(Galaxy galaxy, boolean accountIsFreeTrial, boolean clientIsPrivate) {
-        LoginClusterStatus.ClusterData.Status status;
+    @Override
+    public GalaxyStatus determineGalaxyStatus(Galaxy galaxy, boolean accountIsFreeTrial, boolean clientIsPrivate) {
+        GalaxyStatus status;
+
+        if (!galaxy.isIdentified())
+            return GalaxyStatus.DOWN;
 
         if (galaxy.isAcceptingConnections()) {
-            status = LoginClusterStatus.ClusterData.Status.UP;
+            status = GalaxyStatus.UP;
 
             //If we've exceeded the allowed number of players in the tutorial, then the galaxy is restricted to
             //existing characters.
             if (galaxy.getOnlineTutorialPlayers() >= galaxy.getOnlineTutorialLimit())
-                status = LoginClusterStatus.ClusterData.Status.RESTRICTED;
+                status = GalaxyStatus.RESTRICTED;
 
             //If this account is a free trial account and the galaxy doesn't allow free trial accounts, then
             //restrict to existing characters.
-            if (accountIsFreeTrial && !galaxy.isCharacterCreationEnabled())
-                status = LoginClusterStatus.ClusterData.Status.RESTRICTED;
+            if (accountIsFreeTrial && !galaxy.isCharacterCreationDisabled())
+                status = GalaxyStatus.RESTRICTED;
 
             //If the galaxy is full or this account is a free trial account and the galaxy has its maximum number of
             //free trial accounts connected, then show galaxy as full.
-            if (galaxy.getOnlinePlayerLimit() >= galaxy.getOnlinePlayerLimit()
+            if (galaxy.getOnlinePlayers() >= galaxy.getOnlinePlayerLimit()
                     || (accountIsFreeTrial && galaxy.getOnlineFreeTrialPlayers() >= galaxy.getOnlineFreeTrialLimit()))
-                status = LoginClusterStatus.ClusterData.Status.FULL;
+                status = GalaxyStatus.FULL;
 
         } else {
-            status = LoginClusterStatus.ClusterData.Status.LOADING;
+            status = GalaxyStatus.LOADING;
         }
 
         //Locked takes precedence over up or loading.
         if (galaxy.isLocked() && !clientIsPrivate) {
-            status = LoginClusterStatus.ClusterData.Status.LOCKED;
+            status = GalaxyStatus.LOCKED;
         }
 
         return status;
     }
-
 
     /**
      * This method runs on a schedule and looks for new galaxies in the data store that aren't already in memory. If a
@@ -337,11 +403,15 @@ public final class DefaultGalaxyService implements GalaxyService {
         final Iterable<Galaxy> records = galaxyRepository.findAll();
 
         for (final Galaxy record : records) {
-            //Skip galaxies that are currently loaded.
-            if (this.loadedGalaxies.containsKey(record.getId()))
-                continue;
+            try {
+                //Skip galaxies that are currently loaded.
+                if (this.loadedGalaxies.containsKey(record.getName()))
+                    continue;
 
-            loadGalaxy(record.getId());
+                loadGalaxy(record.getName());
+            } catch (Exception ex) {
+                LOGGER.error("Error loading galaxy.", record.getName());
+            }
         }
     }
 }

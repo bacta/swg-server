@@ -1,7 +1,12 @@
 package io.bacta.engine.security;
 
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+
 import javax.crypto.KeyGenerator;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 
 public final class CryptoUtil {
     /**
@@ -18,5 +23,27 @@ public final class CryptoUtil {
         } catch (GeneralSecurityException ex) {
             throw new IllegalArgumentException("algorithmName");
         }
+    }
+
+    /**
+     * Helper method for converting a key to the PEM format for easy display.
+     *
+     * @param key The key to convert.
+     * @return A string in the PEM format.
+     * @throws IOException
+     */
+    public static String toPem(Key key) throws IOException {
+        final StringWriter writer = new StringWriter();
+        final JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
+
+        try {
+            pemWriter.writeObject(key);
+
+        } finally {
+            pemWriter.close();
+            writer.close();
+        }
+
+        return writer.toString();
     }
 }
