@@ -1,10 +1,8 @@
 package io.bacta.login.server.rest.controller;
 
 import io.bacta.engine.security.CryptoUtil;
+import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.server.model.Galaxy;
-import io.bacta.login.server.model.GalaxyStatusUpdate;
-import io.bacta.login.server.rest.mapping.DetailedGalaxyStatusMapping;
-import io.bacta.login.server.rest.model.DetailedGalaxyStatus;
 import io.bacta.login.server.rest.model.GalaxyListEntry;
 import io.bacta.login.server.rest.model.RegisterGalaxyRequest;
 import io.bacta.login.server.rest.model.RegisteredGalaxyResponse;
@@ -84,12 +82,11 @@ public final class GalaxiesController {
     @PutMapping("/{name}")
     public ResponseEntity<?> updateGalaxy(
             @PathVariable String name,
-            @RequestBody DetailedGalaxyStatus galaxyStatus) {
+            @RequestBody GalaxyServerStatus galaxyStatus) {
         try {
             LOGGER.info("Updating galaxy with name {}", name);
 
-            final GalaxyStatusUpdate update = DetailedGalaxyStatusMapping.map(galaxyStatus);
-            galaxyService.updateGalaxyStatus(name, update);
+            galaxyService.updateGalaxyStatus(name, galaxyStatus);
 
             return ResponseEntity.ok().build();
 

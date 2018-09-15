@@ -31,10 +31,15 @@ io:
     game:
       bindAddress: "0.0.0.0"
       bindPort: 44463
+      bindPingPort: 44464
       galaxyName: "Bacta"
       requiredClientVersion: "20100225-17:43"
       clientPath: "swg-client"
       clientIniFile: "live.cfg"
+      login:
+        rest:
+          base:
+            "http://localhost:8080/api"
       akka:
         config: "game.conf"
       zoneServers:

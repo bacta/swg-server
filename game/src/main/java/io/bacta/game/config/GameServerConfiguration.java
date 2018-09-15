@@ -38,12 +38,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
+import java.util.concurrent.Executor;
 
 
 @Configuration
@@ -64,7 +66,7 @@ public class GameServerConfiguration {
 
     @Inject
     @Bean
-    public ActorSystem getActorSystem(final ApplicationContext context){
+    public ActorSystem getActorSystem(final ApplicationContext context) {
         // Create an Akka system
         actorSystem = ActorSystem.create("Galaxy", akkaConfiguration());
         ext.initialize(context);
@@ -90,6 +92,11 @@ public class GameServerConfiguration {
     @Bean
     public BactaConfiguration getBactaConfiguration() throws FileNotFoundException {
         return new IniBactaConfiguration(Paths.get(gameServerProperties.getClientPath() + File.separator + gameServerProperties.getClientIniFile()));
+    }
+
+    @Bean
+    public Executor taskExecutor() {
+        return new SimpleAsyncTaskExecutor();
     }
 
     @PreDestroy
