@@ -1,6 +1,6 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.message.GodClientMessage;
+import io.bacta.game.message.ClientInactivityMessage;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@MessageHandled(handles = GodClientMessage.class)
+@MessageHandled(handles = ClientInactivityMessage.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class GodClientMessageController implements GameNetworkMessageController<GodClientMessage> {
+public class GodClientMessageController implements GameNetworkMessageController<ClientInactivityMessage> {
     @Override
-    public void handleIncoming(SoeConnection connection, GodClientMessage message) throws Exception {
+    public void handleIncoming(SoeConnection connection, ClientInactivityMessage message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }
