@@ -21,7 +21,10 @@
 package io.bacta.soe.network.handler;
 
 import io.bacta.engine.network.udp.UdpChannel;
+import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeConnectionCache;
+
+import java.nio.ByteBuffer;
 
 /**
  * Created by kyle on 7/3/2017.
@@ -29,4 +32,5 @@ import io.bacta.soe.network.connection.SoeConnectionCache;
 public interface SoeSendHandler {
     void start(final String metricsPrefix, final SoeConnectionCache connectionCache, SoeProtocolHandler soeProtocolHandler, final UdpChannel udpChannel);
     void stop();
+    void sendMessage(final SoeConnection connection, final ByteBuffer message);
 }

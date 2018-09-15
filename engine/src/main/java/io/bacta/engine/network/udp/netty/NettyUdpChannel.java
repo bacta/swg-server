@@ -21,7 +21,6 @@
 package io.bacta.engine.network.udp.netty;
 
 import com.codahale.metrics.MetricRegistry;
-import io.bacta.engine.network.channel.InboundMessageChannel;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +31,7 @@ import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.function.BiConsumer;
 
 /**
  * Created by kyle on 6/11/2017.
@@ -43,7 +43,7 @@ public class NettyUdpChannel implements UdpChannel {
 
     private final MetricRegistry metricRegistry;
     private NettyUdpTransceiver udpTransceiver;
-    private InboundMessageChannel messageChannel;
+    private BiConsumer<InetSocketAddress, ByteBuffer> messageHandlerFunction;
     private String name;
 
     @Inject
@@ -52,8 +52,8 @@ public class NettyUdpChannel implements UdpChannel {
     }
 
     @Override
-    public void start(final String name, final InetAddress bindAddress, final int bindPort, final InboundMessageChannel messageChannel) {
-        this.messageChannel = messageChannel;
+    public void start(final String name, final InetAddress bindAddress, final int bindPort, final BiConsumer<InetSocketAddress, ByteBuffer> messageHandlerFunction) {
+        this.messageHandlerFunction = messageHandlerFunction;
         this.name = name;
         this.udpTransceiver = new NettyUdpTransceiver(
                 bindAddress,
@@ -71,7 +71,7 @@ public class NettyUdpChannel implements UdpChannel {
         msg.content().getBytes(0, buffer);
         buffer.rewind();
 
-        messageChannel.receiveMessage(sender, buffer);
+        messageHandlerFunction.accept(sender, buffer);
     }
 
     @Override

@@ -21,6 +21,7 @@ public class ConnectionSupervisor extends AbstractActor {
     private final SpringAkkaExtension ext;
     private final GameServerProperties properties;
     private ActorRef transRef;
+    private ActorRef pingRef;
 
     @Inject
     public ConnectionSupervisor(final SpringAkkaExtension ext, final GameServerProperties properties) {
@@ -43,6 +44,7 @@ public class ConnectionSupervisor extends AbstractActor {
     public void preStart() throws Exception {
         log.info("Starting up");
         transRef = getContext().actorOf(ext.props(GalaxyTransceiverSupervisor.class), "transceiver");
+        pingRef = getContext().actorOf(ext.props(PingTransceiverSupervisor.class), "ping");
     }
 
     @Override
