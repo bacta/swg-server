@@ -70,13 +70,14 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
     private final String tangibleClassPath;
 
-    @Value("${io.bacta.network.template.path}")
-    private String baseMessagePath;
+    //@Value("${io.bacta.network.template.path}")
+    private final String baseMessagePath;
 
     @Inject
-    public GameNetworkMessageTemplateWriter() {
+    public GameNetworkMessageTemplateWriter(@Value("${io.bacta.network.template.path}") String baseMessagePath) {
 
-        baseMessagePath = "";
+        //baseMessagePath = "";
+        this.baseMessagePath = baseMessagePath;
 
         ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, LOGGER);
@@ -86,21 +87,19 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_CACHE, "true");
         ve.init();
 
-        controllerClassPath = baseMessagePath + ".controller";
-        String fs = System.getProperty("file.separator");
+        final String fs = System.getProperty("file.separator");
+        final String basePath = System.getProperty("user.dir");
+        final String javaSource = "src" + fs + "main" + fs + "java";
 
-        controllerFilePath = System.getProperty("user.dir") + fs  + "src"
-                + fs + "main" + fs + "java" + fs +
-                baseMessagePath.replace(".", fs) + fs +
-                "controller" + fs;
+        controllerClassPath = "io.bacta.game.controllers";
+        controllerFilePath = basePath + fs + "game" + fs + javaSource + fs +
+                controllerClassPath.replace(".", fs) + fs;
         
-        messageClassPath = baseMessagePath + "." + ".com.ocdsoft.bacta.swg.login.message";
-        messageFilePath = System.getProperty("user.dir") + fs  + "src"
-                + fs + "main" + fs + "java" + fs +
-                baseMessagePath.replace(".", fs) + fs +
-                "com.ocdsoft.bacta.swg.login.message" + fs;
+        messageClassPath = "io.bacta.game.message";
+        messageFilePath = basePath + fs + "shared" + fs + javaSource + fs +
+                messageClassPath.replace(".", fs) + fs;
 
-        tangibleClassPath = baseMessagePath + ".object.tangible.TangibleObject";
+        tangibleClassPath = "io.bacta.game.object.tangible.TangibleObject";
 
         objControllerClassPath = controllerClassPath  + ".object";
         objControllerFilePath = controllerFilePath + fs + "object" + fs;
