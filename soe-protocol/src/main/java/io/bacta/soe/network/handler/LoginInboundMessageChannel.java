@@ -47,7 +47,7 @@ import java.nio.ByteBuffer;
 @Component
 @Scope("prototype")
 @Getter
-public class SoeInboundMessageChannel implements InboundMessageChannel {
+public class LoginInboundMessageChannel implements InboundMessageChannel {
 
     private final SoeConnectionCache connectionCache;
     private final SoeProtocolHandler protocolHandler;
@@ -55,10 +55,10 @@ public class SoeInboundMessageChannel implements InboundMessageChannel {
     private final SoeMessageDispatcher soeMessageDispatcher;
 
     @Inject
-    public SoeInboundMessageChannel(final SoeConnectionCache connectionCache,
-                                    final SoeProtocolHandler protocolHandler,
-                                    final SoeConnectionFactory connectionProvider,
-                                    final SoeMessageDispatcher soeMessageDispatcher) {
+    public LoginInboundMessageChannel(final SoeConnectionCache connectionCache,
+                                      final SoeProtocolHandler protocolHandler,
+                                      final SoeConnectionFactory connectionProvider,
+                                      final SoeMessageDispatcher soeMessageDispatcher) {
 
         this.connectionCache = connectionCache;
         this.protocolHandler = protocolHandler;
