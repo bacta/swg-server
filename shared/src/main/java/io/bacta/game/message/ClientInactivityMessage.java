@@ -13,13 +13,13 @@ import java.nio.ByteBuffer;
   */
 @Getter
 @Priority(0x2)
-public final class GodClientMessage extends GameNetworkMessage {
+public final class ClientInactivityMessage extends GameNetworkMessage {
 
-    public GodClientMessage() {
+    public ClientInactivityMessage() {
 
     }
 
-    public GodClientMessage(final ByteBuffer buffer) {
+    public ClientInactivityMessage(final ByteBuffer buffer) {
 
     }
 
