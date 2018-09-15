@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 
 /**
- *  Holder class for the connection retrieval method
+ * Holder class for the connection retrieval method
  */
 @Component
 @Scope("prototype")

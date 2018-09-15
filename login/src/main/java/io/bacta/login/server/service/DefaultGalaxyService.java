@@ -12,8 +12,10 @@ import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -52,16 +54,19 @@ public final class DefaultGalaxyService implements GalaxyService {
      */
     private final Map<String, Galaxy> loadedGalaxies;
     private final TaskScheduler taskScheduler;
+    private final ConnectionMap loginConnections;
 
     @Inject
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
                                 final GalaxyRepository galaxyRepository,
-                                final TaskScheduler taskScheduler) {
+                                final TaskScheduler taskScheduler,
+                                @Qualifier("LoginConnectionMap") ConnectionMap loginConnections) {
 
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
         this.loadedGalaxies = new ConcurrentHashMap<>(INITIAL_GALAXIES_CAPACITY);
         this.taskScheduler = taskScheduler;
+        this.loginConnections = loginConnections;
 
         scheduleMaintenanceTasks();
     }
@@ -252,10 +257,7 @@ public final class DefaultGalaxyService implements GalaxyService {
         connection.sendMessage(message);
     }
 
-    @Override
-    public void sendClusterStatus(SoeConnection connection) {
-        LOGGER.debug("Sending cluster status to client {}.", connection.getSoeUdpConnection().getRemoteAddress());
-
+    private LoginClusterStatus createLoginClusterStatusMessage() {
         final boolean privateClient = false; //TODO: Determine if the client is on the same local network.
         final boolean freeTrialAccount = false; //TODO: Determine if the account is a free trial account.
 
@@ -305,13 +307,23 @@ public final class DefaultGalaxyService implements GalaxyService {
         }
 
         final LoginClusterStatus message = new LoginClusterStatus(clusterData);
-        connection.sendMessage(message);
+        return message;
+    }
+
+    @Override
+    public void sendClusterStatus(SoeConnection connection) {
+        LOGGER.debug("Sending cluster status to client {}.", connection.getSoeUdpConnection().getRemoteAddress());
+
+        final LoginClusterStatus clusterStatusMessage = createLoginClusterStatusMessage();
+        connection.sendMessage(clusterStatusMessage);
     }
 
     @Override
     public void broadcastClusterStatus() {
-        //TODO: Iterate the connected clients, and send the cluster status to each.
-        throw new UnsupportedOperationException("Not yet implemented.");
+        LOGGER.trace("Broadcasting cluster status to connected clients.");
+
+        final LoginClusterStatus clusterStatusMessage = createLoginClusterStatusMessage();
+        loginConnections.broadcast(clusterStatusMessage);
     }
 
     @Override
@@ -425,10 +437,12 @@ public final class DefaultGalaxyService implements GalaxyService {
                 LOGGER.error("Error loading galaxy.", record.getName());
             }
         }
+
+        this.broadcastClusterStatus();
     }
 
     private void scheduleMaintenanceTasks() {
-        LOGGER.info("Scheduling galaxy service maintenance tasks.");
+        LOGGER.trace("Scheduling galaxy service maintenance tasks.");
 
         //Schedule the galaxy maintenance task based on our login server configuration.
         this.taskScheduler.scheduleAtFixedRate(
