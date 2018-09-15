@@ -20,11 +20,11 @@ public final class SceneCreateObjectByCrc extends GameNetworkMessage {
     // This byte has to do with hyper space
     private final byte hyperspace;
 
-    public SceneCreateObjectByCrc(long objectId) {
+    public SceneCreateObjectByCrc(long objectId, String template) {
 
         networkId = objectId;//scno.getNetworkId();
         transform = new Transform();//scno.getTransformObjectToParent();
-        crc = Crc.calculate("object/creature/player/shared_human_male.iff");//scno.getSharedTemplate().getCrcName().getCrc();
+        crc = Crc.calculate(template);//scno.getSharedTemplate().getCrcName().getCrc();
         hyperspace = 0;
     }
 

@@ -44,11 +44,18 @@ public class SelectCharacterController implements GameNetworkMessageController<S
         // Send Guild Updates
 
         // Send Character Baselines
-        final SceneCreateObjectByCrc msg = new SceneCreateObjectByCrc(1000000);
+        final SceneCreateObjectByCrc msg = new SceneCreateObjectByCrc(1000000, "object/creature/player/shared_human_male.iff");
         connection.sendMessage(msg);
 
-        final UpdateContainmentMessage ucm = new UpdateContainmentMessage(1000000);
+        final UpdateContainmentMessage ucm = new UpdateContainmentMessage(1000000, 1000001);
         connection.sendMessage(ucm);
+
+        // Ghost object?
+        final SceneCreateObjectByCrc msg2 = new SceneCreateObjectByCrc(1000001,  "object/player/shared_player.iff");
+        connection.sendMessage(msg2);
+
+        final SceneEndBaselines endBaselines2 = new SceneEndBaselines(1000001);
+        connection.sendMessage(endBaselines2);
 
         final SceneEndBaselines endBaselines = new SceneEndBaselines(1000000);
         connection.sendMessage(endBaselines);
