@@ -1,10 +1,8 @@
 package $packageName;
 
-import GameNetworkMessage;
-import SOECRC32;
+import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
 import lombok.Getter;
-import Priority;
-
 import java.nio.ByteBuffer;
 
 /**

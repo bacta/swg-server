@@ -268,8 +268,7 @@ public final class DefaultGalaxyService implements GalaxyService {
             final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
 
             //Only send status for galaxies that have identified and have at least one connection server.
-            if (galaxy.isIdentified(loginServerProperties.getGalaxyLinkDeadThreshold()) &&
-                    !connectionServers.isEmpty() &&
+            if (!connectionServers.isEmpty() &&
                     (privateClient || !galaxy.isSecret())) {
 
                 //This will use the configured comparator to select the connection server for this connection to use.

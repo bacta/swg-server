@@ -1,21 +1,21 @@
-package $packageName;
+package io.bacta.game.controllers;
 
-import ${messageClasspath}.${messageName};
+import io.bacta.game.message.LagRequest;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
-import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@MessageHandled(handles = $messageNameClass)
+@MessageHandled(handles = LagRequest.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class $className implements GameNetworkMessageController<$messageName> {
+public class LagRequestController implements GameNetworkMessageController<LagRequest> {
     @Override
-    public void handleIncoming(SoeConnection connection, $messageName message) throws Exception {
+    public void handleIncoming(SoeConnection connection, LagRequest message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

@@ -1,8 +1,9 @@
 package io.bacta.game.controllers.connection;
 
 import io.bacta.game.config.GameServerProperties;
-import io.bacta.game.message.ErrorMessage;
 import io.bacta.game.message.connection.ClientIdMsg;
+import io.bacta.game.message.connection.ClientPermissionsMessage;
+import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -27,8 +28,8 @@ public class ClientIdMsgController implements GameNetworkMessageController<Clien
     @Override
     public void handleIncoming(SoeConnection connection, ClientIdMsg message) throws Exception {
 
-        ErrorMessage error = new ErrorMessage("Login Error", "Not implemented.", false);
-        connection.sendMessage(error);
+//        ErrorMessage error = new ErrorMessage("Login Error", "Not implemented.", false);
+//        connection.sendMessage(error);
 
         // Validate client version
         /* (!message.getClientVersion().equals(requiredClientVersion)) {
@@ -48,11 +49,13 @@ public class ClientIdMsgController implements GameNetworkMessageController<Clien
 
         connection.setBactaId(account.getId());
         connection.setBactaUsername(account.getUsername());
+        */
+
         connection.addRole(ConnectionRole.AUTHENTICATED);
 
         // TODO: Actually implement permissions
         ClientPermissionsMessage cpm = new ClientPermissionsMessage(true, true, true, true);
-        connection.sendMessage(cpm);*/
+        connection.sendMessage(cpm);
     }
 }
 
