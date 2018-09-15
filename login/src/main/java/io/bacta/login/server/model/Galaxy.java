@@ -1,8 +1,10 @@
 package io.bacta.login.server.model;
 
+import io.bacta.galaxy.message.GalaxyServerStatus;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -125,5 +127,18 @@ public class Galaxy {
         this.timeZone = timeZone;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
+    }
+
+    public void updateConnectionServers(final Set<GalaxyServerStatus.ConnectionServerEntry> incomingServers) {
+        //TODO: This isn't a safe operation as its not atomic or threadsafe....
+        this.connectionServers.clear();
+
+        incomingServers.forEach(s ->
+            this.connectionServers.add(new ConnectionServerEntry(
+                    s.getId(),
+                    s.getAddress(),
+                    (short)s.getPort(),
+                    (short)s.getPort(),
+                    (short)s.getPing())));
     }
 }

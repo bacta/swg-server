@@ -1,9 +1,9 @@
 package io.bacta.login.server.service;
 
+import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
-import io.bacta.login.server.model.GalaxyStatusUpdate;
 import io.bacta.soe.network.connection.SoeConnection;
 
 import java.security.NoSuchAlgorithmException;
@@ -113,11 +113,11 @@ public interface GalaxyService {
      * A status update from a galaxy.
      *
      * @param galaxyName   The galaxy name to lookup. This may be different than what's in the update.
-     * @param statusUpdate The update from the galaxy.
+     * @param update The update from the galaxy.
      * @throws GalaxyNotFoundException If the galaxy was not found.
      * @throws GalaxyRegistrationFailedException If the galaxy name in the status update is already taken.
      */
-    void updateGalaxyStatus(String galaxyName, GalaxyStatusUpdate statusUpdate)
+    void updateGalaxyStatus(String galaxyName, GalaxyServerStatus update)
             throws GalaxyNotFoundException, GalaxyRegistrationFailedException;
 
     /**
