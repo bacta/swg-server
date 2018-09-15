@@ -7,26 +7,20 @@ import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
+@Slf4j
 @Component
 @MessageHandled(handles = ClientIdMsg.class)
 @ConnectionRolesAllowed({})
 public class ClientIdMsgController implements GameNetworkMessageController<ClientIdMsg> {
-
-    private static Logger logger = LoggerFactory.getLogger(ClientIdMsgController.class);
-
-    //private final AccountService<SoeAccount> accountService;
     private final String requiredClientVersion;
 
     @Inject
-    public ClientIdMsgController(//final AccountService<SoeAccount> accountService,
-                                 final GameServerProperties properties) {
-        //this.accountService = accountService;
+    public ClientIdMsgController(final GameServerProperties properties) {
         requiredClientVersion = properties.getRequiredClientVersion();
     }
     
