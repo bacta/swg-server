@@ -79,7 +79,7 @@ public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDi
 
         this.controllerLoader = controllerLoader;
         this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
-        this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
+        this.gameNetworkMessageTemplateWriter = null;//gameNetworkMessageTemplateWriter;
     }
 
     @PostConstruct
