@@ -39,13 +39,16 @@ import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.inject.Inject;
 import java.util.concurrent.Executor;
@@ -58,7 +61,7 @@ import java.util.concurrent.Executor;
 @Configuration
 @EnableScheduling
 @ConfigurationProperties
-public class LoginServerConfiguration {
+public class LoginServerConfiguration implements SchedulingConfigurer {
 
     private final LoginServerProperties loginServerProperties;
     private final SpringAkkaExtension ext;
@@ -113,18 +116,24 @@ public class LoginServerConfiguration {
     }
 
     @Bean
+    public SessionTokenProvider getSessionTokenProvider(LoginServerProperties properties) {
+        final LoginServerProperties.OAuthProperties oauth = properties.getOauth();
+        final String tokenEndpoint = oauth.getBase() + oauth.getToken(); //TODO: Make this more robust - take separators into account.
+        return new OAuth2SessionTokenProvider(tokenEndpoint, oauth.getClientId(), oauth.getClientSecret());
+    }
+
+    @Bean
     public Executor taskExecutor() {
         return new SimpleAsyncTaskExecutor();
     }
 
     @Bean
-    public SessionTokenProvider getSessionTokenProvider(
-            @Value("${io.bacta.login.server.oauth.base}") String baseUri,
-            @Value("${io.bacta.login.server.oauth.token}") String tokenUri,
-            @Value("${io.bacta.login.server.oauth.client_id}") String clientId,
-            @Value("${io.bacta.login.server.oauth.client_secret}") String clientSecret) {
-        final String tokenEndpoint = baseUri + tokenUri; //TODO: Make this more robust - take separators into account.
+    public TaskScheduler taskScheduler() {
+        return new ConcurrentTaskScheduler();
+    }
 
-        return new OAuth2SessionTokenProvider(tokenEndpoint, clientId, clientSecret);
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
+        scheduledTaskRegistrar.setTaskScheduler(taskScheduler());
     }
 }

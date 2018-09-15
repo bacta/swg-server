@@ -4,6 +4,7 @@ import io.bacta.galaxy.message.GalaxyServerStatus;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -81,11 +82,10 @@ public class Galaxy {
 
 
     //Transient Data - set after read from database.
-
     /**
-     * Signals that this galaxy has identified. This means it is essentially online, or connected.
+     * The last time we heard from this galaxy.
      */
-    private transient boolean identified;
+    private transient Instant lastUpdate = Instant.EPOCH;
     /**
      * The galaxy is ready for clients to start connecting. If it is also in a locked state, then only privileged
      * clients can connect.
@@ -127,6 +127,14 @@ public class Galaxy {
         this.timeZone = timeZone;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
+    }
+
+    /**
+     * We say a galaxy has been identified if we've heard from it in the configured threshold.
+     * @return True if the last update is within the configured threshold.
+     */
+    public boolean isIdentified(long thresholdMilliseconds) {
+        return !lastUpdate.plusMillis(thresholdMilliseconds).isBefore(Instant.now());
     }
 
     public void updateConnectionServers(final Set<GalaxyServerStatus.ConnectionServerEntry> incomingServers) {

@@ -46,11 +46,32 @@ public class LoginServerProperties {
     private int populationHeavyThresholdPercent;
     private int populationMediumThresholdPercent;
     private int populationLightThresholdPercent;
+    /**
+     * How often the maintenance task for galaxies should run.
+     * Time is in milliseconds.
+     */
+    private long galaxyMaintenanceInterval;
+    /**
+     * If we haven't heard from a galaxy in the configured time, then we assume it's gone offline.
+     * Time is in milliseconds.
+     */
+    private long galaxyLinkDeadThreshold;
+
+    private OAuthProperties oauth;
     private LoginSessionMode sessionMode;
     private Akka akka;
 
     @Data
     public static class Akka {
         private String config;
+    }
+
+    @Data
+    public static class OAuthProperties {
+        private String base;
+        private String authorize;
+        private String token;
+        private String clientId;
+        private String clientSecret;
     }
 }

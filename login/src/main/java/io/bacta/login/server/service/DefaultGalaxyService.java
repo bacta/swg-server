@@ -14,12 +14,15 @@ import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -35,7 +38,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public final class DefaultGalaxyService implements GalaxyService {
-    private static final long GALAXY_LIST_STATUS_POLL_INTERVAL = 10000; //10 seconds
     private static final int INITIAL_GALAXIES_CAPACITY = 100;
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 512;
@@ -49,13 +51,19 @@ public final class DefaultGalaxyService implements GalaxyService {
      * Galaxies here have their transient data set and continuously updated.
      */
     private final Map<String, Galaxy> loadedGalaxies;
+    private final TaskScheduler taskScheduler;
 
+    @Inject
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
-                                final GalaxyRepository galaxyRepository) {
+                                final GalaxyRepository galaxyRepository,
+                                final TaskScheduler taskScheduler) {
 
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
         this.loadedGalaxies = new ConcurrentHashMap<>(INITIAL_GALAXIES_CAPACITY);
+        this.taskScheduler = taskScheduler;
+
+        scheduleMaintenanceTasks();
     }
 
     @Override
@@ -147,7 +155,7 @@ public final class DefaultGalaxyService implements GalaxyService {
         }
 
         //Mark that the galaxy has updated itself.
-        galaxy.setIdentified(true);
+        galaxy.setLastUpdate(Instant.now());
 
         //Meta information.
         galaxy.setName(update.getName());
@@ -258,7 +266,7 @@ public final class DefaultGalaxyService implements GalaxyService {
             final SortedSet<ConnectionServerEntry> connectionServers = galaxy.getConnectionServers();
 
             //Only send status for galaxies that have identified and have at least one connection server.
-            if (galaxy.isIdentified() &&
+            if (galaxy.isIdentified(loginServerProperties.getGalaxyLinkDeadThreshold()) &&
                     !connectionServers.isEmpty() &&
                     (privateClient || !galaxy.isSecret())) {
 
@@ -361,7 +369,7 @@ public final class DefaultGalaxyService implements GalaxyService {
     public GalaxyStatus determineGalaxyStatus(Galaxy galaxy, boolean accountIsFreeTrial, boolean clientIsPrivate) {
         GalaxyStatus status;
 
-        if (!galaxy.isIdentified())
+        if (!galaxy.isIdentified(loginServerProperties.getGalaxyLinkDeadThreshold()))
             return GalaxyStatus.DOWN;
 
         if (galaxy.isAcceptingConnections()) {
@@ -400,22 +408,31 @@ public final class DefaultGalaxyService implements GalaxyService {
      * new galaxy was somehow added directly to the data store, then it would get loaded this way. At startup, the server
      * will load all trusted galaxies and attempt to poll them for their status.
      */
-    @Scheduled(initialDelay = 0, fixedRate = GALAXY_LIST_STATUS_POLL_INTERVAL)
-    private void refreshGalaxyServerList() {
+    //@Scheduled(initialDelay = 0, fixedRate = GALAXY_MAINTENANCE_INTERVAL)
+    private void performGalaxyMaintenance() {
         LOGGER.trace("Refreshing galaxy server list.");
 
         final Iterable<Galaxy> records = galaxyRepository.findAll();
 
         for (final Galaxy record : records) {
             try {
-                //Skip galaxies that are currently loaded.
-                if (this.loadedGalaxies.containsKey(record.getName()))
+                if (this.loadedGalaxies.containsKey(record.getName())) {
                     continue;
+                }
 
                 loadGalaxy(record.getName());
             } catch (Exception ex) {
                 LOGGER.error("Error loading galaxy.", record.getName());
             }
         }
+    }
+
+    private void scheduleMaintenanceTasks() {
+        LOGGER.info("Scheduling galaxy service maintenance tasks.");
+
+        //Schedule the galaxy maintenance task based on our login server configuration.
+        this.taskScheduler.scheduleAtFixedRate(
+                this::performGalaxyMaintenance,
+                Duration.ofMillis(loginServerProperties.getGalaxyMaintenanceInterval()));
     }
 }
