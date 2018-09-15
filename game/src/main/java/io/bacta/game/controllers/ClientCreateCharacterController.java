@@ -1,6 +1,7 @@
 package io.bacta.game.controllers;
 
 import io.bacta.game.message.ClientCreateCharacter;
+import io.bacta.game.message.ClientCreateCharacterSuccess;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
@@ -24,6 +25,10 @@ public class ClientCreateCharacterController implements GameNetworkMessageContro
         //Check if their name is set to empty once again (after verifyandlock was done).
 
         //Truncate biography to 1024 characters.
+        String biography = message.getBiography();
+
+        if (biography.length() > 1024)
+            biography = biography.substring(0, 1024);
 
         //Check with login server to make sure that they can still create a character:
         //that limits have not been exceeded.
@@ -43,6 +48,9 @@ public class ClientCreateCharacterController implements GameNetworkMessageContro
         //tell login server that the character was created
         //When login responds with acknowledgement, send the ClientCreateCharacterSuccess message.
         //This will cause the client to login with the new character?
+
+        final ClientCreateCharacterSuccess success = new ClientCreateCharacterSuccess(1000000001165L);
+        connection.sendMessage(success);
     }
 }
 
