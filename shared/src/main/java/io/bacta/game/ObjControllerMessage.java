@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
 
 @Getter
 @AllArgsConstructor
-public final class ObjControllerMessage extends GameNetworkMessage {
+public class ObjControllerMessage extends GameNetworkMessage {
     private final int flags;
     private final int messageType;
     private final long actorNetworkId;

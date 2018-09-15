@@ -1,7 +1,8 @@
 package $packageName;
 
 import java.nio.ByteBuffer;
-import com.ocdsoft.bacta.swg.server.game.message.object.ObjControllerMessage;
+import io.bacta.game.MessageId;
+import io.bacta.game.ObjControllerMessage;
 
 @MessageId(0x${controllerid})
 public class $messageName extends ObjControllerMessage {
