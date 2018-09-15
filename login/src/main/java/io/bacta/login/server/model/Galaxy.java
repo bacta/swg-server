@@ -144,9 +144,16 @@ public class Galaxy {
         incomingServers.forEach(s ->
             this.connectionServers.add(new ConnectionServerEntry(
                     s.getId(),
-                    s.getAddress(),
+                    transformLocalhost(s.getAddress()),
                     (short)s.getPort(),
                     (short)s.getPort(),
                     (short)s.getPing())));
+    }
+
+    private String transformLocalhost(String address) {
+        if ("0.0.0.0".equals(address))
+            return "localhost";
+
+        return address;
     }
 }
