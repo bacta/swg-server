@@ -4,7 +4,7 @@ import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeConnectionCache;
-import io.bacta.soe.network.handler.SoeInboundMessageChannel;
+import io.bacta.soe.network.handler.LoginInboundMessageChannel;
 import io.bacta.soe.network.handler.SoeSendHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by kyle on 7/12/2017.
@@ -26,7 +27,7 @@ import java.net.UnknownHostException;
 public class SoeTransceiver {
 
     private UdpChannel udpChannel;
-    private final SoeInboundMessageChannel inboundMessageChannel;
+    private final LoginInboundMessageChannel inboundMessageChannel;
     private final SoeSendHandler sendHandler;
     private final SoeConnectionCache soeConnectionCache;
 
@@ -35,7 +36,7 @@ public class SoeTransceiver {
 
     @Inject
     public SoeTransceiver(final UdpChannel udpChannel,
-                          final SoeInboundMessageChannel inboundMessageChannel,
+                          final LoginInboundMessageChannel inboundMessageChannel,
                           final SoeSendHandler sendHandler) {
 
         this.udpChannel = udpChannel;
@@ -61,9 +62,16 @@ public class SoeTransceiver {
 
         this.name = name;
         this.started = true;
-        this.udpChannel.start(name, bindAddress, bindPort, inboundMessageChannel);
+        this.udpChannel.start(name, bindAddress, bindPort, this::receiveMessage);
         this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
+    }
 
+    private void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
+        inboundMessageChannel.receiveMessage(sender, message);
+    }
+
+    public void sendMessage(SoeConnection sender, ByteBuffer message) {
+        sendHandler.sendMessage(sender, message);
     }
 
     public SoeConnection getConnection(final InetSocketAddress address) {

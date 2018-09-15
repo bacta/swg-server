@@ -64,7 +64,6 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
     private Gauge<Integer> sizeGauge;
 
     private final Thread sendThread;
-    private String metricPrefix;
 
     @Inject
     public DefaultSoeSendHandler(final SoeNetworkConfiguration networkConfiguration,
@@ -82,7 +81,6 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
     public void start(final String metricPrefix, final SoeConnectionCache connectionCache, final SoeProtocolHandler protocolHandler, final UdpChannel udpChannel) {
 
         if (!sendThread.isAlive()) {
-            this.metricPrefix = metricPrefix;
             sendThread.setName(metricPrefix + "-Send");
             sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
             metricRegistry.register(metricPrefix, (Gauge<Integer>) () -> connectionCache.getConnectionCount());
@@ -125,6 +123,17 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
         }
     }
 
+    @Override
+    public void sendMessage(final SoeConnection connectionProxy, final ByteBuffer message) {
+        final SoeUdpConnection connection = connectionProxy.getSoeUdpConnection();
+        ByteBuffer encodedMessage = protocolHandler.processOutgoing(connectionProxy, message);
+        udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
+        }
+    }
+
+
     private void sendPendingMessages() {
 
         final Set<InetSocketAddress> connectionList = connectionCache.keySet();
@@ -153,11 +162,7 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
             }
 
             for (final ByteBuffer message : messages) {
-                ByteBuffer encodedMessage = protocolHandler.processOutgoing(connectionProxy, message);
-                udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
-                if(LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
-                }
+                sendMessage(connectionProxy, message);
             }
         }
 
