@@ -1,12 +1,16 @@
 package io.bacta.login.server.service;
 
 import com.google.common.collect.ImmutableList;
+import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.message.CharacterCreationDisabled;
 import io.bacta.login.message.LoginClusterStatus;
 import io.bacta.login.message.LoginClusterStatusEx;
 import io.bacta.login.message.LoginEnumCluster;
 import io.bacta.login.server.LoginServerProperties;
-import io.bacta.login.server.model.*;
+import io.bacta.login.server.model.ConnectionServerEntry;
+import io.bacta.login.server.model.Galaxy;
+import io.bacta.login.server.model.GalaxyPopulationStatus;
+import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -116,59 +120,59 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     @Override
-    public void updateGalaxyStatus(String galaxyName, GalaxyStatusUpdate statusUpdate)
+    public void updateGalaxyStatus(String galaxyName, GalaxyServerStatus update)
             throws GalaxyNotFoundException, GalaxyRegistrationFailedException {
         final Galaxy galaxy = getGalaxy(galaxyName);
 
+        //TODO: Make this a common validation method as it is used in multiple places.
         //If we are changing the name of the galaxy, we need to:
         //- Ensure no other galaxy already has that name.
         //- Log that we are changing it.
-        if (!galaxyName.equals(statusUpdate.getName())) {
-            final Galaxy existingGalaxy = this.galaxyRepository.findByName(statusUpdate.getName());
+        if (!galaxyName.equals(update.getName())) {
+            final Galaxy existingGalaxy = this.galaxyRepository.findByName(update.getName());
 
             if (existingGalaxy != null) {
                 LOGGER.error("Could not update galaxy because name is taken by another galaxy.");
 
                 throw new GalaxyRegistrationFailedException(
-                        statusUpdate.getName(),
-                        statusUpdate.getAddress(),
-                        statusUpdate.getPort(),
+                        update.getName(),
+                        update.getAddress(),
+                        update.getPort(),
                         "A galaxy with the requested name already exists.");
             }
 
             LOGGER.info("Updating galaxy {} with new name {}.",
                     galaxyName,
-                    statusUpdate.getName());
+                    update.getName());
         }
 
         //Mark that the galaxy has updated itself.
         galaxy.setIdentified(true);
 
         //Meta information.
-        galaxy.setName(statusUpdate.getName());
-        galaxy.setAddress(statusUpdate.getAddress());
-        galaxy.setPort(statusUpdate.getPort());
-        galaxy.setTimeZone(statusUpdate.getTimeZone());
-        galaxy.setBranch(statusUpdate.getBranch());
-        galaxy.setNetworkVersion(statusUpdate.getNetworkVersion());
-        galaxy.setChangeList(statusUpdate.getChangeList());
+        galaxy.setName(update.getName());
+        galaxy.setAddress(update.getAddress());
+        galaxy.setPort(update.getPort());
+        galaxy.setTimeZone(update.getTimeZone());
+        galaxy.setBranch(update.getBranch());
+        galaxy.setNetworkVersion(update.getNetworkVersion());
+        galaxy.setChangeList(update.getChangeList());
 
         //Metrics information.
-        galaxy.setMaxCharacters(statusUpdate.getMaxCharacters());
-        galaxy.setMaxCharactersPerAccount(statusUpdate.getMaxCharactersPerAccount());
-        galaxy.setOnlinePlayerLimit(statusUpdate.getOnlinePlayerLimit());
-        galaxy.setOnlineTutorialLimit(statusUpdate.getOnlineTutorialLimit());
-        galaxy.setOnlineFreeTrialLimit(statusUpdate.getOnlineFreeTrialLimit());
+        galaxy.setMaxCharacters(update.getMaxCharacters());
+        galaxy.setMaxCharactersPerAccount(update.getMaxCharactersPerAccount());
+        galaxy.setOnlinePlayerLimit(update.getOnlinePlayerLimit());
+        galaxy.setOnlineTutorialLimit(update.getOnlineTutorialLimit());
+        galaxy.setOnlineFreeTrialLimit(update.getOnlineFreeTrialLimit());
 
         //Status information.
-        galaxy.setCharacterCreationDisabled(galaxy.isCharacterCreationDisabled());
-        galaxy.setAcceptingConnections(statusUpdate.isAcceptingConnections());
-        galaxy.setSecret(statusUpdate.isSecret());
-        galaxy.setLocked(statusUpdate.isLocked());
+        galaxy.setCharacterCreationDisabled(update.isCharacterCreationDisabled());
+        galaxy.setAcceptingConnections(update.isAcceptingConnections());
+        galaxy.setSecret(update.isSecret());
+        galaxy.setLocked(update.isLocked());
 
-        //Connection Servers...this may be a naive way to do this.
-        galaxy.getConnectionServers().clear();
-        galaxy.getConnectionServers().addAll(statusUpdate.getConnectionServers());
+        //Connection servers.
+        galaxy.updateConnectionServers(update.getConnectionServers());
 
         galaxyRepository.save(galaxy);
     }
