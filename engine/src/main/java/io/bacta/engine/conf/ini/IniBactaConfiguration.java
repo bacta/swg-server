@@ -74,6 +74,12 @@ public class IniBactaConfiguration implements BactaConfiguration {
     }
 
     @Override
+    public Collection<String> getStringCollectionWithDefault(String sectionName, String propertyName, Collection<String> defaultCollection) {
+        final Collection<String> collection = iniFile.getStringCollection(sectionName, propertyName);
+        return collection != null ? collection : defaultCollection;
+    }
+
+    @Override
     public boolean getBoolean(String sectionName, String propertyName) {
         return iniFile.getBoolean(sectionName, propertyName);
     }
