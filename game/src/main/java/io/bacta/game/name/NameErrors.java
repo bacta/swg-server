@@ -1,6 +1,6 @@
 package io.bacta.game.name;
 
-import io.bacta.shared.tre.localization.StringId;
+import io.bacta.shared.localization.StringId;
 
 public final class NameErrors {
     private static final String localizationFile = "ui";

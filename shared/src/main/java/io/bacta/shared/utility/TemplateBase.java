@@ -1,8 +1,8 @@
 package io.bacta.shared.utility;
 
+import io.bacta.shared.foundation.DataResourceList;
 import io.bacta.shared.iff.Iff;
-import io.bacta.shared.tre.foundation.DataResourceList;
-import io.bacta.shared.tre.template.ObjectTemplate;
+import io.bacta.shared.template.ObjectTemplate;
 
 import java.util.ArrayList;
 import java.util.Random;

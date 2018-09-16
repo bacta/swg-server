@@ -1,7 +1,7 @@
 package io.bacta.shared.utility;
 
 import io.bacta.engine.buffer.ByteBufferWritable;
-import io.bacta.shared.tre.math.Vector;
+import io.bacta.shared.math.Vector;
 import lombok.Getter;
 import lombok.Setter;
 
