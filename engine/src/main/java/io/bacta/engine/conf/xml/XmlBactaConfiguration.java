@@ -77,6 +77,11 @@ public class XmlBactaConfiguration implements BactaConfiguration {
     }
 
     @Override
+    public Collection<String> getStringCollectionWithDefault(String sectionName, String propertyName, Collection<String> defaultCollection) {
+        return null;
+    }
+
+    @Override
     public boolean getBoolean(String sectionName, String propertyName) {
         return false;
     }

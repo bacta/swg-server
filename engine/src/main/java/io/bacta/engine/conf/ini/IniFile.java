@@ -122,6 +122,12 @@ public class IniFile implements IniReader {
     }
 
     @Override
+    public Collection<String> getStringCollectionWithDefault(String sectionName, String propertyName, Collection<String> defaultCollection) {
+        Collection<String> collection = getStringCollection(sectionName, propertyName);
+        return collection != null ? collection : defaultCollection;
+    }
+
+    @Override
     public boolean getBoolean(String sectionName, String propertyName) {
         return getBooleanLast(sectionName, propertyName);
     }
@@ -623,9 +629,9 @@ public class IniFile implements IniReader {
 
             if (Files.exists(Paths.get(filePath))) {
                 reader = new BufferedReader(new FileReader(filePath));
-            } else if (Files.exists(Paths.get(baseDirectory + File.separator + filePath))){
+            } else if (Files.exists(Paths.get(baseDirectory + File.separator + filePath))) {
                 reader = new BufferedReader(new FileReader(baseDirectory + File.separator + filePath));
-            } else if (Files.exists(Paths.get(baseDirectory + File.separator + "../" + filePath))){
+            } else if (Files.exists(Paths.get(baseDirectory + File.separator + "../" + filePath))) {
                 reader = new BufferedReader(new FileReader(baseDirectory + File.separator + "../" + filePath));
             } else {
                 return;
