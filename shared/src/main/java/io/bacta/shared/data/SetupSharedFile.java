@@ -3,8 +3,6 @@ package io.bacta.shared.data;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.shared.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -14,8 +12,6 @@ import java.util.Collection;
 /**
  * Created by crush on 3/19/14.
  */
-@Component
-@Scope("prototype")
 @Slf4j
 public class SetupSharedFile {
 

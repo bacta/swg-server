@@ -1,0 +1,18 @@
+//This code is the user defined code for SharedObjectTemplate until I add user defined sections to the template writer.
+
+	//@TDF-USER-START
+	private ArrangementDescriptor arrangementDescriptor;
+	private SlotDescriptor slotDescriptor;
+
+	public ArrangementDescriptor getArrangementDescriptor() { return arrangementDescriptor; }
+	public SlotDescriptor getSlotDescriptor() { return slotDescriptor; }
+
+	public void setArrangementDescriptor(final ArrangementDescriptor arrangementDescriptor) {
+		this.arrangementDescriptor = arrangementDescriptor;
+	}
+
+	public void setSlotDescriptor(final SlotDescriptor slotDescriptor) {
+		this.slotDescriptor = slotDescriptor;
+	}
+
+	//@TDF-USER-END

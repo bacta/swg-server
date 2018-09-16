@@ -122,13 +122,13 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>io.bacta.shared.tre.template.definition.TemplateDefinitionCompiler</mainClass>
+                            <mainClass>io.bacta.shared.tre.io.bacta.shared.template.definition.TemplateDefinitionCompiler</mainClass>
                             <arguments>
                                 <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.shared</argument>
-                                <argument>io.bacta.shared.tre.template.shared</argument>
+                                <argument>io.bacta.shared.tre.io.bacta.shared.template.shared</argument>
                                 <argument>${project.basedir}/src/gen/java/io/bacta/shared/tre/template/shared</argument>
                                 <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
-                                <argument>io.bacta.shared.tre.template.server</argument>
+                                <argument>io.bacta.shared.tre.io.bacta.shared.template.server</argument>
                                 <argument>${project.basedir}/src/gen/java/io/bacta/shared/tre/template/server</argument>
                             </arguments>
                         </configuration>

@@ -42,8 +42,8 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executor;
 
@@ -91,7 +91,8 @@ public class GameServerConfiguration {
 
     @Bean
     public BactaConfiguration getBactaConfiguration() throws FileNotFoundException {
-        return new IniBactaConfiguration(Paths.get(gameServerProperties.getClientPath() + File.separator + gameServerProperties.getClientIniFile()));
+        final Path configPath = Paths.get(gameServerProperties.getClientPath(), gameServerProperties.getClientIniFile());
+        return new IniBactaConfiguration(configPath);
     }
 
     @Bean

@@ -3,28 +3,25 @@ package io.bacta.game.message;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;
 
 /**
-      8D 14 A5 D4 E8 00 00 00 
-
-  SOECRC32.hashCode(SelectCharacter.class.getSimpleName()); // 0xb5098d76
-  */
+ * Informs the game server that the client is requesting the given character id with which to play.
+ */
 @Getter
 @Priority(0x2)
+@RequiredArgsConstructor
 public final class SelectCharacter extends GameNetworkMessage {
-
-    public SelectCharacter() {
-
-    }
+    private final long id;
 
     public SelectCharacter(final ByteBuffer buffer) {
-
+        this.id = buffer.getLong();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
-
+        buffer.putLong(this.id);
     }
 }

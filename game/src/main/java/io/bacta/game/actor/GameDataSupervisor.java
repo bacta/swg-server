@@ -5,7 +5,6 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
-import io.bacta.game.actor.data.TreeFileSupervisor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ public class GameDataSupervisor extends AbstractActor {
 
         log.info("Game Data Supervisor starting");
         super.preStart();
-        getContext().actorOf(ext.props(TreeFileSupervisor.class), "treFile");
+        //getContext().actorOf(ext.props(TreeFileSupervisor.class), "treFile");
     }
 
     @Override

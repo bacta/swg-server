@@ -1,6 +1,6 @@
 package io.bacta.shared.utility;
 
-import io.bacta.shared.tre.math.Vector;
+import io.bacta.shared.math.Vector;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

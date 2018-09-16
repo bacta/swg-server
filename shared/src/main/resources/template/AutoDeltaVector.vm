@@ -1,0 +1,346 @@
+package com.ocdsoft.bacta.swg.precu.object.archive.delta.vector;
+
+import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
+import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.swg.precu.object.archive.delta.AutoDeltaContainer;
+#if (${trove})
+import gnu.trove.list.${listType};
+import gnu.trove.list.array.${listImpl};
+#end
+
+import java.nio.ByteBuffer;
+import java.util.*;
+#if(${valueCreator})
+import java.util.function.Function;
+#end
+
+public class AutoDelta${valueName}Vector${genericClass} extends AutoDeltaContainer {
+private transient final List
+<Command> commands;
+    private final ${listType}${generic} v;
+    private transient int baselineCommandCount;
+    #if (${valueCreator})
+        private transient final ${valueCreator};
+    #end
+
+    public AutoDelta${valueName}Vector(#if(${valueCreator})${valueCreator}#end) {
+    this.commands = new ArrayList<>(5);
+    this.v = new ${listImpl}${generic}();
+    this.baselineCommandCount = 0;
+    #if (${valueCreator})
+        this.valueCreator = valueCreator;
+    #end
+    }
+
+    public AutoDelta${valueName}Vector(final int initialSize#if(${valueCreator}), ${valueCreator}#end) {
+    this.commands = new ArrayList<>(5);
+    this.v = new ${listImpl}${generic}(initialSize);
+    this.baselineCommandCount = 0;
+    #if (${valueCreator})
+        this.valueCreator = valueCreator;
+    #end
+    }
+
+    public void clear() {
+    if (!isEmpty()) {
+    final Command command = new Command(Command.CLEAR);
+    commands.add(command);
+    ++baselineCommandCount;
+    for (int i = 0, size = v.size(); i < size; ++i)
+    onErase(i, v.get(i)${valueToBoolean});
+    v.clear();
+    touch();
+    onChanged();
+    }
+    }
+
+    public void erase(final int element) {
+    if (element < size()) {
+    final Command command = new Command(Command.ERASE, (short) element);
+    commands.add(command);
+    ++baselineCommandCount;
+    final ${valueType} oldValue = v.get(element)${valueToBoolean};
+    #if($trove)
+        v.removeAt(element);
+    #else
+        v.remove(element);
+    #end
+    touch();
+    onErase(element, oldValue);
+    onChanged();
+    }
+    }
+
+    public void add(final ${valueType} value) {
+    insert(v.size(), value);
+    }
+
+    public void insert(final int index, final ${valueType} value) {
+    final Command command = new Command(Command.INSERT, (short) index, value);
+    commands.add(command);
+    ++baselineCommandCount;
+    #if($trove)
+        v.insert(index, value${valueFromBoolean});
+    #else
+        v.add(index, value${valueFromBoolean});
+    #end
+    touch();
+    onInsert(index, value);
+    onChanged();
+    }
+
+    public void set(final int element, final ${valueType} value) {
+    if (element < v.size() && v.get(element) == (value${valueFromBoolean}))
+    return;
+
+    final Command command = new Command(Command.SET, (short) element, value);
+    commands.add(command);
+    ++baselineCommandCount;
+
+    final ${valueType} oldValue = v.get(element)${valueToBoolean};
+    v.set(element, value${valueFromBoolean});
+    touch();
+    onSet(element, oldValue, value);
+    onChanged();
+    }
+
+    public void set(final ${listType}${generic} value) {
+    final Command command = new Command(Command.SETALL, (short) value.size());
+    commands.add(command);
+    ++baselineCommandCount;
+
+    //Is this the best way to do this?
+    v.clear();
+    v.addAll(value);
+
+    for (int i = 0, size = value.size(); i < size; ++i) {
+    final Command subCommand = new Command(Command.SET, (short) i, value.get(i)${valueToBoolean});
+    commands.add(subCommand);
+    ++baselineCommandCount;
+    }
+
+    touch();
+    onChanged();
+    }
+
+    public int find(final ${valueType} value) {
+    for (int i = 0, size = v.size(); i < size; ++i) {
+    if ((v.get(i)${valueToBoolean}) == value)
+    return i;
+    }
+
+    return -1;
+    }
+
+    public ${listType}${generic} get() {
+    return v;
+    }
+
+    public ${valueType} get(int index) {
+    return v.get(index)${valueToBoolean};
+    }
+
+    public boolean isEmpty() {
+    return v.isEmpty();
+    }
+
+    @Override
+    public int size() {
+    return v.size();
+    }
+
+    @Override
+    public boolean isDirty() {
+    return commands.size() > 0;
+    }
+
+    @Override
+    public void clearDelta() {
+    commands.clear();
+    }
+
+    @Override
+    public void pack(final ByteBuffer buffer) {
+    buffer.putInt(v.size());
+    buffer.putInt(baselineCommandCount);
+
+    for (int i = 0, size = v.size(); i < size; ++i) {
+    final ${valueType} value = v.get(i)${valueToBoolean};
+    ${valueSerializer};
+    }
+    }
+
+    @Override
+    public void packDelta(final ByteBuffer buffer) {
+    buffer.putInt(commands.size());
+    buffer.putInt(baselineCommandCount);
+
+    for (int i = 0, size = commands.size(); i < size; ++i) {
+    final Command command = commands.get(i);
+    buffer.put(command.cmd);
+
+    switch (command.cmd) {
+    case Command.ERASE:
+    buffer.putShort(command.index);
+    break;
+    case Command.INSERT:
+    case Command.SET: {
+    buffer.putShort(command.index);
+    final ${valueType} value = command.value; //value will never be null in this case - ignore warning.
+    ${valueSerializer};
+    break;
+    }
+    case Command.SETALL: {
+    buffer.putShort(command.index);
+    for (int j = 0; j < command.index; ++j) {
+    ++i;
+    final Command nextCommand = commands.get(i);
+    final ${valueType} value = nextCommand.value;//value will never be null in this case - ignore warning.
+    ${valueSerializer};
+    }
+    break;
+    }
+    case Command.CLEAR:
+    break;
+    }
+    }
+
+    clearDelta();
+    }
+
+    @Override
+    public void unpack(final ByteBuffer buffer) {
+    v.clear();
+    clearDelta();
+
+    final int commandCount = buffer.getInt();
+    baselineCommandCount = buffer.getInt();
+
+    for (int i = 0; i < commandCount; ++i) {
+    final ${valueType} value = ${valueDeserializer};
+    v.add(value${valueFromBoolean});
+    }
+
+    onChanged();
+    }
+
+    @Override
+    public void unpackDelta(final ByteBuffer buffer) {
+    int skipCount;
+    final int commandCount = buffer.getInt();
+    final int targetBaselineCommandCount = buffer.getInt();
+
+    skipCount = commandCount + baselineCommandCount - targetBaselineCommandCount;
+
+    if (skipCount > commandCount)
+    skipCount = commandCount;
+
+    int i;
+    for (i = 0; i < skipCount; ++i) {
+    final byte cmd = buffer.get();
+    short index = 0;
+
+    if (cmd != Command.CLEAR)
+    index = buffer.getShort();
+
+    if (cmd == Command.SETALL) {
+    for (int j = 0; j < index; ++j) {
+    ++i;
+    ${valueDeserializer};
+    }
+    } else if (cmd != Command.ERASE && cmd != Command.CLEAR)
+    ${valueDeserializer};
+    }
+
+    for (; i < commandCount; ++i) {
+    final byte cmd = buffer.get();
+
+    switch (cmd) {
+    case Command.ERASE:
+    {
+    final short index = buffer.getShort();
+    erase(index);
+    break;
+    }
+    case Command.INSERT:
+    {
+    final short index = buffer.getShort();
+    final ${valueType} value = ${valueDeserializer};
+    insert(index, value);
+    break;
+    }
+    case Command.SET:
+    {
+    final short index = buffer.getShort();
+    final ${valueType} value = ${valueDeserializer};
+    set(index, value);
+    break;
+    }
+    case Command.SETALL:
+    {
+    final short index = buffer.getShort();
+    final ${listType}${generic} tempList = new ${listImpl}${generic}(index);
+
+    for (int j = 0; j < index; ++j) {
+    ++i;
+    final ${valueType} value = ${valueDeserializer};
+    tempList.add(value${valueFromBoolean});
+    }
+    set(tempList);
+    break;
+    }
+    case Command.CLEAR:
+    clear();
+    break;
+    }
+    }
+    }
+
+    private void onChanged() {
+    }
+
+    private void onErase(final int index, final ${valueType} oldValue) {
+    }
+
+    private void onInsert(final int index, final ${valueType} value) {
+    }
+
+    private void onSet(final int index, final ${valueType} oldValue, final ${valueType} newValue) {
+    }
+
+    public final class Command {
+    public static final byte ERASE = 0x00;
+    public static final byte INSERT = 0x01;
+    public static final byte SET = 0x02;
+    public static final byte SETALL = 0x03;
+    public static final byte CLEAR = 0x04;
+
+    public final byte cmd;
+    public final short index;
+    public final ${valueType} value;
+
+    public Command(final byte cmd) {
+    this.cmd = cmd;
+    this.index = 0;
+    this.value = ${valueDefault};
+    }
+
+    public Command(final byte cmd, final short index) {
+    this.cmd = cmd;
+    this.index = index;
+    this.value = ${valueDefault};
+    }
+
+    public Command(final byte cmd, final short index, final ${valueType} value) {
+    this.cmd = cmd;
+    this.index = index;
+    this.value = value;
+    }
+
+    public Command(final ByteBuffer buffer) {
+    this.cmd = buffer.get();
+    this.index = buffer.getShort();
+    this.value = ${valueDeserializer};
+    }
+    }
+    }
