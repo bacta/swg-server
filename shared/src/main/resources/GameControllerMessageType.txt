@@ -1,0 +1,1017 @@
+//Newline delimited list of GameControllerMessage types to generate GameControllerMessage enum. Use = to assign the
+//counter a specific value. Anything following // on the current line will be ignored.
+
+Nothing
+
+CameraYaw
+CameraPitch
+MovePlayer
+ToggleLight
+
+//-----------------------------------------------------------------
+//-- ui commands
+
+UiChatCollapse //5
+UiChatIconify
+UiChatMaximize
+UiChatTabEdit
+UiChatTabKill
+
+UiChatTabNew //10
+UiChatTabNext
+UiChatTabPrev
+UiCombatAim
+UiCombatAttack
+
+UiCombatTarget
+UiPosture0
+UiPosture1
+UiPosture2
+UiAttitude0
+UiAttitude1 //20
+
+UiAttitude2
+UiAttitude3
+UiAttitude4
+UiConversationResponse0
+UiConversationResponse1
+
+UiConversationResponse2
+UiConversationResponse3
+UiConversationResponse4
+UiConversationResponse5
+UiConversationStart  //30
+
+UiConversationStop
+UiDebugPrint
+UiGameMenuActivate
+UiInventoryClose
+UiInventoryIconify
+
+UiInventoryMaximize
+UiMfdIconify
+UiMfdMaximize
+UiMfdNext
+UiMfdPrev //40
+
+UiMissionBrowser
+UiMissionCreation
+UiPointerToggleDown
+UiPointerToggleUp
+UiRadarIconify
+
+UiRadarMaximize
+UiRadarRangeDecrease
+UiRadarRangeIncrease
+UiRadarUpdate
+UiSkills //50
+
+UiDataStorage
+UiStartChat
+UiTargetsClearAll
+UiTargetsClearSelected
+UiTargetsIconify
+
+UiTargetsNext
+UiTargetsPeaceAttackToggle
+UiTargetsPrev
+UiToggleChatBubblesMinimized
+UiToggleHud //60
+
+UiToolbarPaneNext
+UiToolbarPanePrev
+UiToolbarSlot0
+UiToolbarSlot1
+UiToolbarSlot2
+
+UiToolbarSlot3
+UiToolbarSlot4
+UiToolbarSlot5
+UiToolbarSlot6
+UiToolbarSlot7 //70
+
+UiToolbarSlot8
+UiToolbarSlot9
+UiToolbarSlot10
+UiToolbarSlot11
+UiPersistentMessageBrowser
+
+UiChatRoomBrowser
+UiWorkspaceFrameClose
+UiWorkspaceFrameIconify
+UiWorkspaceFrameMaximize
+UiWorkspaceFrameNext //80
+
+UiWorkspaceFramePrev
+Left
+Right
+Up
+Down //85
+
+ButtonDeprecated          // 86
+Yaw
+Pitch
+Roll
+CameraYawMouse //90
+
+CameraPitchMouse   
+CameraZoom
+CameraLock
+CameraReset
+Exit
+
+CockpitCamera	
+ChaseCamera
+ObjectCamera
+SpinCamera
+FlybyCamera //100
+
+TrackCamera
+Increase
+Decrease
+FullSpeed
+FullStop //105
+
+Alt
+Shift
+FireGun
+ToggleGun
+CameraResetCursor //110
+
+CycleTargets	
+NetSpawn
+NetUpdateTransform
+NetFrag
+NetDeath
+
+NetShoot		
+NetMove
+NetChat
+NetDisconnect
+HeadCamera   //120
+
+ToggleShipState	
+SetTransform1
+Idle
+Walk
+FreeCamera
+
+Wear
+SetTransform2
+Run
+AnimationStateIdle
+AnimationStateWalk //130
+
+AnimationStateRun
+SetMemberData				// Message to set member data.  Requires a submessage to describe what member data.
+ApplyDelta					// Message to modify member data.  Requires a submessage to describe what member data.
+SwoopCamera
+SetYaw
+
+Turn
+EnvironmentPause  
+TerrainShowLodBorderChunks
+TerrainFreeze
+ToggleEnvironment  //140
+
+ToggleOcclusion
+UmbraExportFalse
+UmbraExportTrue
+TerrainToggleHeightBias
+TerrainShowLod
+
+TerrainMultithreaded
+FillMode
+BuildingIncreaseDesiredLevel
+BuildingDecreaseDesiredLevel
+Pause                            //150
+
+Panorama
+ScreenShot360
+ToggleRunOn
+ToggleRunOff
+MoveLongitudinal
+
+MoveLateral
+ToggleStrafe
+CameraPivotYaw
+CameraPivotPitch
+CameraPivotTranslateX        //160
+
+CameraPivotTranslateY
+CameraPivotZoom
+CameraTranslateX
+CameraTranslateY
+CameraTranslateZ
+
+FreeChaseCamera
+MouseWheel
+CameraSmarts
+CameraSmartsAbove4Meters
+CameraSwoopIn                  //170
+
+CameraDoorway
+Emote1
+Emote2
+Emote3
+Emote4
+
+Emote5
+Emote6
+Emote7
+Emote8
+Emote9            //180
+
+Emote10
+CycleRunAnimation
+CycleRunAnimationBackward
+CycleWalkAnimation
+CycleWalkAnimationBackward
+
+AnimationStateRun2
+AnimationStateRun3
+AnimationStateRun4
+AnimationStateRun5
+AnimationStateRun6       //190
+
+AnimationStateRun7
+AnimationStateRun8
+AnimationStateRun9
+AnimationStateRun10
+AnimationStateWalk2
+
+AnimationStateWalk3
+AnimationStateWalk4
+AnimationStateWalk5
+AnimationStateWalk6
+AnimationStateWalk7    //200
+
+AnimationStateWalk8
+AnimationStateWalk9
+AnimationStateWalk10
+CombatAction
+CombatDamage
+
+CombatDamageList
+WarpPlayerToFreeCamera
+ResourceAdd
+ActivateInstallation
+ResourcePoolAddHarvester //210
+
+ResourceSetInstalledEfficiency
+InstallationHarvest
+ResourcePoolCollectResource
+ResourceFinishHarvest
+DeactivateInstallation
+
+ResourcePoolRemoveHarvester
+ResourcePoolDepleted
+ResourceTypeDepleted
+ResourceSpawnPool
+ResourceEmptyHopper //220
+
+NpcConversationStart
+NpcConversationStop
+NpcConversationMessage
+NpcConversationResponses
+NpcConversationSelect
+
+TransferItem
+OpponentInfo
+DebugPortalCamera
+ClientResourceHarvesterActivate
+ClientResourceHarvesterDeactivate //230
+
+ClientResourceHarvesterListen
+ClientResourceHarvesterStopListening
+ClientResourceHarvesterGetResourceData
+ClientResourceHarvesterResourceData
+ClientResourceHarvesterResourceSelect
+
+ClientResourceHarvesterSurvey
+ClientResourceHarvesterEmptyHopper
+ClientResourceHarvesterEmptyHopperResponse
+ClientObjectMenuRequest
+ClientObjectMenuSelect //240
+
+NetUpdateTransformWithParent
+AnimationAction
+SpatialChatSend
+SpatialChatReceive
+MissionListRequest
+
+MissionListResponse
+MissionDetailsRequest
+MissionDetailsResponse
+MissionAcceptRequest
+MissionAcceptResponse  //250
+
+MissionRemoveRequest
+MissionRemoveResponse
+MissionPostRequest
+MissionPostResponse
+MissionCreateRequest
+
+MissionCreateResponse
+ServerMissionAssign
+DraftSchematicsMessage
+DraftSlotsMessage
+SchematicAttribsMessage  //260
+
+IngredientsHopperMessage
+ExperimentMessage
+FillSchematicSlotMessage
+EmptySchematicSlotMessage
+NextCraftingStage
+
+CreatePrototype
+CreateManfSchematic
+CraftingResult
+NextStageReady
+SelectDraftSchematic  //270
+
+RequestCraftingSession
+CancelCraftingSession
+RestartCraftingSession
+SchematicCustomizationsMessage
+ExperimentResult
+
+GetTokenForObject
+SecureTrade
+CommandQueueEnqueue
+CommandQueueRemove
+CommandQueueEnqueueFwd  //280
+
+CommandQueueAlterWaitTimerFwd
+CommandQueueForceExecuteCommandFwd
+PvpMessage
+GetWaypointForObject
+UiPersistentMessageComposer
+
+UiChatRooms
+UiSkillCommands
+UiCharacterSheet
+CameraPathNormal
+CameraPathAddWaypoint //290
+
+CameraPathPlayback
+CameraPathDeleteLastWaypoint
+ScriptTrigger
+ClientLookAtTarget
+CombatAimToClient  //295
+
+VtuneResume
+VtunePause
+VtuneCounter
+SynchronizeScriptVars
+ClientMoodChange	//300
+
+TransferObjectToCell
+SocialReceive
+SocialSend
+UiChatTab
+SetPosture
+
+UiClientSocial
+UiClientMood
+CombatSpam
+UiCycleTargetInward
+UiCycleTargetOutward	//310
+
+UiCycleTargetNext
+UiCycleTargetPrev
+AttachScript
+DetachScript
+SitOnObject
+
+UiCombatQueueCollapse
+UiCombatQueueExpand
+Teleport
+TeleportAck
+WeaponRangesMessage	//320
+
+UiMissionDetails
+MissionAbort
+SetBuildingCityId
+ClientCommandParser
+DebugKeyContext1
+
+ObjectMenuRequest
+ObjectMenuResponse
+SetState
+SetAttribute
+SetMaxAttribute	//330
+
+SetMentalState
+SetMentalStateToward
+SetCover
+SetMentalStateTowardClampBehavior
+SetMaxMentalState
+
+SetMentalStateDecay
+SetLocomotion
+SetAutoAttack
+SetOwnerId
+SetMaxHitPoints	//340
+
+SetVisible
+SetInvulnerable
+SetCombatAttitude
+AddPlayerToSpawnQueue
+RemovePlayerFromSpawnQueue
+
+SetCustomizationData
+GroupSetName
+GroupAddMember
+GroupRemoveMember
+GroupDisband	//350
+
+SetGroupInviter
+SetPerformanceType
+SetPerformanceListenTarget
+SetPerformanceWatchTarget
+UiSurvey
+
+SetPerformanceStartTime
+ForwardNpcConversationMessage
+MusicFlourish
+CommandQueueAdd
+AddNpcConversationResponse	//360
+
+RemoveNpcConversationResponse
+SendNpcConversationResponses
+PlayerResponseToNpcConversation
+ScriptTransferMoney
+GroupMakeLeader
+
+PersistObject
+SetCacheVersion
+SetObjectName
+SetObjectNameStringId
+TeleportObject		//370
+
+UpdatePositionOnPlanetServer
+SetPlayerControlled
+Customize
+PermanentlyDestroy
+TransferAuthority
+
+AddLocationTarget
+RemoveLocationTarget
+AddLocationExitTarget
+RemoveLocationExitTarget
+SetBuildingIsPublic	//380
+
+SetInCombat
+AddAim
+ClearAims
+AlterHitPoints
+AddResource
+
+SetCombatTarget
+RemoveCombatTarget
+SetCraftedId
+StartCraftingSession
+StopCraftingSession	//390
+
+AddIngredientToHopper
+RemoveIngredientFromHopper
+AddObjectToOutputSlot
+SetCraftingManufactureSchematic
+ClearCraftingManufactureSchematic
+
+SetCraftingPrototype
+ClearCraftingPrototype
+SetVisibleComponents
+SetIsShield
+ResourcePoolDeductResource	//400
+
+DebugKeyContext2
+SetAmmo
+AddAllowed
+RemoveAllowed
+AddBanned
+
+RemoveBanned
+SetDefaultWeapon
+SetModValue
+GrantCommand
+GrantExperiencePoints	//410
+
+GrantSkill
+RevokeCommand
+RevokeSkill
+AlterAttribute
+AddAttributeModifier
+
+RemoveAttributeModifiers
+RemoveAllAttributeModifiers
+ApplyDamageToArmor
+SetCombatTargets
+SetCurrentWeapon	//420
+
+SetGroup
+SetMood
+SetIncapacitated
+SetSayMode
+SetAnimationMood
+
+SetScaleFactor
+SetShockWounds
+SetLookAtTarget
+SetMovementStationary
+SetMovementWalk	//430
+
+SetMovementRun
+SetSlopeModAngle
+SetSlopeModPercent
+SetWaterModPercent
+SetMovementPercent
+
+SetTurnPercent
+SetAccelPercent
+PlanetAddTravelPoint
+PlanetRemoveTravelPoint
+PlanetTravelPointNamesRequest	//440
+
+PlanetTravelPointNamesResponse
+FactoryAddObject
+AddSchematic
+ManufactureInstallationCreateObject
+ShowFlyText
+
+NextCraftingStageResult
+DraftSlotsQueryResponse
+SetBattlefieldParticipant
+ClearBattlefieldParticipants
+CraftingSessionEnded	//450
+
+SetIntDynamicVariable
+SetIntArrayDynamicVariable
+SetFloatDynamicVariable
+SetFloatArrayDynamicVariable
+SetStringDynamicVariable
+
+SetStringArrayDynamicVariable
+SetObjIdDynamicVariable
+SetObjIdArrayDynamicVariable
+SetLocationDynamicVariable
+SetStringIdDynamicVariable	//460
+
+SetStringIdArrayDynamicVariable
+CopyDynamicVariable
+CopyDynamicVariableToSubList
+AddNestedObjVarList
+RemoveObjVarItem
+
+EraseObjVarListEntries
+SetObjVarItemVar
+GuildCreate
+GuildRemoveMember
+GuildSetMemberProfessionInfo	//470
+
+GuildRemoveEnemy
+GuildSetEnemy
+GuildDisband
+GuildSetLeader
+BiographyRetrieved
+
+SetLocationArrayDynamicVariable
+GuildSetName
+GuildSetAbbrev
+ReplaceMe1
+ReplaceMe2	//480
+
+ReplaceMe3
+ReplaceMe4
+ReplaceMe5
+ReplaceMe6
+ReplaceMe7
+
+ReplaceMe8
+CharacterMatchRetrieved
+InitDecay
+SetDecay
+SetVolume	//490
+
+SetMasterId
+SetCreatorId
+SetCreatorName
+SetCreatorXp
+SetCreatorXpType
+
+SetCraftedType
+RadarZoom
+AutoRun
+RadarMap
+SetForcePower	//500
+
+SetMaxForcePower
+SetWeather
+AddJedi
+RemoveJedi
+UpdateJedi
+
+RequestJediBounty
+RemoveJediBounty
+StartingLocations
+StartingLocationSelectionResult
+SynchronizeScriptVarDeltas	//510
+
+MouseWalkStart
+MouseWalk
+CancelAutoRun
+DirectDamage
+SetMovementScale
+
+SetAccelScale
+Disconnect
+TeleportNextFrame
+ResourceWeights
+ServerAddPlanetMapLocation	//520
+
+ServerRemovePlanetMapLocation
+SetCondition
+ClearCondition
+SetHouse
+SetGroupMemberDifficulty
+
+SetDifficulty
+GrantOfflineXp
+CityCreate
+CitySetName
+CityRemove	// 530
+
+CitySetCitizen
+CityRemoveCitizen
+CitySetStructure
+CityRemoveStructure
+SetForceRegenRate
+
+UpdateJediLocation
+SetJediOffline
+CreatureSetBaseWalkSpeed
+CreatureSetBaseRunSpeed
+EmergencyDismountForRider   // 540
+
+DetachRiderForMount
+SetDecayTime
+ClearDecayTime
+CitySetCityHall
+CitySetLocation
+
+CitySetRadius
+CitySetLeader
+CitySetIncomeTax
+CitySetPropertyTax
+CitySetSalesTax // 550
+
+CitySetTravelInfo
+CitySetCloneInfo
+ModData
+CancelMod
+ObjectMenuDirty
+
+AttributesDirty
+SetTransformDynamicVariable
+SetTransformArrayDynamicVariable
+SetVectorDynamicVariable
+SetVectorArrayDynamicVariable // 560
+
+AiSetMovement
+AiSetMovementWalk
+UpdateJediBounties
+SetAppearanceFromObjectTemplate
+AiSetMovementRun
+
+ApplyWound
+SetWound
+ImageDesignerChange
+ImageDesignerCancel
+ImageDesignerStart // 570
+
+SetJediState
+UpdateJediState
+MakeDead
+UpdateJediSpentJediSkillPoints
+UpdateJediScriptData
+
+RemoveJediScriptData
+RemoveAllJediBounties
+UpdateJediFaction
+SetCurrentQuest
+SetRegenRate // 580
+
+UpdateObserversCount
+HideFromClient
+SetHibernationDelay
+SetAttackableOverride
+ModifyCurrentGcwPoints
+
+ModifyCurrentGcwRating
+ModifyCurrentPvpKills
+ModifyLifetimeGcwPoints
+ModifyMaxGcwImperialRating
+ModifyMaxGcwRebelRating // 590
+
+ModifyLifetimePvpKills
+ModifyNextGcwRatingCalcTime
+CancelMessageTo
+ClearSessionActivity
+AddSessionActivity
+
+AddPassiveReveal
+RemovePassiveReveal
+RemoveAllPassiveReveal
+ModifyHologramType
+ModifyVisibleOnMapAndRadar // 600
+
+SetCoverVisibility
+BuffBuilderChange
+BuffBuilderCancel
+BuffBuilderStart
+IncubatorStart
+
+IncubatorCommit
+IncubatorCancel
+ModifyCollectionSlotValue
+RemoveCollection
+AdjustLotCount // 610
+
+Squelch
+Unsquelch
+SetPriviledgedTitle
+CollectionRequestServerFirst
+CollectionRevokeServerFirst
+
+AddHateOverTime
+SetConnectedCharacterLfgData
+RemoveConnectedCharacterData
+SetConnectedCharacterGroupData
+SetConnectedCharacterPlanetData // 620
+
+SetConnectedCharacterBiographyData
+RemoveConnectedCharacterBiographyData
+SetGroupMemberProfession
+SetConnectedCharacterLevelData
+SetConnectedCharacterProfessionData
+
+SetConnectedCharacterAnonymousData
+SetConnectedCharacterInterestsData
+SetConnectedCharacterRegionData
+SetGroupPickupTimer
+SetGroupPickupLocation // 630
+
+SetConnectedCharacterDisplayLocationInSearchResultsData
+SetConnectedCharacterPlayerCityData
+AddUniverseEvent
+RemoveUniverseEvent
+SetConnectedCharacterSearchableByCtsSourceGalaxyData
+
+ForceHateTarget
+AddUserToAccessList
+RemoveUserFromAccessList
+ClearUserAccessList
+GuildUpdateGuildWarKillTrackingData // 640
+
+GuildSetGuildElectionEndTime
+GuildAddMemberRank
+GuildRemoveMemberRank
+GuildAddCreatorMember
+GuildAddSponsorMember
+
+GuildSetMemberPermission
+GuildSetMemberTitle
+GuildSetMemberAllegiance
+GuildSetMemberPermissionAndAllegiance
+GuildSetMemberNameAndPermission // 650
+
+CitySetCreationTime
+AdjustGcwImperialScore
+AdjustGcwRebelScore
+CitySetCitizenProfessionInfo
+CitySetCitizenAddRank
+
+CitySetCitizenRemoveRank
+CitySetCitizenTitle
+AdjustPgcRating
+AdjustPgcRatingData
+SetPgcRatingData // 660
+
+FixPgcChroniclerName
+CitySetFaction
+GuildSetGuildFaction
+GuildSetGuildGcwDefenderRegion
+CitySetGcwDefenderRegion
+
+//-- Space controller messages
+FormDataForEdit = 1000
+ShipDynamicsYaw
+ShipDynamicsPitch
+ShipDynamicsRoll
+ShipFireWeaponAll
+
+ShipFireWeapon0  //1005
+ShipFireWeapon1
+ShipFireWeapon2
+ShipFireWeapon3
+ShipFireWeapon4
+
+ShipFireWeapon5 //1010
+ShipFireWeapon6
+ShipFireWeapon7
+ShipDamageMessage
+ServerAsteroidDebugData
+
+CommPlayer //1015
+LightningHitShip
+EnvironmentHitShip
+ClientLookAtTargetComponent
+UiCycleComponentTargetForward
+
+UiCycleComponentTargetBackward //1020
+UpdateShipOnCollision
+AboutToHyperspace
+PlayerTransitioningOut
+PlayerTransitioningIn
+
+UiPlayEffect //1025
+ShipThrottleChangeStart
+ShipThrottleChange
+ShipThrottleSetSlider
+YawButton
+
+PitchButton //1030
+RollButton
+ShipThrottleSetAxis
+SpaceTargetClosestShip
+SpaceTargetClosestCapShip
+
+SpaceTargetUnderReticle //1035
+SpaceTargetNextFriendly
+SpaceTargetPreviousFriendly
+SpaceTargetNextEnemy
+SpaceTargetPreviousEnemy
+
+SetGroupShipForMember // 1040
+SetGroupShipFormationSlotForMember
+AddIgnoreIntersect
+RemoveIgnoreIntersect
+SpaceTargetNextOnScreenUnderVariableReticle
+
+SpaceTargetPreviousOnScreenUnderVariableReticle // 1045
+SpaceTargetClosestPlayerShip
+SpaceTargetClosestNPCShip
+JoystickPovDirection
+JoystickPovCenter
+
+AddGroupPOBShipAndOwner //1050
+RemoveGroupPOBShip
+SpaceTerminalRequest
+SpaceTerminalResponse
+SetThrottlePosition
+
+SpaceTargetLastEnemyThatShotPlayer //1055
+SpaceTargetClosestEnemy
+SpaceTargetClosestEnemyPlayer
+SpaceTargetClosestFriend
+SpaceTargetClosestFriendPlayer
+
+SpaceTargetNextFriendlyPlayer //1060
+SpaceTargetPreviousFriendlyPlayer
+SpaceTargetNextEnemyPlayer
+SpaceTargetPreviousEnemyPlayer
+SpaceTargetGroupLeader
+
+SpaceTargetNextGroupMember //1065
+SpaceTargetPreviousGroupMember
+SwapRollYawAxes
+RearView
+HyperspaceOrientShipToPointAndLockPlayerInput
+
+LockPlayerShipInputOnClient // 1070
+UnlockPlayerShipInputOnClient
+SpaceTargetNext
+SpaceTargetPrevious
+SetSpecialAbility
+
+SpaceShipHit //1075
+ShipThrottleDeltaAxis
+ShipThrottleDeltaSlider
+DroidCommandProgramming
+InviteOtherGroupMembersToLaunchIntoSpace
+
+AskGroupMemberToLaunchIntoSpace //1080
+GroupMemberInvitationToLaunchIntoSpaceResponse
+RelayGroupMemberInvitationToLaunchAnswer
+//-- End space controller messages
+
+GroupMakeLootMaster
+GroupSetLootRule
+
+GroupOpenLotteryWindowOnClient //1085
+GroupCloseLotteryWindowOnClient
+GroupLotteryWindowHeartbeat
+GroupLotteryWindowCloseResults
+QuestTaskCounterData
+
+PushCreature // 1090
+SetBioLink
+QuestTaskTimerData
+SlowDownEffect
+RemoveSlowDownEffect
+
+RemoveSlowDownEffectProxy // 1095
+CommandTimer
+AddHate
+SetHate
+RemoveHateTarget
+
+ClearHateList // 1100
+ChangeRoleIconChoice
+AiSetCreatureName
+AiCreatureState
+AiSetHomeLocation
+
+SetLevel // 1105
+RecalculateLevel
+AiSetFrozen
+AiSetRetreating
+AiSetLogging
+
+AiEquipPrimaryWeapon // 1110
+AiEquipSecondaryWeapon
+AiUnEquipWeapons
+AiMarkCombatStartLocation
+ShowCombatText
+
+SetCurrentWorkingSkill // 1115
+SetProfessionTemplate
+ResetHateTimer
+AutoExpireHateListTargetEnabled
+
+//-- ep3 controller messages
+ShipStopFiring = 1200 // use for ep3
+CyberneticsOpen
+CyberneticsChangeRequest
+CyberneticsChangeRequestToNPC
+SpaceMiningSaleOpen
+
+DetachAllRidersForMount // 1205
+SpaceMiningSaleSellResource
+RequestActivateQuest
+RequestCompleteQuest
+RemoveAllAllowed
+
+RemoveAllBanned // 1210
+//-- End ep3 controller messages
+
+StaticLootItemData
+ShowLootBox
+QuestTaskLocationData
+ForceActivateQuest
+
+Jump // 1215
+PrimaryAttack
+SecondaryAttack
+PrimaryAction
+PrimaryActionAndAttack
+
+SetIntendedTarget // 1220
+ClientIntendedTarget
+ToggleAutoAim
+ToggleRepeatPrimaryAttack
+SetIntendedAndSummonRadialMenu
+
+CustomizeFinished // 1225
+OpenCustomizationWindow
+IncrementKillMeter
+UntargetOnly
+PetToolbarSlot0
+
+PetToolbarSlot1 // 1230
+PetToolbarSlot2
+PetToolbarSlot3
+PetToolbarSlot4
+PetToolbarSlot5
+
+PetToolbarSlot6 // 1235
+PetToolbarSlot7
+PetToolbarSlot8
+RemoveAllAttributeAndSkillmodModifiers
+AddBuff
+
+RemoveBuff // 1240
+ClientMinigameOpen
+ClientMinigameClose
+ClientMinigameResult
+CreateSaga
+
+OpenRatingWindow // 1245
+RatingFinished
+AbandonPlayerQuest
+OpenRecipe 
+AddObjectEffect
+
+RemoveObjectEffect // 1250
+RemoveAllObjectEffect 

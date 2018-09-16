@@ -3,6 +3,8 @@ package io.bacta.shared.tre;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by crush on 3/20/14.
@@ -27,7 +29,8 @@ final class SearchAbsolute extends SearchNode {
         byte[] bytes = null;
 
         try {
-            RandomAccessFile file = new RandomAccessFile(this.filePath + filePath, "r");
+            final Path path = Paths.get(this.filePath, filePath);
+            final RandomAccessFile file = new RandomAccessFile(path.toString(), "r");
 
             bytes = new byte[(int) file.length()];
             file.readFully(bytes);

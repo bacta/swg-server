@@ -1,0 +1,242 @@
+package com.ocdsoft.bacta.swg.precu.object.archive.delta.set;
+
+import com.ocdsoft.bacta.engine.buffer.ByteBufferWritable;
+import com.ocdsoft.bacta.engine.utils.BufferUtil;
+import com.ocdsoft.bacta.swg.precu.object.archive.delta.AutoDeltaContainer;
+#if (${trove})
+import gnu.trove.set.${setType};
+import gnu.trove.set.hash.${setImpl};
+#end
+
+import java.nio.ByteBuffer;
+import java.util.*;
+#if(${valueCreator})
+import java.util.function.Function;
+#end
+
+public class AutoDelta${valueName}Set${genericClass} extends AutoDeltaContainer {
+private transient final List
+<Command> commands;
+    private final ${setType}${generic} set;
+    private transient int baselineCommandCount;
+    #if (${valueCreator})
+        private final ${valueCreator};
+    #end
+
+    public AutoDelta${valueName}Set(#if(${valueCreator})${valueCreator}#end) {
+    this.commands = new ArrayList<>(5);
+    this.set = new ${setImpl}${generic}();
+    this.baselineCommandCount = 0;
+    #if (${valueCreator})
+        this.valueCreator = valueCreator;
+    #end
+    }
+
+    public ${setType}${generic} get() {
+    return set;
+    }
+
+    @Override
+    public int size() {
+    return set.size();
+    }
+
+    public boolean isEmpty() {
+    return set.isEmpty();
+    }
+
+    public boolean contains(final ${valueType} value) {
+    return set.contains(value${valueFromBoolean});
+    }
+
+    public void clear() {
+    if (!isEmpty()) {
+    final Command command = new Command(Command.CLEAR, ${valueDefault});
+    commands.add(command);
+    ++baselineCommandCount;
+    ${containerForEachStart}
+    erase(value${valueToBoolean});
+    ${containerForEachEnd}
+    set.clear();
+    touch();
+    onChanged();
+    }
+    }
+
+    public void erase(final ${valueType} value) {
+    if (set.contains(value${valueFromBoolean})) {
+    final Command command = new Command(Command.ERASE, value);
+    commands.add(command);
+    ++baselineCommandCount;
+    set.remove(value${valueFromBoolean});
+    touch();
+    onErase(value);
+    onChanged();
+    }
+    }
+
+    public void insert(final ${valueType} value) {
+    if (set.add(value${valueFromBoolean})) {
+    final Command command = new Command(Command.INSERT, value);
+    commands.add(command);
+    ++baselineCommandCount;
+    touch();
+    onInsert(value);
+    onChanged();
+    }
+    }
+
+    @Override
+    public boolean isDirty() {
+    return commands.size() > 0;
+    }
+
+    @Override
+    public void clearDelta() {
+    commands.clear();
+    }
+
+    @Override
+    public void pack(ByteBuffer buffer) {
+    buffer.putInt(set.size());
+    buffer.putInt(baselineCommandCount);
+
+    ${containerForEachStart}
+    ${valueSerializer};
+    ${containerForEachEnd}
+    }
+
+    @Override
+    public void packDelta(ByteBuffer buffer) {
+    buffer.putInt(commands.size());
+    buffer.putInt(baselineCommandCount);
+
+    for (final Command command : commands)
+    command.writeToBuffer(buffer);
+
+    clearDelta();
+    }
+
+    @Override
+    public void unpackDelta(ByteBuffer buffer) {
+    int skipCount;
+    final int commandCount = buffer.getInt();
+    final int targetBaselineCommandCount = buffer.getInt();
+
+    // if (commandCount+baselineCommandCount) < targetBaselineCommandCount, it
+    // means that we have missed some changes and are behind; when this happens,
+    // catch up by applying all the deltas that came in, and set
+    // baselineCommandCount to targetBaselineCommandCount
+    if ((commandCount + baselineCommandCount) > targetBaselineCommandCount)
+    skipCount = commandCount + baselineCommandCount - targetBaselineCommandCount;
+    else
+    skipCount = 0;
+
+    if (skipCount > commandCount)
+    skipCount = commandCount;
+
+    int i;
+    for (i = 0; i < skipCount; ++i) {
+    final byte cmd = buffer.get();
+
+    if (cmd != Command.CLEAR)
+    ${valueDeserializer};
+    }
+
+    for (; i < commandCount; ++i) {
+    final Command command = new Command(buffer);
+
+    switch (command.cmd) {
+    case Command.ERASE:
+    erase(command.value);
+    break;
+    case Command.INSERT:
+    insert(command.value);
+    break;
+    case Command.CLEAR:
+    clear();
+    break;
+    }
+    }
+
+    // if we are behind, catch up
+    if (baselineCommandCount < targetBaselineCommandCount)
+    baselineCommandCount = targetBaselineCommandCount;
+    }
+
+    @Override
+    public void unpack(ByteBuffer buffer) {
+    set.clear();
+    clearDelta();
+
+    final int commandCount = buffer.getInt();
+    baselineCommandCount = buffer.getInt();
+
+    for (int i = 0; i < commandCount; ++i) {
+    final ${valueType} value = ${valueDeserializer};
+    set.add(value${valueFromBoolean});
+    }
+
+    onChanged();
+    }
+
+    private void onChanged() {
+    //implement on changed callback
+    }
+
+    private void onErase(final ${valueType} value) {
+    //implement on erase callback
+    }
+
+    private void onInsert(final ${valueType} value) {
+    //implement on insert callback
+    }
+
+
+    public final class Command implements ByteBufferWritable {
+    private static final byte ERASE = 0x00;
+    private static final byte INSERT = 0x01;
+    private static final byte CLEAR = 0x02;
+
+    public final byte cmd;
+    public final ${valueType} value;
+
+    public Command(final byte cmd, final ${valueType} value) {
+    this.cmd = cmd;
+    this.value = value;
+    }
+
+    public Command(final ByteBuffer buffer) {
+    cmd = buffer.get();
+
+    switch (cmd) {
+    case ERASE:
+    case INSERT:
+    value = ${valueDeserializer};
+    break;
+    case CLEAR:
+    value = ${valueDefault};
+    break;
+    default:
+    value = ${valueDefault};
+    assert false : "Unknown command type.";
+    }
+    }
+
+    @Override
+    public void writeToBuffer(ByteBuffer buffer) {
+    buffer.put(cmd);
+
+    switch (cmd) {
+    case ERASE:
+    case INSERT:
+    ${valueSerializer};
+    break;
+    case CLEAR:
+    break;
+    default:
+    assert false : "Unknown command type.";
+    }
+    }
+    }
+    }

@@ -34,7 +34,7 @@ io:
       bindPingPort: 44464
       galaxyName: "Bacta"
       requiredClientVersion: "20100225-17:43"
-      clientPath: "swg-client"
+      clientPath: "C:/Users/crush/Swg/nge/"
       clientIniFile: "live.cfg"
       login:
         rest:

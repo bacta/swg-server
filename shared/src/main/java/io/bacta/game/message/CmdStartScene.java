@@ -2,7 +2,7 @@ package io.bacta.game.message;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.tre.math.Vector;
+import io.bacta.shared.math.Vector;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;
@@ -14,35 +14,35 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 public class CmdStartScene extends GameNetworkMessage {
 
-    private final boolean ignoreLayoutFiles;
-    private final long characterId;
-    private final String terrain;
-    private final Vector vector;
-    private final float yaw;
+    private final long networkId;
+    private final String sceneName;
+    private final Vector startPosition;
+    private final float startYaw;
     private final String templateName;
-    private final long timeSeconds;
-    private final int galacticTime;
+    private final long serverTime;
+    private final int serverEpoch;
+    private final boolean ignoreLayoutFiles;
 
     public CmdStartScene(final ByteBuffer buffer) {
         ignoreLayoutFiles = BufferUtil.getBoolean(buffer);
-        characterId = buffer.getLong();
-        terrain = BufferUtil.getAscii(buffer);
-        vector = new Vector(buffer);
-        yaw = buffer.getFloat();
+        networkId = buffer.getLong();
+        sceneName = BufferUtil.getAscii(buffer);
+        startPosition = new Vector(buffer);
+        startYaw = buffer.getFloat();
         templateName = BufferUtil.getAscii(buffer);
-        timeSeconds = buffer.getLong();
-        galacticTime = buffer.getInt();
+        serverTime = buffer.getLong();
+        serverEpoch = buffer.getInt();
     }
 
     @Override
     public void writeToBuffer(ByteBuffer buffer) {
         BufferUtil.put(buffer, ignoreLayoutFiles);
-        buffer.putLong(characterId);
-        BufferUtil.putAscii(buffer, terrain);
-        vector.writeToBuffer(buffer);
-        buffer.putFloat(yaw);
+        buffer.putLong(networkId);
+        BufferUtil.putAscii(buffer, sceneName);
+        startPosition.writeToBuffer(buffer);
+        buffer.putFloat(startYaw);
         BufferUtil.putAscii(buffer, templateName);
-        buffer.putLong(timeSeconds);
-        buffer.putInt(galacticTime);
+        buffer.putLong(serverTime);
+        buffer.putInt(serverEpoch);
     }
 }

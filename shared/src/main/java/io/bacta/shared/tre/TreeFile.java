@@ -2,8 +2,6 @@ package io.bacta.shared.tre;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,8 +14,6 @@ import java.util.*;
  * domain.
  */
 @SuppressWarnings("deprecation")
-@Scope("prototype")
-@Component
 public class TreeFile {
     public static final int ID_TREE = 0x54524545; //'TREE'
     public static final int ID_0005 = 0x30303035; //'0005'

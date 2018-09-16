@@ -14,10 +14,10 @@ public final class UpdateContainmentMessage extends GameNetworkMessage {
     private final long containerId;
     private final int slotArrangement;
 
-    public UpdateContainmentMessage(long parentId, long objectId, int slotArrangement) {
-        this.objectId = objectId;//object.getNetworkId();
-        this.containerId = parentId;//object.getContainedBy();
-        this.slotArrangement = slotArrangement;//object.getCurrentArrangement();
+    public UpdateContainmentMessage(long networkId, long containerId, int slotArrangement) {
+        this.objectId = networkId;
+        this.containerId = containerId;
+        this.slotArrangement = slotArrangement;
     }
 
     public UpdateContainmentMessage(final ByteBuffer buffer) {

@@ -19,7 +19,6 @@ public class ObjectSupervisor extends AbstractActor {
     private final SpringAkkaExtension ext;
     private final GameServerProperties properties;
 
-
     @Inject
     public ObjectSupervisor(final SpringAkkaExtension ext, final GameServerProperties properties) {
         this.ext = ext;

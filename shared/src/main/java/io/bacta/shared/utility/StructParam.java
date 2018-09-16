@@ -1,10 +1,10 @@
 package io.bacta.shared.utility;
 
 
+import io.bacta.shared.foundation.DataResourceList;
+import io.bacta.shared.foundation.Tag;
 import io.bacta.shared.iff.Iff;
-import io.bacta.shared.tre.foundation.DataResourceList;
-import io.bacta.shared.tre.foundation.Tag;
-import io.bacta.shared.tre.template.ObjectTemplate;
+import io.bacta.shared.template.ObjectTemplate;
 import org.checkerframework.com.google.common.base.Preconditions;
 
 /**
