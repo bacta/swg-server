@@ -18,23 +18,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.soe.network.dispatch;
+package io.bacta.game.dispatch;
 
-import gnu.trove.map.TIntObjectMap;
+import io.bacta.game.context.GameRequestContext;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
+import io.bacta.soe.network.dispatch.GameNetworkMessageControllerData;
+import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
-import io.bacta.soe.util.ClientString;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
-import io.bacta.soe.util.ObjectControllerNames;
-import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
@@ -50,41 +48,13 @@ import java.nio.ByteBuffer;
 
 @Slf4j
 @Scope("prototype")
-public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDispatcher {
-
-    private final static int OBJECT_CONTROLLER_MESSAGE = 0x80CE5E46;
-    /**
-     * Map of controller data to dispatch messages
-     */
-    protected TIntObjectMap<GameNetworkMessageControllerData> controllers;
-
-    /**
-     * Creates the {@link GameNetworkMessage} to be passed to the appropriate controller
-     */
-    protected final GameNetworkMessageSerializer gameNetworkMessageSerializer;
-
-    /**
-     * Generates missing {@link GameNetworkMessage} and {@link GameNetworkMessageController} classes for implementation
-     * Writes files directly to the project structure
-     */
-    protected final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
-
-
-    private GameNetworkMessageControllerLoader controllerLoader;
+public class GameGameNetworkMessageDispatcher extends DefaultGameNetworkMessageDispatcher {
 
     @Inject
-    public DefaultGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
-                                               final GameNetworkMessageSerializer gameNetworkMessageSerializer,
-                                               final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
-
-        this.controllerLoader = controllerLoader;
-        this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
-        this.gameNetworkMessageTemplateWriter = null;//gameNetworkMessageTemplateWriter;
-    }
-
-    @PostConstruct
-    private void initialize() {
-        controllers = controllerLoader.loadControllers();
+    public GameGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
+                                            final GameNetworkMessageSerializer gameNetworkMessageSerializer,
+                                            final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
+        super(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
     }
 
     @Override
@@ -108,8 +78,8 @@ public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDi
 
                 LOGGER.debug("Routing to {}", controller.getClass().getSimpleName());
 
-                SoeRequestContext context = new SoeRequestContext(connection);
-                controller.handleIncoming(context, incomingMessage); //Can't fix this one yet.
+                GameRequestContext gameRequestContext = new GameRequestContext(connection);
+                controller.handleIncoming(gameRequestContext, incomingMessage); //Can't fix this one yet.
 
 
             } catch (GameNetworkMessageTypeNotFoundException e) {
@@ -120,30 +90,6 @@ public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDi
 
         } else {
             handleMissingController(priority, gameMessageType, buffer);
-        }
-    }
-
-    protected void handleMissingController(short priority, int gameMessageType, ByteBuffer buffer) {
-
-        if(gameNetworkMessageTemplateWriter == null) {
-            final String propertyName = Integer.toHexString(gameMessageType);
-            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
-            return;
-        }
-
-        if (gameMessageType == OBJECT_CONTROLLER_MESSAGE) {
-            final int objcType = buffer.getInt(4);
-            final String propertyName = Integer.toHexString(objcType);
-
-            gameNetworkMessageTemplateWriter.createObjFiles(objcType, buffer);
-            LOGGER.error("{} Unhandled ObjC Message: 0x{}", ObjectControllerNames.get(propertyName), propertyName);
-            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
-        } else {
-
-            final String propertyName = Integer.toHexString(gameMessageType);
-            gameNetworkMessageTemplateWriter.createGameNetworkMessageFiles(priority, gameMessageType, buffer);
-            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
-            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
         }
     }
 }

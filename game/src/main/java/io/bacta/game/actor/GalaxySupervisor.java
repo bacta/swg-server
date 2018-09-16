@@ -6,7 +6,7 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.config.GameServerProperties;
+import io.bacta.game.GameServerProperties;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
