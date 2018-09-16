@@ -1,8 +1,7 @@
 package $packageName;
 
 import ${messageClasspath}.${messageName};
-import io.bacta.soe.network.connection.ConnectionRole;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.game.context.GameRequestContext;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -13,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @MessageHandled(handles = $messageNameClass)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class $className implements GameNetworkMessageController<$messageName> {
+public class $className implements GameNetworkMessageController<GameRequestContext, $messageName> {
     @Override
-    public void handleIncoming(SoeConnection connection, $messageName message) throws Exception {
+    public void handleIncoming(GameRequestContext context, $messageName message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

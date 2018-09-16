@@ -1,7 +1,7 @@
 package io.bacta.game.login;
 
 import io.bacta.galaxy.message.GalaxyServerStatus;
-import io.bacta.game.config.GameServerProperties;
+import io.bacta.game.GameServerProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.game.config;
+package io.bacta.game;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

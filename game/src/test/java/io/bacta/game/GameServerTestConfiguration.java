@@ -28,7 +28,6 @@ import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
 import io.bacta.game.actor.GalaxySupervisor;
-import io.bacta.game.config.GameServerProperties;
 import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;

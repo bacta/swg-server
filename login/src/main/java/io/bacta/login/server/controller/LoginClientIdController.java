@@ -23,7 +23,7 @@ package io.bacta.login.server.controller;
 
 import io.bacta.login.message.LoginClientId;
 import io.bacta.login.server.service.ClientService;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -34,7 +34,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = LoginClientId.class)
 @ConnectionRolesAllowed({})
-public class LoginClientIdController implements GameNetworkMessageController<LoginClientId> {
+public class LoginClientIdController implements GameNetworkMessageController<SoeRequestContext, LoginClientId> {
     private final ClientService clientService;
 
     @Inject
@@ -43,7 +43,7 @@ public class LoginClientIdController implements GameNetworkMessageController<Log
     }
 
     @Override
-    public void handleIncoming(SoeConnection connection, LoginClientId message) throws Exception {
-        clientService.validateClient(connection, message.getClientVersion(), message.getId(), message.getKey());
+    public void handleIncoming(SoeRequestContext context, LoginClientId message) {
+        clientService.validateClient(context.getConnection(), message.getClientVersion(), message.getId(), message.getKey());
     }
 }
