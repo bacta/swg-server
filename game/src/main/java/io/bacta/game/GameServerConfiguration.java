@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.game.config;
+package io.bacta.game;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -28,7 +28,7 @@ import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
 import io.bacta.game.actor.GalaxySupervisor;
-import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
+import io.bacta.game.dispatch.GameGameNetworkMessageDispatcher;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
@@ -86,7 +86,7 @@ public class GameServerConfiguration {
                                                                         final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                                                         final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
-        return new DefaultGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
+        return new GameGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
     }
 
     @Bean

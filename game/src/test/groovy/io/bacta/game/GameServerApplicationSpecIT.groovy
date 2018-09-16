@@ -4,7 +4,6 @@ import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
-import io.bacta.game.config.GameServerProperties
 import io.bacta.soe.network.connection.SoeConnection
 import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.boot.test.context.SpringBootTest

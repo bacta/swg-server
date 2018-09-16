@@ -1,10 +1,10 @@
 package io.bacta.game.controllers.connection;
 
-import io.bacta.game.config.GameServerProperties;
+import io.bacta.game.GameServerProperties;
+import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.connection.ClientIdMsg;
 import io.bacta.game.message.connection.ClientPermissionsMessage;
 import io.bacta.soe.network.connection.ConnectionRole;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -17,7 +17,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = ClientIdMsg.class)
 @ConnectionRolesAllowed({})
-public class ClientIdMsgController implements GameNetworkMessageController<ClientIdMsg> {
+public class ClientIdMsgController implements GameNetworkMessageController<GameRequestContext, ClientIdMsg> {
     private final String requiredClientVersion;
 
     @Inject
@@ -26,7 +26,7 @@ public class ClientIdMsgController implements GameNetworkMessageController<Clien
     }
     
     @Override
-    public void handleIncoming(SoeConnection connection, ClientIdMsg message) throws Exception {
+    public void handleIncoming(GameRequestContext context, ClientIdMsg message) throws Exception {
 
 //        ErrorMessage error = new ErrorMessage("Login Error", "Not implemented.", false);
 //        connection.sendMessage(error);
@@ -51,11 +51,11 @@ public class ClientIdMsgController implements GameNetworkMessageController<Clien
         connection.setBactaUsername(account.getUsername());
         */
 
-        connection.addRole(ConnectionRole.AUTHENTICATED);
+        context.getConnection().addRole(ConnectionRole.AUTHENTICATED);
 
         // TODO: Actually implement permissions
         ClientPermissionsMessage cpm = new ClientPermissionsMessage(true, true, true, true);
-        connection.sendMessage(cpm);
+        context.sendMessage(cpm);
     }
 }
 

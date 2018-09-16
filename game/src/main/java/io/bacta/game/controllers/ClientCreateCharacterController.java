@@ -1,9 +1,9 @@
 package io.bacta.game.controllers;
 
+import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterSuccess;
 import io.bacta.soe.network.connection.ConnectionRole;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = ClientCreateCharacter.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class ClientCreateCharacterController implements GameNetworkMessageController<ClientCreateCharacter> {
+public class ClientCreateCharacterController implements GameNetworkMessageController<GameRequestContext, ClientCreateCharacter> {
     @Override
-    public void handleIncoming(SoeConnection connection, ClientCreateCharacter message) throws Exception {
+    public void handleIncoming(GameRequestContext context, ClientCreateCharacter message) throws Exception {
         //Check if they are allowed to skip tutorial.
         //Check if they are allowed to create jedi.
         //Check if they are allowed to create regular character.
@@ -50,7 +50,7 @@ public class ClientCreateCharacterController implements GameNetworkMessageContro
         //This will cause the client to login with the new character?
 
         final ClientCreateCharacterSuccess success = new ClientCreateCharacterSuccess(1000000001165L);
-        connection.sendMessage(success);
+        context.sendMessage(success);
     }
 }
 
