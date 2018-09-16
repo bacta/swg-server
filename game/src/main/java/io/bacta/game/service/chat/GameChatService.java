@@ -11,4 +11,8 @@ public class GameChatService {
     public void sendSystemMessageSimple(ServerObject sender, StringId msg, ServerObject target) {
         LOGGER.warn("Not implemented.");
     }
+
+    public void destroyAvatar(final String avatarName) {
+        LOGGER.warn("Not implemented.");
+    }
 }

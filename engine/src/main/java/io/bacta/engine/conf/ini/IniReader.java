@@ -41,6 +41,8 @@ public interface IniReader {
 
     Collection<String> getStringCollection(String sectionName, String propertyName);
 
+    Collection<String> getStringCollectionWithDefault(String sectionName, String propertyName, Collection<String> defaultCollection);
+
     boolean getBoolean(String sectionName, String propertyName);
 
     boolean getBoolean(String sectionName, String propertyName, int index);
