@@ -12,7 +12,7 @@ public enum Race {
     RODIAN,
     TRANDOSHAN,
     TWILEK,
-    WOOKIE,
+    WOOKIEE,
     ZABRAK;
 
     public static Race parseRace(String templateString) {
