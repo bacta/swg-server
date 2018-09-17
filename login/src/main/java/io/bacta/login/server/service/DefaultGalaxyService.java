@@ -12,10 +12,12 @@ import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.soe.event.TransceiverStartedEvent;
 import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +58,8 @@ public final class DefaultGalaxyService implements GalaxyService {
     private final TaskScheduler taskScheduler;
     private final ConnectionMap loginConnections;
 
+    private boolean maintenanceScheduled;
+
     @Inject
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
                                 final GalaxyRepository galaxyRepository,
@@ -67,8 +71,6 @@ public final class DefaultGalaxyService implements GalaxyService {
         this.loadedGalaxies = new ConcurrentHashMap<>(INITIAL_GALAXIES_CAPACITY);
         this.taskScheduler = taskScheduler;
         this.loginConnections = loginConnections;
-
-        scheduleMaintenanceTasks();
     }
 
     @Override
@@ -419,7 +421,6 @@ public final class DefaultGalaxyService implements GalaxyService {
      * new galaxy was somehow added directly to the data store, then it would get loaded this way. At startup, the server
      * will load all trusted galaxies and attempt to poll them for their status.
      */
-    //@Scheduled(initialDelay = 0, fixedRate = GALAXY_MAINTENANCE_INTERVAL)
     private void performGalaxyMaintenance() {
         LOGGER.trace("Refreshing galaxy server list.");
 
@@ -441,11 +442,22 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     private void scheduleMaintenanceTasks() {
-        LOGGER.trace("Scheduling galaxy service maintenance tasks.");
+        if (!maintenanceScheduled) {
+            LOGGER.trace("Scheduling galaxy service maintenance tasks.");
 
-        //Schedule the galaxy maintenance task based on our login server configuration.
-        this.taskScheduler.scheduleAtFixedRate(
-                this::performGalaxyMaintenance,
-                Duration.ofMillis(loginServerProperties.getGalaxyMaintenanceInterval()));
+            //Schedule the galaxy maintenance task based on our login server configuration.
+            this.taskScheduler.scheduleAtFixedRate(
+                    this::performGalaxyMaintenance,
+                    Duration.ofMillis(loginServerProperties.getGalaxyMaintenanceInterval()));
+
+            maintenanceScheduled = true;
+        } else {
+            LOGGER.error("Attempted to schedule maintenance after it's already been scheduled.");
+        }
+    }
+
+    @EventListener
+    private void onTransceiverStarted(final TransceiverStartedEvent event) {
+        scheduleMaintenanceTasks();
     }
 }

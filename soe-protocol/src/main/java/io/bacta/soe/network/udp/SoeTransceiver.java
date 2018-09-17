@@ -70,6 +70,7 @@ public class SoeTransceiver {
         this.udpChannel.start(name, bindAddress, bindPort, this::receiveMessage);
         this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
         this.started = true;
+
         publisher.publishEvent(new TransceiverStartedEvent());
     }
 
