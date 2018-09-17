@@ -25,12 +25,36 @@
                 <configuration>
                     <filesets>
                         <fileset>
+                            <directory>${project.basedir}/src/gen</directory>
+                        </fileset>
+                        <fileset>
                             <directory>../dist</directory>
                             <includes>
                                 <include>lib/${project.name}/**</include>
                             </includes>
                         </fileset>
                     </filesets>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
+                    <arguments>
+                        <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
+                        <argument>io.bacta.game.object.template.server</argument>
+                        <argument>${project.basedir}/src/gen/java/io/bacta/game/object/template/server</argument>
+                    </arguments>
                 </configuration>
             </plugin>
             <plugin>
@@ -95,67 +119,4 @@
             <!--<artifactId>spring-boot-starter-rest</artifactId>-->
         <!--</dependency>-->
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>template-gen</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <configuration>
-                            <directory>${project.basedir}/src/gen</directory>
-                        </configuration>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <phase>generate-sources</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.6.0</version>
-                        <executions>
-                            <execution>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
-                            <arguments>
-                                <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
-                                <argument>io.bacta.game.object.template.server</argument>
-                                <argument>${project.basedir}/src/gen/java/io/bacta/game/object/template/server</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>add-source</goal>
-                                </goals>
-                                <configuration>
-                                    <sources>
-                                        <source>src/gen/java</source>
-                                    </sources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-    </profiles>
 </project>
