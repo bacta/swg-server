@@ -109,9 +109,9 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     @Bean(name = "LoginTransceiver")
     public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver, @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
         LOGGER.info("Starting LoginTransceiver");
-        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
         connectionMap.setGetConnectionMethod(soeTransceiver::getConnection);
         connectionMap.setBroadcastMethod(soeTransceiver::broadcast);
+        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
         return soeTransceiver;
     }
 

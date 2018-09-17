@@ -2,10 +2,13 @@ package io.bacta.soe.network.udp;
 
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.soe.event.TransceiverStartedEvent;
+import io.bacta.soe.event.TransceiverStoppedEvent;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeConnectionCache;
 import io.bacta.soe.network.handler.LoginInboundMessageChannel;
 import io.bacta.soe.network.handler.SoeSendHandler;
+import io.bacta.soe.service.PublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,6 +33,7 @@ public class SoeTransceiver {
     private final LoginInboundMessageChannel inboundMessageChannel;
     private final SoeSendHandler sendHandler;
     private final SoeConnectionCache soeConnectionCache;
+    private final PublisherService publisherService;
 
     private String name = "";
     private boolean started;
@@ -37,12 +41,14 @@ public class SoeTransceiver {
     @Inject
     public SoeTransceiver(final UdpChannel udpChannel,
                           final LoginInboundMessageChannel inboundMessageChannel,
-                          final SoeSendHandler sendHandler) {
+                          final SoeSendHandler sendHandler,
+                          final PublisherService publisherService) {
 
         this.udpChannel = udpChannel;
         this.inboundMessageChannel = inboundMessageChannel;
         this.sendHandler = sendHandler;
         this.soeConnectionCache = inboundMessageChannel.getConnectionCache();
+        this.publisherService = publisherService;
         this.started = false;
     }
 
@@ -61,9 +67,10 @@ public class SoeTransceiver {
         }
 
         this.name = name;
-        this.started = true;
         this.udpChannel.start(name, bindAddress, bindPort, this::receiveMessage);
         this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
+        this.started = true;
+        publisherService.onEvent(new TransceiverStartedEvent());
     }
 
     private void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
@@ -93,5 +100,6 @@ public class SoeTransceiver {
         LOGGER.info("Shutting down SoeTransceiver({})", name);
         udpChannel.stop();
         sendHandler.stop();
+        publisherService.onEvent(new TransceiverStoppedEvent());
     }
 }
