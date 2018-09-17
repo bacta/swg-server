@@ -30,9 +30,9 @@ import io.bacta.soe.event.DisconnectEvent;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeConnectionCache;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.service.PublisherService;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +53,7 @@ import java.util.Set;
 class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
-    private final PublisherService publisherService;
+    private final ApplicationEventPublisher publisher;
     private final MetricRegistry metricRegistry;
 
     private UdpChannel udpChannel;
@@ -67,11 +67,11 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
 
     @Inject
     public DefaultSoeSendHandler(final SoeNetworkConfiguration networkConfiguration,
-                                 final PublisherService publisherService,
+                                 final ApplicationEventPublisher publisher,
                                  final MetricRegistry metricRegistry) {
 
         this.networkConfiguration = networkConfiguration;
-        this.publisherService = publisherService;
+        this.publisher = publisher;
         this.metricRegistry = metricRegistry;
 
         sendThread = new Thread(this);
@@ -171,7 +171,7 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
             final SoeUdpConnection connection = connectionProxy.getSoeUdpConnection();
 
             if(connection != null) {
-                publisherService.onEvent(new DisconnectEvent(connectionProxy));
+                publisher.publishEvent(new DisconnectEvent(connectionProxy));
 
                 if (networkConfiguration.isReportUdpDisconnects()) {
                     LOGGER.info("Client disconnected: {}  Connection: {}  Reason: {}", connection.getRemoteAddress(), connection.getId(), connection.getTerminateReason().getReason());
