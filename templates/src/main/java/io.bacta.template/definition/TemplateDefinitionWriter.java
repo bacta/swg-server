@@ -863,6 +863,8 @@ public class TemplateDefinitionWriter {
             "lombok.extern.slf4j.Slf4j",
             "io.bacta.shared.iff.Iff",
             "com.google.common.base.Preconditions",
+            "io.bacta.shared.container.ArrangementDescriptor",
+            "io.bacta.shared.container.SlotDescriptor",
             "io.bacta.shared.foundation.Tag",
             "io.bacta.shared.foundation.DataResourceList",
             "io.bacta.shared.localization.StringId",
