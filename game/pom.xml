@@ -59,6 +59,10 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>templates</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ocdsoft.bacta.soe</groupId>
             <artifactId>soe-protocol</artifactId>
         </dependency>
@@ -122,16 +126,30 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>io.bacta.shared.tre.io.bacta.shared.template.definition.TemplateDefinitionCompiler</mainClass>
+                            <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
                             <arguments>
-                                <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.shared</argument>
-                                <argument>io.bacta.shared.tre.io.bacta.shared.template.shared</argument>
-                                <argument>${project.basedir}/src/gen/java/io/bacta/shared/tre/template/shared</argument>
                                 <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
-                                <argument>io.bacta.shared.tre.io.bacta.shared.template.server</argument>
-                                <argument>${project.basedir}/src/gen/java/io/bacta/shared/tre/template/server</argument>
+                                <argument>io.bacta.game.object.template.server</argument>
+                                <argument>${project.basedir}/src/gen/java/io/bacta/game/object/template/server</argument>
                             </arguments>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/gen/java</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
