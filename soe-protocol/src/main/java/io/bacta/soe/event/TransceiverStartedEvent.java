@@ -1,4 +1,9 @@
 package io.bacta.soe.event;
 
-public class TransceiverStartedEvent {
+import org.springframework.context.ApplicationEvent;
+
+public class TransceiverStartedEvent extends ApplicationEvent {
+    public TransceiverStartedEvent(Object source) {
+        super(source);
+    }
 }
