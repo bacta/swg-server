@@ -1,0 +1,13 @@
+private ArrangementDescriptor arrangementDescriptor;
+private SlotDescriptor slotDescriptor;
+
+public ArrangementDescriptor getArrangementDescriptor() { return arrangementDescriptor; }
+public SlotDescriptor getSlotDescriptor() { return slotDescriptor; }
+
+public void setArrangementDescriptor(final ArrangementDescriptor arrangementDescriptor) {
+    this.arrangementDescriptor = arrangementDescriptor;
+}
+
+public void setSlotDescriptor(final SlotDescriptor slotDescriptor) {
+    this.slotDescriptor = slotDescriptor;
+}
