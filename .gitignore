@@ -35,3 +35,6 @@ build.properties
 
 #hide npm modules
 node_modules/
+
+*application-local.yml
+*application-local.properties
