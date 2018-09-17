@@ -1,9 +1,9 @@
 package io.bacta.game.message.object;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.ByteBufferWritable;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.COMMAND_QUEUE_ENQUEUE)
-public class MessageQueueCommandQueueEnqueue implements ByteBufferWritable {
+public class MessageQueueCommandQueueEnqueue implements MessageQueueData {
     private final int sequenceId;
     private final int commandHash;
     private final long targetId;
