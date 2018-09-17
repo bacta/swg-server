@@ -3,6 +3,7 @@ package $packageName;
 import ${messageClasspath}.${messageName};
 import io.bacta.game.context.GameRequestContext;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
 import org.springframework.stereotype.Component;

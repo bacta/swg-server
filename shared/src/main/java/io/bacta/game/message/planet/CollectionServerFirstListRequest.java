@@ -9,10 +9,12 @@ import lombok.Getter;
 import java.nio.ByteBuffer;
 
 /**
- * Created by crush on 5/26/2016.
- */
+      00 00 
+
+  SOECRC32.hashCode(CollectionServerFirstListRequest.class.getSimpleName()); // 0x4f686fd9
+  */
 @Getter
-@Priority(0x05)
+@Priority(0x2)
 @AllArgsConstructor
 public final class CollectionServerFirstListRequest extends GameNetworkMessage {
     private final String updateNumber;
