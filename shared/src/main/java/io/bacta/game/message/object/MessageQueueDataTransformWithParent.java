@@ -1,9 +1,9 @@
 package io.bacta.game.message.object;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.ByteBufferWritable;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
 import io.bacta.shared.math.Transform;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.NET_UPDATE_TRANSFORM_WITH_PARENT)
-public final class MessageQueueDataTransformWithParent implements ByteBufferWritable {
+public final class MessageQueueDataTransformWithParent implements MessageQueueData {
     private final int syncStamp;
     private final int sequenceNumber;
     private final long parentNetworkId;
