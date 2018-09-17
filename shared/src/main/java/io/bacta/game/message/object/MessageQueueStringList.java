@@ -1,9 +1,9 @@
 package io.bacta.game.message.object;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.ByteBufferWritable;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.NPC_CONVERSATION_RESPONSES)
-public final class MessageQueueStringList implements ByteBufferWritable {
+public final class MessageQueueStringList implements MessageQueueData {
     private final List<String> strings; //vector of unicode strings.
 
     public MessageQueueStringList(final ByteBuffer buffer) {

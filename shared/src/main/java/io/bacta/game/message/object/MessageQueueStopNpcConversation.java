@@ -1,9 +1,9 @@
 package io.bacta.game.message.object;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.ByteBufferWritable;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
 import io.bacta.shared.localization.StringId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.NPC_CONVERSATION_STOP)
-public final class MessageQueueStopNpcConversation implements ByteBufferWritable {
+public final class MessageQueueStopNpcConversation implements MessageQueueData {
     private final long npc;
     private final StringId finalMessageId;
     private final String finalMessageProse; //unicode
