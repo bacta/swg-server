@@ -29,6 +29,6 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public class DisconnectEvent implements Event {
+public class DisconnectEvent {
     private final SoeConnection connection;
 }
