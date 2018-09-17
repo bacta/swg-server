@@ -1,0 +1,4 @@
+io:
+  bacta:
+    game:
+      clientPath: "swg-client"
