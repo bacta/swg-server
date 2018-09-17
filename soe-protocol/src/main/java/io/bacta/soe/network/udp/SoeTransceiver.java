@@ -71,7 +71,7 @@ public class SoeTransceiver {
         this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
         this.started = true;
 
-        publisher.publishEvent(new TransceiverStartedEvent());
+        publisher.publishEvent(new TransceiverStartedEvent(this));
     }
 
     private void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
