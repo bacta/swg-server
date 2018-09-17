@@ -24,6 +24,9 @@ package io.bacta.soe.serialize;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -36,6 +39,7 @@ import javax.inject.Inject;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,11 +60,14 @@ public final class ObjControllerMessageSerializer implements ApplicationContextA
 
     @PostConstruct
     private void loadMessages() {
-
-        String[] messageBeanNames = context.getBeanNamesForType(MessageQueueData.class);
-        for(String messageName : messageBeanNames) {
-            MessageQueueData message = (MessageQueueData) context.getBean(messageName);
-            loadMessageClass(message.getClass());
+        try (ScanResult scanResult =
+                     new ClassGraph()
+                             .enableAllInfo()
+                             .whitelistPackages("io.bacta")
+                             .scan()) {
+            ClassInfoList controlClasses = scanResult.getClassesImplementing("io.bacta.game.MessageQueueData");
+            List<Class<MessageQueueData>> controlClassRefs = controlClasses.loadClasses(MessageQueueData.class);
+            controlClassRefs.forEach(this::loadMessageClass);
         }
     }
 
