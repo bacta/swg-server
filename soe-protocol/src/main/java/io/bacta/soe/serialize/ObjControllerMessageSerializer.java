@@ -58,7 +58,7 @@ public final class ObjControllerMessageSerializer implements ApplicationContextA
     private void loadMessages() {
 
         String[] messageBeanNames = context.getBeanNamesForType(MessageQueueData.class);
-        for(String messageName : messageBeanNames) {
+        for (String messageName : messageBeanNames) {
             MessageQueueData message = (MessageQueueData) context.getBean(messageName);
             loadMessageClass(message.getClass());
         }
