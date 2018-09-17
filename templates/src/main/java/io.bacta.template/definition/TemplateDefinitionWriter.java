@@ -1,9 +1,13 @@
 package io.bacta.template.definition;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import io.bacta.engine.utils.StringUtil;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +34,9 @@ public class TemplateDefinitionWriter {
      * @param templateDefinitionFile The template definition file to use.
      * @param version                The version to use.
      */
-    public void write(final OutputStream outputStream, final TemplateDefinitionFile templateDefinitionFile, int version) {
+    public void write(final OutputStream outputStream,
+                      final TemplateDefinitionFile templateDefinitionFile,
+                      int version) {
         final PrintStream printStream = new PrintStream(outputStream);
         final TemplateData templateData = templateDefinitionFile.getTemplateData(version);
 
@@ -42,6 +48,7 @@ public class TemplateDefinitionWriter {
         printClassConstructorRegistration(printStream, templateData);
         printFields(printStream, templateData);
         printConstructors(printStream, templateData);
+        printUserDefined(printStream, templateData);
         printMethods(printStream, templateData);
         printLoadMethod(printStream, templateData);
         printSaveMethod(printStream, templateData);
@@ -82,8 +89,10 @@ public class TemplateDefinitionWriter {
         final String access = templateData.templateParent == null ? "public" : "protected static";
 
         //Demarcate the top level class with an annotation.
-        if (templateData.fileParent != null)
+        if (templateData.fileParent != null) {
+            printStream.println("@Slf4j");
             printStream.println("@TemplateDefinition");
+        }
 
         printStream.printf("%s%s class %s extends %s {\n", tabs, access, name, baseName);
         printStream.printf("\tprivate static final Logger LOGGER = LoggerFactory.getLogger(%s.class);\n", name);
@@ -228,6 +237,32 @@ public class TemplateDefinitionWriter {
         printStream.printf("%s\t\tsuper(filename, objectTemplateList);\n", tabs);
         printStream.printf("%s\t}\n", tabs);
         printStream.println();
+    }
+
+    private void printUserDefined(final PrintStream printStream, final TemplateData templateData) {
+        try {
+            final String tabs = getTabString(templateData);
+
+            final String name = templateData.templateParent == null
+                    ? templateData.getName()
+                    : templateData.getName() + "ObjectTemplate";
+
+            final URL url = Resources.getResource("/templates/object/include/" + name + ".txt");
+            final List<String> userDefinedLines = Resources.readLines(url, Charsets.UTF_8);
+
+            printStream.println();
+            printStream.printf("%s\t//@TDF-USER-START\n", tabs);
+            printStream.println();
+            for (final String line : userDefinedLines) {
+                printStream.printf("%s\t%s\n", tabs, line);
+            }
+            printStream.println();
+            printStream.printf("%s\t//@TDF-USER-END\n", tabs);
+            printStream.println();
+
+        } catch (IOException ex) {
+            //Do nothing
+        }
     }
 
     private void printMethods(final PrintStream printStream, final TemplateData templateData) {
