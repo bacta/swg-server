@@ -1,9 +1,9 @@
 package io.bacta.game.message.object;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.ByteBufferWritable;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
 import io.bacta.shared.math.Vector;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.SIT_ON_OBJECT)
-public final class MessageQueueSitOnObject implements ByteBufferWritable {
+public final class MessageQueueSitOnObject implements MessageQueueData {
     public static final float MAXIMUM_CHAIR_RANGE = 2.0f;
     public static final float MAXIMUM_CHAIR_RANGE_SQUARED = MAXIMUM_CHAIR_RANGE * MAXIMUM_CHAIR_RANGE;
 
