@@ -7,6 +7,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
+import io.bacta.game.actor.zone.ZoneSupervisor;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

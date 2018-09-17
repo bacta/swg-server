@@ -13,7 +13,7 @@ import io.bacta.shared.foundation.DataResourceList;
 import io.bacta.shared.iff.Iff;
 import io.bacta.shared.template.ObjectTemplate;
 import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.shared.template.definition.TemplateDefinition;
+import io.bacta.template.definition.TemplateDefinition;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import lombok.extern.slf4j.Slf4j;

@@ -68,6 +68,7 @@
     <modules>
         <module>engine</module>
         <module>soe-protocol</module>
+        <module>templates</module>
         <module>shared</module>
         <module>login</module>
         <module>game</module>
@@ -263,6 +264,11 @@
             <dependency>
                 <groupId>com.ocdsoft.bacta.swg</groupId>
                 <artifactId>galaxy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ocdsoft.bacta</groupId>
+                <artifactId>templates</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
