@@ -1,5 +1,6 @@
 package io.bacta.game.message;
 
+import io.bacta.game.MessageId;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.nio.ByteBuffer;
   */
 @Getter
 @Priority(0x2)
+@MessageId(0x173b91c2)
 public final class ClientInactivityMessage extends GameNetworkMessage {
 
     public ClientInactivityMessage() {
