@@ -1,4 +1,4 @@
-package io.bacta.game.controllers;
+package io.bacta.game.controllers.object;
 
 /**
  * Created by kyle on 4/10/2016.

@@ -3,21 +3,22 @@ package $packageName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ocdsoft.bacta.swg.server.game.object.tangible.TangibleObject;
+import io.bacta.game.object.tangible.TangibleObject;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.MessageHandled;
 import ${messageClasspath}.${messageName};
 import com.ocdsoft.bacta.soe.controller.ObjController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
+@Slf4j
+@Component
 @MessageHandled(handles = ${messageName}.class)
-public class $className implements ObjController<$messageName, TangibleObject> {
+public class $className implements MessageQueueController<$messageName, TangibleObject> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(${className}.class);
-	
 	@Override
 	public void handleIncoming(final SoeUdpConnection connection, final $messageName message, final TangibleObject invoker) {
-
 		LOGGER.warn("This object controller is not implemented");
-		
+
 	}
 }

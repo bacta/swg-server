@@ -13,7 +13,7 @@ import io.bacta.archive.delta.vector.AutoDeltaObjectVector;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.command.CommandQueue;
-import io.bacta.game.controllers.GameControllerMessageFlags;
+import io.bacta.game.controllers.object.GameControllerMessageFlags;
 import io.bacta.game.message.UpdatePostureMessage;
 import io.bacta.game.message.object.MessageQueuePosture;
 import io.bacta.game.object.tangible.TangibleObject;

@@ -6,7 +6,7 @@ import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.controllers.ObjControllerBuilder;
+import io.bacta.game.controllers.object.ObjControllerBuilder;
 import io.bacta.game.message.object.MessageQueueObjectMenuRequest;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.tangible.creature.CreatureObject;

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.ocdsoft.bacta.soe.controller.MessageHandled;
 import com.ocdsoft.bacta.soe.controller.GameNetworkMessageController;
 import com.ocdsoft.bacta.soe.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.connection.ConnectionRole;
 import com.ocdsoft.bacta.soe.connection.SoeUdpConnection;
 import ${messageClasspath}.${messageName};

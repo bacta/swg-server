@@ -1,4 +1,4 @@
-package io.bacta.game.controllers;
+package io.bacta.game.controllers.object;
 
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;

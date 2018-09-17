@@ -4,7 +4,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.controllers.ObjControllerBuilder;
+import io.bacta.game.controllers.object.ObjControllerBuilder;
 import io.bacta.game.message.object.MessageQueueBiographyPayload;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.shared.biography.BiographyPayload;
