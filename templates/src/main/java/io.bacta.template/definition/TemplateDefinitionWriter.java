@@ -4,7 +4,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import io.bacta.engine.utils.StringUtil;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
@@ -260,7 +259,7 @@ public class TemplateDefinitionWriter {
             printStream.printf("%s\t//@TDF-USER-END\n", tabs);
             printStream.println();
 
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             //Do nothing
         }
     }
@@ -863,6 +862,7 @@ public class TemplateDefinitionWriter {
 
     private static final String[] includes = new String[]{
             "lombok.Getter",
+            "lombok.extern.slf4j.Slf4j",
             "io.bacta.shared.iff.Iff",
             "com.google.common.base.Preconditions",
             "io.bacta.shared.foundation.Tag",
