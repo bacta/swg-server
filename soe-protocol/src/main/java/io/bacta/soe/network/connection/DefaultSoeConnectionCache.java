@@ -21,7 +21,9 @@
 package io.bacta.soe.network.connection;
 
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.soe.event.ConnectEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -42,11 +44,13 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
 
     private final Map<InetSocketAddress, SoeConnection> connectionMap;
     private final Map<Integer, Queue<SoeConnection>> connectedAccountCache;
+    private final ApplicationEventPublisher publisher;
 
     @Inject
-    public DefaultSoeConnectionCache() {
+    public DefaultSoeConnectionCache(final ApplicationEventPublisher publisher) {
         this.connectionMap = new ConcurrentHashMap<>();
         this.connectedAccountCache = new ConcurrentHashMap<>();
+        this.publisher = publisher;
     }
 
     /**
@@ -66,6 +70,7 @@ public final class DefaultSoeConnectionCache implements SoeConnectionCache {
     @Override
     public void put(final InetSocketAddress remoteAddress, final SoeConnection connection) {
         connectionMap.put(remoteAddress, connection);
+        publisher.publishEvent(new ConnectEvent(connection));
         LOGGER.debug("New connection from {}.  Total clients: {}",
                 remoteAddress,
                 getConnectionCount());

@@ -1,4 +1,4 @@
 package io.bacta.soe.event;
 
-public class TransceiverStoppedEvent implements Event {
+public class TransceiverStoppedEvent {
 }
