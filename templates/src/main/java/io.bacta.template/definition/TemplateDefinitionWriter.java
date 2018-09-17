@@ -94,7 +94,6 @@ public class TemplateDefinitionWriter {
         }
 
         printStream.printf("%s%s class %s extends %s {\n", tabs, access, name, baseName);
-        printStream.printf("\tprivate static final Logger LOGGER = LoggerFactory.getLogger(%s.class);\n", name);
     }
 
     private void printTemplateTag(final PrintStream printStream, final TemplateData templateData) {
@@ -246,10 +245,9 @@ public class TemplateDefinitionWriter {
                     ? templateData.getName()
                     : templateData.getName() + "ObjectTemplate";
 
-            final URL url = Resources.getResource("/templates/object/include/" + name + ".txt");
+            final URL url = Resources.getResource("templates/object/include/" + name + ".txt");
             final List<String> userDefinedLines = Resources.readLines(url, Charsets.UTF_8);
 
-            printStream.println();
             printStream.printf("%s\t//@TDF-USER-START\n", tabs);
             printStream.println();
             for (final String line : userDefinedLines) {
