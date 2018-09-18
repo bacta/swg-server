@@ -97,7 +97,7 @@ public class PlanetObject extends UniverseObject {
                 return Collections.unmodifiableList(this.mapLocationListStatic);
             case DYNAMIC:
                 return Collections.unmodifiableList(this.mapLocationListDynamic);
-            case PERSIST:
+            case PERSISTENT:
                 return Collections.unmodifiableList(this.mapLocationListPersist);
             default:
                 LOGGER.error("Unknown map location type");
@@ -111,7 +111,7 @@ public class PlanetObject extends UniverseObject {
                 return mapLocationListVersionStatic.get();
             case DYNAMIC:
                 return mapLocationListVersionDynamic.get();
-            case PERSIST:
+            case PERSISTENT:
                 return mapLocationListVersionPersist.get();
             default:
                 LOGGER.error("Unknown map location type");
