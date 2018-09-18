@@ -6,7 +6,7 @@ import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.controllers.object.ObjControllerBuilder;
 import io.bacta.game.message.object.MessageQueueBiographyPayload;
-import io.bacta.game.object.tangible.creature.CreatureObject;
+import io.bacta.game.object.ServerObject;
 import io.bacta.shared.biography.BiographyPayload;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.AllArgsConstructor;
@@ -24,8 +24,12 @@ public final class BiographyService {
         this.cachedBiographyMap = new TLongObjectHashMap<>();
     }
 
-    public void setBiography(final long networkId, final String biography) {
+    public void setBiography(final ServerObject creature, String biography) {
+        if (biography.length() > 1024)
+            biography = biography.substring(0, 1024);
+
         LOGGER.error("Not implemented");
+
         //write to the database.
         //cache.
     }
@@ -34,16 +38,16 @@ public final class BiographyService {
         LOGGER.error("Not implemented");
     }
 
-    public void requestBiography(final long biographyOwnerId, final CreatureObject requestorObject) {
-        final SoeConnection connection = requestorObject.getConnection();
+    public void requestBiography(final ServerObject target, final ServerObject requestor) {
+        final SoeConnection connection = requestor.getConnection();
 
         if (connection != null) {
             final MessageQueueBiographyPayload payload = new MessageQueueBiographyPayload(
-                    new BiographyPayload(biographyOwnerId, DEFAULT_BACTA_BIO));
+                    new BiographyPayload(target.getNetworkId(), DEFAULT_BACTA_BIO));
 
             final ObjControllerMessage msg = ObjControllerBuilder.newBuilder()
                     .send().reliable().authClient()
-                    .build(biographyOwnerId, GameControllerMessageType.BIOGRAPHY_RETRIEVED, payload);
+                    .build(target.getNetworkId(), GameControllerMessageType.BIOGRAPHY_RETRIEVED, payload);
 
             connection.sendMessage(msg);
         }

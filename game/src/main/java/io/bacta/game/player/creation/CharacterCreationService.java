@@ -255,7 +255,7 @@ public class CharacterCreationService {
         setupPlayer(playerCreature, speciesGender, profession, createMessage.isJedi());
 
         if (!createMessage.getBiography().isEmpty())
-            biographyService.setBiography(playerCreature.getNetworkId(), createMessage.getBiography());
+            biographyService.setBiography(playerCreature, createMessage.getBiography());
 
         final PlayerObject play = serverObjectService.createObject("object/player/player.iff", playerCreature);
 
