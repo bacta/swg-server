@@ -1,7 +1,7 @@
-package io.bacta.game.controllers;
+package io.bacta.game.controllers.tutorial;
 
 import io.bacta.game.context.GameRequestContext;
-import io.bacta.game.message.NewbieTutorialResponse;
+import io.bacta.game.message.tutorial.NewbieTutorialResponse;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -16,7 +16,11 @@ import org.springframework.stereotype.Component;
 public class NewbieTutorialResponseController implements GameNetworkMessageController<GameRequestContext, NewbieTutorialResponse> {
     @Override
     public void handleIncoming(GameRequestContext context, NewbieTutorialResponse message) throws Exception {
-        LOGGER.warn("This controller is not implemented");
+        LOGGER.warn("This controller is not fully implemented");
+
+        final String response = message.getResponse();
+
+        LOGGER.info("Received newbie tutorial response of {}", response);
     }
 }
 

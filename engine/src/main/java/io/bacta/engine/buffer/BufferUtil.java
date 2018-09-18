@@ -20,8 +20,11 @@
 
 package io.bacta.engine.buffer;
 
+import gnu.trove.iterator.TFloatIterator;
+import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TIntObjectMap;
@@ -339,6 +342,16 @@ public class BufferUtil {
         return set;
     }
 
+    public static TFloatArrayList getTFloatArrayList(ByteBuffer buffer) {
+        final int size = buffer.getInt();
+        final TFloatArrayList list = new TFloatArrayList(size);
+
+        for (int i = 0; i < size; ++i)
+            list.add(buffer.getFloat());
+
+        return list;
+    }
+
     public static TIntArrayList getTIntArrayList(ByteBuffer buffer) {
         final int size = buffer.getInt();
         final TIntArrayList list = new TIntArrayList(size);
@@ -398,6 +411,14 @@ public class BufferUtil {
         });
     }
 
+    public static <V extends ByteBufferWritable> void put(ByteBuffer buffer, TFloatList list) {
+        buffer.putInt(list.size());
+        final TFloatIterator iterator = list.iterator();
+
+        while (iterator.hasNext())
+            buffer.putFloat(iterator.next());
+    }
+
     public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, Collection<T> list) {
         buffer.putInt(list.size());
         list.stream().forEachOrdered(item -> put(buffer, item));
@@ -407,17 +428,6 @@ public class BufferUtil {
         buffer.putInt(list.size());
         list.stream().forEachOrdered(item -> valueWriter.accept(buffer, item));
     }
-
-    //These are covered by Collection<T>
-//    public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, Set<T> set) {
-//        buffer.putInt(set.size());
-//        set.stream().forEachOrdered(item -> put(buffer, item));
-//    }
-//
-//    public static <T> void put(ByteBuffer buffer, Set<T> set, BiConsumer<ByteBuffer, T> valueWriter) {
-//        buffer.putInt(set.size());
-//        set.stream().forEachOrdered(item -> valueWriter.accept(buffer, item));
-//    }
 
     public static void put(ByteBuffer buffer, TIntList list) {
         buffer.putInt(list.size());
