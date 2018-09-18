@@ -2,7 +2,7 @@ package io.bacta.game.controllers;
 
 import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.SelectCharacter;
-import io.bacta.game.service.player.CharacterSelectionService;
+import io.bacta.game.player.CharacterSelectionService;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
