@@ -398,25 +398,26 @@ public class BufferUtil {
         });
     }
 
-    public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, List<T> list) {
+    public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, Collection<T> list) {
         buffer.putInt(list.size());
         list.stream().forEachOrdered(item -> put(buffer, item));
     }
 
-    public static <T> void put(ByteBuffer buffer, List<T> list, BiConsumer<ByteBuffer, T> valueWriter) {
+    public static <T> void put(ByteBuffer buffer, Collection<T> list, BiConsumer<ByteBuffer, T> valueWriter) {
         buffer.putInt(list.size());
         list.stream().forEachOrdered(item -> valueWriter.accept(buffer, item));
     }
 
-    public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, Set<T> set) {
-        buffer.putInt(set.size());
-        set.stream().forEachOrdered(item -> put(buffer, item));
-    }
-
-    public static <T> void put(ByteBuffer buffer, Set<T> set, BiConsumer<ByteBuffer, T> valueWriter) {
-        buffer.putInt(set.size());
-        set.stream().forEachOrdered(item -> valueWriter.accept(buffer, item));
-    }
+    //These are covered by Collection<T>
+//    public static <T extends ByteBufferWritable> void put(ByteBuffer buffer, Set<T> set) {
+//        buffer.putInt(set.size());
+//        set.stream().forEachOrdered(item -> put(buffer, item));
+//    }
+//
+//    public static <T> void put(ByteBuffer buffer, Set<T> set, BiConsumer<ByteBuffer, T> valueWriter) {
+//        buffer.putInt(set.size());
+//        set.stream().forEachOrdered(item -> valueWriter.accept(buffer, item));
+//    }
 
     public static void put(ByteBuffer buffer, TIntList list) {
         buffer.putInt(list.size());
