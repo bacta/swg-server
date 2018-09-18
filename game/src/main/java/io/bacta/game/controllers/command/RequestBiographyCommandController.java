@@ -1,0 +1,28 @@
+package io.bacta.game.controllers.command;
+
+import io.bacta.game.context.GameRequestContext;
+import io.bacta.game.controllers.object.CommandQueueController;
+import io.bacta.game.controllers.object.QueuesCommand;
+import io.bacta.game.object.ServerObject;
+import io.bacta.game.player.BiographyService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+
+@Slf4j
+@Component
+@QueuesCommand("requestbiography")
+public class RequestBiographyCommandController implements CommandQueueController {
+    private final BiographyService biographyService;
+
+    @Inject
+    public RequestBiographyCommandController(BiographyService biographyService) {
+        this.biographyService = biographyService;
+    }
+
+    @Override
+    public void handleCommand(GameRequestContext context, ServerObject actor, ServerObject target, String params) {
+        biographyService.requestBiography(target, actor);
+    }
+}

@@ -17,6 +17,20 @@ public class CmdSceneReadyController implements GameNetworkMessageController<Gam
     @Override
     public void handleIncoming(GameRequestContext context, CmdSceneReady message) throws Exception {
         LOGGER.warn("This controller is not implemented");
+
+//        // Make sure our player has the server's speed maximum
+//        PlayerCreatureController const * playerController = safe_cast<PlayerCreatureController const *>(getCreatureController());
+//        if(playerController)
+//        {
+//            GenericValueTypeMessage<float> const msg("fca11a62d23041008a4f0df36aa7dca6", playerController->getServerSpeedForPlayer());
+//            Client const * const client = getClient();
+//            if (client)
+//                return client->send(msg, true);
+//        }
+
+        //onGroupMemberConnected(getNetworkId())
+
+        //Check cell permissions. Kick out if no longer allowed in cell.
     }
 }
 
