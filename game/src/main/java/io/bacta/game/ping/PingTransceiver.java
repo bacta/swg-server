@@ -4,7 +4,6 @@ package io.bacta.game.ping;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.game.GameServerProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -12,7 +11,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 @Component
-@Scope("prototype")
 @Slf4j
 public final class PingTransceiver {
 

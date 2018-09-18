@@ -45,7 +45,6 @@ public class GalaxySupervisor extends AbstractActor {
         getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
         getContext().actorOf(ext.props(ObjectSupervisor.class), "object");
         getContext().actorOf(ext.props(ZoneSupervisor.class), "zone");
-        getContext().actorOf(ext.props(ConnectionSupervisor.class), "connection");
     }
 
     @Override
