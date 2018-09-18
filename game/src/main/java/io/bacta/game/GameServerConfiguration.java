@@ -31,6 +31,7 @@ import io.bacta.game.actor.GalaxySupervisor;
 import io.bacta.game.dispatch.GameGameNetworkMessageDispatcher;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
+import io.bacta.soe.network.udp.SoeTransceiver;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +94,12 @@ public class GameServerConfiguration {
     public BactaConfiguration getBactaConfiguration() throws FileNotFoundException {
         final Path configPath = Paths.get(gameServerProperties.getClientPath(), gameServerProperties.getClientIniFile());
         return new IniBactaConfiguration(configPath);
+    }
+
+    @Inject
+    @Bean
+    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
+        return soeTransceiver;
     }
 
     @Bean
