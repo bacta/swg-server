@@ -17,7 +17,7 @@ import io.bacta.soe.network.connection.ConnectionMap;
 import io.bacta.soe.network.connection.SoeConnection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public final class DefaultGalaxyService implements GalaxyService, ApplicationListener<TransceiverStartedEvent> {
+public final class DefaultGalaxyService implements GalaxyService {
     private static final int INITIAL_GALAXIES_CAPACITY = 100;
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 512;
@@ -456,8 +456,8 @@ public final class DefaultGalaxyService implements GalaxyService, ApplicationLis
         }
     }
 
-    @Override
-    public void onApplicationEvent(TransceiverStartedEvent transceiverStartedEvent) {
+    @EventListener
+    public void onTransceiverStart(TransceiverStartedEvent transceiverStartedEvent) {
         scheduleMaintenanceTasks();
     }
 }
