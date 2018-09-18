@@ -17,6 +17,8 @@ public class SetFurnitureRotationDegreeController implements GameNetworkMessageC
     @Override
     public void handleIncoming(GameRequestContext context, SetFurnitureRotationDegree message) throws Exception {
         LOGGER.warn("This controller is not implemented");
+
+        //Sets the value furnitureRotationDegree on the player.
     }
 }
 
