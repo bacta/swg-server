@@ -303,12 +303,12 @@ public class CreatureObject extends TangibleObject {
 
     public final void addSkill(final String skill) {
         skills.insert(skill);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void removeSkill(final String skill) {
         skills.erase(skill);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final boolean hasSkill(final String skill) {
@@ -317,7 +317,7 @@ public class CreatureObject extends TangibleObject {
 
     public final void setLookAtTarget(long lookAtTarget) {
         this.lookAtTarget.set(lookAtTarget);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final int getGuildId() {
@@ -359,37 +359,37 @@ public class CreatureObject extends TangibleObject {
 
     public final void setUnmodifiedMaxAttributes(TIntList values) {
         unmodifiedMaxAttributes.set(values);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setHealthBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.HEALTH, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setConstitutionBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.CONSTITUTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setActionBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.ACTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setStaminaBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.STAMINA, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setMindBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.MIND, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWillpowerBase(int value) {
         unmodifiedMaxAttributes.set(Attribute.WILLPOWER, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     //Attribute wounds
@@ -419,33 +419,33 @@ public class CreatureObject extends TangibleObject {
 
     public final void setHealthWounds(int value) {
         attributeWounds.set(Attribute.HEALTH, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
 
     public final void setConstitutionWounds(int value) {
         attributeWounds.set(Attribute.CONSTITUTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setActionWounds(int value) {
         attributeWounds.set(Attribute.ACTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setStaminaWounds(int value) {
         attributeWounds.set(Attribute.STAMINA, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setMindWounds(int value) {
         attributeWounds.set(Attribute.MIND, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWillpowerWounds(int value) {
         attributeWounds.set(Attribute.WILLPOWER, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void initializeAttribute(final int attribute, final int value) {
@@ -481,32 +481,32 @@ public class CreatureObject extends TangibleObject {
 
     public final void setHealthEncumbrance(int value) {
         attribBonus.set(Attribute.HEALTH, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setConstitutionEncumbrance(int value) {
         attribBonus.set(Attribute.CONSTITUTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setActionEncumbrance(int value) {
         attribBonus.set(Attribute.ACTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setStaminaEncumbrance(int value) {
         attribBonus.set(Attribute.STAMINA, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setMindEncumbrance(int value) {
         attribBonus.set(Attribute.MIND, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWillpowerEncumbrance(int value) {
         attribBonus.set(Attribute.WILLPOWER, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     //ham
@@ -536,37 +536,37 @@ public class CreatureObject extends TangibleObject {
 
     public final void setAttributes(TIntList value) {
         attributes.set(value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setHealth(int value) {
         attributes.set(Attribute.HEALTH, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setConstitution(int value) {
         attributes.set(Attribute.CONSTITUTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setAction(int value) {
         attributes.set(Attribute.ACTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setStamina(int value) {
         attributes.set(Attribute.STAMINA, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setMind(int value) {
         attributes.set(Attribute.MIND, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWillpower(int value) {
         attributes.set(Attribute.WILLPOWER, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     //hamMax
@@ -596,37 +596,37 @@ public class CreatureObject extends TangibleObject {
 
     public final void setMaxAttributes(TIntList value) {
         maxAttributes.set(value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setHealthMax(int value) {
         maxAttributes.set(Attribute.HEALTH, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setConstitutionMax(int value) {
         maxAttributes.set(Attribute.CONSTITUTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setActionMax(int value) {
         maxAttributes.set(Attribute.ACTION, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setStaminaMax(int value) {
         maxAttributes.set(Attribute.STAMINA, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setMindMax(int value) {
         maxAttributes.set(Attribute.MIND, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWillpowerMax(int value) {
         maxAttributes.set(Attribute.WILLPOWER, value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final float getRunSpeed() {
@@ -655,32 +655,32 @@ public class CreatureObject extends TangibleObject {
 
     public final void setRunSpeed(float speed) {
         runSpeed.set(speed);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWalkSpeed(float speed) {
         walkSpeed.set(speed);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setSlopeModAngle(float angle) {
         slopeModAngle.set(angle);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setSlopeModPercent(float percent) {
         slopeModPercent.set(percent);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setWaterModPercent(float percent) {
         waterModPercent.set(percent);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final void setScaleFactor(float value) {
         scaleFactor.set(value);
-        //setDirty(true);
+        setDirty(true);
     }
 
     public final boolean isIncapacitated() {
@@ -713,6 +713,11 @@ public class CreatureObject extends TangibleObject {
 
     public boolean getUseLookAtYaw() {
         return useLookAtYaw;
+    }
+
+    public void setGroupInviter(final long inviterNetworkId, final String inviterName, final long inviterShipNetworkId) {
+        this.groupInviter.set(new GroupInviter(inviterNetworkId, inviterName, inviterShipNetworkId));
+        setDirty(true);
     }
 
     @Override

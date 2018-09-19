@@ -1,0 +1,26 @@
+package io.bacta.game.controllers;
+
+import io.bacta.game.context.GameRequestContext;
+import io.bacta.game.message.GcwRegionsReq;
+import io.bacta.soe.network.connection.ConnectionRole;
+import io.bacta.soe.network.controller.ConnectionRolesAllowed;
+import io.bacta.soe.network.controller.GameNetworkMessageController;
+import io.bacta.soe.network.controller.MessageHandled;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@MessageHandled(handles = GcwRegionsReq.class)
+@ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
+public final class GcwRegionsReqController implements GameNetworkMessageController<GameRequestContext, GcwRegionsReq> {
+    @Override
+    public void handleIncoming(GameRequestContext context, GcwRegionsReq message) throws Exception {
+
+        LOGGER.warn("Not yet implemented");
+
+        //send GcwRegionsRsp
+        //send GcwGroupsRsp
+
+    }
+}

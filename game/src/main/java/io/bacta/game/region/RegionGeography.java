@@ -1,0 +1,30 @@
+package io.bacta.game.region;
+
+public enum RegionGeography {
+    DESERT,
+    FOREST,
+    JUNGLE,
+    PLATEAU,
+    OASIS,
+    CANYON,
+    LAKE,
+    LAKESHORE,
+    BEACH,
+    OCEAN,
+    UNDERWATER,
+    RIVER,
+    VOLCANO,
+    SWAMP,
+    PLAINS,
+    PRAIRIE,
+    MOUNTAINS,
+    HILLS,
+    GRASSLAND,
+    WASTELAND,
+    CITY,
+    FICTIONAL,
+    PATHFIND,
+    DEFAULT,
+    THEATER,
+    OVERLOAD
+}
