@@ -121,4 +121,8 @@ public class SOECRC32 {
     public static int[] getCRC32Table() {
         return crc_table;
     }
+
+    public static void main(String[] args) {
+        System.out.println(String.format("%x", hashCode("SetLfgInterests")));
+    }
 }
