@@ -1,11 +1,11 @@
 package io.bacta.game.object;
 
-import io.bacta.shared.container.ArrangementDescriptorList;
-import io.bacta.shared.container.SlotDescriptorList;
 import io.bacta.shared.object.template.SharedObjectTemplate;
-import io.bacta.shared.template.ObjectTemplate;
-import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.shared.tre.TreeFile;
+import io.bacta.swg.container.ArrangementDescriptorList;
+import io.bacta.swg.container.SlotDescriptorList;
+import io.bacta.swg.template.ObjectTemplate;
+import io.bacta.swg.template.ObjectTemplateList;
+import io.bacta.swg.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

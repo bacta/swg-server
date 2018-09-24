@@ -64,7 +64,7 @@ import java.nio.ByteBuffer;
 
          00  - Zero Byte
          07  - Packet Type = Clock Sync
-         72 56   - TimeStamp =  29270  - Unknown What this is exactly
+         72 56   - TimeStamp =  29270  - UNKNOWN What this is exactly
          00 00 00 00 - Master Ping Time  - 0
          00 00 00 00 - Average Ping Time  - 0
          00 00 00 00 - Low Ping Time  - 0
@@ -80,7 +80,7 @@ import java.nio.ByteBuffer;
 
          00  - Zero Byte
          07  - Packet Type = Clock Sync
-         4B 42   - TimeStamp =  19266  - Unknown What this is exactly
+         4B 42   - TimeStamp =  19266  - UNKNOWN What this is exactly
          00 00 00 5C - Master Ping Time  - 92
          00 00 00 5C - Average Ping Time  - 92
          00 00 00 5C - Low Ping Time  - 92

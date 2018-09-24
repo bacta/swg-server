@@ -22,12 +22,12 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>templates</artifactId>
+            <groupId>io.bacta</groupId>
+            <artifactId>swg</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jzlib</artifactId>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>tools</artifactId>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
@@ -78,7 +78,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
+                    <mainClass>io.bacta.tools.template.TemplateDefinitionCompilerApplication</mainClass>
                     <arguments>
                         <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.shared</argument>
                         <argument>io.bacta.shared.object.template</argument>

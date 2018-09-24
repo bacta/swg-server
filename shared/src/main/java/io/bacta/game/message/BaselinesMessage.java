@@ -3,7 +3,7 @@ package io.bacta.game.message;
 import io.bacta.archive.delta.AutoDeltaByteStream;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.object.GameObject;
+import io.bacta.swg.object.GameObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

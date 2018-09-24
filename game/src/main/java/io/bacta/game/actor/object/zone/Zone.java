@@ -1,6 +1,6 @@
 package io.bacta.game.actor.object.zone;
 
-import io.bacta.shared.tre.TreeFile;
+import io.bacta.swg.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,7 @@ public final class Zone {
     }
 
     private void checkConfigured() {
-        if(name == null || iffPath == null) {
+        if (name == null || iffPath == null) {
             throw new ZoneNotConfiguredException();
         }
     }

@@ -47,7 +47,7 @@ public class ClientString {
 
 	public static String get(String propertyName) {
 		if(!prop.containsKey(propertyName))
-			return "Unknown";
+			return "UNKNOWN";
 		
 		return prop.getProperty(propertyName);
 	}

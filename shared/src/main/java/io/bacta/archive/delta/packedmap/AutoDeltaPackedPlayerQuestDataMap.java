@@ -1,7 +1,7 @@
 package io.bacta.archive.delta.packedmap;
 
 import io.bacta.archive.delta.map.AutoDeltaIntObjectMap;
-import io.bacta.shared.object.PlayerQuestData;
+import io.bacta.swg.object.PlayerQuestData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

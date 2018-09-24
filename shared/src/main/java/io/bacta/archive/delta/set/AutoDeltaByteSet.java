@@ -209,7 +209,7 @@ public class AutoDeltaByteSet extends AutoDeltaContainer {
                     break;
                 default:
                     value = (byte) 0;
-                    assert false : "Unknown command type.";
+                    assert false : "UNKNOWN command type.";
             }
         }
 
@@ -225,7 +225,7 @@ public class AutoDeltaByteSet extends AutoDeltaContainer {
                 case CLEAR:
                     break;
                 default:
-                    assert false : "Unknown command type.";
+                    assert false : "UNKNOWN command type.";
             }
         }
     }

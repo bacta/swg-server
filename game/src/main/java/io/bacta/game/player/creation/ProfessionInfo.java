@@ -3,8 +3,8 @@ package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.bacta.shared.foundation.Tag;
-import io.bacta.shared.iff.Iff;
+import io.bacta.swg.foundation.Tag;
+import io.bacta.swg.iff.Iff;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.bacta.shared.foundation.Tag.TAG_0000;
+import static io.bacta.swg.foundation.Tag.TAG_0000;
 
 
 /**

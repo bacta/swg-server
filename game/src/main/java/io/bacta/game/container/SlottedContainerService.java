@@ -4,8 +4,8 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import io.bacta.engine.utils.ReflectionUtil;
-import io.bacta.shared.container.*;
-import io.bacta.shared.object.GameObject;
+import io.bacta.swg.container.*;
+import io.bacta.swg.object.GameObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package io.bacta.archive;
 
-import io.bacta.shared.object.GameObject;
+import io.bacta.swg.object.GameObject;
 
 /**
  * Created by crush on 5/8/2016.

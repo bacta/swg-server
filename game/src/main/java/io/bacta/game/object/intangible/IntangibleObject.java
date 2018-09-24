@@ -4,9 +4,9 @@ import io.bacta.archive.delta.AutoDeltaInt;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.template.server.ServerIntangibleObjectTemplate;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
-import io.bacta.shared.container.SlotIdManager;
-import io.bacta.shared.template.ObjectTemplateList;
 import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.swg.container.SlotIdManager;
+import io.bacta.swg.template.ObjectTemplateList;
 
 import javax.inject.Inject;
 

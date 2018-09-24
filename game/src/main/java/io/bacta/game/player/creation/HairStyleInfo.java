@@ -2,7 +2,7 @@ package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
-import io.bacta.shared.iff.Iff;
+import io.bacta.swg.iff.Iff;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.bacta.shared.foundation.Tag.TAG_NAME;
+import static io.bacta.swg.foundation.Tag.TAG_NAME;
 
 /**
  * Created by crush on 6/4/2016.

@@ -20,7 +20,7 @@
 
 package io.bacta.soe.util;
 
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.swg.util.SOECRC32;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -119,7 +119,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = ClientString.get(opcode);
         
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -189,7 +189,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = ObjectControllerNames.get(opcode);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -252,7 +252,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = CommandNames.get(commandHash);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
+            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
             return;
         }
 

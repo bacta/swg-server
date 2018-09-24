@@ -4,7 +4,7 @@ import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
-import io.bacta.shared.radialmenu.ObjectMenuRequestData;
+import io.bacta.swg.radialmenu.ObjectMenuRequestData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

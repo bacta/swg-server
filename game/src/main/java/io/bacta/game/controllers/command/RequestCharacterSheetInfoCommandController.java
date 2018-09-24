@@ -5,7 +5,7 @@ import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
 import io.bacta.game.controllers.player.CharacterSheetResponseMessage;
 import io.bacta.game.object.ServerObject;
-import io.bacta.shared.math.Vector;
+import io.bacta.swg.math.Vector;
 import org.springframework.stereotype.Component;
 
 @Component

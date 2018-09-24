@@ -2,9 +2,9 @@ package io.bacta.game.player.creation;
 
 
 import com.google.common.collect.ImmutableMap;
-import io.bacta.shared.foundation.Tag;
-import io.bacta.shared.iff.Iff;
-import io.bacta.shared.tre.TreeFile;
+import io.bacta.swg.foundation.Tag;
+import io.bacta.swg.iff.Iff;
+import io.bacta.swg.tre.TreeFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.bacta.shared.foundation.Tag.TAG_0000;
+import static io.bacta.swg.foundation.Tag.TAG_0000;
 
 /**
  * Created by crush on 3/29/14.

@@ -49,7 +49,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
+                    <mainClass>io.bacta.tools.template.TemplateDefinitionCompilerApplication</mainClass>
                     <arguments>
                         <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
                         <argument>io.bacta.game.object.template.server</argument>
@@ -83,8 +83,12 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.bacta</groupId>
+            <artifactId>swg</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>templates</artifactId>
+            <artifactId>tools</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ocdsoft.bacta.soe</groupId>

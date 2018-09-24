@@ -2,11 +2,11 @@ package io.bacta.game.container;
 
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.utils.ReflectionUtil;
-import io.bacta.shared.container.ContainedByProperty;
-import io.bacta.shared.container.Container;
-import io.bacta.shared.container.ContainerErrorCode;
-import io.bacta.shared.container.ContainerResult;
-import io.bacta.shared.object.GameObject;
+import io.bacta.swg.container.ContainedByProperty;
+import io.bacta.swg.container.Container;
+import io.bacta.swg.container.ContainerErrorCode;
+import io.bacta.swg.container.ContainerResult;
+import io.bacta.swg.object.GameObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
