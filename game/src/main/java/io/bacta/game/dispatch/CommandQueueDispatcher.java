@@ -9,7 +9,7 @@ import io.bacta.game.controllers.object.QueuesCommand;
 import io.bacta.game.message.object.CommandQueueEnqueue;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.ServerObjectService;
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.swg.util.SOECRC32;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

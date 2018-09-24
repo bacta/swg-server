@@ -1,8 +1,8 @@
 package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableMap;
-import io.bacta.shared.datatable.DataTable;
-import io.bacta.shared.datatable.DataTableManager;
+import io.bacta.swg.datatable.DataTable;
+import io.bacta.swg.datatable.DataTableManager;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

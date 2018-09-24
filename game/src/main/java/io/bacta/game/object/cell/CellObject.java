@@ -6,9 +6,9 @@ import io.bacta.archive.delta.AutoDeltaVariable;
 import io.bacta.engine.lang.UnicodeString;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
-import io.bacta.shared.container.SlotIdManager;
-import io.bacta.shared.math.Vector;
-import io.bacta.shared.template.ObjectTemplateList;
+import io.bacta.swg.container.SlotIdManager;
+import io.bacta.swg.math.Vector;
+import io.bacta.swg.template.ObjectTemplateList;
 
 import javax.inject.Inject;
 

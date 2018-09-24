@@ -6,7 +6,8 @@ public class RegionPvp extends RegionCircle {
         NORMAL(0),
         TRUCE(1),
         PVP_BATTLEFIELD(2),
-        PVE_BATTLEFIELD(3);
+        PVE_BATTLEFIELD(3),
+        PVP_ADVANCED(4);
 
         public final int value;
 
@@ -24,6 +25,8 @@ public class RegionPvp extends RegionCircle {
                     return PVP_BATTLEFIELD;
                 case 3:
                     return PVE_BATTLEFIELD;
+                case 4:
+                    return PVP_ADVANCED;
                 default:
                     throw new ArrayIndexOutOfBoundsException(value);
             }

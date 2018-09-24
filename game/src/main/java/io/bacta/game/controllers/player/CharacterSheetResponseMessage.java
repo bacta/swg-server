@@ -3,7 +3,7 @@ package io.bacta.game.controllers.player;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.math.Vector;
+import io.bacta.swg.math.Vector;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

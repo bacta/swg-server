@@ -1,8 +1,8 @@
 package io.bacta.game.command;
 
 import io.bacta.game.object.ServerObject;
-import io.bacta.shared.command.Command;
-import io.bacta.shared.property.Property;
+import io.bacta.swg.command.Command;
+import io.bacta.swg.property.Property;
 
 /**
  * Created by crush on 5/18/2016.

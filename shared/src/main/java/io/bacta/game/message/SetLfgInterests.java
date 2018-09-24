@@ -3,7 +3,7 @@ package io.bacta.game.message;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.foundation.BitArray;
+import io.bacta.swg.foundation.BitArray;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

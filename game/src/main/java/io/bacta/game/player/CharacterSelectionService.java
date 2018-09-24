@@ -78,7 +78,7 @@ public final class CharacterSelectionService {
      *         //Check if their name is set to empty once again (after verifyandlock was done).
      *
      *         //Truncate biography to 1024 characters.
-     *         String biography = message.getBiography();
+     *         STRING biography = message.getBiography();
      *
      *         if (biography.length() > 1024)
      *             biography = biography.substring(0, 1024);

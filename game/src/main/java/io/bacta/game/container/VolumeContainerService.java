@@ -2,8 +2,8 @@ package io.bacta.game.container;
 
 import io.bacta.engine.utils.ReflectionUtil;
 import io.bacta.game.object.ServerObject;
-import io.bacta.shared.container.*;
-import io.bacta.shared.object.GameObject;
+import io.bacta.swg.container.*;
+import io.bacta.swg.object.GameObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

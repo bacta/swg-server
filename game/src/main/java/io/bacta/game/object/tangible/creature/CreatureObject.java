@@ -21,14 +21,14 @@ import io.bacta.game.object.template.server.ServerCreatureObjectTemplate;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.game.object.universe.group.GroupInviter;
 import io.bacta.game.object.universe.group.GroupMissionCriticalObject;
-import io.bacta.shared.collision.CollisionProperty;
-import io.bacta.shared.container.SlotIdManager;
-import io.bacta.shared.math.Vector;
-import io.bacta.shared.object.Buff;
-import io.bacta.shared.object.GameObject;
 import io.bacta.shared.object.template.SharedCreatureObjectTemplate;
-import io.bacta.shared.template.ObjectTemplateList;
 import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.swg.collision.CollisionProperty;
+import io.bacta.swg.container.SlotIdManager;
+import io.bacta.swg.math.Vector;
+import io.bacta.swg.object.Buff;
+import io.bacta.swg.object.GameObject;
+import io.bacta.swg.template.ObjectTemplateList;
 
 import javax.inject.Inject;
 

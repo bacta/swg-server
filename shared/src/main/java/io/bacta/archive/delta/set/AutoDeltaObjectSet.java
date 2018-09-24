@@ -209,7 +209,7 @@ public class AutoDeltaObjectSet<T extends ByteBufferWritable> extends AutoDeltaC
                     break;
                 default:
                     value = null;
-                    assert false : "Unknown command type.";
+                    assert false : "UNKNOWN command type.";
             }
         }
 
@@ -225,7 +225,7 @@ public class AutoDeltaObjectSet<T extends ByteBufferWritable> extends AutoDeltaC
                 case CLEAR:
                     break;
                 default:
-                    assert false : "Unknown command type.";
+                    assert false : "UNKNOWN command type.";
             }
         }
     }

@@ -1,8 +1,8 @@
 package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableMap;
-import io.bacta.shared.iff.Iff;
-import io.bacta.shared.tre.TreeFile;
+import io.bacta.swg.iff.Iff;
+import io.bacta.swg.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static io.bacta.shared.foundation.Tag.TAG_0000;
+import static io.bacta.swg.foundation.Tag.TAG_0000;
 
 /**
  * Created by crush on 3/28/14.
