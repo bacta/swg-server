@@ -115,7 +115,7 @@ class DefaultSoeSendHandler implements SoeSendHandler, Runnable {
                     sendPendingMessages();
 
                 } catch (Exception e) {
-                    LOGGER.error("Unknown", e);
+                    LOGGER.error("UNKNOWN", e);
                 }
             }
         } catch (InterruptedException e) {

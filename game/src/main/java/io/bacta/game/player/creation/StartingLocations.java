@@ -1,7 +1,7 @@
 package io.bacta.game.player.creation;
 
-import io.bacta.shared.datatable.DataTable;
-import io.bacta.shared.datatable.DataTableManager;
+import io.bacta.swg.datatable.DataTable;
+import io.bacta.swg.datatable.DataTableManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -191,7 +191,7 @@ public class AutoDeltaShortFloatMap extends AutoDeltaContainer {
                     erase(command.key);
                     break;
                 default:
-                    assert false : "Unknown command";
+                    assert false : "UNKNOWN command";
                     break;
             }
         }

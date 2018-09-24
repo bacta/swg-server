@@ -2,7 +2,7 @@ package io.bacta.game.message;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.math.Vector;
+import io.bacta.swg.math.Vector;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;

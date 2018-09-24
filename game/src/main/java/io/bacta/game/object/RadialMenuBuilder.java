@@ -1,7 +1,7 @@
 package io.bacta.game.object;
 
 import com.google.common.collect.ImmutableList;
-import io.bacta.shared.radialmenu.ObjectMenuRequestData;
+import io.bacta.swg.radialmenu.ObjectMenuRequestData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 

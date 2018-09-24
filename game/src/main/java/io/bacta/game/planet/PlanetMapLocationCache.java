@@ -47,7 +47,7 @@ public final class PlanetMapLocationCache {
             case PERSISTENT:
                 return persistentLocations.valueCollection();
             default:
-                throw new IllegalArgumentException("Unknown map location type.");
+                throw new IllegalArgumentException("UNKNOWN map location type.");
         }
     }
 
@@ -60,7 +60,7 @@ public final class PlanetMapLocationCache {
             case PERSISTENT:
                 return persistentLocationsVersion.get();
             default:
-                throw new IllegalArgumentException("Unknown map location type.");
+                throw new IllegalArgumentException("UNKNOWN map location type.");
         }
     }
 }

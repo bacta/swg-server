@@ -34,8 +34,63 @@ io:
       bindPingPort: 44464
       galaxyName: "Bacta"
       requiredClientVersion: "20100225-17:43"
+
+
+      # Configures the TreeFile archive. See io.bacta.swg.tre for more detailed information.
+      # Types of data search nodes:
+      # - toc - Table of contents archive. Requires a path and priority.
+      # - tree - Tree archive. Requires a path and priority.
+      # - path - Path to search. Requires a path and priority.
+      # - cache - Not implemented. Requires a priority.
+      # - absolute - Enable searching from application path. Requires a priority.
+      #
+      # Priority determines in what order the search node will be searched. The higher, the better. Multiple
+      # nodes can share the same priority in which case they will be searched in the order they are listed.
+      #
+      # Warning: Placing the server side files in the client directory can cause the client to crash and
+      #          is not advised. Recommended to put them in a different directory, and configure tree file
+      #          to search for them there below.
+      treeFile:
+        search:
+          - type: "toc"
+            path: "swg-client/sku0_client.toc"
+            priority: 3
+
+          - type: "toc"
+            path: "swg-client/sku1_client.toc"
+            priority: 3
+
+          - type: "toc"
+            path: "swg-client/sku2_client.toc"
+            priority: 3
+
+          - type: "toc"
+            path: "swg-client/sku3_client.toc"
+            priority: 3
+
+          - type: "path"
+            path: "data/sku.0/sys.shared/compiled/game"
+            priority: 2
+
+          - type: "path"
+            path: "data/sku.0/sys.server/compiled/game"
+            priority: 2
+
+          - type: "path"
+            path: "data/sku.0/sys.shared/built/game"
+            priority: 1
+
+          - type: "path"
+            path: "data/sku.0/sys.server/built/game"
+            priority: 1
+
+          - type: "absolute"
+            priority: 0
+
+      # Deprecating the use of the client directory as the data source for server files.
       clientPath: "swg-client"
       clientIniFile: "live.cfg"
+
       login:
         rest:
           base:

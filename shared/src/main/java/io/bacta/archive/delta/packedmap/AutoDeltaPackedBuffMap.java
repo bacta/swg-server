@@ -1,7 +1,7 @@
 package io.bacta.archive.delta.packedmap;
 
 import io.bacta.archive.delta.map.AutoDeltaIntObjectMap;
-import io.bacta.shared.object.Buff;
+import io.bacta.swg.object.Buff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class AutoDeltaPackedBuffMap extends AutoDeltaIntObjectMap<Buff.PackedBuf
                 command.writeToBuffer(target);
             }
         } else {
-            LOGGER.error("Unknown version {} when packing PackedBuff string to buffer.", version);
+            LOGGER.error("UNKNOWN version {} when packing PackedBuff string to buffer.", version);
         }
     }
 
@@ -76,7 +76,7 @@ public class AutoDeltaPackedBuffMap extends AutoDeltaIntObjectMap<Buff.PackedBuf
      * <p>
      * The format appears to be [(versionNumber)v](packedData)
      * <p>
-     * Current iteration for NGE is version 2. Version 0 is called "old school" and doesn't have the version prefix.
+     * CURRENT iteration for NGE is version 2. Version 0 is called "old school" and doesn't have the version prefix.
      * We shouldn't encounter these because none are being loaded from an old database. However, we might want to use
      * them if we are talking to the Pre-CU client.
      * <p>

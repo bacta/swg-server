@@ -4,7 +4,7 @@ package io.bacta.game.message;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.math.Transform;
+import io.bacta.swg.math.Transform;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.ByteBuffer;

@@ -72,7 +72,7 @@ public class DiscoveryActor extends AbstractActor {
                 })
 
                 .match(String.class, s -> {
-                    log.info("Received String message: {}", s);
+                    log.info("Received STRING message: {}", s);
                 })
                 .matchAny(o -> log.info("received unknown message", o))
                 .build();

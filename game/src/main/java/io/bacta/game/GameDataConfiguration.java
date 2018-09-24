@@ -1,12 +1,12 @@
 package io.bacta.game;
 
 import io.bacta.engine.conf.BactaConfiguration;
-import io.bacta.shared.container.ArrangementDescriptorList;
-import io.bacta.shared.container.SlotDescriptorList;
-import io.bacta.shared.container.SlotIdManager;
-import io.bacta.shared.data.SetupSharedFile;
-import io.bacta.shared.datatable.DataTableManager;
-import io.bacta.shared.tre.TreeFile;
+import io.bacta.game.data.TreeFileService;
+import io.bacta.swg.container.ArrangementDescriptorList;
+import io.bacta.swg.container.SlotDescriptorList;
+import io.bacta.swg.container.SlotIdManager;
+import io.bacta.swg.datatable.DataTableManager;
+import io.bacta.swg.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,15 +26,9 @@ public class GameDataConfiguration {
     }
 
     @Bean
-    public TreeFile getTreeFile(BactaConfiguration configuration) {
-        LOGGER.info("Setting up tree file.");
-
-        final TreeFile treeFile = new TreeFile();
-
-        final SetupSharedFile setupSharedFile = new SetupSharedFile(configuration, treeFile);
-        setupSharedFile.install();
-
-        return treeFile;
+    public TreeFile getTreeFile(TreeFileService treeFileService) {
+        //TODO: Maybe we shouldn't expose the tree file like this, but rather just pass the service around.
+        return treeFileService.getTreeFile();
     }
 
     @Bean

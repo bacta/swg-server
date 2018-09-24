@@ -68,7 +68,8 @@
     <modules>
         <module>engine</module>
         <module>soe-protocol</module>
-        <module>templates</module>
+        <module>swg</module>
+        <module>tools</module>
         <module>shared</module>
         <module>login</module>
         <module>game</module>
@@ -242,6 +243,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.bacta</groupId>
+                <artifactId>swg</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.ocdsoft.bacta</groupId>
                 <artifactId>shared</artifactId>
                 <version>${project.version}</version>
@@ -262,13 +268,8 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.ocdsoft.bacta.swg</groupId>
-                <artifactId>galaxy</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.ocdsoft.bacta</groupId>
-                <artifactId>templates</artifactId>
+                <artifactId>tools</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

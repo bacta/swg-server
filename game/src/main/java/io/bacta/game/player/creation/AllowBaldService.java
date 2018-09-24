@@ -2,8 +2,8 @@ package io.bacta.game.player.creation;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import io.bacta.shared.datatable.DataTable;
-import io.bacta.shared.datatable.DataTableManager;
+import io.bacta.swg.datatable.DataTable;
+import io.bacta.swg.datatable.DataTableManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

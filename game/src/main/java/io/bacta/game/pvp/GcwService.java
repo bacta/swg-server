@@ -2,8 +2,8 @@ package io.bacta.game.pvp;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import io.bacta.shared.datatable.DataTable;
-import io.bacta.shared.datatable.DataTableManager;
+import io.bacta.swg.datatable.DataTable;
+import io.bacta.swg.datatable.DataTableManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -2,8 +2,8 @@ package io.bacta.game.region;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import io.bacta.shared.datatable.DataTable;
-import io.bacta.shared.datatable.DataTableManager;
+import io.bacta.swg.datatable.DataTable;
+import io.bacta.swg.datatable.DataTableManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import static io.bacta.game.region.RegionPvp.PvpType.PVP_BATTLEFIELD;
 @Service
 public final class RegionService {
     private static final String DYNAMIC_REGION_TEMPLATE = "object/universe/dynamic_region.iff";
-    private static final String ENVIRONMENT_FLAGS_DATA_TABLE = "datatables/regions/region_environment_flags.iff";
+    private static final String ENVIRONMENT_FLAGS_DATA_TABLE = "datatables/region/region_environment_flags.iff";
     private static final String REGION_FILES_DATA_TABLE = "datatables/region/planets.iff";
 
     private final TObjectIntMap<String> environmentConversionMap = new TObjectIntHashMap<String>();
@@ -39,119 +39,132 @@ public final class RegionService {
 
     @Inject
     public RegionService(final DataTableManager dataTableManager) {
-        loadRegionDataTables(dataTableManager);
         loadEnvironmentFlagTable(dataTableManager);
+        loadRegionDataTables(dataTableManager);
     }
 
     private void loadRegionDataTables(DataTableManager dataTableManager) {
-        final DataTable regionFilesDataTable = dataTableManager.getTable(REGION_FILES_DATA_TABLE, true);
+        try {
+            final DataTable regionFilesDataTable = dataTableManager.getTable(REGION_FILES_DATA_TABLE, true);
 
-        if (regionFilesDataTable == null) {
-            LOGGER.warn("Static regions could not be found because the regions data table could not be opened.");
-            return;
-        }
-
-        final int totalRegionFiles = regionFilesDataTable.getNumRows();
-
-        for (int regionFileIndex = 0; regionFileIndex < totalRegionFiles; ++regionFileIndex) {
-            final String planetName = regionFilesDataTable.getStringValue(0, regionFileIndex);
-            final String regionFileName = regionFilesDataTable.getStringValue(1, regionFileIndex);
-            final float regionMinX = regionFilesDataTable.getFloatValue(2, regionFileIndex);
-            final float regionMinY = regionFilesDataTable.getFloatValue(3, regionFileIndex);
-            final float regionMaxX = regionFilesDataTable.getFloatValue(4, regionFileIndex);
-            final float regionMaxY = regionFilesDataTable.getFloatValue(5, regionFileIndex);
-
-            final DataTable regionDataTable = dataTableManager.getTable(regionFileName, true);
-
-            if (regionDataTable == null) {
-                LOGGER.warn("Could not open region file {}", regionFileName);
-                continue;
+            if (regionFilesDataTable == null) {
+                LOGGER.warn("Static regions could not be found because the regions data table could not be opened.");
+                return;
             }
 
-            final RegionData regionData = getOrCreateRegionData(planetName);
+            final int totalRegionFiles = regionFilesDataTable.getNumRows();
 
-            final int totalRegions = regionDataTable.getNumRows();
+            for (int regionFileIndex = 0; regionFileIndex < totalRegionFiles; ++regionFileIndex) {
+                final String planetName = regionFilesDataTable.getStringValue(0, regionFileIndex);
+                final String regionFileName = regionFilesDataTable.getStringValue(1, regionFileIndex);
+                final float regionMinX = regionFilesDataTable.getFloatValue(2, regionFileIndex);
+                final float regionMinY = regionFilesDataTable.getFloatValue(3, regionFileIndex);
+                final float regionMaxX = regionFilesDataTable.getFloatValue(4, regionFileIndex);
+                final float regionMaxY = regionFilesDataTable.getFloatValue(5, regionFileIndex);
 
-            for (int regionIndex = 0; regionIndex < totalRegions; ++regionIndex) {
-                final String regionName = regionDataTable.getStringValue(0, regionIndex);
-                final RegionGeometry geometry = RegionGeometry.from(regionDataTable.getIntValue(1, regionIndex));
-                final float minX = regionDataTable.getFloatValue(2, regionIndex);
-                final float minY = regionDataTable.getFloatValue(3, regionIndex);
-                final float maxX = regionDataTable.getFloatValue(4, regionIndex);
-                final float maxY = regionDataTable.getFloatValue(5, regionIndex);
-                final RegionPvp.PvpType pvp = RegionPvp.PvpType.from(regionDataTable.getIntValue(6, regionIndex));
-                final int geography = regionDataTable.getIntValue(7, regionIndex);
-                final int minDifficulty = regionDataTable.getIntValue(8, regionIndex);
-                final int maxDifficulty = regionDataTable.getIntValue(9, regionIndex);
-                final int spawn = regionDataTable.getIntValue(10, regionIndex);
-                final int mission = regionDataTable.getIntValue(11, regionIndex);
-                final int buildable = regionDataTable.getIntValue(12, regionIndex);
-                final int municipal = regionDataTable.getIntValue(13, regionIndex);
-                final int visible = regionDataTable.getIntValue(14, regionIndex);
-                final int notify = regionDataTable.getIntValue(15, regionIndex);
-                final int environmentFlags = convertFromStringToEnvironmentInfo(regionDataTable.getStringValue(16, regionIndex));
+                final DataTable regionDataTable = dataTableManager.getTable(regionFileName, true);
 
-                //Ensure the name is unique.
-                if (regionName.isEmpty()) {
-                    LOGGER.warn("Row {} of region table {} has no region name.", regionIndex, regionFileName);
+                if (regionDataTable == null) {
+                    LOGGER.warn("Could not open region file {}", regionFileName);
                     continue;
                 }
 
-                if (regionData.regionsByName.containsKey(regionName)) {
-                    LOGGER.warn("Row {} of region table {} tried to add a duplicate region {}.", regionIndex, regionFileName, regionName);
-                    continue;
-                }
+                final RegionData regionData = getOrCreateRegionData(planetName);
 
-                final Region region;
+                final int totalRegions = regionDataTable.getNumRows();
 
-                switch (geometry) {
-                    case RECTANGLE:
-                        region = new RegionRectangle();
-                        //Add region to quad tree of the current region data.
-                        //If the add fails, delete it.
-                        break;
-                    case CIRCLE: {
-                        if (PVE_BATTLEFIELD.equals(pvp) || PVP_BATTLEFIELD.equals(pvp)) {
-                            region = new RegionPvp();
-                            //add to quad tree. delete on fail.
-                        } else {
-                            region = new RegionCircle();
-                            //add to quad tree. delete on fail.
-                        }
+                for (int regionIndex = 0; regionIndex < totalRegions; ++regionIndex) {
+                    final String regionName = regionDataTable.getStringValue(0, regionIndex);
+                    final RegionGeometry geometry = RegionGeometry.from(regionDataTable.getIntValue(1, regionIndex));
+                    final float minX = regionDataTable.getFloatValue(2, regionIndex);
+                    final float minY = regionDataTable.getFloatValue(3, regionIndex);
+                    final float maxX = regionDataTable.getFloatValue(4, regionIndex);
+                    final float maxY = regionDataTable.getFloatValue(5, regionIndex);
+                    //TODO: Lets remove the enum conversions here because the datatables can arbitrarily define enum values.
+                    final RegionPvp.PvpType pvp = RegionPvp.PvpType.from(regionDataTable.getIntValue(6, regionIndex));
+                    final int geography = regionDataTable.getIntValue(7, regionIndex);
+                    final int minDifficulty = regionDataTable.getIntValue(8, regionIndex);
+                    final int maxDifficulty = regionDataTable.getIntValue(9, regionIndex);
+                    final int spawn = regionDataTable.getIntValue(10, regionIndex);
+                    final int mission = regionDataTable.getIntValue(11, regionIndex);
+                    final int buildable = regionDataTable.getIntValue(12, regionIndex);
+                    final int municipal = regionDataTable.getIntValue(13, regionIndex);
+                    final int visible = regionDataTable.getIntValue(14, regionIndex);
+                    final int notify = regionDataTable.getIntValue(15, regionIndex);
+                    final String environmentFlagString = regionDataTable.getStringValue(16, regionIndex);
+                    final int environmentFlags = convertFromStringToEnvironmentInfo(environmentFlagString);
+
+                    //Ensure the name is unique.
+                    if (regionName.isEmpty()) {
+                        LOGGER.warn("Row {} of region table {} has no region name.", regionIndex, regionFileName);
+                        continue;
                     }
-                    break;
-                    default:
-                        throw new IllegalArgumentException("");
+
+                    if (regionData.regionsByName.containsKey(regionName)) {
+                        LOGGER.warn("Row {} of region table {} tried to add a duplicate region {}.", regionIndex, regionFileName, regionName);
+                        continue;
+                    }
+
+                    final Region region;
+
+                    switch (geometry) {
+                        case RECTANGLE:
+                            region = new RegionRectangle();
+                            //Add region to quad tree of the current region data.
+                            //If the add fails, delete it.
+                            break;
+                        case CIRCLE: {
+                            if (PVE_BATTLEFIELD.equals(pvp) || PVP_BATTLEFIELD.equals(pvp)) {
+                                region = new RegionPvp();
+                                //add to quad tree. delete on fail.
+                            } else {
+                                region = new RegionCircle();
+                                //add to quad tree. delete on fail.
+                            }
+                        }
+                        break;
+                        default:
+                            throw new IllegalArgumentException("");
+                    }
+
+                    region.setName(regionName);
+                    region.setPlanet(planetName);
+                    region.setPvp(pvp.value);
+                    region.setGeography(geography);
+                    region.setMinDifficulty(minDifficulty);
+                    region.setMaxDifficulty(maxDifficulty);
+                    region.setSpawn(spawn);
+                    region.setMission(mission);
+                    region.setBuildable(buildable);
+                    region.setMunicipal(municipal);
+                    region.setVisible(visible != 0);
+                    region.setNotify(notify != 0);
+                    region.setEnvironmentFlags(environmentFlags);
+
+                    staticRegions.add(region);
+                    regionData.regionsByName.put(regionName, region);
+
+                    dataTableManager.close(regionFileName);
                 }
 
-                region.setName(regionName);
-                region.setPlanet(planetName);
-                region.setPvp(pvp.value);
-                region.setGeography(geography);
-                region.setMinDifficulty(minDifficulty);
-                region.setMaxDifficulty(maxDifficulty);
-                region.setSpawn(spawn);
-                region.setMission(mission);
-                region.setBuildable(buildable);
-                region.setMunicipal(municipal);
-                region.setVisible(visible != 0);
-                region.setNotify(notify != 0);
-                region.setEnvironmentFlags(environmentFlags);
-
-                staticRegions.add(region);
-                regionData.regionsByName.put(regionName, region);
-
-                dataTableManager.close(regionFileName);
+                dataTableManager.close(REGION_FILES_DATA_TABLE);
             }
 
-            dataTableManager.close(REGION_FILES_DATA_TABLE);
+            LOGGER.info("Loaded {} region planets, for a total of {} static regions.", planetRegions.size(), staticRegions.size());
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
     private void loadEnvironmentFlagTable(DataTableManager dataTableManager) {
         final DataTable dataTable = dataTableManager.getTable(ENVIRONMENT_FLAGS_DATA_TABLE, true);
 
-        for (int i =0 ; i < dataTable.getNumRows(); ++i) {
+        if (dataTable == null) {
+            LOGGER.warn("Could not load environment flag data because the environment flags data table could not be opened.");
+            return;
+        }
+
+        for (int i = 0; i < dataTable.getNumRows(); ++i) {
             final String value = dataTable.getStringValue(0, i);
             final int environmentInfo = (1 << i);
 
@@ -187,6 +200,9 @@ public final class RegionService {
     }
 
     private int convertFromStringToEnvironmentInfo(final String environmentString) {
+        if (environmentString == null || environmentString.isEmpty())
+            return 0;
+
         //parse the string
         final String[] split = environmentString.split(",");
         int outputValue = 0;

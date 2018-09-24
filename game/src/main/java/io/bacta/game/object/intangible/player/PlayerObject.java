@@ -13,10 +13,10 @@ import io.bacta.game.object.intangible.schematic.DraftSchematicCombinedCrcs;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.game.waypoint.Waypoint;
-import io.bacta.shared.container.SlotIdManager;
-import io.bacta.shared.foundation.BitArray;
-import io.bacta.shared.object.GameObject;
-import io.bacta.shared.template.ObjectTemplateList;
+import io.bacta.swg.container.SlotIdManager;
+import io.bacta.swg.foundation.BitArray;
+import io.bacta.swg.object.GameObject;
+import io.bacta.swg.template.ObjectTemplateList;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +37,7 @@ public final class PlayerObject extends IntangibleObject {
     private final AutoDeltaStringIntMap experiencePoints;   // xp name->amount map
     private final AutoDeltaInt expModified;        // just a flag that we increment any time the creature is granted new xp
     private final AutoDeltaInt maxForcePower;      ///< Maximum force power the player can have
-    private final AutoDeltaInt forcePower;         ///< Current force power the player has
+    private final AutoDeltaInt forcePower;         ///< CURRENT force power the player has
     private float forceRegenRate;     ///< Rate at which the force power regenerates (units/sec)
     private float forceRegenValue;    ///< Amount of force power that's regenerated
     private final AutoDeltaInt craftingLevel;           // crafting level of the current crafting session

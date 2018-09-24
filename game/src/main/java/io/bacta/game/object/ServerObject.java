@@ -13,15 +13,15 @@ import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.game.object.universe.group.GroupObject;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.container.*;
-import io.bacta.shared.localization.StringId;
-import io.bacta.shared.object.GameObject;
 import io.bacta.shared.object.template.SharedObjectTemplate;
-import io.bacta.shared.portal.PortalProperty;
-import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.shared.util.NetworkId;
 import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.util.SoeMessageUtil;
+import io.bacta.swg.container.*;
+import io.bacta.swg.localization.StringId;
+import io.bacta.swg.object.GameObject;
+import io.bacta.swg.portal.PortalProperty;
+import io.bacta.swg.template.ObjectTemplateList;
+import io.bacta.swg.util.NetworkId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public abstract class ServerObject extends GameObject {
     @Setter
     protected transient SoeConnection connection;
 
-    //SOE Kept a pointer to the ScriptReference. We are going to try just the String for now.
+    //SOE Kept a pointer to the ScriptReference. We are going to try just the STRING for now.
     //Notice that this value could be null. It shouldn't be accessed directly.
     @Getter
     @Setter
