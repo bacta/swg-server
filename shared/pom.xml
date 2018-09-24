@@ -80,7 +80,7 @@
                 <configuration>
                     <mainClass>io.bacta.tools.template.TemplateDefinitionCompilerApplication</mainClass>
                     <arguments>
-                        <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.shared</argument>
+                        <argument>${project.parent.basedir}/dsrc/sku.0/sys.shared</argument>
                         <argument>io.bacta.shared.object.template</argument>
                         <argument>${project.basedir}/src/gen/java/io/bacta/shared/object/template</argument>
                     </arguments>
