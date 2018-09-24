@@ -27,4 +27,29 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <id>compile-datatables</id>
+                        <configuration>
+                            <mainClass>io.bacta.tools.datatable.DataTableCompilerApplication</mainClass>
+                            <arguments>
+                                <argument>${project.parent.basedir}/dsrc/sku.0/sys.server/compiled/game/datatables</argument>
+                                <argument>${project.parent.basedir}/data/sku.0/sys.server/compiled/game/datatables</argument>
+                            </arguments>
+                        </configuration>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
