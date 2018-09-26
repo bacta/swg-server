@@ -1,5 +1,6 @@
 package io.bacta.game.controllers.command;
 
+import io.bacta.game.command.CommandQueueParameters;
 import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
@@ -22,7 +23,7 @@ public class GroupInviteCommandController implements CommandQueueController {
     }
 
     @Override
-    public void handleCommand(GameRequestContext context, ServerObject actor, ServerObject target, String params) {
+    public void handleCommand(GameRequestContext context, ServerObject actor, ServerObject target, CommandQueueParameters params) {
         LOGGER.warn("Not yet implemented.");
 //        final CreatureObject creatureObject = actor.asCreatureObject();
 //

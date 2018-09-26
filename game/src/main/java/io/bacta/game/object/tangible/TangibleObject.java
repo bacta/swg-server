@@ -83,6 +83,11 @@ public class TangibleObject extends ServerObject
     private final AutoDeltaIntSet guildAccessList;
     private final AutoDeltaStringObjectMap<TangibleObjectEffect> effectsMap;
 
+    /**
+     * The network id of the object which created this object.
+     */
+    private long creatorId;
+
     @Inject
     public TangibleObject(final ObjectTemplateList objectTemplateList,
                           final SlotIdManager slotIdManager,
@@ -270,6 +275,50 @@ public class TangibleObject extends ServerObject
     public final void clearCondition(ServerTangibleObjectTemplate.Conditions condition) {
         int currentCondition = this.condition.get();
         this.condition.set(currentCondition & ((int) (~condition.value)));
+    }
+
+    public boolean hasCondition(int condition) {
+        return (this.condition.get() & condition) != 0;
+    }
+
+    public boolean isInvulnerable() {
+        return hasCondition((int) ServerTangibleObjectTemplate.Conditions.C_invulnerable.value);
+    }
+
+    public boolean isCrafted() {
+        return hasCondition((int) ServerTangibleObjectTemplate.Conditions.C_crafted.value);
+    }
+
+    public boolean isCraftingTool() {
+        //return getObjVars().hasItem(OBJVAR_CRAFTING_TOOL);
+        //TODO: Implement obj vars...
+        return false;
+    }
+
+    public long getCraftedId() {
+        //TODO: implement obj vars...
+        //return getObjVars().getItem(OBJVAR_CRAFTING_SCHEMATIC);
+        return 0;
+    }
+
+    public long getCreatorId() {
+        return creatorId;
+    }
+
+    public int getMaxHitPoints() {
+        return maxHitPoints.get();
+    }
+
+    public int getDamageTaken() {
+        return damageTaken.get();
+    }
+
+    public void setCreatorId(long networkId) {
+        this.creatorId = networkId;
+    }
+
+    public int getCount() {
+        return this.count.get();
     }
 
     @Override
