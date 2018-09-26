@@ -3,6 +3,7 @@ package io.bacta.game.dispatch;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.game.command.CommandQueueParameters;
 import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
@@ -94,8 +95,9 @@ public final class CommandQueueDispatcher {
         //TODO: We need to do something with sequence Id...for example, actually queue the commands.
 
         if (controller != null) {
+            final CommandQueueParameters parameters = new CommandQueueParameters(data.getParams());
             final ServerObject target = serverObjectService.get(data.getTargetId());
-            controller.handleCommand(context, actor, target, data.getParams());
+            controller.handleCommand(context, actor, target, parameters);
         } else {
             LOGGER.error("No controller loaded to handle CommandQueueController for command '{}'(0x{}).",
                     knownCommandNames.get(data.getCommandHash()),
