@@ -1,5 +1,6 @@
 package io.bacta.game.controllers.command;
 
+import io.bacta.game.command.CommandQueueParameters;
 import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 @QueuesCommand("requestcharactersheetinfo")
 public class RequestCharacterSheetInfoCommandController implements CommandQueueController {
     @Override
-    public void handleCommand(GameRequestContext context, ServerObject actor, ServerObject target, String params) {
+    public void handleCommand(GameRequestContext context, ServerObject actor, ServerObject target, CommandQueueParameters params) {
 
         final int bornDate = 0;
         final int played = 0;
