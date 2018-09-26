@@ -139,7 +139,7 @@ public final class PlayerObject extends IntangibleObject {
         maxDrink = new AutoDeltaInt();
         meds = new AutoDeltaInt();
         maxMeds = new AutoDeltaInt();
-        privilegedTitle = new AutoDeltaByte();
+        privilegedTitle = new AutoDeltaByte(PrivilegedTitles.DEVELOPER);
         completedQuests = new AutoDeltaVariable<>(new BitArray(), BitArray::new);
         activeQuests = new AutoDeltaVariable<>(new BitArray(), BitArray::new);
         currentQuest = new AutoDeltaInt();
