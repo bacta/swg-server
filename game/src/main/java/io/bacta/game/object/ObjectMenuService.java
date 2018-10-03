@@ -7,7 +7,7 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.controllers.object.ObjControllerBuilder;
-import io.bacta.game.message.object.MessageQueueObjectMenuRequest;
+import io.bacta.game.message.object.ObjectMenuRequest;
 import io.bacta.game.object.RadialMenuBuilder.RadialSubMenuBuilder;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.player.PlayerObjectService;
@@ -79,7 +79,7 @@ public final class ObjectMenuService {
         return 0;
     }
 
-    public void handleObjectMenuRequest(final SoeConnection connection, final ServerObject actor, final MessageQueueObjectMenuRequest request) {
+    public void handleObjectMenuRequest(final SoeConnection connection, final ServerObject actor, final ObjectMenuRequest request) {
         final CreatureObject creatureObject = actor.asCreatureObject();
         final ServerObject targetObject = serverObjectService.get(request.getTargetId());
 
@@ -135,7 +135,7 @@ public final class ObjectMenuService {
         //TODO: Append scripted object menu request for this object based on the accessing creature.
 
         //TODO: Append this message to the outgoing message queue.
-        final MessageQueueObjectMenuRequest data = new MessageQueueObjectMenuRequest(
+        final ObjectMenuRequest data = new ObjectMenuRequest(
                 targetObject.getNetworkId(), creatureObject.getNetworkId(), builder.build(), request.getSequenceId());
 
         final ObjControllerMessage msg = ObjControllerBuilder.newBuilder().send().reliable().authClient()

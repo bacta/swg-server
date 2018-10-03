@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.NET_UPDATE_TRANSFORM_WITH_PARENT)
-public final class MessageQueueDataTransformWithParent implements MessageQueueData {
+public final class DataTransformWithParent implements MessageQueueData {
     private final int syncStamp;
     private final int sequenceNumber;
     private final long parentNetworkId;
@@ -25,7 +25,7 @@ public final class MessageQueueDataTransformWithParent implements MessageQueueDa
     private float lookAtYaw;
     private boolean useLookAtYaw;
 
-    public MessageQueueDataTransformWithParent(final ByteBuffer buffer) {
+    public DataTransformWithParent(final ByteBuffer buffer) {
         this.syncStamp = buffer.getInt();
         this.sequenceNumber = buffer.getInt();
         this.parentNetworkId = buffer.getLong();
