@@ -14,13 +14,13 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.OBJECT_MENU_REQUEST)
-public final class MessageQueueObjectMenuRequest implements MessageQueueData {
+public final class ObjectMenuRequest implements MessageQueueData {
     private final long targetId;
     private final long requestorId;
     private final List<ObjectMenuRequestData> data;
     private final byte sequenceId;
 
-    public MessageQueueObjectMenuRequest(final ByteBuffer buffer) {
+    public ObjectMenuRequest(final ByteBuffer buffer) {
         targetId = buffer.getLong();
         requestorId = buffer.getLong();
         data = BufferUtil.getArrayList(buffer, ObjectMenuRequestData::new);
