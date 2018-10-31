@@ -7,6 +7,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
+import io.bacta.game.actor.db.DatabaseSupervisor;
 import io.bacta.game.actor.zone.ZoneSupervisor;
 import io.bacta.shared.MemberConstants;
 import org.springframework.context.annotation.Scope;
@@ -42,6 +43,7 @@ public class GalaxySupervisor extends AbstractActor {
                 ClusterEvent.UnreachableMember.class);
 
         super.preStart();
+        getContext().actorOf(ext.props(DatabaseSupervisor.class), "database");
         getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
         getContext().actorOf(ext.props(ObjectSupervisor.class), "object");
         getContext().actorOf(ext.props(ZoneSupervisor.class), "zone");

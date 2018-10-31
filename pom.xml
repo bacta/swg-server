@@ -29,6 +29,9 @@
         <spring.security.jwt.version>1.0.9.RELEASE</spring.security.jwt.version>
         <reactor.spring.version>1.0.1.RELEASE</reactor.spring.version>
         <bouncycastle.pkix.version>1.60</bouncycastle.pkix.version>
+        <berkeleydb.version>18.3.1</berkeleydb.version>
+        <kryo.version>3.0.3</kryo.version>
+        <kryo.serializer.version>0.37</kryo.serializer.version>
     </properties>
 
     <issueManagement>
@@ -353,6 +356,21 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.pkix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>${berkeleydb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>${kryo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.javakaffee</groupId>
+                <artifactId>kryo-serializers</artifactId>
+                <version>${kryo.serializer.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
