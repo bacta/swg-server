@@ -21,15 +21,11 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.engine.network.controller.MessageController;
-import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
-import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 
 import java.nio.ByteBuffer;
 
 public interface SoeMessageController extends MessageController {
-    void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) throws Exception;
-    void setSoeMessageDispatcher(SoeMessageDispatcher soeMessageDispatcher);
-    void setGameNetworkMessageDispatcher(GameNetworkMessageDispatcher gameNetworkMessageDispatcher);
+    void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) throws Exception;
 }

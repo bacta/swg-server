@@ -20,7 +20,6 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.ClockReflectMessage;
 import io.bacta.soe.network.message.SoeMessageType;
@@ -92,14 +91,12 @@ import java.nio.ByteBuffer;
  */
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketClockSync})
-public class ClockSyncController extends BaseSoeController {
+public class ClockSyncController implements SoeMessageController {
 
     private static final long serverStartTime = System.currentTimeMillis();
 
     @Override
-    public void handleIncoming(final byte zeroByte, final SoeMessageType type, final SoeConnection connection, final ByteBuffer buffer) {
-
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+    public void handleIncoming(final byte zeroByte, final SoeMessageType type, final SoeUdpConnection connection, final ByteBuffer buffer) {
 
         short timeStamp = buffer.getShort();
 		int masterPingTime = buffer.getInt();
@@ -110,15 +107,15 @@ public class ClockSyncController extends BaseSoeController {
 		long ourSent = buffer.getLong();
 		long ourReceived = buffer.getLong();
 
-        soeUdpConnection.updatePingData(masterPingTime, averagePingTime, lowPingTime, highPingTime, lastPingTime);
+        connection.updatePingData(masterPingTime, averagePingTime, lowPingTime, highPingTime, lastPingTime);
 
         ClockReflectMessage outMessage = new ClockReflectMessage(
                 timeStamp,
                 Clock.now(),
                 ourSent,
                 ourReceived,
-                soeUdpConnection.getProtocolMessagesSent(),
-                soeUdpConnection.getProtocolMessagesReceived()
+                connection.getProtocolMessagesSent(),
+                connection.getProtocolMessagesReceived()
         );
 
         connection.sendMessage(outMessage);

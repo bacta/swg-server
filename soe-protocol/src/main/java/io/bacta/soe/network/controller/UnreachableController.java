@@ -20,7 +20,6 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
@@ -30,11 +29,10 @@ import java.nio.ByteBuffer;
 
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketUnreachableConnection})
-public class UnreachableController extends BaseSoeController {
+public class UnreachableController implements SoeMessageController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-        soeUdpConnection.terminate(TerminateReason.UNREACHABLE, true);
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+        connection.terminate(TerminateReason.UNREACHABLE, true);
     }
 }

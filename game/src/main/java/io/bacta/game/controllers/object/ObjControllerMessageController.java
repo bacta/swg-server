@@ -2,8 +2,8 @@ package io.bacta.game.controllers.object;
 
 
 import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.dispatch.MessageQueueDispatcher;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -17,7 +17,7 @@ import javax.inject.Inject;
 @Component
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
 @MessageHandled(handles = ObjControllerMessage.class)
-public final class ObjControllerMessageController implements GameNetworkMessageController<GameRequestContext, ObjControllerMessage> {
+public final class ObjControllerMessageController implements GameNetworkMessageController<SoeRequestContext, ObjControllerMessage> {
 
     private final MessageQueueDispatcher messageQueueDispatcher;
 
@@ -27,7 +27,7 @@ public final class ObjControllerMessageController implements GameNetworkMessageC
     }
 
     @Override
-    public void handleIncoming(GameRequestContext context, ObjControllerMessage message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, ObjControllerMessage message) throws Exception {
         messageQueueDispatcher.dispatch(context, message);
     }
 }

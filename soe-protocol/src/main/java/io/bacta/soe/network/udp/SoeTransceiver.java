@@ -1,16 +1,12 @@
 package io.bacta.soe.network.udp;
 
 import io.bacta.engine.network.udp.UdpChannel;
-import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.event.TransceiverStartedEvent;
 import io.bacta.soe.event.TransceiverStoppedEvent;
-import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.connection.SoeConnectionCache;
-import io.bacta.soe.network.handler.LoginInboundMessageChannel;
-import io.bacta.soe.network.handler.SoeSendHandler;
+import io.bacta.soe.network.channel.SoeMessageChannel;
+import io.bacta.soe.network.channel.SoeSendHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -26,13 +22,11 @@ import java.nio.ByteBuffer;
 
 @Slf4j
 @Component
-@Scope("prototype")
 public class SoeTransceiver {
 
     private UdpChannel udpChannel;
-    private final LoginInboundMessageChannel inboundMessageChannel;
+    private final SoeMessageChannel inboundMessageChannel;
     private final SoeSendHandler sendHandler;
-    private final SoeConnectionCache soeConnectionCache;
     private final ApplicationEventPublisher publisher;
 
     private String name = "";
@@ -40,14 +34,13 @@ public class SoeTransceiver {
 
     @Inject
     public SoeTransceiver(final UdpChannel udpChannel,
-                          final LoginInboundMessageChannel inboundMessageChannel,
+                          final SoeMessageChannel inboundMessageChannel,
                           final SoeSendHandler sendHandler,
                           final ApplicationEventPublisher publisher) {
 
         this.udpChannel = udpChannel;
         this.inboundMessageChannel = inboundMessageChannel;
         this.sendHandler = sendHandler;
-        this.soeConnectionCache = inboundMessageChannel.getConnectionCache();
         this.publisher = publisher;
         this.started = false;
     }
@@ -68,7 +61,7 @@ public class SoeTransceiver {
 
         this.name = name;
         this.udpChannel.start(name, bindAddress, bindPort, this::receiveMessage);
-        this.sendHandler.start(name, soeConnectionCache, inboundMessageChannel.getProtocolHandler(), udpChannel);
+        this.sendHandler.start(name, udpChannel);
         this.started = true;
 
         publisher.publishEvent(new TransceiverStartedEvent());
@@ -76,24 +69,6 @@ public class SoeTransceiver {
 
     private void receiveMessage(InetSocketAddress sender, ByteBuffer message) {
         inboundMessageChannel.receiveMessage(sender, message);
-    }
-
-    public void sendMessage(SoeConnection sender, ByteBuffer message) {
-        sendHandler.sendMessage(sender, message);
-    }
-
-    public SoeConnection getConnection(final InetSocketAddress address) {
-        SoeConnection connection = soeConnectionCache.get(address);
-        if(connection == null) {
-            connection = inboundMessageChannel.getConnectionProvider().newOutgoingInstance(address);
-            soeConnectionCache.put(address, connection);
-        }
-
-        return connection;
-    }
-
-    public void broadcast(GameNetworkMessage message) {
-        soeConnectionCache.broadcast(message);
     }
 
     @PreDestroy

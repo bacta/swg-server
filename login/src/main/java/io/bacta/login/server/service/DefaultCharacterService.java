@@ -4,7 +4,7 @@ import io.bacta.login.message.CharacterType;
 import io.bacta.login.message.EnumerateCharacterId;
 import io.bacta.login.server.model.Character;
 import io.bacta.login.server.repository.CharacterRepository;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,7 @@ public final class DefaultCharacterService implements CharacterService {
     }
 
     @Override
-    public void sendEnumerateCharacters(SoeConnection connection, int bactaId) {
+    public void sendEnumerateCharacters(SoeRequestContext context, int bactaId) {
         final Set<EnumerateCharacterId.CharacterData> characterDataSet = new HashSet<>();
         final List<Character> accountCharacters = characterRepository.findByBactaId(bactaId);
 
@@ -71,6 +71,6 @@ public final class DefaultCharacterService implements CharacterService {
         }
 
         final EnumerateCharacterId message = new EnumerateCharacterId(characterDataSet);
-        connection.sendMessage(message);
+        context.sendMessage(message);
     }
 }

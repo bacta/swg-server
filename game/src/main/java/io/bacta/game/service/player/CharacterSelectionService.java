@@ -1,12 +1,13 @@
 package io.bacta.game.service.player;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.CmdStartScene;
 import io.bacta.game.message.ParametersMessage;
 import io.bacta.game.message.ServerTimeMessage;
 import io.bacta.game.object.tangible.creature.CreatureObject;
+import io.bacta.game.scene.SceneService;
 import io.bacta.game.service.guild.GuildService;
 import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,17 +20,21 @@ import java.util.Collections;
 @Component
 @Scope("prototype")
 public final class CharacterSelectionService {
+
     private final GuildService guildService;
     private final ServerObjectService serverObjectService;
+    private final SceneService sceneService;
 
     @Inject
     public CharacterSelectionService(GuildService guildService,
-                                     ServerObjectService serverObjectService) {
+                                     ServerObjectService serverObjectService,
+                                     SceneService sceneService) {
         this.guildService = guildService;
         this.serverObjectService = serverObjectService;
+        this.sceneService = sceneService;
     }
 
-    public void selectCharacter(GameRequestContext context, long networkId) {
+    public void selectCharacter(SoeRequestContext context, long networkId) {
         LOGGER.info("Selecting character with network id {}", networkId);
         //Send appropriate messages.
 
@@ -38,6 +43,9 @@ public final class CharacterSelectionService {
         // Verify Account Ownership
         //TODO: What if nothing with that id exists?
         //TODO: What if that creature doesn't belong to the account that signed in?
+
+        //ActorRef scene = sceneService.getScene(playerCreature.getSceneId());
+        //scene.tell(new LoadPlayerCharacter(networkId), ActorRef.noSender());
 
         // Start Scene
         final CmdStartScene start = new CmdStartScene(
@@ -65,7 +73,7 @@ public final class CharacterSelectionService {
         guildService.sendTo(context);
 
         //Send creates and baselines for all the creatures objects.
-        playerCreature.sendCreateAndBaselinesTo(Collections.singleton(context.getConnection()));
+        playerCreature.sendCreateAndBaselinesTo(Collections.singleton(context));
     }
 
 
