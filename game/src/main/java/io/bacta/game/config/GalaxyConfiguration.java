@@ -22,7 +22,7 @@ package io.bacta.game.config;
 
 import akka.actor.ActorSystem;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.actor.GalaxySupervisor;
+import io.bacta.game.actor.GalaxyActor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +48,6 @@ public class GalaxyConfiguration {
     }
 
     private void deployActors() {
-        actorSystem.actorOf(ext.props(GalaxySupervisor.class), "galaxy");
+        actorSystem.actorOf(ext.props(GalaxyActor.class), "galaxy");
     }
 }

@@ -20,15 +20,15 @@ import java.util.Optional;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class GalaxySupervisor extends AbstractActor {
+public class GalaxyActor extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxySupervisor.class.getSimpleName());
+    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxyActor.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final SpringAkkaExtension ext;
     private final GameServerProperties properties;
 
     @Inject
-    public GalaxySupervisor(
+    public GalaxyActor(
             final SpringAkkaExtension ext,
             final GameServerProperties properties) {
         this.ext = ext;
