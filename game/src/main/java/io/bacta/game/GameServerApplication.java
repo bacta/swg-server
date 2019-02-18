@@ -22,7 +22,6 @@ package io.bacta.game;
 
 import io.bacta.engine.context.ApplicationErrorListener;
 import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableAutoConfiguration
 @EnableScheduling
 @ComponentScan({
         "io.bacta.game",

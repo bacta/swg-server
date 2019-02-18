@@ -6,7 +6,6 @@ import com.google.common.io.Files;
 import gnu.trove.list.TIntList;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.utils.StringUtil;
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterFailed;
 import io.bacta.game.message.ClientCreateCharacterSuccess;
@@ -32,6 +31,7 @@ import io.bacta.shared.localization.StringId;
 import io.bacta.shared.math.Transform;
 import io.bacta.shared.math.Vector;
 import io.bacta.shared.object.template.SharedObjectTemplate;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -124,7 +124,7 @@ public class CharacterCreationService {
                 .build();
     }
 
-    public void createCharacter(GameRequestContext context, ClientCreateCharacter createMessage) {
+    public void createCharacter(SoeRequestContext context, ClientCreateCharacter createMessage) {
         //TODO: Account verification.
         final int accountId = 1;
         final String username = "crush";

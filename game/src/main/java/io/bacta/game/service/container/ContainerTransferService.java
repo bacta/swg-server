@@ -9,7 +9,7 @@ import io.bacta.shared.localization.StringId;
 import io.bacta.shared.math.Transform;
 import io.bacta.shared.object.GameObject;
 import io.bacta.shared.portal.CellProperty;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -345,7 +345,7 @@ public final class ContainerTransferService {
         containerResult.setError(ContainerErrorCode.SUCCESS);
 
         if (transferer != null) {
-            final SoeConnection client = transferer.getConnection();
+            final SoeRequestContext client = transferer.getConnection();
 
             if (client != null && !client.isGod()) {
                 LOGGER.debug("Player tried to drop something in world, but they are not a god.");

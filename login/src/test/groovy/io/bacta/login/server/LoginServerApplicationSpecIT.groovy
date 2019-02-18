@@ -4,9 +4,9 @@ import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
-import io.bacta.soe.network.connection.ConnectionMap
-import io.bacta.soe.network.connection.DefaultConnectionMap
-import io.bacta.soe.network.connection.SoeConnection
+import io.bacta.soe.network.connection.BroadcastService
+import io.bacta.soe.network.connection.DefaultBroadcastService
+import io.bacta.soe.network.connection.SoeClient
 import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
@@ -43,7 +43,7 @@ class LoginServerApplicationSpecIT extends Specification {
 
         setup:
 
-        SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, properties.getBindPort()));
+        SoeClient connection = soeClient.getConnection(new InetSocketAddress(serverHost, properties.getBindPort()));
 
         when:
 
@@ -58,9 +58,9 @@ class LoginServerApplicationSpecIT extends Specification {
 
         setup:
 
-        ConnectionMap connectionMap = new DefaultConnectionMap()
+        BroadcastService connectionMap = new DefaultBroadcastService()
         connectionMap.setGetConnectionMethod(soeClient.&getConnection)
-        SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, properties.getBindPort()));
+        SoeClient connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, properties.getBindPort()));
 
         when:
 
@@ -75,9 +75,9 @@ class LoginServerApplicationSpecIT extends Specification {
 
         setup:
 
-        ConnectionMap connectionMap = new DefaultConnectionMap()
+        BroadcastService connectionMap = new DefaultBroadcastService()
         connectionMap.setGetConnectionMethod(soeClient.&getConnection)
-        SoeConnection connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, properties.getBindPort()));
+        SoeClient connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, properties.getBindPort()));
         def startingReceivedReliables = connection.soeUdpConnection.incomingMessageProcessor.gameNetworkMessagesReceived.get()
         def startingSequence = connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get()
 

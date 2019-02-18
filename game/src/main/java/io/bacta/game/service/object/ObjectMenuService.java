@@ -15,7 +15,7 @@ import io.bacta.game.service.player.PlayerObjectService;
 import io.bacta.shared.datatable.DataTable;
 import io.bacta.shared.datatable.DataTableManager;
 import io.bacta.shared.radialmenu.RadialMenuInfo;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public final class ObjectMenuService {
         return 0;
     }
 
-    public void handleObjectMenuRequest(final SoeConnection connection, final ServerObject actor, final MessageQueueObjectMenuRequest request) {
+    public void handleObjectMenuRequest(final SoeRequestContext connection, final ServerObject actor, final MessageQueueObjectMenuRequest request) {
         final CreatureObject creatureObject = actor.asCreatureObject();
         final ServerObject targetObject = serverObjectService.get(request.getTargetId());
 

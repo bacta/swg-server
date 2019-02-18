@@ -258,7 +258,7 @@
             </dependency>
             <dependency>
                 <groupId>com.ocdsoft.bacta.swg</groupId>
-                <artifactId>zone</artifactId>
+                <artifactId>scene</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -22,8 +22,6 @@ package io.bacta.soe.network.dispatch;
 
 import gnu.trove.map.TIntObjectMap;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.context.SoeRequestContext;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
@@ -32,10 +30,10 @@ import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import io.bacta.soe.util.ObjectControllerNames;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 /**
@@ -49,68 +47,64 @@ import java.nio.ByteBuffer;
  */
 
 @Slf4j
-@Scope("prototype")
-public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDispatcher {
+@Component
+public final class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDispatcher {
 
     private final static int OBJECT_CONTROLLER_MESSAGE = 0x80CE5E46;
     /**
      * Map of controller data to dispatch messages
      */
-    protected TIntObjectMap<GameNetworkMessageControllerData> controllers;
+    private final TIntObjectMap<GameNetworkMessageControllerData> controllers;
 
     /**
      * Creates the {@link GameNetworkMessage} to be passed to the appropriate controller
      */
-    protected final GameNetworkMessageSerializer gameNetworkMessageSerializer;
+    private final GameNetworkMessageSerializer gameNetworkMessageSerializer;
 
     /**
      * Generates missing {@link GameNetworkMessage} and {@link GameNetworkMessageController} classes for implementation
      * Writes files directly to the project structure
      */
-    protected final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
+    private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
-
-    private GameNetworkMessageControllerLoader controllerLoader;
 
     @Inject
     public DefaultGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
                                                final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                                final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
-        this.controllerLoader = controllerLoader;
+
         this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
         this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
-    }
-
-    @PostConstruct
-    private void initialize() {
         controllers = controllerLoader.loadControllers();
     }
 
+//    @PostConstruct
+//    private void initialize() {
+//        controllers = controllerLoader.loadControllers();
+//    }
+
     @Override
-    public void dispatch(short priority, int gameMessageType, SoeConnection connection, ByteBuffer buffer) {
+    public void dispatch(short priority, int gameMessageType, InetSocketAddress sender, ByteBuffer buffer) {
 
         final GameNetworkMessageControllerData controllerData = controllers.get(gameMessageType);
 
         if (controllerData != null) {
-            if (!controllerData.containsRoles(connection.getRoles())) {
+            if (!controllerData.containsRoles(context.getRoles())) {
                 LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
-                LOGGER.error("Connection: {}", connection.toString());
-                return;
+                LOGGER.error("Connection: {}", context.toString());
+                throw new RuntimeException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + context.getRemoteAddress());
             }
 
             try {
                 final GameNetworkMessageController controller = controllerData.getController();
                 final GameNetworkMessage incomingMessage = gameNetworkMessageSerializer.readFromBuffer(gameMessageType, buffer);
 
-                connection.logReceivedMessage(incomingMessage);
                 LOGGER.trace("received {}", incomingMessage.getClass().getSimpleName());
 
                 LOGGER.debug("Routing to {}", controller.getClass().getSimpleName());
 
-                SoeRequestContext context = new SoeRequestContext(connection);
                 controller.handleIncoming(context, incomingMessage); //Can't fix this one yet.
-
 
             } catch (GameNetworkMessageTypeNotFoundException e) {
                 handleMissingController(priority, gameMessageType, buffer);
@@ -121,6 +115,8 @@ public class DefaultGameNetworkMessageDispatcher implements GameNetworkMessageDi
         } else {
             handleMissingController(priority, gameMessageType, buffer);
         }
+
+        throw new RuntimeException("Unable to dispatch message from " + context.getRemoteAddress());
     }
 
     protected void handleMissingController(short priority, int gameMessageType, ByteBuffer buffer) {

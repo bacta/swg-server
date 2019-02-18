@@ -21,7 +21,10 @@
 package io.bacta.soe.message
 
 import io.bacta.soe.config.SoeNetworkConfiguration
-import io.bacta.soe.network.connection.*
+import io.bacta.soe.network.connection.SoeClient
+import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
+import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
+import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
@@ -59,7 +62,7 @@ class MultiPacketSpec extends Specification {
         processedPackets = new ArrayList<ByteBuffer>()
 
         swgMessageRouter = Mock(GameNetworkMessageDispatcher) {
-            dispatch(_,_,_,_) >> { short priority, int gameMessageType, SoeConnection connection, ByteBuffer buffer ->
+            dispatch(_,_,_,_) >> { short priority, int gameMessageType, SoeClient connection, ByteBuffer buffer ->
                 processedPackets.add(buffer)
             }
         }
@@ -76,7 +79,7 @@ class MultiPacketSpec extends Specification {
         def messageSerializer = Mock(GameNetworkMessageSerializer)
 
         def soeUdpConnection = new SoeUdpConnection(null, null, 0, networkConfig, new SoeIncomingMessageProcessor(networkConfig), new SoeOutgoingMessageProcessor(networkConfig, messageSerializer))
-        def SoeConnection = new IncomingSoeConnection(soeUdpConnection)
+        def SoeConnection = new SoeClient(soeUdpConnection)
 
         when:
         for(List<Byte> array : multiList) {

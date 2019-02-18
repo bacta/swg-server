@@ -1,7 +1,7 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.planet.CollectionServerFirstListRequest;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = CollectionServerFirstListRequest.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class CollectionServerFirstListRequestController implements GameNetworkMessageController<GameRequestContext, CollectionServerFirstListRequest> {
+public class CollectionServerFirstListRequestController implements GameNetworkMessageController<SoeRequestContext, CollectionServerFirstListRequest> {
     @Override
-    public void handleIncoming(GameRequestContext context, CollectionServerFirstListRequest message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, CollectionServerFirstListRequest message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

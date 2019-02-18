@@ -20,7 +20,6 @@
 
 package io.bacta.soe.network.controller;
 
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +30,12 @@ import java.nio.ByteBuffer;
 @Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketAckAll1, SoeMessageType.cUdpPacketAckAll2, SoeMessageType.cUdpPacketAckAll3, SoeMessageType.cUdpPacketAckAll4})
-public class AckAllController extends BaseSoeController {
+public class AckAllController implements SoeMessageController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
-
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
         short sequenceNum = buffer.getShort();
-        soeUdpConnection.ackAllFromClient(sequenceNum);
-        LOGGER.trace("{} Client AckAll for Sequence {} {}", soeUdpConnection.getId(), sequenceNum, buffer.order());
+        connection.ackAllFromClient(sequenceNum);
+        LOGGER.trace("{} Client AckAll for Sequence {} {}", connection.getId(), sequenceNum, buffer.order());
     }
 }

@@ -1,6 +1,6 @@
 package io.bacta.login.server.service;
 
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 
 public interface CharacterService {
     void deleteCharacter(int clusterId, long networkId, int bactaId);
@@ -19,5 +19,5 @@ public interface CharacterService {
 //
 //    void toggleCompletedTutorial(int bactaId, boolean completed);
 
-    void sendEnumerateCharacters(SoeConnection connection, int bactaId);
+    void sendEnumerateCharacters(SoeRequestContext context, int bactaId);
 }

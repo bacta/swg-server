@@ -44,6 +44,6 @@ public class LoginClientIdController implements GameNetworkMessageController<Soe
 
     @Override
     public void handleIncoming(SoeRequestContext context, LoginClientId message) {
-        clientService.validateClient(context.getConnection(), message.getClientVersion(), message.getId(), message.getKey());
+        clientService.validateClient(context, message.getClientVersion(), message.getId(), message.getKey());
     }
 }

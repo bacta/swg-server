@@ -5,10 +5,13 @@ import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
-import io.bacta.game.actor.zone.ZoneSupervisor;
+import io.bacta.game.actor.galaxy.SceneSupervisor;
 import io.bacta.shared.MemberConstants;
+import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +19,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 @Component
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GalaxySupervisor extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxySupervisor.class.getSimpleName());
@@ -44,7 +47,8 @@ public class GalaxySupervisor extends AbstractActor {
         super.preStart();
         getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
         getContext().actorOf(ext.props(ObjectSupervisor.class), "object");
-        getContext().actorOf(ext.props(ZoneSupervisor.class), "zone");
+        getContext().actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_ROUTER);
+        getContext().actorOf(ext.props(SceneSupervisor.class), ActorConstants.GALAXY_SCENE_SUPERVISOR);
     }
 
     @Override

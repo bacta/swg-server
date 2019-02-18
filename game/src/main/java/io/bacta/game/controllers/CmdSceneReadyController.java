@@ -1,7 +1,7 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.CmdSceneReady;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = CmdSceneReady.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class CmdSceneReadyController implements GameNetworkMessageController<GameRequestContext, CmdSceneReady> {
+public class CmdSceneReadyController implements GameNetworkMessageController<SoeRequestContext, CmdSceneReady> {
     @Override
-    public void handleIncoming(GameRequestContext context, CmdSceneReady message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, CmdSceneReady message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

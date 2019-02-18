@@ -25,7 +25,7 @@ import io.bacta.shared.object.template.SharedTangibleObjectTemplate;
 import io.bacta.shared.property.CustomizationDataProperty;
 import io.bacta.shared.template.ObjectTemplateList;
 import io.bacta.shared.utility.TriggerVolumeData;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -370,7 +370,7 @@ public class TangibleObject extends ServerObject
     }
 
     @Override
-    protected void sendObjectSpecificBaselinesToClient(final SoeConnection client) {
+    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
         super.sendObjectSpecificBaselinesToClient(client);
 
         if (!isNonPvpObject()) {

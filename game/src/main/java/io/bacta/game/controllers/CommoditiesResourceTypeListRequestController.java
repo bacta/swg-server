@@ -1,7 +1,7 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.CommoditiesResourceTypeListRequest;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = CommoditiesResourceTypeListRequest.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class CommoditiesResourceTypeListRequestController implements GameNetworkMessageController<GameRequestContext, CommoditiesResourceTypeListRequest> {
+public class CommoditiesResourceTypeListRequestController implements GameNetworkMessageController<SoeRequestContext, CommoditiesResourceTypeListRequest> {
     @Override
-    public void handleIncoming(GameRequestContext context, CommoditiesResourceTypeListRequest message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, CommoditiesResourceTypeListRequest message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

@@ -22,11 +22,13 @@ package io.bacta.soe.network.controller;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.engine.buffer.UnsignedUtil;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
 /**
@@ -62,10 +64,17 @@ import java.nio.ByteBuffer;
 @Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketMulti})
-public class MultiController extends BaseSoeController {
+public class MultiController implements SoeMessageController {
+
+    private final SoeMessageDispatcher soeMessageDispatcher;
+
+    @Inject
+    public MultiController(final SoeMessageDispatcher soeMessageDispatcher) {
+        this.soeMessageDispatcher = soeMessageDispatcher;
+    }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
         while (buffer.remaining() > 3) {
             
