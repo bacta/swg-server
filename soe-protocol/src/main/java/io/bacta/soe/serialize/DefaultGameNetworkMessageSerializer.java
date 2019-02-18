@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -58,7 +57,6 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Scope("prototype")
 public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer, ApplicationContextAware {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
@@ -84,7 +82,7 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
                              .enableAllInfo()
                              .whitelistPackages("io.bacta")
                              .scan()) {
-            ClassInfoList controlClasses = scanResult.getSubclasses("io.bacta.shared.GameNetworkMessage");
+            ClassInfoList controlClasses = scanResult.getSubclasses(GameNetworkMessage.class.getName());
             List<Class<GameNetworkMessage>> controlClassRefs = controlClasses.loadClasses(GameNetworkMessage.class);
             controlClassRefs.forEach(this::loadMessageClass);
         }

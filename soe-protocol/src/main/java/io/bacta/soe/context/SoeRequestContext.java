@@ -1,19 +1,29 @@
 package io.bacta.soe.context;
 
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.message.TerminateReason;
 import lombok.Getter;
 
+import java.net.InetSocketAddress;
+
+@Getter
 public class SoeRequestContext {
 
-    @Getter
-    protected final SoeConnection connection;
+    private final SoeSessionContext sessionContext;
 
-    public SoeRequestContext(final SoeConnection connection) {
-        this.connection = connection;
+    public SoeRequestContext(SoeSessionContext soeSessionContext) {
+        this.sessionContext = soeSessionContext;
     }
 
     public void sendMessage(GameNetworkMessage message) {
-        connection.sendMessage(message);
+        sessionContext.sendMessage(message);
+    }
+
+    public InetSocketAddress getRemoteAddress() {
+        return sessionContext.getRemoteAddress();
+    }
+
+    public void disconnect(TerminateReason refused, boolean b) {
+        //TODO: Implement
     }
 }

@@ -20,7 +20,6 @@
 
 package io.bacta.soe.service;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
@@ -30,7 +29,6 @@ import java.util.Random;
  */
 
 @Component
-@Scope("prototype")
 public class RandomIntSessionKeyService implements SessionKeyService {
     private final Random random = new Random();
 

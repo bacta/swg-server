@@ -20,7 +20,6 @@
 
 package io.bacta.login.server;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -29,16 +28,8 @@ import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.login.server.actor.LoginSupervisor;
 import io.bacta.login.server.session.OAuth2SessionTokenProvider;
 import io.bacta.login.server.session.SessionTokenProvider;
-import io.bacta.soe.network.connection.ConnectionMap;
-import io.bacta.soe.network.connection.DefaultConnectionMap;
-import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
-import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
-import io.bacta.soe.network.udp.SoeTransceiver;
-import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
+import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -66,7 +57,6 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     private final LoginServerProperties loginServerProperties;
     private final SpringAkkaExtension ext;
     private ActorSystem actorSystem;
-    private ActorRef loginSupervisor;
 
     @Inject
     public LoginServerConfiguration(final LoginServerProperties loginServerProperties, final SpringAkkaExtension ext) {
@@ -78,41 +68,19 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context){
         // Create an Akka system
-        actorSystem = ActorSystem.create("Galaxy", akkaConfiguration());
+        actorSystem = ActorSystem.create("login", akkaConfiguration());
         ext.initialize(context);
 
-        // Start root actor
-        loginSupervisor = actorSystem.actorOf(ext.props(LoginSupervisor.class), ActorConstants.LOGIN_SUPERVISOR);
+        // Start root actors
+        actorSystem.actorOf(ext.props(LoginSupervisor.class), ActorConstants.LOGIN_SUPERVISOR);
+        //actorSystem.actorOf(ext.props(SoeSupervisor.class), ActorConstants.SOE_SUPERVISOR);
+        actorSystem.actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_ROUTER);
+
         return actorSystem;
     }
 
     private Config akkaConfiguration() {
         return ConfigFactory.load(loginServerProperties.getAkka().getConfig());
-    }
-
-
-    @Bean(name = "LoginConnectionMap")
-    public ConnectionMap getConnectionCache() {
-        return new DefaultConnectionMap();
-    }
-
-    @Inject
-    @Bean
-    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
-                                                                        final GameNetworkMessageSerializer gameNetworkMessageSerializer,
-                                                                        final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
-
-        return new DefaultGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
-    }
-
-    @Inject
-    @Bean(name = "LoginTransceiver")
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver, @Qualifier("LoginConnectionMap") ConnectionMap connectionMap) {
-        LOGGER.info("Starting LoginTransceiver");
-        connectionMap.setGetConnectionMethod(soeTransceiver::getConnection);
-        connectionMap.setBroadcastMethod(soeTransceiver::broadcast);
-        soeTransceiver.start("login", loginServerProperties.getBindAddress(), loginServerProperties.getBindPort());
-        return soeTransceiver;
     }
 
     @Bean

@@ -6,7 +6,7 @@ import io.bacta.game.object.template.server.ServerIntangibleObjectTemplate;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 
 import javax.inject.Inject;
 
@@ -33,7 +33,7 @@ public class IntangibleObject extends ServerObject {
     }
 
     @Override
-    protected void sendObjectSpecificBaselinesToClient(final SoeConnection client) {
+    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
         //IsFlattenedTheaterMessage<pair<long, bool>>
     }
 

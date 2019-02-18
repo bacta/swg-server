@@ -38,6 +38,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -49,6 +50,7 @@ import java.nio.file.Paths;
 @Configuration
 @ConfigurationProperties
 @Slf4j
+@Profile("test")
 public class GameServerTestConfiguration {
 
     private final GameServerProperties gameServerProperties;

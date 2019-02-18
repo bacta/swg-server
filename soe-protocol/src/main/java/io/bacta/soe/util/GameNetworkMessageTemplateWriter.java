@@ -31,7 +31,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ import java.nio.ByteBuffer;
  */
 @Slf4j
 @Component
-@Scope("prototype")
 public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
 
     private final VelocityEngine ve;

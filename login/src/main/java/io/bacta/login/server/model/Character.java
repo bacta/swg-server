@@ -1,6 +1,7 @@
 package io.bacta.login.server.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -35,6 +36,7 @@ public class Character {
     @Column(nullable = false)
     private int bactaId;
 
+    @EqualsAndHashCode
     public static class CharacterEntityKey implements Serializable {
         private long networkId;
         private int galaxyId;

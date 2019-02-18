@@ -28,7 +28,7 @@ import io.bacta.shared.object.Buff;
 import io.bacta.shared.object.GameObject;
 import io.bacta.shared.object.template.SharedCreatureObjectTemplate;
 import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 
 import javax.inject.Inject;
 
@@ -716,7 +716,7 @@ public class CreatureObject extends TangibleObject {
     }
 
     @Override
-    protected void sendObjectSpecificBaselinesToClient(final SoeConnection client) {
+    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
         super.sendObjectSpecificBaselinesToClient(client);
 
 //        final Property property = getProperty(SlowDownProperty.getClassPropertyId());

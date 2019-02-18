@@ -20,7 +20,7 @@ import io.bacta.shared.object.template.SharedObjectTemplate;
 import io.bacta.shared.portal.PortalProperty;
 import io.bacta.shared.template.ObjectTemplateList;
 import io.bacta.shared.util.NetworkId;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,7 +63,7 @@ public abstract class ServerObject extends GameObject {
 
     @Getter
     @Setter
-    protected transient SoeConnection connection;
+    protected transient SoeRequestContext connection;
 
     //SOE Kept a pointer to the ScriptReference. We are going to try just the String for now.
     //Notice that this value could be null. It shouldn't be accessed directly.
@@ -71,7 +71,7 @@ public abstract class ServerObject extends GameObject {
     @Setter
     private transient Set<String> attachedScripts;
 
-    protected transient final Set<SoeConnection> listeners;
+    protected transient final Set<SoeRequestContext> listeners;
 
     private transient int localFlags;
 
@@ -364,7 +364,7 @@ public abstract class ServerObject extends GameObject {
      *
      * @param clients The client connections that are receiving the create and baseline messages.
      */
-    public final void sendCreateAndBaselinesTo(final Set<SoeConnection> clients) {
+    public final void sendCreateAndBaselinesTo(final Set<SoeRequestContext> clients) {
         LOGGER.trace("Sending create and baselines to {}.", getNetworkId());
 
         //Don't send anything if we are being destroyed or are not supposed to send to the client.
@@ -391,7 +391,7 @@ public abstract class ServerObject extends GameObject {
         final BaselinesMessage firstParentAuthClientServerBaselines = new BaselinesMessage(this, firstParentAuthClientServerPackage, BaselinesMessage.BASELINES_FIRST_PARENT_CLIENT_SERVER);
         final BaselinesMessage firstParentAuthClientServerNpBaselines = new BaselinesMessage(this, firstParentAuthClientServerPackageNp, BaselinesMessage.BASELINES_FIRST_PARENT_CLIENT_SERVER_NP);
 
-        for (final SoeConnection client : clients) {
+        for (final SoeRequestContext client : clients) {
             client.sendMessage(msg);
 
             if (sendUpdateContainment)
@@ -402,14 +402,14 @@ public abstract class ServerObject extends GameObject {
         }
 
         //These only get sent to this client.
-        final SoeConnection authClient = getConnection();
+        final SoeRequestContext authClient = getConnection();
 
         if (authClient != null) {
             authClient.sendMessage(authClientServerBaselines);
             authClient.sendMessage(authClientServerNpBaselines);
         }
 
-        final SoeConnection firstParentClient = getParentPlayerClient(this);
+        final SoeRequestContext firstParentClient = getParentPlayerClient(this);
 
         if (firstParentClient != null) {
             firstParentClient.sendMessage(firstParentAuthClientServerBaselines);
@@ -431,20 +431,20 @@ public abstract class ServerObject extends GameObject {
 
         final SceneEndBaselines endBaselines = new SceneEndBaselines(getNetworkId());
 
-        for (final SoeConnection client : clients) {
+        for (final SoeRequestContext client : clients) {
             sendObjectSpecificBaselinesToClient(client);
             client.sendMessage(endBaselines);
         }
     }
 
-    protected void sendObjectSpecificBaselinesToClient(final SoeConnection client) {
+    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
         //To be implemented by sub classes to send special baseline messages.
     }
 
-    public final void sendDestroyTo(final Set<SoeConnection> clients) {
+    public final void sendDestroyTo(final Set<SoeRequestContext> clients) {
         SceneDestroyObject msg = null;
 
-        for (final SoeConnection client : clients) {
+        for (final SoeRequestContext client : clients) {
             //If its the first client, create the message.
             //This will prevent us from creating a message if the set is empty.
             if (msg == null)
@@ -513,7 +513,7 @@ public abstract class ServerObject extends GameObject {
 
     public final void broadcastMessage(GameNetworkMessage message, boolean sendSelf) {
 
-        for (SoeConnection theirConnection : listeners) {
+        for (SoeRequestContext theirConnection : listeners) {
             if (!sendSelf && theirConnection == getConnection()) {
                 continue;
             }
@@ -528,7 +528,7 @@ public abstract class ServerObject extends GameObject {
     }
 
     public final void broadcastMessage(ObjControllerMessage message, boolean changeReceiver) {
-        for (final SoeConnection theirConnection : listeners) {
+        for (final SoeRequestContext theirConnection : listeners) {
 
             if (changeReceiver) {
                 LOGGER.error("Set receiver is disabled right now! FIX THIS.");
@@ -743,7 +743,7 @@ public abstract class ServerObject extends GameObject {
         return this instanceof GroupObject ? (GroupObject) this : null;
     }
 
-    public static final SoeConnection getParentPlayerClient(ServerObject obj) {
+    public static final SoeRequestContext getParentPlayerClient(ServerObject obj) {
         while (obj != null && !obj.isInWorld() && !obj.isPlayerControlled())
             obj = (ServerObject) ContainerTransferService.getContainedByObject(obj);
 

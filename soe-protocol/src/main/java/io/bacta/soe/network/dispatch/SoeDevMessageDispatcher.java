@@ -21,7 +21,7 @@
 package io.bacta.soe.network.dispatch;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
 import io.bacta.soe.network.message.SoeMessageType;
@@ -30,9 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
@@ -41,22 +41,23 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Scope("prototype")
 public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
 
     private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
-    private final GameNetworkMessageDispatcher gameNetworkMessageDispatcher;
+    private final ApplicationContext context;
 
     @Inject
     public SoeDevMessageDispatcher(final ApplicationContext applicationContext, final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
-        this.gameNetworkMessageDispatcher = gameNetworkMessageDispatcher;
-        if(applicationContext != null) {
-            load(applicationContext);
-        }
+        this.context = applicationContext;
+    }
+
+    @PostConstruct
+    private void initialize() {
+        load(context);
     }
 
     @Override
-    public void dispatch(SoeConnection connection, ByteBuffer buffer) {
+    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer) {
 
         byte zeroByte = buffer.get();
         byte type = buffer.get();
@@ -110,9 +111,6 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
 
                 SoeMessageType[] types = controllerAnnotation.handles();
                 LOGGER.debug("Loading SoeMessageController: {}", controllerClass.getSimpleName());
-
-                controller.setSoeMessageDispatcher(this);
-                controller.setGameNetworkMessageDispatcher(gameNetworkMessageDispatcher);
 
                 for(SoeMessageType udpPacketType : types) {
 

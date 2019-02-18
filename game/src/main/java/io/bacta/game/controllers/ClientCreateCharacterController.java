@@ -1,8 +1,8 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.service.player.creation.CharacterCreationService;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = ClientCreateCharacter.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class ClientCreateCharacterController implements GameNetworkMessageController<GameRequestContext, ClientCreateCharacter> {
+public class ClientCreateCharacterController implements GameNetworkMessageController<SoeRequestContext, ClientCreateCharacter> {
     private final CharacterCreationService creationService;
 
     @Inject
@@ -25,7 +25,7 @@ public class ClientCreateCharacterController implements GameNetworkMessageContro
     }
 
     @Override
-    public void handleIncoming(GameRequestContext context, ClientCreateCharacter message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, ClientCreateCharacter message) throws Exception {
         this.creationService.createCharacter(context, message);
     }
 }

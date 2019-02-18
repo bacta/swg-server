@@ -1,7 +1,7 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.NewbieTutorialResponse;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 @MessageHandled(handles = NewbieTutorialResponse.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class NewbieTutorialResponseController implements GameNetworkMessageController<GameRequestContext, NewbieTutorialResponse> {
+public class NewbieTutorialResponseController implements GameNetworkMessageController<SoeRequestContext, NewbieTutorialResponse> {
     @Override
-    public void handleIncoming(GameRequestContext context, NewbieTutorialResponse message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, NewbieTutorialResponse message) throws Exception {
         LOGGER.warn("This controller is not implemented");
     }
 }

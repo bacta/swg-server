@@ -42,7 +42,7 @@ io:
             "http://localhost:8080/api"
       akka:
         config: "game.conf"
-      zoneServers:
+      scenes:
           - name: "tatooine"
             iffPath: "/some/iff/path/tatooine"
           - name: "naboo"

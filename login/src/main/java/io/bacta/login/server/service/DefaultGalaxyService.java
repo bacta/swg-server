@@ -12,11 +12,10 @@ import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.event.TransceiverStartedEvent;
-import io.bacta.soe.network.connection.ConnectionMap;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.network.connection.BroadcastService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public final class DefaultGalaxyService implements GalaxyService {
      */
     private final Map<String, Galaxy> loadedGalaxies;
     private final TaskScheduler taskScheduler;
-    private final ConnectionMap loginConnections;
+    private final BroadcastService broadcastService;
 
     private boolean maintenanceScheduled;
 
@@ -64,13 +63,13 @@ public final class DefaultGalaxyService implements GalaxyService {
     public DefaultGalaxyService(final LoginServerProperties loginServerProperties,
                                 final GalaxyRepository galaxyRepository,
                                 final TaskScheduler taskScheduler,
-                                @Qualifier("LoginConnectionMap") ConnectionMap loginConnections) {
+                                final BroadcastService broadcastService) {
 
         this.loginServerProperties = loginServerProperties;
         this.galaxyRepository = galaxyRepository;
         this.loadedGalaxies = new ConcurrentHashMap<>(INITIAL_GALAXIES_CAPACITY);
         this.taskScheduler = taskScheduler;
-        this.loginConnections = loginConnections;
+        this.broadcastService = broadcastService;
     }
 
     @Override
@@ -216,8 +215,8 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     @Override
-    public void sendClusterEnum(SoeConnection connection) {
-        LOGGER.debug("Sending cluster enumeration to client {}.", connection.getSoeUdpConnection().getRemoteAddress());
+    public void sendClusterEnum(SoeRequestContext context) {
+        LOGGER.debug("Sending cluster enumeration to client {}.", context.getRemoteAddress());
 
         final boolean privateClient = false; //TODO: Determine if the client is on the same local network.
 
@@ -241,11 +240,11 @@ public final class DefaultGalaxyService implements GalaxyService {
         }
 
         final LoginEnumCluster message = new LoginEnumCluster(clusters, loginServerProperties.getMaxCharactersPerAccount());
-        connection.sendMessage(message);
+        context.sendMessage(message);
     }
 
     @Override
-    public void sendDisabledCharacterCreationServers(SoeConnection connection) {
+    public void sendDisabledCharacterCreationServers(SoeRequestContext context) {
         final Collection<Galaxy> galaxies = getGalaxies();
 
         //Should we curate a set rather than keep it on the record and look it up?
@@ -256,7 +255,7 @@ public final class DefaultGalaxyService implements GalaxyService {
                 .collect(Collectors.toSet());
 
         final CharacterCreationDisabled message = new CharacterCreationDisabled(disabledGalaxies);
-        connection.sendMessage(message);
+        context.sendMessage(message);
     }
 
     private LoginClusterStatus createLoginClusterStatusMessage() {
@@ -312,11 +311,11 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     @Override
-    public void sendClusterStatus(SoeConnection connection) {
-        LOGGER.debug("Sending cluster status to client {}.", connection.getSoeUdpConnection().getRemoteAddress());
+    public void sendClusterStatus(SoeRequestContext context) {
+        LOGGER.debug("Sending cluster status to client {}.", context.getRemoteAddress());
 
         final LoginClusterStatus clusterStatusMessage = createLoginClusterStatusMessage();
-        connection.sendMessage(clusterStatusMessage);
+        context.sendMessage(clusterStatusMessage);
     }
 
     @Override
@@ -324,12 +323,12 @@ public final class DefaultGalaxyService implements GalaxyService {
         LOGGER.trace("Broadcasting cluster status to connected clients.");
 
         final LoginClusterStatus clusterStatusMessage = createLoginClusterStatusMessage();
-        loginConnections.broadcast(clusterStatusMessage);
+        broadcastService.broadcast(clusterStatusMessage);
     }
 
     @Override
-    public void sendExtendedClusterStatus(SoeConnection connection) {
-        LOGGER.info("Sending extended cluster info to {}.", connection.getSoeUdpConnection().getRemoteAddress());
+    public void sendExtendedClusterStatus(SoeRequestContext context) {
+        LOGGER.info("Sending extended cluster info to {}.", context.getRemoteAddress());
 
         final Collection<Galaxy> galaxies = getGalaxies();
         final Set<LoginClusterStatusEx.ClusterData> clusterDataEx = new TreeSet<>();
@@ -346,7 +345,7 @@ public final class DefaultGalaxyService implements GalaxyService {
         }
 
         final LoginClusterStatusEx message = new LoginClusterStatusEx(clusterDataEx);
-        connection.sendMessage(message);
+        context.sendMessage(message);
     }
 
     @Override

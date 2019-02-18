@@ -28,7 +28,6 @@ import io.bacta.engine.buffer.UnsignedUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -38,7 +37,6 @@ import java.nio.ByteOrder;
 @SuppressWarnings("deprecation")
 @Slf4j
 @Component
-@Scope("prototype")
 public final class XOREncryption implements SoeEncryption {
 
     @Getter
