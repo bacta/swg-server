@@ -54,13 +54,17 @@ public class NodeSupervisor extends AbstractActor {
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
-        List<GameServerProperties.Scene> sceneList = properties.getScenes();
+        //List<GameServerProperties.Scene> sceneList = properties.getScenes();
 
-        for(GameServerProperties.Scene server : sceneList) {
-            ActorRef sceneActor = getContext().actorOf(ext.props(SceneActor.class), server.getName());
-            sceneActor.tell(server, getSelf());
-            sceneService.addScene(server.getName(), sceneActor);
-        }
+        properties.getScenes()
+                .parallelStream()
+                .forEach(this::createSceneActor);
+//
+//        for(GameServerProperties.Scene server : sceneList) {
+//            ActorRef sceneActor = getContext().actorOf(ext.props(SceneActor.class), server.getName());
+//            sceneActor.tell(server, getSelf());
+//            sceneService.addScene(server.getName(), sceneActor);
+//        }
     }
 
     @Override
@@ -86,6 +90,13 @@ public class NodeSupervisor extends AbstractActor {
                 .match(ClusterEvent.UnreachableMember.class, this::memberDown)
                 .matchAny(o -> log.info("received unknown message", o))
                 .build();
+    }
+
+    private ActorRef createSceneActor(GameServerProperties.Scene scene) {
+        final ActorRef sceneActor = getContext().actorOf(ext.props(SceneActor.class), scene.getName());
+        sceneActor.tell(scene, getSelf());
+        sceneService.addScene(scene.getName(), sceneActor);
+        return sceneActor;
     }
 
     private void memberUp(ClusterEvent.MemberUp mUp) {
