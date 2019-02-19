@@ -22,7 +22,7 @@ package io.bacta.game.config;
 
 import akka.actor.ActorSystem;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.actor.GalaxyActor;
+import io.bacta.game.actor.galaxy.GalaxyActor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
