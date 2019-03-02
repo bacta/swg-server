@@ -12,8 +12,6 @@ import io.bacta.game.message.ClientCreateCharacterSuccess;
 import io.bacta.game.name.NameErrors;
 import io.bacta.game.name.NameService;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.object.intangible.player.PlayerObject;
-import io.bacta.game.object.tangible.TangibleObject;
 import io.bacta.game.object.tangible.creature.Attribute;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.object.tangible.creature.Gender;
@@ -36,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -192,9 +189,9 @@ public class CharacterCreationService {
         }
 
         applyScaleLimits(playerCreature, createMessage.getScaleFactor());
-        playerCreature.setObjectName(createMessage.getCharacterName());
-        playerCreature.setOwnerId(playerCreature.getNetworkId());
-        playerCreature.setPlayerControlled(true);
+//        playerCreature.setObjectName(createMessage.getCharacterName());
+//        playerCreature.setOwnerId(playerCreature.getNetworkId());
+//        playerCreature.setPlayerControlled(true);
 
         StartingLocations.StartingLocationInfo startingLocationInfo = startingLocations.getStartingLocationInfo(createMessage.getStartingLocation());
 
@@ -222,51 +219,51 @@ public class CharacterCreationService {
 
         if (collision != null)
             collision.setPlayerControlled(true);
-
-        final TangibleObject tangibleObject = TangibleObject.asTangibleObject(playerCreature);
-
-        if (tangibleObject != null)
-            tangibleObject.setAppearanceData(createMessage.getAppearanceData());
-
-        final String hairStyleTemplate;
-
-        //Validate the hair style. If it is invalid, then use the default hair template.
-        if (!isValidHairSelection(createMessage.getHairTemplateName(), speciesGender)) {
-            hairStyleTemplate = hairStylesService.getDefaultHairStyle(speciesGender);
-
-            LOGGER.error("{} used an invalid hair style {} for species/gender {}.",
-                    username, createMessage.getHairTemplateName(), speciesGender);
-        } else {
-            hairStyleTemplate = createMessage.getHairTemplateName();
-        }
-
-        // hair equip hack - lives on
-        if (!hairStyleTemplate.isEmpty()) {
-            final ServerObject hair = serverObjectService.createObject(createMessage.getHairTemplateName(), playerCreature);
-            assert hair != null : String.format("Could not create hair %s\n", createMessage.getHairTemplateName());
-
-            final TangibleObject tangibleHair = TangibleObject.asTangibleObject(hair);
-
-            assert tangibleHair != null : "Hair is not tangible, wtf.  Can't customize it.  (among other things, probably)...";
-
-            tangibleHair.setAppearanceData(createMessage.getHairAppearanceData());
-        }
-
-        setupPlayer(playerCreature, speciesGender, profession, createMessage.isJedi());
-
-        if (!createMessage.getBiography().isEmpty())
-            biographyService.setBiography(playerCreature.getNetworkId(), createMessage.getBiography());
-
-        final PlayerObject play = serverObjectService.createObject("object/player/player.iff", playerCreature);
-
-        assert play != null : String.format("%d unable to create player object for new character %s", accountId, playerCreature.getNetworkId());
-
-        play.setStationId(accountId);
-        play.setBornDate((int) Instant.now().getEpochSecond());
-        play.setSkillTemplate(createMessage.getSkillTemplate(), true);
-        play.setWorkingSkill(createMessage.getWorkingSkill(), true);
-
-        playerCreature.setSceneIdOnThisAndContents(startingLocationInfo.getPlanet());
+//
+//        final TangibleObject tangibleObject = TangibleObject.asTangibleObject(playerCreature);
+//
+//        if (tangibleObject != null)
+//            tangibleObject.setAppearanceData(createMessage.getAppearanceData());
+//
+//        final String hairStyleTemplate;
+//
+//        //Validate the hair style. If it is invalid, then use the default hair template.
+//        if (!isValidHairSelection(createMessage.getHairTemplateName(), speciesGender)) {
+//            hairStyleTemplate = hairStylesService.getDefaultHairStyle(speciesGender);
+//
+//            LOGGER.error("{} used an invalid hair style {} for species/gender {}.",
+//                    username, createMessage.getHairTemplateName(), speciesGender);
+//        } else {
+//            hairStyleTemplate = createMessage.getHairTemplateName();
+//        }
+//
+//        // hair equip hack - lives on
+//        if (!hairStyleTemplate.isEmpty()) {
+//            final ServerObject hair = serverObjectService.createObject(createMessage.getHairTemplateName(), playerCreature);
+//            assert hair != null : String.format("Could not create hair %s\n", createMessage.getHairTemplateName());
+//
+//            final TangibleObject tangibleHair = TangibleObject.asTangibleObject(hair);
+//
+//            assert tangibleHair != null : "Hair is not tangible, wtf.  Can't customize it.  (among other things, probably)...";
+//
+//            tangibleHair.setAppearanceData(createMessage.getHairAppearanceData());
+//        }
+//
+//        setupPlayer(playerCreature, speciesGender, profession, createMessage.isJedi());
+//
+//        if (!createMessage.getBiography().isEmpty())
+//            biographyService.setBiography(playerCreature.getNetworkId(), createMessage.getBiography());
+//
+//        final PlayerObject play = serverObjectService.createObject("object/player/player.iff", playerCreature);
+//
+//        assert play != null : String.format("%d unable to create player object for new character %s", accountId, playerCreature.getNetworkId());
+//
+//        play.setStationId(accountId);
+//        play.setBornDate((int) Instant.now().getEpochSecond());
+//        play.setSkillTemplate(createMessage.getSkillTemplate(), true);
+//        play.setWorkingSkill(createMessage.getWorkingSkill(), true);
+//
+//        playerCreature.setSceneIdOnThisAndContents(startingLocationInfo.getPlanet());
 
         // Persist object (Done in Object Manager)
 
@@ -326,7 +323,7 @@ public class CharacterCreationService {
             scaleFactor = Math.max(scaleFactor, scaleMin);
         }
 
-        creatureObject.setScaleFactor(scaleFactor);
+        //creatureObject.setScaleFactor(scaleFactor);
         creatureObject.setScale(Vector.XYZ111.multiply(scaleFactor));
     }
 
@@ -349,7 +346,7 @@ public class CharacterCreationService {
 
         for (int i = 0; i < Attribute.SIZE; ++i) {
             final int value = profList.get(i) + raceList.get(i);
-            creatureObject.initializeAttribute(i, value);
+            //creatureObject.initializeAttribute(i, value);
         }
     }
 

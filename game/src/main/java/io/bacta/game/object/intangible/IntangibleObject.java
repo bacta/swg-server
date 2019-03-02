@@ -6,7 +6,6 @@ import io.bacta.game.object.template.server.ServerIntangibleObjectTemplate;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.template.ObjectTemplateList;
-import io.bacta.soe.context.SoeRequestContext;
 
 import javax.inject.Inject;
 
@@ -32,10 +31,10 @@ public class IntangibleObject extends ServerObject {
         sharedPackage.addVariable(count);
     }
 
-    @Override
-    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
-        //IsFlattenedTheaterMessage<pair<long, bool>>
-    }
+//    @Override
+//    protected void sendObjectSpecificBaselinesToClient(final SoeRequestContext client) {
+//        //IsFlattenedTheaterMessage<pair<long, bool>>
+//    }
 
     public enum TheaterLocationType {
         NONE,

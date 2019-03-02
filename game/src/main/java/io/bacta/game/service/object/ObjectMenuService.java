@@ -4,13 +4,9 @@ import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
-import io.bacta.game.GameControllerMessageType;
-import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.controllers.object.ObjControllerBuilder;
 import io.bacta.game.message.object.MessageQueueObjectMenuRequest;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.tangible.creature.CreatureObject;
-import io.bacta.game.service.object.RadialMenuBuilder.RadialSubMenuBuilder;
 import io.bacta.game.service.player.PlayerObjectService;
 import io.bacta.shared.datatable.DataTable;
 import io.bacta.shared.datatable.DataTableManager;
@@ -81,68 +77,68 @@ public final class ObjectMenuService {
     }
 
     public void handleObjectMenuRequest(final SoeRequestContext connection, final ServerObject actor, final MessageQueueObjectMenuRequest request) {
-        final CreatureObject creatureObject = actor.asCreatureObject();
-        final ServerObject targetObject = serverObjectService.get(request.getTargetId());
-
-        if (targetObject == null)
-            return;
-
-        final boolean isGod = creatureObject.getConnection() != null && creatureObject.getConnection().isGod();
-
-        final RadialMenuBuilder builder = RadialMenuBuilder.newBuilder();
-
-        if (canPickUpObject(creatureObject, targetObject)) {
-            builder.root(getMenuTypeByName("ITEM_PICKUP"), "", false);
-        }
-
-        if (!creatureObject.isInWorldCell() || isGod) {
-            final RadialSubMenuBuilder moveBuilder = builder
-                    .root(getMenuTypeByName("ITEM_MOVE"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_FORWARD"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_BACKWARD"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_LEFT"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_RIGHT"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_UP"), "", false)
-                    .item(getMenuTypeByName("ITEM_MOVE_DOWN"), "", false)
-                    .item(getMenuTypeByName("ITEM_COPY_LOCATION"), "", false)
-                    .item(getMenuTypeByName("ITEM_COPY_HEIGHT"), "", false);
-
-            //TODO: Get the rotation degree from the creature.
-            final RadialSubMenuBuilder rotateBuilder = builder
-                    .root(getMenuTypeByName("ITEM_ROTATE"), "", false)
-                    .item(getMenuTypeByName("ITEM_ROTATE_LEFT"), "@ui_radial:item_rotate_yaw +90", false)
-                    .item(getMenuTypeByName("ITEM_ROTATE_RIGHT"), "@ui_radial:item_rotate_yaw -90", false)
-                    .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_YAW"), "", false);
-
-            //final PlayerObject playerObject = playerObjectService.getPlayerObject(creatureObject);
-            //NGE had some special collection that if earned, unlocked new rotation modes.
-            //We will just enable them for now for Gods.
-            if (isGod) {
-                rotateBuilder
-                        .item(getMenuTypeByName("ITEM_ROTATE_FORWARD"), "@ui_radial:item_rotate_pitch +90", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_BACKWARD"), "@ui_radial:item_rotate_pitch -90", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_PITCH"), "", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_CLOCKWISE"), "@ui_radial:item_rotate_roll +90", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_COUNTERCLOCKWISE"), "@ui_radial:item_rotate_pitch -90", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_ROLL"), "", false)
-                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM"), "", false);
-            }
-
-            rotateBuilder
-                    .item(getMenuTypeByName("ITEM_ROTATE_RESET"), "", false)
-                    .item(getMenuTypeByName("ITEM_ROTATE_COPY"), "", false);
-        }
-
-        //TODO: Append scripted object menu request for this object based on the accessing creature.
-
-        //TODO: Append this message to the outgoing message queue.
-        final MessageQueueObjectMenuRequest data = new MessageQueueObjectMenuRequest(
-                targetObject.getNetworkId(), creatureObject.getNetworkId(), builder.build(), request.getSequenceId());
-
-        final ObjControllerMessage msg = ObjControllerBuilder.newBuilder().send().reliable().authClient()
-                .build(creatureObject.getNetworkId(), GameControllerMessageType.OBJECT_MENU_RESPONSE, data);
-
-        connection.sendMessage(msg);
+//        final CreatureObject creatureObject = actor.asCreatureObject();
+//        final ServerObject targetObject = serverObjectService.get(request.getTargetId());
+//
+//        if (targetObject == null)
+//            return;
+//
+//        final boolean isGod = creatureObject.getConnection() != null && creatureObject.getConnection().isGod();
+//
+//        final RadialMenuBuilder builder = RadialMenuBuilder.newBuilder();
+//
+//        if (canPickUpObject(creatureObject, targetObject)) {
+//            builder.root(getMenuTypeByName("ITEM_PICKUP"), "", false);
+//        }
+//
+//        if (!creatureObject.isInWorldCell() || isGod) {
+//            final RadialSubMenuBuilder moveBuilder = builder
+//                    .root(getMenuTypeByName("ITEM_MOVE"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_FORWARD"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_BACKWARD"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_LEFT"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_RIGHT"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_UP"), "", false)
+//                    .item(getMenuTypeByName("ITEM_MOVE_DOWN"), "", false)
+//                    .item(getMenuTypeByName("ITEM_COPY_LOCATION"), "", false)
+//                    .item(getMenuTypeByName("ITEM_COPY_HEIGHT"), "", false);
+//
+//            //TODO: Get the rotation degree from the creature.
+//            final RadialSubMenuBuilder rotateBuilder = builder
+//                    .root(getMenuTypeByName("ITEM_ROTATE"), "", false)
+//                    .item(getMenuTypeByName("ITEM_ROTATE_LEFT"), "@ui_radial:item_rotate_yaw +90", false)
+//                    .item(getMenuTypeByName("ITEM_ROTATE_RIGHT"), "@ui_radial:item_rotate_yaw -90", false)
+//                    .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_YAW"), "", false);
+//
+//            //final PlayerObject playerObject = playerObjectService.getPlayerObject(creatureObject);
+//            //NGE had some special collection that if earned, unlocked new rotation modes.
+//            //We will just enable them for now for Gods.
+//            if (isGod) {
+//                rotateBuilder
+//                        .item(getMenuTypeByName("ITEM_ROTATE_FORWARD"), "@ui_radial:item_rotate_pitch +90", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_BACKWARD"), "@ui_radial:item_rotate_pitch -90", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_PITCH"), "", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_CLOCKWISE"), "@ui_radial:item_rotate_roll +90", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_COUNTERCLOCKWISE"), "@ui_radial:item_rotate_pitch -90", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM_ROLL"), "", false)
+//                        .item(getMenuTypeByName("ITEM_ROTATE_RANDOM"), "", false);
+//            }
+//
+//            rotateBuilder
+//                    .item(getMenuTypeByName("ITEM_ROTATE_RESET"), "", false)
+//                    .item(getMenuTypeByName("ITEM_ROTATE_COPY"), "", false);
+//        }
+//
+//        //TODO: Append scripted object menu request for this object based on the accessing creature.
+//
+//        //TODO: Append this message to the outgoing message queue.
+//        final MessageQueueObjectMenuRequest data = new MessageQueueObjectMenuRequest(
+//                targetObject.getNetworkId(), creatureObject.getNetworkId(), builder.build(), request.getSequenceId());
+//
+//        final ObjControllerMessage msg = ObjControllerBuilder.newBuilder().send().reliable().authClient()
+//                .build(creatureObject.getNetworkId(), GameControllerMessageType.OBJECT_MENU_RESPONSE, data);
+//
+//        connection.sendMessage(msg);
     }
 
     public boolean canPickUpObject(final CreatureObject actor, final ServerObject object) {

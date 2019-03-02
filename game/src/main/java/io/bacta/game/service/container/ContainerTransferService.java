@@ -5,11 +5,9 @@ import io.bacta.game.service.chat.GameChatService;
 import io.bacta.game.service.player.VeteranRewardsService;
 import io.bacta.shared.container.*;
 import io.bacta.shared.foundation.CrcString;
-import io.bacta.shared.localization.StringId;
 import io.bacta.shared.math.Transform;
 import io.bacta.shared.object.GameObject;
 import io.bacta.shared.portal.CellProperty;
-import io.bacta.soe.context.SoeRequestContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -189,7 +187,7 @@ public final class ContainerTransferService {
             return false;
         }
 
-        item.onContainerTransferComplete(sourceObject, destination);
+        //item.onContainerTransferComplete(sourceObject, destination);
         //TODO: Post transfer script hook
         return true;
     }
@@ -290,7 +288,7 @@ public final class ContainerTransferService {
         if (!success)
             LOGGER.warn("Checks to add an item succeeded, but the add failed.");
 
-        item.onContainerTransferComplete(sharedTransfer.sourceObject, destination);
+        //item.onContainerTransferComplete(sharedTransfer.sourceObject, destination);
         //TODO: Post transfer script hooks.
         return true;
     }
@@ -317,11 +315,11 @@ public final class ContainerTransferService {
             containerResult.setError(ContainerErrorCode.NO_CONTAINER);
             return false;
         }
-
-        if (!item.canDropInWorld()) {
-            containerResult.setError(ContainerErrorCode.WRONG_TYPE);
-            return false;
-        }
+//
+//        if (!item.canDropInWorld()) {
+//            containerResult.setError(ContainerErrorCode.WRONG_TYPE);
+//            return false;
+//        }
 
         if (!canTransferTo(destination, item, transferer, containerResult)) {
             LOGGER.debug("Could not transfer to dest cell.");
@@ -336,7 +334,7 @@ public final class ContainerTransferService {
         cellProperty.addObjectToWorld(item);
         item.setTransformObjectToParent(transform);
 
-        item.onContainerTransferComplete(sharedTransfer.sourceObject, destination);
+        //item.onContainerTransferComplete(sharedTransfer.sourceObject, destination);
         //TODO: Post transfer script hooks.
         return true;
     }
@@ -344,20 +342,20 @@ public final class ContainerTransferService {
     public boolean transferItemToWorld(final ServerObject destination, final ServerObject item, final ServerObject transferer, final ContainerResult containerResult, final Transform transform) {
         containerResult.setError(ContainerErrorCode.SUCCESS);
 
-        if (transferer != null) {
-            final SoeRequestContext client = transferer.getConnection();
+//        if (transferer != null) {
+//            final SoeRequestContext client = transferer.getConnection();
+//
+//            if (client != null && !client.isGod()) {
+//                LOGGER.debug("Player tried to drop something in world, but they are not a god.");
+//                containerResult.setError(ContainerErrorCode.NO_PERMISSION);
+//                return false;
+//            }
+//        }
 
-            if (client != null && !client.isGod()) {
-                LOGGER.debug("Player tried to drop something in world, but they are not a god.");
-                containerResult.setError(ContainerErrorCode.NO_PERMISSION);
-                return false;
-            }
-        }
-
-        if (!item.canDropInWorld()) {
-            containerResult.setError(ContainerErrorCode.WRONG_TYPE);
-            return false;
-        }
+//        if (!item.canDropInWorld()) {
+//            containerResult.setError(ContainerErrorCode.WRONG_TYPE);
+//            return false;
+//        }
 
         if (!canTransferTo(null, item, transferer, containerResult)) {
             return false;
@@ -384,7 +382,7 @@ public final class ContainerTransferService {
 
         item.setTransformObjectToParent(transform);
 
-        item.onContainerTransferComplete(sharedTransfer.sourceObject, null);
+        //item.onContainerTransferComplete(sharedTransfer.sourceObject, null);
         //TODO: Post transfer script hook.
         return true;
     }
@@ -399,19 +397,19 @@ public final class ContainerTransferService {
 
     public void sendContainerMessageToClient(final ServerObject player, final ContainerErrorCode errorCode, final ServerObject target) {
         final boolean sendMessage = errorCode != ContainerErrorCode.BLOCKED_BY_SCRIPT && errorCode != ContainerErrorCode.SILENT_ERROR;
-
-        if (sendMessage || (player.getConnection() != null && player.getConnection().isGod())) {
-            final String message;
-
-            if (target != null && (!target.getAssignedObjectName().isEmpty() || target.getNameStringId().isValid()))
-                message = String.format("container%02d_prose", errorCode.value);
-            else
-                message = String.format("container%02d", errorCode.value);
-
-            final StringId code = new StringId("container_error_message", message);
-
-            gameChatService.sendSystemMessageSimple(player, code, target);
-        }
+//
+//        if (sendMessage || (player.getConnection() != null && player.getConnection().isGod())) {
+//            final String message;
+//
+//            if (target != null && (!target.getAssignedObjectName().isEmpty() || target.getNameStringId().isValid()))
+//                message = String.format("container%02d_prose", errorCode.value);
+//            else
+//                message = String.format("container%02d", errorCode.value);
+//
+//            final StringId code = new StringId("container_error_message", message);
+//
+//            gameChatService.sendSystemMessageSimple(player, code, target);
+//        }
     }
 
     private SharedTransfer sharedTransferBegin(final GameObject item, final ContainerResult containerResult) {
