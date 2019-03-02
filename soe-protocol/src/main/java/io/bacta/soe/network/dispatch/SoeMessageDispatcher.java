@@ -20,7 +20,7 @@
 
 package io.bacta.soe.network.dispatch;
 
-import io.bacta.engine.network.dispatch.MessageDispatcher;
+import io.bacta.engine.network.handler.MessageHandler;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 
 import java.nio.ByteBuffer;
@@ -28,6 +28,6 @@ import java.nio.ByteBuffer;
 /**
  * Created by kburkhardt on 2/10/15.
  */
-public interface SoeMessageDispatcher extends MessageDispatcher {
+public interface SoeMessageDispatcher extends MessageHandler {
     void dispatch(SoeUdpConnection client, ByteBuffer buffer);
 }

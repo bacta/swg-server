@@ -10,9 +10,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.soe.event.DisconnectEvent;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
 import io.bacta.soe.network.forwarder.SwgRequestMessage;
 import io.bacta.soe.network.forwarder.SwgResponseMessage;
+import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -28,13 +28,13 @@ public class GalaxyGameNetworkMessageRouter extends AbstractActor {
     private final SoeUdpConnectionCache connectionCache;
     private final Cache<InetSocketAddress, ActorRef> clientCache;
     private final SpringAkkaExtension ext;
-    private final GameNetworkMessageDispatcher dispatcher;
+    private final GameNetworkMessageHandler dispatcher;
     private final ApplicationEventPublisher publisher;
 
     @Inject
     public GalaxyGameNetworkMessageRouter(final ApplicationEventPublisher publisher,
                                           final SoeUdpConnectionCache connectionCache,
-                                          final GameNetworkMessageDispatcher dispatcher,
+                                          final GameNetworkMessageHandler dispatcher,
                                           final SpringAkkaExtension ext) {
         this.publisher = publisher;
         this.connectionCache = connectionCache;
@@ -73,15 +73,16 @@ public class GalaxyGameNetworkMessageRouter extends AbstractActor {
      * @param request
      */
     private void handleRequest(final SwgRequestMessage request) throws ExecutionException {
-        log.debug("Received Request Opcode: {} from {} with content {}", request.getOpcode(), request.getRemoteAddress(), request.getBuffer());
-
+        if(log.isDebugEnabled()) {
+            log.debug("Received Request: {} from {}", request.getGameNetworkMessage().getClass().getSimpleName(), request.getRemoteAddress());
+        }
         ActorRef client = clientCache.get(request.getRemoteAddress(), () -> {
             ActorRef newConnection = getContext().actorOf(ext.props(SoeClient.class), request.getRemoteAddress().toString());
             clientCache.put(request.getRemoteAddress(), newConnection);
             newConnection.tell(new ConfigureConnection(request.getRemoteAddress()), getSelf());
             return newConnection;
         });
-        client.tell(request, getSelf());
+        client.tell(request.getGameNetworkMessage(), getSelf());
     }
 
     private void handleResponse(final SwgResponseMessage response) {
