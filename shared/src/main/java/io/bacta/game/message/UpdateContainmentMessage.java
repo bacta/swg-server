@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 @Getter
 @Priority(0x4)
 public final class UpdateContainmentMessage extends GameNetworkMessage {
-
     private final long objectId;
     private final long containerId;
     private final int slotArrangement;
