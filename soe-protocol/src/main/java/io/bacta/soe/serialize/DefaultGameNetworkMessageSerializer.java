@@ -22,12 +22,12 @@ package io.bacta.soe.serialize;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.util.SOECRC32;
 import io.bacta.soe.util.MessageHashUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;

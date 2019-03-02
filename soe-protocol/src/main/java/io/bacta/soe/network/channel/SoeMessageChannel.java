@@ -98,13 +98,16 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
 
         byte type = message.get(1);
 
-        SoeUdpConnection connection = connectionCache.getIfPresent(sender);
         SoeMessageType packetType = SoeMessageType.values()[type];
 
         if (type <= 0x1E) {
 
+            SoeUdpConnection connection;
+
             if (packetType == SoeMessageType.cUdpPacketConnect) {
                 connection = connectionCache.getNewConnection(sender);
+            } else {
+                connection = connectionCache.getIfPresent(sender);
             }
 
             if (connection != null) {

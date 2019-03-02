@@ -18,13 +18,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.login.server;
+package io.bacta.login.server.config;
 
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.actor.LoginSupervisor;
 import io.bacta.login.server.session.OAuth2SessionTokenProvider;
 import io.bacta.login.server.session.SessionTokenProvider;

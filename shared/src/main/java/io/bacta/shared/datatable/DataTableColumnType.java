@@ -2,7 +2,7 @@ package io.bacta.shared.datatable;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

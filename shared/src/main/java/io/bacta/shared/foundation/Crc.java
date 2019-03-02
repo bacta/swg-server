@@ -1,7 +1,6 @@
 package io.bacta.shared.foundation;
 
-
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 
 /**
  * Created by crush on 11/22/2015.
