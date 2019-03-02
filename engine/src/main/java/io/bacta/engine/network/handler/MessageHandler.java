@@ -18,9 +18,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.engine.network.dispatch;
+package io.bacta.engine.network.handler;
 
 
-public interface MessageDispatcher {
+public interface MessageHandler {
 
 }

@@ -26,8 +26,8 @@ import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
 import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
 import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.controller.*
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
+import io.bacta.soe.network.handler.GameNetworkMessageHandler
 import io.bacta.soe.network.message.SoeMessageType
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
 import io.bacta.soe.util.SoeMessageUtil
@@ -61,7 +61,7 @@ class MultiPacketSpec extends Specification {
 
         processedPackets = new ArrayList<ByteBuffer>()
 
-        swgMessageRouter = Mock(GameNetworkMessageDispatcher) {
+        swgMessageRouter = Mock(GameNetworkMessageHandler) {
             dispatch(_,_,_,_) >> { short priority, int gameMessageType, SoeClient connection, ByteBuffer buffer ->
                 processedPackets.add(buffer)
             }

@@ -20,9 +20,11 @@
 
 package io.bacta.soe.network.controller;
 
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
+import io.bacta.soe.network.forwarder.GameNetworkMessageForwarder;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -37,11 +39,13 @@ import java.nio.ByteOrder;
 @SoeController(handles = {SoeMessageType.cUdpPacketZeroEscape})
 public class ZeroEscapeController implements SoeMessageController {
 
-    private final GameNetworkMessageDispatcher dispatcher;
+    private final GameNetworkMessageForwarder forwarder;
+    private final GameNetworkMessageSerializer gameNetworkMessageSerializer;
 
     @Inject
-    public ZeroEscapeController(final GameNetworkMessageDispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public ZeroEscapeController(final GameNetworkMessageForwarder forwarder,  final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
+        this.forwarder = forwarder;
+        this.gameNetworkMessageSerializer = gameNetworkMessageSerializer;
     }
 
     @Override
@@ -50,6 +54,7 @@ public class ZeroEscapeController implements SoeMessageController {
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         int opcode = buffer.getInt();
 
-        dispatcher.dispatch(zeroByte, opcode, connection.get, buffer.slice().order(ByteOrder.LITTLE_ENDIAN));
+        final GameNetworkMessage gameNetworkMessage = gameNetworkMessageSerializer.readFromBuffer(opcode, buffer);
+        forwarder.forward(connection, gameNetworkMessage);
     }
 }
