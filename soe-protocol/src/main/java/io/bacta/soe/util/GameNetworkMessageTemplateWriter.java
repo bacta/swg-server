@@ -20,7 +20,7 @@
 
 package io.bacta.soe.util;
 
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;

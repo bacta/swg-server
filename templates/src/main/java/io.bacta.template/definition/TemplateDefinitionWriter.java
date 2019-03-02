@@ -245,7 +245,7 @@ public class TemplateDefinitionWriter {
                     ? templateData.getName()
                     : templateData.getName() + "ObjectTemplate";
 
-            final URL url = Resources.getResource("templates/object/include/" + name + ".txt");
+            final URL url = Resources.getResource("template/object/include/" + name + ".txt");
             final List<String> userDefinedLines = Resources.readLines(url, Charsets.UTF_8);
 
             printStream.printf("%s\t//@TDF-USER-START\n", tabs);

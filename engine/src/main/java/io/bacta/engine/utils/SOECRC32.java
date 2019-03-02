@@ -18,7 +18,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.shared.util;
+package io.bacta.engine.utils;
 
 public class SOECRC32 {
 

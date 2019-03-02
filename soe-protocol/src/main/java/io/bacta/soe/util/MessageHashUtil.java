@@ -21,9 +21,9 @@
 package io.bacta.soe.util;
 
 
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.MessageId;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.shared.util.SOECRC32;
 
 /**
  * Created by kyle on 5/28/2016.
