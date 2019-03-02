@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+@Getter
 @Priority(0x5)
 public final class DeltasMessage extends GameNetworkMessage {
     public static final byte DELTAS_CLIENT_ONLY = 0;
@@ -21,13 +22,9 @@ public final class DeltasMessage extends GameNetworkMessage {
     public static final byte DELTAS_FIRST_PARENT_CLIENT_SERVER = 8;
     public static final byte DELTAS_FIRST_PARENT_CLIENT_SERVER_NP = 9;
 
-    @Getter
     private final long target;
-    @Getter
     private final int typeId;
-    @Getter
     private final ByteBuffer packageBuffer;
-    @Getter
     private final byte packageId;
 
     public DeltasMessage(final GameObject object, final AutoDeltaByteStream stream, final int packageId) {
