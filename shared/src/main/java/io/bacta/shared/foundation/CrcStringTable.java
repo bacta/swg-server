@@ -2,8 +2,8 @@ package io.bacta.shared.foundation;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.shared.iff.Iff;
-import io.bacta.shared.util.SOECRC32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

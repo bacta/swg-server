@@ -3,12 +3,12 @@ package io.bacta.game.dispatch;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
 import io.bacta.game.message.object.CommandQueueEnqueue;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.service.object.ServerObjectService;
-import io.bacta.shared.util.SOECRC32;
 import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;

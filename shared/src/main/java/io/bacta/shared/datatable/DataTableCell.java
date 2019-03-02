@@ -1,7 +1,7 @@
 package io.bacta.shared.datatable;
 
 
-import io.bacta.shared.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 
 /**
  * Created by crush on 2/8/15.

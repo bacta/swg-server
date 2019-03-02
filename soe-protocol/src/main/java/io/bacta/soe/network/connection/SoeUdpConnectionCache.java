@@ -65,6 +65,10 @@ public final class SoeUdpConnectionCache {
 
     public SoeUdpConnection getNewConnection(InetSocketAddress sender) {
         try {
+            SoeUdpConnection connection = getIfPresent(sender);
+            if(connection != null) {
+                invalidate(sender);
+            }
             return connectionCache.get(sender);
         } catch (ExecutionException e) {
             throw new RuntimeException("Unable to get or load connection", e);
