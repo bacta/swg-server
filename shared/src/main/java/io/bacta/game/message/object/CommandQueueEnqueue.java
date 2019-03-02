@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.COMMAND_QUEUE_ENQUEUE)
 public class CommandQueueEnqueue implements MessageQueueData {
-
     private final int sequenceId;
     private final int commandHash;
     private final long targetId;

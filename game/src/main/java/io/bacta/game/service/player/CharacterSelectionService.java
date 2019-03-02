@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.time.Instant;
-import java.util.Collections;
 
 @Slf4j
 @Component
@@ -73,7 +72,7 @@ public final class CharacterSelectionService {
         guildService.sendTo(context);
 
         //Send creates and baselines for all the creatures objects.
-        playerCreature.sendCreateAndBaselinesTo(Collections.singleton(context));
+        //playerCreature.sendCreateAndBaselinesTo(Collections.singleton(context));
     }
 
 

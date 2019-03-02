@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 
 @AllArgsConstructor
 public class CmdStartScene extends GameNetworkMessage {
-
     private final long networkId;
     private final String sceneName;
     private final Vector startPosition;
