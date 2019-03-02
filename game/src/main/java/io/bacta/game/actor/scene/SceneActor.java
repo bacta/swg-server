@@ -6,8 +6,8 @@ import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
 import io.bacta.game.actor.object.scene.Scene;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
 import io.bacta.soe.network.forwarder.SwgRequestMessage;
+import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -21,13 +21,13 @@ public class SceneActor extends AbstractActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), SceneActor.class.getSimpleName());
     private final SpringAkkaExtension ext;
     private final GameServerProperties properties;
-    private final GameNetworkMessageDispatcher dispatcher;
+    private final GameNetworkMessageHandler dispatcher;
     private final Scene scene;
 
     @Inject
     public SceneActor(final SpringAkkaExtension ext,
                       final GameServerProperties properties,
-                      final GameNetworkMessageDispatcher dispatcher,
+                      final GameNetworkMessageHandler dispatcher,
                       final Scene scene) {
         this.ext = ext;
         this.properties = properties;

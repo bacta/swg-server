@@ -24,6 +24,7 @@ import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
+import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     private final ApplicationContext context;
 
     @Inject
-    public SoeDevMessageDispatcher(final ApplicationContext applicationContext, final GameNetworkMessageDispatcher gameNetworkMessageDispatcher) {
+    public SoeDevMessageDispatcher(final ApplicationContext applicationContext, final GameNetworkMessageHandler gameNetworkMessageDispatcher) {
         this.context = applicationContext;
     }
 
