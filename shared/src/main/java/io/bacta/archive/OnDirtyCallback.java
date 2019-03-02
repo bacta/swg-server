@@ -9,11 +9,6 @@ public class OnDirtyCallback<T extends GameObject> implements OnDirtyCallbackBas
     private T owner;
     private Runnable callback;
 
-    public OnDirtyCallback(final T owner, final Runnable callback) {
-        this.owner = owner;
-        this.callback = callback;
-    }
-
     public void set(final T owner, final Runnable callback) {
         this.owner = owner;
         this.callback = callback;

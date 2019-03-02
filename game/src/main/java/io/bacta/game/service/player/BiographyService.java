@@ -2,13 +2,7 @@ package io.bacta.game.service.player;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
-import io.bacta.game.GameControllerMessageType;
-import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.controllers.object.ObjControllerBuilder;
-import io.bacta.game.message.object.MessageQueueBiographyPayload;
 import io.bacta.game.object.tangible.creature.CreatureObject;
-import io.bacta.shared.biography.BiographyPayload;
-import io.bacta.soe.context.SoeRequestContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,18 +29,18 @@ public final class BiographyService {
     }
 
     public void requestBiography(final long biographyOwnerId, final CreatureObject requestorObject) {
-        final SoeRequestContext connection = requestorObject.getConnection();
-
-        if (connection != null) {
-            final MessageQueueBiographyPayload payload = new MessageQueueBiographyPayload(
-                    new BiographyPayload(biographyOwnerId, DEFAULT_BACTA_BIO));
-
-            final ObjControllerMessage msg = ObjControllerBuilder.newBuilder()
-                    .send().reliable().authClient()
-                    .build(biographyOwnerId, GameControllerMessageType.BIOGRAPHY_RETRIEVED, payload);
-
-            connection.sendMessage(msg);
-        }
+//        final SoeRequestContext connection = requestorObject.getConnection();
+//
+//        if (connection != null) {
+//            final MessageQueueBiographyPayload payload = new MessageQueueBiographyPayload(
+//                    new BiographyPayload(biographyOwnerId, DEFAULT_BACTA_BIO));
+//
+//            final ObjControllerMessage msg = ObjControllerBuilder.newBuilder()
+//                    .send().reliable().authClient()
+//                    .build(biographyOwnerId, GameControllerMessageType.BIOGRAPHY_RETRIEVED, payload);
+//
+//            connection.sendMessage(msg);
+//        }
     }
 
     @AllArgsConstructor

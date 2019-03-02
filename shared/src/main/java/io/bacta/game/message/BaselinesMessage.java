@@ -4,10 +4,12 @@ import io.bacta.archive.delta.AutoDeltaByteStream;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.shared.object.GameObject;
+import lombok.Getter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+@Getter
 @Priority(0x5)
 public final class BaselinesMessage extends GameNetworkMessage {
     public static final byte BASELINES_CLIENT_ONLY = 0;
