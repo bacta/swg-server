@@ -1,6 +1,7 @@
 package io.bacta.game.actor.galaxy;
 
 import akka.actor.AbstractActor;
+import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
@@ -8,6 +9,9 @@ import akka.event.LoggingAdapter;
 import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
+import io.bacta.game.message.ClientCreateCharacter;
+import io.bacta.game.name.NameValidatorServiceActor;
+import io.bacta.game.player.PlayerCreationSupervisor;
 import io.bacta.shared.MemberConstants;
 import lombok.Getter;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -25,6 +29,8 @@ public class GalaxyActor extends AbstractActor {
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final SpringAkkaExtension ext;
     private final GameServerProperties properties;
+
+    private ActorRef playerCreationService;
 
     @Getter
     private String name;
@@ -49,9 +55,12 @@ public class GalaxyActor extends AbstractActor {
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
-        super.preStart();
+        context().actorOf(ext.props(SceneSupervisor.class), ActorConstants.GALAXY_SCENE_SUPERVISOR);
+        context().actorOf(ext.props(NameValidatorServiceActor.class), ActorConstants.NAME_VALIDATION_SERVICE);
 
-        getContext().actorOf(ext.props(SceneSupervisor.class), ActorConstants.GALAXY_SCENE_SUPERVISOR);
+        playerCreationService = context().actorOf(ext.props(PlayerCreationSupervisor.class), ActorConstants.PLAYER_CREATION_SERVICE);
+
+        super.preStart();
     }
 
     @Override
@@ -71,11 +80,12 @@ public class GalaxyActor extends AbstractActor {
                 .match(ClusterEvent.UnreachableMember.class, this::unreachableMember)
                 .match(ClusterEvent.MemberRemoved.class, this::memberRemoved)
                 .match(String.class, this::stringReceived)
+                .match(ClientCreateCharacter.class, this::clientCreateCharacter)
                 .matchAny(this::unhandledMessage)
                 .build();
     }
 
-    private void memberUp(ClusterEvent.MemberUp message){
+    private void memberUp(ClusterEvent.MemberUp message) {
         log.info("Member is Up: {} with Roles {}", message.member(), message.member().getRoles());
 
         if (message.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
@@ -105,5 +115,10 @@ public class GalaxyActor extends AbstractActor {
 
     private void unhandledMessage(Object o) {
         log.info("received unknown message", o);
+    }
+
+
+    private void clientCreateCharacter(ClientCreateCharacter msg) {
+        playerCreationService.forward(msg, context());
     }
 }
