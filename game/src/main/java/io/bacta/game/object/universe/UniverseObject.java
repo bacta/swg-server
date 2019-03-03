@@ -3,9 +3,9 @@ package io.bacta.game.object.universe;
 
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
+import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.object.template.SharedObjectTemplate;
-import io.bacta.swg.container.SlotIdManager;
-import io.bacta.swg.template.ObjectTemplateList;
+import io.bacta.shared.template.ObjectTemplateList;
 
 import javax.inject.Inject;
 

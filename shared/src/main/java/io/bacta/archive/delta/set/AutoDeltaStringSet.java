@@ -205,7 +205,7 @@ public class AutoDeltaStringSet extends AutoDeltaContainer {
                     break;
                 default:
                     value = null;
-                    assert false : "UNKNOWN command type.";
+                    assert false : "Unknown command type.";
             }
         }
 
@@ -221,7 +221,7 @@ public class AutoDeltaStringSet extends AutoDeltaContainer {
                 case CLEAR:
                     break;
                 default:
-                    assert false : "UNKNOWN command type.";
+                    assert false : "Unknown command type.";
             }
         }
     }

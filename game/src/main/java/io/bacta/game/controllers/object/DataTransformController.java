@@ -2,28 +2,30 @@ package io.bacta.game.controllers.object;
 
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.object.DataTransform;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.object.ServerObjectService;
-import lombok.extern.slf4j.Slf4j;
+import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.soe.context.SoeRequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
-@Slf4j
 @Component
 @GameControllerMessage(GameControllerMessageType.NET_UPDATE_TRANSFORM)
 public class DataTransformController implements MessageQueueController<DataTransform> {
-    private final ServerObjectService serverObjectService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DataTransformController.class);
 
-    @Inject
-    public DataTransformController(final ServerObjectService serverObjectService) {
-        this.serverObjectService = serverObjectService;
-    }
+	private final ServerObjectService serverObjectService;
 
-    @Override
-    public void handleIncoming(GameRequestContext context, ServerObject actor, int flags, float value, DataTransform data) {
-        LOGGER.warn("This controller is not implemented");
-    }
+	@Inject
+	public DataTransformController(final ServerObjectService serverObjectService) {
+		this.serverObjectService = serverObjectService;
+	}
+
+	@Override
+	public void handleIncoming(SoeRequestContext context, ServerObject actor, int flags, float value, DataTransform data) {
+		LOGGER.warn("This controller is not implemented");
+	}
 }

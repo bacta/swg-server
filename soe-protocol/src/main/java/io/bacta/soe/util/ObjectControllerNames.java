@@ -45,7 +45,7 @@ public class ObjectControllerNames {
 
 	public static String get(String propertyName) {
 		if(!prop.containsKey(propertyName.toUpperCase()))
-			return "UNKNOWN";
+			return "Unknown";
 		
 		return prop.getProperty(propertyName.toUpperCase());
 	}

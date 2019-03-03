@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +46,6 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@Scope("prototype")
 public final class ObjControllerMessageSerializer implements ApplicationContextAware {
 
     private final Map<GameControllerMessageType, Constructor<? extends MessageQueueData>> messageQueueDataConstructorMap;

@@ -2,8 +2,8 @@ package io.bacta.game.object.intangible.schematic;
 
 import io.bacta.game.object.intangible.IntangibleObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
-import io.bacta.swg.container.SlotIdManager;
-import io.bacta.swg.template.ObjectTemplateList;
+import io.bacta.shared.container.SlotIdManager;
+import io.bacta.shared.template.ObjectTemplateList;
 
 import javax.inject.Inject;
 

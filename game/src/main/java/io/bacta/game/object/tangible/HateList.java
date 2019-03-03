@@ -6,9 +6,8 @@ import gnu.trove.map.hash.TObjectFloatHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import io.bacta.game.object.intangible.player.PlayerObject;
-import io.bacta.game.object.tangible.creature.CreatureObject;
-import io.bacta.swg.object.GameObject;
-import io.bacta.swg.util.NetworkId;
+import io.bacta.shared.object.GameObject;
+import io.bacta.shared.util.NetworkId;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,21 +218,21 @@ public class HateList {
     }
 
     public boolean isOwnerValid() {
-        final CreatureObject ownerCreature = CreatureObject.asCreatureObject(owner);
-        final boolean ownerIncapacitated = (ownerCreature != null) && ownerCreature.isIncapacitated();
-
-        if (ownerIncapacitated)
-            return false;
-
-        final boolean ownerDead = (ownerCreature != null) && ownerCreature.isDead();
-
-        if (ownerDead)
-            return false;
-
-        final boolean ownerDisabled = (ownerCreature != null) && ownerCreature.isDisabled();
-
-        if (ownerDisabled)
-            return false;
+//        final CreatureObject ownerCreature = CreatureObject.asCreatureObject(owner);
+//        final boolean ownerIncapacitated = (ownerCreature != null) && ownerCreature.isIncapacitated();
+//
+//        if (ownerIncapacitated)
+//            return false;
+//
+//        final boolean ownerDead = (ownerCreature != null) && ownerCreature.isDead();
+//
+//        if (ownerDead)
+//            return false;
+//
+//        final boolean ownerDisabled = (ownerCreature != null) && ownerCreature.isDisabled();
+//
+//        if (ownerDisabled)
+//            return false;
 
         //final AICreatureController ownerAiCreatureController = AICreatureController.asAiCreatureController(owner.getController());
         //final boolean ownerRetreating = (ownerAiCreatureController != null) && ownerAiCreatureController.isRetreating();

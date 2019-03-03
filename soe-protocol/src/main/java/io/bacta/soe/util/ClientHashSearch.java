@@ -20,7 +20,7 @@
 
 package io.bacta.soe.util;
 
-import io.bacta.swg.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 import lombok.Getter;
 
 import java.io.*;
@@ -56,7 +56,7 @@ public class ClientHashSearch {
 				System.out.println("Ensure your integer is entered in Hex starting with 0x");
 			}
 			
-			System.out.println("Input STRING to search client for");
+			System.out.println("Input String to search client for");
 			System.out.print("> ");
 		}
 		
@@ -105,7 +105,7 @@ public class ClientHashSearch {
 //					hash[3] == target[3]) {
 //				
 //				synchronized(matches) {
-//					matches.add(new STRING(value) + " 0x" + Integer.toHexString(targetHash));
+//					matches.add(new String(value) + " 0x" + Integer.toHexString(targetHash));
 //				}
 //				
 //			}

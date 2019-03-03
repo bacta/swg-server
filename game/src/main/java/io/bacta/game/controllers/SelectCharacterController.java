@@ -1,8 +1,8 @@
 package io.bacta.game.controllers;
 
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.message.SelectCharacter;
-import io.bacta.game.player.CharacterSelectionService;
+import io.bacta.game.service.player.CharacterSelectionService;
+import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = SelectCharacter.class)
 @ConnectionRolesAllowed({ConnectionRole.AUTHENTICATED})
-public class SelectCharacterController implements GameNetworkMessageController<GameRequestContext, SelectCharacter> {
+public class SelectCharacterController implements GameNetworkMessageController<SoeRequestContext, SelectCharacter> {
     private final CharacterSelectionService service;
 
     @Inject
@@ -25,7 +25,7 @@ public class SelectCharacterController implements GameNetworkMessageController<G
     }
 
     @Override
-    public void handleIncoming(GameRequestContext context, SelectCharacter message) throws Exception {
+    public void handleIncoming(SoeRequestContext context, SelectCharacter message) throws Exception {
         this.service.selectCharacter(context, message.getId());
     }
 }

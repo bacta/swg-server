@@ -209,8 +209,8 @@ public final class SoeUdpConnection implements UdpConnection, SoeUdpConnectionMB
         terminate(reason, true);
     }
 
-    public void terminate(TerminateReason reason, boolean sendTerminate) {
-        if(sendTerminate) {
+    public void terminate(TerminateReason reason, boolean silent) {
+        if(!silent) {
             Terminate terminate = new Terminate(this.getId(), reason);
             sendMessage(terminate);
         }
@@ -294,7 +294,7 @@ public final class SoeUdpConnection implements UdpConnection, SoeUdpConnectionMB
 
 //    013CD300	UdpConnection::UdpConnection(UdpManager *,UdpIpAddress,int,int)
 //    013CD390	UdpConnection::UdpConnection(UdpManager *,UdpConnection::PacketHistoryEntry const *)
-//    013CD4B0	UdpConnection::INIT(UdpManager *,UdpIpAddress,int)
+//    013CD4B0	UdpConnection::Init(UdpManager *,UdpIpAddress,int)
 //    013CD770	UdpConnection::~UdpConnection(void)
 //    013CD840	UdpConnection::PortUnreachable(void)
 //    013CD900	UdpConnection::InternalDisconnect(int,UdpConnection::DisconnectReason)

@@ -2,7 +2,7 @@ package io.bacta.game.message.planet;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.engine.buffer.ByteBufferWritable;
-import io.bacta.swg.math.Vector2d;
+import io.bacta.shared.math.Vector2d;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

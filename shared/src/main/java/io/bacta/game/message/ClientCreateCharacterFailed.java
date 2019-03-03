@@ -3,7 +3,7 @@ package io.bacta.game.message;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.swg.localization.StringId;
+import io.bacta.shared.localization.StringId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

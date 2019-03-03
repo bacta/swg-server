@@ -21,7 +21,6 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
@@ -36,7 +35,7 @@ import java.nio.ByteBuffer;
 @Slf4j
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketConnect})
-public class ConnectController extends BaseSoeController {
+public class ConnectController implements SoeMessageController {
 
     private final SoeNetworkConfiguration networkConfiguration;
     private final SessionKeyService keyService;
@@ -49,15 +48,13 @@ public class ConnectController extends BaseSoeController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
-
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
         int protocolVersion = buffer.getInt();
         
         if(protocolVersion != networkConfiguration.getProtocolVersion()) {
-            soeUdpConnection.terminate(TerminateReason.REFUSED);
-            LOGGER.warn("Client from '{}' attempted to use a non-supported protocol version: {}", soeUdpConnection.getRemoteAddress().getHostString(), protocolVersion);
+            connection.terminate(TerminateReason.REFUSED);
+            LOGGER.warn("Client from '{}' attempted to use a non-supported protocol version: {}", connection.getRemoteAddress().getHostString(), protocolVersion);
             return;
         }
         
@@ -74,7 +71,7 @@ public class ConnectController extends BaseSoeController {
             encryptMethod2 = EncryptMethod.NONE;
         }
 
-        soeUdpConnection.doConfirm(
+        connection.doConfirm(
                 connectionId,
                 encryptCode,
                 maxRawPacketSize,

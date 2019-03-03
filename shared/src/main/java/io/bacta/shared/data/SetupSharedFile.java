@@ -1,7 +1,7 @@
 package io.bacta.shared.data;
 
 import io.bacta.engine.conf.BactaConfiguration;
-import io.bacta.swg.tre.TreeFile;
+import io.bacta.shared.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;

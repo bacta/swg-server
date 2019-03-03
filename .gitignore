@@ -38,7 +38,4 @@ node_modules/
 
 *application-local.yml
 *application-local.properties
-
 /swg-client/
-/dsrc/
-/data/

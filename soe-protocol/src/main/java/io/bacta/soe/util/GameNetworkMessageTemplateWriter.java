@@ -20,7 +20,7 @@
 
 package io.bacta.soe.util;
 
-import io.bacta.swg.util.SOECRC32;
+import io.bacta.engine.utils.SOECRC32;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -31,7 +31,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ import java.nio.ByteBuffer;
  */
 @Slf4j
 @Component
-@Scope("prototype")
 public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
 
     private final VelocityEngine ve;
@@ -119,7 +117,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = ClientString.get(opcode);
         
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -189,7 +187,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = ObjectControllerNames.get(opcode);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
@@ -252,7 +250,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = CommandNames.get(commandHash);
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("UNKNOWN com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
+            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
             return;
         }
 

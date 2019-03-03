@@ -9,9 +9,9 @@ import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.session.SessionException;
 import io.bacta.login.server.session.SessionToken;
 import io.bacta.login.server.session.SessionTokenProvider;
+import io.bacta.soe.context.SoeRequestContext;
+import io.bacta.soe.context.SoeSessionContext;
 import io.bacta.soe.network.connection.ConnectionRole;
-import io.bacta.soe.network.connection.SoeConnection;
-import io.bacta.soe.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,59 +46,61 @@ public final class DefaultClientService implements ClientService {
     }
 
     @Override
-    public void validateClient(SoeConnection connection, String clientVersion, String id, String key) {
+    public void validateClient(SoeRequestContext context, String clientVersion, String id, String key) {
+
+        SoeSessionContext sessionContext = context.getSessionContext();
+
         try {
             //Client wants to know the difference in time between the server and client.
             final int epoch = (int) (System.currentTimeMillis() / 1000);
 
-            LOGGER.info("Sending server epoch {} to client {}.", epoch, connection.getSoeUdpConnection().getRemoteAddress());
+            LOGGER.info("Sending server epoch {} to client {}.", epoch, sessionContext.getRemoteAddress());
 
             final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
-            connection.sendMessage(serverEpoch);
+            context.sendMessage(serverEpoch);
 
             //Make sure the client version is correct. If not, then we will catch that and send them a message.
             ensureClientVersion(clientVersion);
 
             switch (loginServerProperties.getSessionMode()) {
                 case ESTABLISH:
-                    establishSessionMode(connection, id, key);
+                    establishSessionMode(context, id, key);
                     break;
                 case VALIDATE:
-                    validateSessionMode(connection, id, key);
+                    validateSessionMode(context, id, key);
                     break;
                 case DISCOVER:
                 default: {
-                    discoverSessionMode(connection, id, key);
+                    discoverSessionMode(context, id, key);
                     break;
                 }
             }
 
             //If they got to this point, then they've been authenticated. Set their connection roles.
-            connection.addRole(ConnectionRole.AUTHENTICATED);
+            sessionContext.addRole(ConnectionRole.AUTHENTICATED);
 
         } catch (SessionException ex) {
             LOGGER.warn("Rejected client validation because session failed with message {}", ex.getMessage());
 
             final ErrorMessage message = new ErrorMessage("VALIDATION FAILED", "Your credentials were rejected by the server.");
-            connection.sendMessage(message);
-            connection.disconnect(TerminateReason.REFUSED, false);
+            context.sendMessage(message);
 
         } catch (InvalidClientException ex) {
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
-                    connection.getSoeUdpConnection().getRemoteAddress(),
+                    sessionContext.getRemoteAddress(),
                     ex.getClientVersion(),
                     requiredClientVersion);
 
             final String serverApplicationVersion = ""; //SOE only sent this in debug mode. Not sure we care to send it at all.
 
             final LoginIncorrectClientId incorrectId = new LoginIncorrectClientId(requiredClientVersion, serverApplicationVersion);
-            connection.sendMessage(incorrectId);
+            context.sendMessage(incorrectId);
         }
     }
 
 
     @Override
-    public void clientValidated(SoeConnection connection, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
+    public void clientValidated(SoeRequestContext context, int bactaId, String username, String sessionKey, boolean isSecure, int gameBits, int subscriptionBits) {
         //implement admin
 
         //Session key login: sessionId + accountId
@@ -118,28 +120,28 @@ public final class DefaultClientService implements ClientService {
         //Ignore the above since we are doing session with JWT now.
         //Using JWT, we don't have to cipher any tokens. We can pass it straight to the game server.
 
-        sendLoginClientToken(connection, sessionKey, bactaId, username);
+        sendLoginClientToken(context, sessionKey, bactaId, username);
 
-        galaxyService.sendClusterEnum(connection);
-        galaxyService.sendDisabledCharacterCreationServers(connection);
-        galaxyService.sendClusterStatus(connection);
-        galaxyService.sendExtendedClusterStatus(connection);
+        galaxyService.sendClusterEnum(context);
+        galaxyService.sendDisabledCharacterCreationServers(context);
+        galaxyService.sendClusterStatus(context);
+        galaxyService.sendExtendedClusterStatus(context);
 
-        characterService.sendEnumerateCharacters(connection, bactaId);
+        characterService.sendEnumerateCharacters(context, bactaId);
     }
 
-    private void sendLoginClientToken(SoeConnection connection, String token, int bactaId, String username) {
+    private void sendLoginClientToken(SoeRequestContext context, String token, int bactaId, String username) {
         final LoginClientToken message = new LoginClientToken(token, bactaId, username);
-        connection.sendMessage(message);
+        context.sendMessage(message);
     }
 
-    private void establishSessionMode(SoeConnection connection, String username, String password)
+    private void establishSessionMode(SoeRequestContext context, String username, String password)
             throws SessionException {
         final SessionToken sessionToken = sessionTokenProvider.Provide(username, password);
 
         //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
         final SetSessionKey message = new SetSessionKey(sessionToken.getToken());
-        connection.sendMessage(message);
+        context.sendMessage(message);
 
         //TODO: game bits, subscription bits, is secure? Do we care?
         final boolean isSecure = false;
@@ -147,7 +149,7 @@ public final class DefaultClientService implements ClientService {
         final int subscriptionBits = 0;
 
         clientValidated(
-                connection,
+                context,
                 sessionToken.getAccountId(),
                 username,
                 sessionToken.getToken(),
@@ -156,12 +158,12 @@ public final class DefaultClientService implements ClientService {
                 subscriptionBits);
     }
 
-    private void validateSessionMode(SoeConnection connection, String id, String sessionKey) {
+    private void validateSessionMode(SoeRequestContext context, String id, String sessionKey) {
         //Communicate with auth server and check if the session key validates, and is issued by the correct issuer, etc.
         throw new UnsupportedOperationException("Not yet implemented.");
     }
 
-    private void discoverSessionMode(SoeConnection connection, String id, String key) {
+    private void discoverSessionMode(SoeRequestContext context, String id, String key) {
         //first try validate key, then try establish if that fails.
         throw new UnsupportedOperationException("Not yet implemented.");
     }

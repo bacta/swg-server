@@ -191,7 +191,7 @@ public class AutoDeltaByteLongMap extends AutoDeltaContainer {
                     erase(command.key);
                     break;
                 default:
-                    assert false : "UNKNOWN command";
+                    assert false : "Unknown command";
                     break;
             }
         }

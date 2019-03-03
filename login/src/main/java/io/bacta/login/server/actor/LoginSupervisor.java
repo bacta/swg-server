@@ -5,9 +5,11 @@ import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.shared.MemberConstants;
+import io.bacta.soe.event.PublisherActor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,9 +42,9 @@ public class LoginSupervisor extends AbstractActor {
                 ClusterEvent.initialStateAsEvents(),
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
-
         super.preStart();
-        // getContext().actorOf(ext.props(GameDataSupervisor.class), "data");
+
+        getContext().actorOf(ext.props(PublisherActor.class), ActorConstants.PUBLISHER);
     }
 
     @Override
@@ -77,7 +79,7 @@ public class LoginSupervisor extends AbstractActor {
                     }
                 })
                 .match(String.class, s -> {
-                    log.info("Received STRING message: {}", s);
+                    log.info("Received String message: {}", s);
                 })
                 .matchAny(o -> log.info("received unknown message", o))
                 .build();
