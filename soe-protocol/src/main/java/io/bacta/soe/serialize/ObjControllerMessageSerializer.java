@@ -57,7 +57,7 @@ public final class ObjControllerMessageSerializer implements ApplicationContextA
     }
 
     @PostConstruct
-    private void loadMessages() {
+    protected void loadMessages() {
         try (ScanResult scanResult =
                      new ClassGraph()
                              .enableAllInfo()

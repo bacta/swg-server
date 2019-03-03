@@ -20,17 +20,19 @@
 
 package io.bacta.soe.message
 
+import com.codahale.metrics.MetricRegistry
+import io.bacta.shared.GameNetworkMessage
 import io.bacta.soe.config.SoeNetworkConfiguration
-import io.bacta.soe.network.connection.SoeClient
 import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
 import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
 import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
 import io.bacta.soe.network.forwarder.GameNetworkMessageForwarder
-import io.bacta.soe.network.handler.GameNetworkMessageHandler
 import io.bacta.soe.network.message.SoeMessageType
+import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
+import io.bacta.soe.serialize.ObjControllerMessageSerializer
 import io.bacta.soe.util.SoeMessageUtil
 import spock.lang.Shared
 import spock.lang.Specification
@@ -46,10 +48,10 @@ class MultiPacketSpec extends Specification {
     def soeMessageRouter
 
     @Shared
-    def swgMessageRouter
+    def forwarder
     
     @Shared
-    List<ByteBuffer> processedPackets
+    List<GameNetworkMessage> processedPackets
 
     @Shared
     def networkConfig = new SoeNetworkConfiguration()
@@ -62,13 +64,13 @@ class MultiPacketSpec extends Specification {
 
         processedPackets = new ArrayList<ByteBuffer>()
 
-        swgMessageRouter = Mock(GameNetworkMessageHandler) {
-            dispatch(_,_,_,_) >> { short priority, int gameMessageType, SoeClient connection, ByteBuffer buffer ->
-                processedPackets.add(buffer)
+        forwarder = Mock(GameNetworkMessageForwarder) {
+            forward(_,_,) >> { final SoeUdpConnection connection, final GameNetworkMessage gameNetworkMessage ->
+                processedPackets.add(gameNetworkMessage)
             }
         }
 
-        soeMessageRouter = new SoeDevMessageDispatcher(null, swgMessageRouter)
+        soeMessageRouter = new SoeDevMessageDispatcher(null)
         loadControllers(soeMessageRouter.metaClass.getProperty(soeMessageRouter, "controllers"))
 
     }
@@ -80,20 +82,16 @@ class MultiPacketSpec extends Specification {
         def messageSerializer = Mock(GameNetworkMessageSerializer)
 
         def soeUdpConnection = new SoeUdpConnection(null, null, 0, networkConfig, new SoeIncomingMessageProcessor(networkConfig), new SoeOutgoingMessageProcessor(networkConfig, messageSerializer))
-        def SoeConnection = new SoeClient(soeUdpConnection)
 
         when:
         for(List<Byte> array : multiList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(SoeConnection, buffer)
+            soeMessageRouter.dispatch(soeUdpConnection, buffer)
         }
         
         then:
         noExceptionThrown()
-        processedPackets.size() > 0
-        for(ByteBuffer buffer : processedPackets) {
-          println SoeMessageUtil.bytesToHex(buffer)
-        }
+        processedPackets.size() == 2
     }
     
     
@@ -115,7 +113,13 @@ class MultiPacketSpec extends Specification {
 
         controllers.put(SoeMessageType.cUdpPacketGroup, groupController)
 
-        def zeroController = new ZeroEscapeController(Mock(GameNetworkMessageForwarder), Mock(GameNetworkMessageSerializer))
+        def objSerializer = new ObjControllerMessageSerializer()
+        objSerializer.loadMessages()
+
+        def serializer = new DefaultGameNetworkMessageSerializer(Mock(MetricRegistry), objSerializer)
+        serializer.loadMessages()
+
+        def zeroController = new ZeroEscapeController(forwarder, serializer)
 
         controllers.put(SoeMessageType.cUdpPacketZeroEscape, zeroController)
 
