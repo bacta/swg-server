@@ -11,8 +11,7 @@ addons:
     token:
       secure: "$SONAR_TOKEN"
 script:
-  mvn clean install
-  mvn sonar:sonar -Dsonar.projectKey=bacta_swg-server -Dsonar.organization=bacta -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b4c98a93685a1d479bb1e624b7f60d89a39c1e28
+  -  mvn sonar:sonar -Dsonar.projectKey=bacta_swg-server -Dsonar.organization=bacta -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=b4c98a93685a1d479bb1e624b7f60d89a39c1e28
 notifications:
   slack:
     secure: Omz99q6p96StRYp1ytgyIZZAdeyHuflnwlB/8xTh6Fucb+svc9V0q4dWns4TByOb8HlW/T2Bl7rYt3xKHSt9iI1Bc2Nrh4MnPJJXCRjmOdDtnh4gMXCWn3g/bwZysIEHt/o6QhF3RhZS3aHaC0z+MnE29f2cUrkayB9VPwFArUUrL3B5rMx1OjMEbLS36akvFOr5CEOQjdAmAltAeh5oN7qLWiav/fhzobdODv41AkK4k/nkVrwRBm0KVemz0q+NJXULMBNVp5QX3tgO4yyRjeTaDL1kHxfZH/QAKNmjWKR0QVUpphfSIyVgAJAvREb330LmXqEQecg+uZrJARacZECr1c3w3BRRE4vQfQif6B8T326P2tmndPzSx+bgzRHCsvtZ3NH/lpOrKekOBhvM8tauc3uUTO6EPYjpRQSrUKhTVKXI8U8OqVnxs8wV/2aMzZVwCreb75MJCnmLU38F+WZr7Kz1i2ytLvikybQVX7zdmV56HOpIyZCXHmAtdeSoh3GGgeVy+gRUYhBK/Ux9K28bsWxzst/O7KNqZ1+Rq5ghn0zz5CTuYazEo0l54LqlXqQUinwuxANgfwXsNlj46vZvWE3NeXcuqqYeh+5ycxm6gipu5pOtHoWsh/t3Lz/x1sYvryPdHRqQI4mxfIMxwdQsdSL0aFonU4tbMoYNQlI=
