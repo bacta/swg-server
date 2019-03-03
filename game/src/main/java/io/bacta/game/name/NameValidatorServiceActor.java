@@ -23,6 +23,5 @@ public class NameValidatorServiceActor extends AbstractActor {
     }
 
     private void validateName(ValidateName msg) {
-
     }
 }
