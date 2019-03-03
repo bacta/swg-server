@@ -17,12 +17,23 @@ public class SpringAkkaExtension implements Extension {
     }
 
     public Props props(String actorBeanName) {
-        return Props.create(SpringActorProducer.class,
-                applicationContext, actorBeanName);
+        return Props.create(
+                SpringActorProducer.class,
+                applicationContext,
+                actorBeanName);
     }
 
     public Props props(Class clazz) {
-        return Props.create(SpringActorProducer.class,
-                applicationContext, Introspector.decapitalize(clazz.getSimpleName()));
+        return Props.create(
+                SpringActorProducer.class,
+                applicationContext,
+                Introspector.decapitalize(clazz.getSimpleName()));
     }
+
+//    public Props props(Class clazz, Object...args) {
+//        return Props.create(SpringActorProducer.class,
+//                applicationContext,
+//                Introspector.decapitalize(clazz.getSimpleName()),
+//                ...args);
+//    }
 }
