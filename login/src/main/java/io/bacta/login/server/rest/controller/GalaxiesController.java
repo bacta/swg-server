@@ -64,6 +64,7 @@ public final class GalaxiesController {
 
     /**
      * Gets the details of a specific galaxy from the galaxy cluster.
+     *
      * @param name The name of the galaxy.
      * @return The galaxy details. 404 if galaxy does not exist.
      */
@@ -104,10 +105,20 @@ public final class GalaxiesController {
 //        return ResponseEntity.ok(galaxy);
 //    }
 
+    /**
+     * Removes a galaxy from the cluster enum.
+     *
+     * @param name The name of the galaxy to remove.
+     * @return No content if successful. 404 Not found if failed.
+     */
     @DeleteMapping("/{name}")
     public ResponseEntity<?> deleteGalaxy(@PathVariable String name) {
-        //galaxyService.unregisterGalaxy(id);
-        return ResponseEntity.ok().build();
+        try {
+            galaxyService.unregisterGalaxy(name);
+            return ResponseEntity.noContent().build();
+        } catch (GalaxyNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping

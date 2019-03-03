@@ -15,12 +15,10 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/accounts",
-					"protocol": "http",
+					"raw": "{{bacta.base}}/api/accounts",
 					"host": [
-						"localhost"
+						"{{bacta.base}}"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"accounts"
@@ -43,18 +41,61 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Bacta\",\n\t\"address\": \"127.0.0.1\",\n\t\"port\": 44463,\n\t\"timeZone\": -7\n}"
+					"raw": "{\n\t\"name\": \"Bacta\",\n\t\"address\": \"127.0.0.1\",\n\t\"port\": 44453,\n\t\"timeZone\": -7\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/galaxies",
-					"protocol": "http",
+					"raw": "{{bacta.base}}/api/galaxies",
 					"host": [
-						"localhost"
+						"{{bacta.base}}"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"galaxies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetGalaxies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteGalaxy",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{bacta.base}}/api/galaxies/Bacta",
+					"host": [
+						"{{bacta.base}}"
+					],
+					"path": [
+						"api",
+						"galaxies",
+						"Bacta"
 					]
 				}
 			},

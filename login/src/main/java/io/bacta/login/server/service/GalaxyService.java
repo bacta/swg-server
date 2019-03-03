@@ -107,14 +107,14 @@ public interface GalaxyService {
      *
      * @param name The name of the galaxy which should be removed.
      */
-    void unregisterGalaxy(String name);
+    void unregisterGalaxy(String name) throws GalaxyNotFoundException;
 
     /**
      * A status update from a galaxy.
      *
-     * @param galaxyName   The galaxy name to lookup. This may be different than what's in the update.
-     * @param update The update from the galaxy.
-     * @throws GalaxyNotFoundException If the galaxy was not found.
+     * @param galaxyName The galaxy name to lookup. This may be different than what's in the update.
+     * @param update     The update from the galaxy.
+     * @throws GalaxyNotFoundException           If the galaxy was not found.
      * @throws GalaxyRegistrationFailedException If the galaxy name in the status update is already taken.
      */
     void updateGalaxyStatus(String galaxyName, GalaxyServerStatus update)

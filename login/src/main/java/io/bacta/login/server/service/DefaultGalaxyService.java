@@ -125,8 +125,12 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     @Override
-    public void unregisterGalaxy(String name) {
+    public void unregisterGalaxy(String name) throws GalaxyNotFoundException {
         final Galaxy galaxy = galaxyRepository.findByName(name);
+
+        if (galaxy == null)
+            throw new GalaxyNotFoundException(name);
+
         galaxyRepository.delete(galaxy);
 
         //Unload it from memory if it exists there.
