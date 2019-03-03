@@ -27,7 +27,7 @@ public abstract class ServerObjectActor<T extends ServerObject> extends Abstract
     /**
      * Stores a local cache of objects that this object is observing.
      */
-    protected TLongObjectMap<ServerObject> localObjectCache;
+    protected final TLongObjectMap<ServerObject> localObjectCache;
 
     protected ServerObjectActor(T serverObject) {
         this.object = serverObject;
