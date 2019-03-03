@@ -1,6 +1,7 @@
 package io.bacta.soe.network.forwarder;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
@@ -13,11 +14,11 @@ import javax.inject.Inject;
 @Component
 public class AkkaGameNetworkMessageForwarder implements GameNetworkMessageForwarder {
 
-    private final ActorRef galaxyUdpMessageDispatcher;
+    private final ActorSelection galaxyUdpMessageDispatcher;
 
     @Inject
     public AkkaGameNetworkMessageForwarder(final ActorSystem actorSystem, final SpringAkkaExtension ext) {
-        this.galaxyUdpMessageDispatcher = actorSystem.actorFor(ActorConstants.GAME_NETWORK_ROUTER);
+        this.galaxyUdpMessageDispatcher = actorSystem.actorSelection("/user/" + ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
     }
 
     @Override
