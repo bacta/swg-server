@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "61eda47f-8d80-4277-b7fc-d33ddcb9da8a",
+		"name": "Bacta Rest API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetAccounts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/accounts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateGalaxy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Bacta\",\n\t\"address\": \"127.0.0.1\",\n\t\"port\": 44463,\n\t\"timeZone\": -7\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/galaxies",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"galaxies"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bacta.token.value}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "647b4192-a21a-493b-b34c-766369f13ea5",
+				"type": "text/javascript",
+				"exec": [
+					"const acquireToken = function () {",
+					"    const baseAddress = pm.environment.get('bacta.base');",
+					"    const tokenEndpoint = pm.environment.get('bacta.endpoints.auth.token');",
+					"",
+					"    const username = pm.environment.get('bacta.username');",
+					"    const password = pm.environment.get('bacta.password');",
+					"    const clientId = pm.environment.get('bacta.client_id');",
+					"    const clientSecret = pm.environment.get('bacta.client_secret');",
+					"    ",
+					"    const apiRequest = {",
+					"        url: baseAddress + tokenEndpoint,",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Accept': 'application/json',",
+					"            'Content-Type': 'application/x-www-form-urlencoded',",
+					"            'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)",
+					"        },",
+					"        body: {",
+					"            mode: 'urlencoded',",
+					"            urlencoded: [",
+					"                { key: \"grant_type\", value: \"password\", disabled: false },",
+					"                { key: \"username\", value: username, disabled: false },",
+					"                { key: \"password\", value: password, disabled: false },",
+					"            ]",
+					"        }",
+					"    }",
+					"    ",
+					"    ",
+					"    pm.sendRequest(apiRequest, function (err, res) {",
+					"       var json = res.json();",
+					"       ",
+					"       //TODO: Handle token expiration.",
+					"       //TODO: Error handling.",
+					"       ",
+					"       const nowDate = Date.now();",
+					"       ",
+					"       pm.environment.set('bacta.token.value', json.access_token);",
+					"       pm.environment.set('bacta.token.expires', nowDate + json.expires_in);",
+					"    });",
+					"}",
+					"",
+					"const isTokenExpired = function (expires) {",
+					"    const nowDate = Date.now();",
+					"    const expired = (expires - nowDate) <= 0;",
+					"    return expired;",
+					"}",
+					"",
+					"//Check if we have a token that is unexpired.",
+					"const token = pm.environment.get('bacta.token.value');",
+					"const expires = pm.environment.get('bacta.token.expires');",
+					"",
+					"//Only get a new token if: There is no token or the current token is expired.",
+					"if (!token || isTokenExpired(expires)) {",
+					"    acquireToken();",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6a3ef232-dd45-4efa-b0b1-23b03ed32980",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
