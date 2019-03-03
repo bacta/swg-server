@@ -1,0 +1,18 @@
+language: java
+
+jdk:
+  - oraclejdk11
+  - openjdk11
+
+env:
+  global:
+    - secure: "Zy6jPRwLxe0QtJyPpukaPHRG8j+C1YCQ4ImA8nOpeTx46TRmW5pAf1S4iA34jf+W+Gtp2hZwnr1VG2lTe9vPrL6YvVxnZ9UlPHl2KyulWovn01pDmSbUZ8OYu7fhQz9sbddypBpsHlk57uwaA6lrMnF3hw0uAPMhSzKygIKUH7nZ+sVPofTAVl12YtWUzepCx4i9ClIHeoMzGPVNvlnCHiys8Ape/foa0GPAYo+NAdEQXeDij08gdvzFqUgT2fsjkCKM+xIoPbHOO1cqhRELz/oxOJWKq/RZ+WNTlnrkRAne0qm+KOjBRR5HknUmIGYeG+rkBqiNoSYDdOummEqhviCcb0JohXxclqIn0nwGCQgwoneAfEDOhtrSUCsw9AUrTa8HJrxPieXqPBoMn62SKv3iFXhq/LBKicYqcCrhBMLWrM3YUDtIrqPQY9sLd69UjHABmoaQdBeBuVYGc9Lnn813Y81SUERucCw9Jxm+r+XeW30woZiuVi4LUQC+OjTWzsd1XMCmyC56xXXIs7SnrslnLzobEp8mkiW+uFllWqxbNHx6tvQ/gq74iu4hWHqT4wGF8Zu1ddGw5NiuCf2DuquoS+GuO9Wfq+Zy9K7VyjHFnz+coeqdW+nvtBfr7h0JedC0cz09QDdETxjnf6qJNtvBAZrJO/XflvCfh7GFqI0="
+
+addons:
+  sonarcloud:
+    organization: "bacta" # the key of the org you chose at step #3
+    token:
+      secure: $SONAR_TOKEN # encrypted value of your token
+script:
+  - ./mvn clean install -B
+  - ./mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
