@@ -95,10 +95,10 @@ public class CreatureObject extends TangibleObject {
 
 
     @Inject
-    public CreatureObject(final ObjectTemplateList objectTempalteList,
+    public CreatureObject(final ObjectTemplateList objectTemplateList,
                           final SlotIdManager slotIdManager,
                           final ServerObjectTemplate template) {
-        super(objectTempalteList, slotIdManager, template);
+        super(objectTemplateList, slotIdManager, template);
 
         unmodifiedMaxAttributes = new AutoDeltaIntVector();
         skills = new AutoDeltaStringSet();
