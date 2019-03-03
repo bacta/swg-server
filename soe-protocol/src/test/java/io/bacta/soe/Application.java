@@ -20,24 +20,14 @@
 
 package io.bacta.soe;
 
-import io.bacta.soe.network.dispatch.DefaultGameNetworkMessageDispatcher;
-import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
-import io.bacta.soe.network.dispatch.GameNetworkMessageDispatcher;
-import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
-import javax.inject.Inject;
-
 @SpringBootApplication
-@EnableAutoConfiguration
 @EnableConfigurationProperties
 @ComponentScan({"io.bacta.soe", "io.bacta.engine"})
 @PropertySources({
@@ -49,12 +39,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Inject
-    @Bean
-    public GameNetworkMessageDispatcher getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
-                                                                        final GameNetworkMessageSerializer gameNetworkMessageSerializer,
-                                                                        final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
-
-        return new DefaultGameNetworkMessageDispatcher(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
-    }
 }

@@ -4,10 +4,10 @@ package io.bacta.game.dispatch;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
-import io.bacta.game.context.GameRequestContext;
 import io.bacta.game.controllers.object.MessageQueueController;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.object.ServerObjectService;
+import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -67,7 +67,7 @@ public final class MessageQueueDispatcher {
         }
     }
 
-    public void dispatch(final GameRequestContext context, final ObjControllerMessage message) {
+    public void dispatch(final SoeRequestContext context, final ObjControllerMessage message) {
         final ServerObject actor = serverObjectService.get(message.getActorNetworkId());
         final GameControllerMessageType type = GameControllerMessageType.from(message.getMessageType());
 

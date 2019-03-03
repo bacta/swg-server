@@ -12,8 +12,8 @@ import java.nio.ByteBuffer;
 /**
  * Created by crush on 5/30/2016.
  * <p>
- * A generic message queue data that contains a simple payload of one STRING.
- * The meaning of the STRING is context and message dependant.
+ * A generic message queue data that contains a simple payload of one String.
+ * The meaning of the String is context and message dependant.
  */
 @Getter
 @AllArgsConstructor

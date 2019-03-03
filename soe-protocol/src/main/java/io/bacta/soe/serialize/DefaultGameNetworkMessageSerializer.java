@@ -22,13 +22,13 @@ package io.bacta.soe.serialize;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.util.MessageHashUtil;
-import io.bacta.swg.util.SOECRC32;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
@@ -39,7 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -58,7 +57,6 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Scope("prototype")
 public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer, ApplicationContextAware {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
@@ -84,7 +82,7 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
                              .enableAllInfo()
                              .whitelistPackages("io.bacta")
                              .scan()) {
-            ClassInfoList controlClasses = scanResult.getSubclasses("io.bacta.shared.GameNetworkMessage");
+            ClassInfoList controlClasses = scanResult.getSubclasses(GameNetworkMessage.class.getName());
             List<Class<GameNetworkMessage>> controlClassRefs = controlClasses.loadClasses(GameNetworkMessage.class);
             controlClassRefs.forEach(this::loadMessageClass);
         }

@@ -1,7 +1,7 @@
 package io.bacta.game.waypoint;
 
 
-import io.bacta.swg.util.NetworkId;
+import io.bacta.shared.util.NetworkId;
 import lombok.Getter;
 
 /**

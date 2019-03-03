@@ -21,32 +21,27 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.engine.buffer.UnsignedUtil;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
 
 @Component
+@Slf4j
 @SoeController(handles = {SoeMessageType.cUdpPacketTerminate})
-public class TerminateController extends BaseSoeController {
-
-    private static final Logger logger = LoggerFactory.getLogger(TerminateController.class);
+public class TerminateController implements SoeMessageController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
-
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
         long connectionID = UnsignedUtil.getUnsignedInt(buffer);
         TerminateReason terminateReason = TerminateReason.values()[buffer.getShort()];
 
-        if(connectionID == soeUdpConnection.getId()) {
-            soeUdpConnection.terminate(terminateReason, true);
+        if(connectionID == connection.getId()) {
+            connection.terminate(terminateReason, true);
         }
     }
 }

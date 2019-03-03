@@ -49,7 +49,7 @@ public final class AccountsController {
     public ResponseEntity<?> account(@PathVariable int id) {
         final Optional<Account> account = accountRepository.findById(id);
 
-        if (!account.isPresent())
+        if (account == null)
             return ResponseEntity.notFound().build();
 
         final AccountListEntry model = new AccountListEntry(

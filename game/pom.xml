@@ -49,9 +49,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.bacta.tools.template.TemplateDefinitionCompilerApplication</mainClass>
+                    <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
                     <arguments>
-                        <argument>${project.parent.basedir}/dsrc/sku.0/sys.server</argument>
+                        <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
                         <argument>io.bacta.game.object.template.server</argument>
                         <argument>${project.basedir}/src/gen/java/io/bacta/game/object/template/server</argument>
                     </arguments>
@@ -83,12 +83,8 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.bacta</groupId>
-            <artifactId>swg</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>tools</artifactId>
+            <artifactId>templates</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ocdsoft.bacta.soe</groupId>
@@ -117,18 +113,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sleepycat</groupId>
-            <artifactId>je</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.javakaffee</groupId>
-            <artifactId>kryo-serializers</artifactId>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->

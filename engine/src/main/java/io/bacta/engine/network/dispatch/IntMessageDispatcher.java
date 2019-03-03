@@ -20,6 +20,8 @@
 
 package io.bacta.engine.network.dispatch;
 
-public interface IntMessageDispatcher<C, D> extends MessageDispatcher {
+import io.bacta.engine.network.handler.MessageHandler;
+
+public interface IntMessageDispatcher<C, D> extends MessageHandler {
 	void dispatch(int opcode, C client, D message);
 }

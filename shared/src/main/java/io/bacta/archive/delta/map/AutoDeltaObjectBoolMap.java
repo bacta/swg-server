@@ -194,7 +194,7 @@ public class AutoDeltaObjectBoolMap<K extends ByteBufferWritable> extends AutoDe
                     erase(command.key);
                     break;
                 default:
-                    assert false : "UNKNOWN command";
+                    assert false : "Unknown command";
                     break;
             }
         }
