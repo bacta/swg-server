@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -46,22 +47,22 @@ public final class AccountsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> account(@PathVariable int id) {
-        final Account account = accountRepository.findOne(id);
+        final Optional<Account> account = accountRepository.findById(id);
 
         if (account == null)
             return ResponseEntity.notFound().build();
 
         final AccountListEntry model = new AccountListEntry(
-                account.getId(),
-                account.getUsername(),
-                account.getCreated());
+                account.get().getId(),
+                account.get().getUsername(),
+                account.get().getCreated());
 
         return ResponseEntity.ok(model);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
-        accountRepository.delete(id);
+        accountRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 

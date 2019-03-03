@@ -74,8 +74,7 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
 
         // Start root actors
         actorSystem.actorOf(ext.props(LoginSupervisor.class), ActorConstants.LOGIN_SUPERVISOR);
-        //actorSystem.actorOf(ext.props(SoeSupervisor.class), ActorConstants.SOE_SUPERVISOR);
-        actorSystem.actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_ROUTER);
+        actorSystem.actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
 
         return actorSystem;
     }
