@@ -78,7 +78,6 @@
     <modules>
         <module>engine</module>
         <module>soe-protocol</module>
-        <module>templates</module>
         <module>shared</module>
         <module>login</module>
         <module>game</module>
@@ -460,5 +459,17 @@
             <version>${checker.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>template-gen</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>templates</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>
