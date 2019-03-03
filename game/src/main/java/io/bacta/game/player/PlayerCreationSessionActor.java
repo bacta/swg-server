@@ -56,8 +56,6 @@ class PlayerCreationSessionActor extends AbstractActor {
         this.started = true;
         this.createMessage = msg;
 
-        validateObjectTemplate();
-
         //Validation
         //- Name is not being validated by someone else already (they have a lock on that name)
         //- The template wasn't empty: NO_TEMPLATE
@@ -67,6 +65,11 @@ class PlayerCreationSessionActor extends AbstractActor {
         //- Name against static checks. Length, character set, etc.
         //- Name against known existing names.
         //- Name against the database.
+
+        validateObjectTemplate();
+        validateCharacterName();
+
+        createCharacter();
     }
 
     private boolean isExpired() {
@@ -79,7 +82,13 @@ class PlayerCreationSessionActor extends AbstractActor {
 
         if (templateName == null || templateName.isEmpty())
             throw new PlayerCreationException(client, createMessage.getCharacterName(), NameErrors.NO_TEMPLATE);
+    }
 
+    private void validateCharacterName() throws PlayerCreationException {
 
+    }
+
+    private void createCharacter() {
+        //final var creatureObject;
     }
 }
