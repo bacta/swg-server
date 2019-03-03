@@ -34,7 +34,6 @@ import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +47,6 @@ import java.nio.file.Paths;
 
 
 @Configuration
-@ConfigurationProperties
 @Slf4j
 @Profile("test")
 public class GameServerTestConfiguration {
@@ -86,7 +84,7 @@ public class GameServerTestConfiguration {
                                                                      final GameNetworkMessageSerializer gameNetworkMessageSerializer,
                                                                      final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
-        return new DefaultGameNetworkMessageHandler(controllerLoader, gameNetworkMessageSerializer, gameNetworkMessageTemplateWriter);
+        return new DefaultGameNetworkMessageHandler(controllerLoader, gameNetworkMessageTemplateWriter);
     }
 
     @Bean

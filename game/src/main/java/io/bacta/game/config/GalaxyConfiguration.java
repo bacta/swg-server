@@ -21,18 +21,17 @@
 package io.bacta.game.config;
 
 import akka.actor.ActorSystem;
+import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.actor.galaxy.GalaxyActor;
+import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
 
-
 @Configuration
-@ConfigurationProperties
 @Slf4j
 @Profile("Galaxy")
 public class GalaxyConfiguration {
@@ -49,5 +48,6 @@ public class GalaxyConfiguration {
 
     private void deployActors() {
         actorSystem.actorOf(ext.props(GalaxyActor.class), "galaxy");
+        actorSystem.actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
     }
 }
