@@ -76,7 +76,7 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
     }
 
     @PostConstruct
-    private void loadMessages() {
+    protected void loadMessages() {
         try (ScanResult scanResult =
                      new ClassGraph()
                              .enableAllInfo()
