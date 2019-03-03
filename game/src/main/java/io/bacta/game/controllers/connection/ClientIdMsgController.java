@@ -51,7 +51,7 @@ public class ClientIdMsgController implements GameNetworkMessageController<SoeRe
         connection.setBactaUsername(account.getUsername());
         */
 
-        context.addRole(ConnectionRole.AUTHENTICATED);
+        context.getSessionContext().addRole(ConnectionRole.AUTHENTICATED);
 
         // TODO: Actually implement permissions
         ClientPermissionsMessage cpm = new ClientPermissionsMessage(true, true, true, true);
