@@ -21,9 +21,9 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,20 +42,21 @@ import java.nio.ByteBuffer;
         SoeMessageType.cUdpPacketFragment2,
         SoeMessageType.cUdpPacketFragment3,
         SoeMessageType.cUdpPacketFragment4})
-public class ReliableMessageController extends BaseSoeController {
+public class ReliableMessageController implements SoeMessageController {
 
     private final SoeNetworkConfiguration networkConfiguration;
+    private final SoeMessageDispatcher soeMessageDispatcher;
 
     @Inject
-    public ReliableMessageController(final SoeNetworkConfiguration networkConfiguration) {
+    public ReliableMessageController(final SoeNetworkConfiguration networkConfiguration, final SoeMessageDispatcher soeMessageDispatcher) {
         this.networkConfiguration = networkConfiguration;
+        this.soeMessageDispatcher = soeMessageDispatcher;
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
+        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         long nextClientReliableStamp = incomingMessageProcessor.getReliableStamp();
         short reliableStamp = buffer.getShort();
@@ -93,14 +94,13 @@ public class ReliableMessageController extends BaseSoeController {
             }
         }
         
-        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", soeUdpConnection.getId(), reliableStamp, buffer.order());
-        soeUdpConnection.ackClient(reliableStamp);
+        LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", connection.getId(), reliableStamp, buffer.order());
+        connection.ackClient(reliableStamp);
     }
 
-    private void processPacket(final ReliablePacketMode mode, final SoeConnection connection, final ByteBuffer buffer) {
+    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer) {
 
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
+        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         if(mode == ReliablePacketMode.cReliablePacketModeReliable) {
 

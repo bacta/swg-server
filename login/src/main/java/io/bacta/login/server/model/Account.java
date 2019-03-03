@@ -24,6 +24,8 @@ public class Account {
 
     private String encodedPassword;
 
+    protected Account() {}
+
     public Account(final String username,
                    final String encodedPassword) {
         this.username = username;

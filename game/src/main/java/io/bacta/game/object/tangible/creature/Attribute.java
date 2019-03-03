@@ -1,6 +1,6 @@
 package io.bacta.game.object.tangible.creature;
 
-import io.bacta.swg.localization.StringId;
+import io.bacta.shared.localization.StringId;
 
 public final class Attribute {
     private static final String tableName = "att_n";

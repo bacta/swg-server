@@ -2,7 +2,7 @@ package io.bacta.game.name;
 
 import io.bacta.game.object.tangible.creature.Gender;
 import io.bacta.game.object.tangible.creature.Race;
-import io.bacta.swg.localization.StringId;
+import io.bacta.shared.localization.StringId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

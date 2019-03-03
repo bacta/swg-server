@@ -3,7 +3,6 @@ package io.bacta.soe.network.connection;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -17,9 +16,8 @@ import java.util.Random;
  * This factory creates the underlying UDP connection
  */
 @Component
-@Scope("prototype")
 @Slf4j
-class SoeUdpConnectionFactory {
+public class SoeUdpConnectionFactory {
 
     private final Random randomId;
     private final MBeanServer mBeanServer;
@@ -45,7 +43,7 @@ class SoeUdpConnectionFactory {
      * {@link java.nio.ByteBuffer}
      * @return new {@link SoeUdpConnection} for the sender
      */
-    SoeUdpConnection newInstance(final InetSocketAddress sender) {
+    public SoeUdpConnection newInstance(final InetSocketAddress sender) {
 
         final int connectionID = randomId.nextInt();
         ObjectName objectName = null;

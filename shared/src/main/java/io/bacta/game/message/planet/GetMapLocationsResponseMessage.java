@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by crush on 5/28/2016.
@@ -17,9 +17,9 @@ import java.util.Collection;
 @AllArgsConstructor
 public final class GetMapLocationsResponseMessage extends GameNetworkMessage {
     private final String planetName;
-    private final Collection<MapLocation> mapLocationsStatic;
-    private final Collection<MapLocation> mapLocationsDynamic;
-    private final Collection<MapLocation> mapLocationsPersist;
+    private final List<MapLocation> mapLocationsStatic;
+    private final List<MapLocation> mapLocationsDynamic;
+    private final List<MapLocation> mapLocationsPersist;
     private final int versionStatic;
     private final int versionDynamic;
     private final int versionPersist;

@@ -3,14 +3,13 @@ package io.bacta.game.dispatch;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.game.command.CommandQueueParameters;
-import io.bacta.game.context.GameRequestContext;
+import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
 import io.bacta.game.message.object.CommandQueueEnqueue;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.object.ServerObjectService;
-import io.bacta.swg.util.SOECRC32;
+import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -89,15 +88,14 @@ public final class CommandQueueDispatcher {
         }
     }
 
-    public void dispatch(final GameRequestContext context, final ServerObject actor, final CommandQueueEnqueue data) {
+    public void dispatch(final SoeRequestContext context, final ServerObject actor, final CommandQueueEnqueue data) {
         final CommandQueueController controller = controllers.get(data.getCommandHash());
 
         //TODO: We need to do something with sequence Id...for example, actually queue the commands.
 
         if (controller != null) {
-            final CommandQueueParameters parameters = new CommandQueueParameters(data.getParams());
             final ServerObject target = serverObjectService.get(data.getTargetId());
-            controller.handleCommand(context, actor, target, parameters);
+            controller.handleCommand(context, actor, target, data.getParams());
         } else {
             LOGGER.error("No controller loaded to handle CommandQueueController for command '{}'(0x{}).",
                     knownCommandNames.get(data.getCommandHash()),

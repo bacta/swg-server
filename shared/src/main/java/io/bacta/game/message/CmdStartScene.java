@@ -2,7 +2,7 @@ package io.bacta.game.message;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.swg.math.Vector;
+import io.bacta.shared.math.Vector;
 import lombok.AllArgsConstructor;
 
 import java.nio.ByteBuffer;
@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 
 @AllArgsConstructor
 public class CmdStartScene extends GameNetworkMessage {
-
     private final long networkId;
     private final String sceneName;
     private final Vector startPosition;

@@ -4,7 +4,7 @@ import com.codahale.metrics.MetricFilter
 import com.codahale.metrics.MetricRegistry
 import groovy.util.logging.Slf4j
 import io.bacta.engine.util.AwaitUtil
-import io.bacta.soe.network.connection.SoeConnection
+import io.bacta.soe.network.connection.SoeClient
 import io.bacta.soe.network.udp.SoeTransceiver
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Profile
@@ -41,7 +41,7 @@ class GameServerApplicationSpecIT extends Specification {
 
         setup:
 
-        SoeConnection connection = soeClient.getConnection(new InetSocketAddress(serverHost, properties.getBindPort()))
+        SoeClient connection = soeClient.getConnection(new InetSocketAddress(serverHost, properties.getBindPort()))
 
         when:
 

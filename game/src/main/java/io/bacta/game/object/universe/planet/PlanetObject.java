@@ -5,8 +5,8 @@ import io.bacta.game.message.planet.MapLocation;
 import io.bacta.game.message.planet.MapLocationType;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.game.object.universe.UniverseObject;
-import io.bacta.swg.container.SlotIdManager;
-import io.bacta.swg.template.ObjectTemplateList;
+import io.bacta.shared.container.SlotIdManager;
+import io.bacta.shared.template.ObjectTemplateList;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,10 +97,10 @@ public class PlanetObject extends UniverseObject {
                 return Collections.unmodifiableList(this.mapLocationListStatic);
             case DYNAMIC:
                 return Collections.unmodifiableList(this.mapLocationListDynamic);
-            case PERSISTENT:
+            case PERSIST:
                 return Collections.unmodifiableList(this.mapLocationListPersist);
             default:
-                LOGGER.error("UNKNOWN map location type");
+                LOGGER.error("Unknown map location type");
                 return null;
         }
     }
@@ -111,10 +111,10 @@ public class PlanetObject extends UniverseObject {
                 return mapLocationListVersionStatic.get();
             case DYNAMIC:
                 return mapLocationListVersionDynamic.get();
-            case PERSISTENT:
+            case PERSIST:
                 return mapLocationListVersionPersist.get();
             default:
-                LOGGER.error("UNKNOWN map location type");
+                LOGGER.error("Unknown map location type");
                 return 0;
         }
     }

@@ -22,7 +22,6 @@ package io.bacta.soe.network.controller;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import io.bacta.soe.network.connection.SoeConnection;
 import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.message.SoeMessageType;
@@ -34,20 +33,21 @@ import java.nio.ByteOrder;
 
 @Component
 @SoeController(handles = {SoeMessageType.cUdpPacketOrdered, SoeMessageType.cUdpPacketOrdered2})
-public class OrderedController extends BaseSoeController {
+public class OrderedController implements SoeMessageController {
 
     private final Counter rejectedOrderedMessages;
+    private final ZeroEscapeController zeroEscapeController;
 
     @Inject
-    public OrderedController(final MetricRegistry metrics) {
-        rejectedOrderedMessages =  metrics.counter(MetricRegistry.name( "com.ocdsoft.bacta.swg.login.message", "rejected-ordered"));
+    public OrderedController(final MetricRegistry metrics, final ZeroEscapeController zeroEscapeController) {
+        rejectedOrderedMessages =  metrics.counter(MetricRegistry.name( "io.bacta.swg.login.message", "rejected-ordered"));
+        this.zeroEscapeController = zeroEscapeController;
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
 
-        SoeUdpConnection soeUdpConnection = connection.getSoeUdpConnection();
-        SoeIncomingMessageProcessor incomingMessageProcessor = soeUdpConnection.getIncomingMessageProcessor();
+        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         short orderedStamp = buffer.getShort();
         int diff = orderedStamp - incomingMessageProcessor.getOrderedStampLast();
@@ -56,12 +56,9 @@ public class OrderedController extends BaseSoeController {
             diff += 0x10000;
         }
         if (diff < 30000) {
+
             incomingMessageProcessor.setOrderedStampLast(orderedStamp);
-
-            buffer.order(ByteOrder.LITTLE_ENDIAN);
-            int opcode = buffer.getInt();
-
-            gameNetworkMessageDispatcher.dispatch(zeroByte, opcode, connection, buffer.slice().order(ByteOrder.LITTLE_ENDIAN));
+            zeroEscapeController.handleIncoming(zeroByte, type, connection, buffer.slice().order(ByteOrder.LITTLE_ENDIAN));
 
         } else {
             rejectedOrderedMessages.inc();

@@ -24,7 +24,7 @@ import io.bacta.soe.network.connection.ConnectionRole;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by kyle on 4/22/2016.
@@ -40,7 +40,7 @@ public class GameNetworkMessageControllerData {
         this.roles = roles;
     }
 
-    public boolean containsRoles(final List<ConnectionRole> userRoles) {
+    public boolean containsRoles(final Set<ConnectionRole> userRoles) {
 
         for (final ConnectionRole role : roles) {
             if (userRoles.contains(role)) {

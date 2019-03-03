@@ -40,8 +40,7 @@ public class GameServerProperties {
     private String clientPath;
     private String clientIniFile;
     private Akka akka;
-    private List<ZoneServer> zoneServers;
-    private TreeFileProperties treeFile;
+    private List<Scene> scenes;
 
     @Data
     public static class Akka {
@@ -49,22 +48,9 @@ public class GameServerProperties {
     }
 
     @Data
-    public static class ZoneServer {
+    public static class Scene {
         private String name;
         private String iffPath;
-        private int port;
-    }
-
-    @Data
-    public static class TreeFileProperties {
-        private List<SearchNodeProperties> search;
-
-        @Data
-        public static class SearchNodeProperties {
-            private String type;
-            private String path;
-            private int priority;
-        }
     }
 }
 

@@ -2,8 +2,8 @@ package io.bacta.game.waypoint;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.engine.buffer.ByteBufferWritable;
-import io.bacta.swg.util.NetworkId;
-import io.bacta.swg.utility.Location;
+import io.bacta.shared.util.NetworkId;
+import io.bacta.shared.utility.Location;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

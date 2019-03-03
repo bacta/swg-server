@@ -4,7 +4,7 @@ import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
-import io.bacta.swg.object.ConversationStarter;
+import io.bacta.shared.object.ConversationStarter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -2,9 +2,9 @@ package io.bacta.game.message;
 
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.swg.math.Transform;
-import io.bacta.swg.math.Vector;
-import io.bacta.swg.object.GameObject;
+import io.bacta.shared.math.Transform;
+import io.bacta.shared.math.Vector;
+import io.bacta.shared.object.GameObject;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;

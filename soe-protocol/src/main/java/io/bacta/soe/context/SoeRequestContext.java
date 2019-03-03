@@ -1,19 +1,18 @@
 package io.bacta.soe.context;
 
 import io.bacta.shared.GameNetworkMessage;
-import io.bacta.soe.network.connection.SoeConnection;
 import lombok.Getter;
 
+@Getter
 public class SoeRequestContext {
 
-    @Getter
-    protected final SoeConnection connection;
+    private final SoeSessionContext sessionContext;
 
-    public SoeRequestContext(final SoeConnection connection) {
-        this.connection = connection;
+    public SoeRequestContext(final SoeSessionContext sessionContext) {
+        this.sessionContext = sessionContext;
     }
 
     public void sendMessage(GameNetworkMessage message) {
-        connection.sendMessage(message);
+        sessionContext.sendMessage(message);
     }
 }

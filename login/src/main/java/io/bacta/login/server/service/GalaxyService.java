@@ -4,7 +4,7 @@ import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.login.server.model.Galaxy;
 import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
-import io.bacta.soe.network.connection.SoeConnection;
+import io.bacta.soe.context.SoeRequestContext;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -125,23 +125,23 @@ public interface GalaxyService {
      * the permissions of the connection. For example, secret galaxies will not be sent to a client that is not on
      * the local network.
      *
-     * @param connection The connection which will receive the message.
+     * @param context The connection which will receive the message.
      */
-    void sendClusterEnum(SoeConnection connection);
+    void sendClusterEnum(SoeRequestContext context);
 
     /**
      * Sends a list of any galaxies that have disabled character creation.
      *
-     * @param connection The connection which will receive the message.
+     * @param context The connection which will receive the message.
      */
-    void sendDisabledCharacterCreationServers(SoeConnection connection);
+    void sendDisabledCharacterCreationServers(SoeRequestContext context);
 
     /**
      * Sends the status of all active galaxies to a specific connection.
      *
-     * @param connection The connection which will receive the message.
+     * @param context The connection which will receive the message.
      */
-    void sendClusterStatus(SoeConnection connection);
+    void sendClusterStatus(SoeRequestContext context);
 
     /**
      * Sends out the cluster status message to all connections that are currently connected to the login server. This
@@ -152,7 +152,7 @@ public interface GalaxyService {
     /**
      * Sends extended status of all active galaxies to specific connection.
      *
-     * @param connection The connection which will receive the message.
+     * @param context The connection which will receive the message.
      */
-    void sendExtendedClusterStatus(SoeConnection connection);
+    void sendExtendedClusterStatus(SoeRequestContext context);
 }

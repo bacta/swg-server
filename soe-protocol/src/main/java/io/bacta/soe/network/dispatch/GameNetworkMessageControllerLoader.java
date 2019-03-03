@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Modifier;
@@ -43,7 +42,6 @@ import java.lang.reflect.Modifier;
  */
 @Slf4j
 @Component
-@Scope("prototype")
 public final class GameNetworkMessageControllerLoader implements ApplicationContextAware {
 
     private ApplicationContext context;

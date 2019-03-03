@@ -6,6 +6,6 @@ package io.bacta.game.message.planet;
  * I don't have much idea about what this.
  */
 public class CollectionServerFirstSet {
-    //Set<Pair<Pair<int, STRING>, Pair<NetworkId, UnicodeString>>>
+    //Set<Pair<Pair<int, String>, Pair<NetworkId, UnicodeString>>>
     //Set<Pair<Pair<claimTime, CollectionsDataTable::CollectionInfoCollection>, Pair<claimantId, claimantName>>>
 }
