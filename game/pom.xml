@@ -51,7 +51,7 @@
                 <configuration>
                     <mainClass>io.bacta.template.definition.TemplateDefinitionCompiler</mainClass>
                     <arguments>
-                        <argument>${project.parent.basedir}/dsrc/sku.0/sys.server</argument>
+                        <argument>${project.parent.basedir}/swg-client/dsrc/sku.0/sys.server</argument>
                         <argument>io.bacta.game.object.template.server</argument>
                         <argument>${project.basedir}/src/gen/java/io/bacta/game/object/template/server</argument>
                     </arguments>
