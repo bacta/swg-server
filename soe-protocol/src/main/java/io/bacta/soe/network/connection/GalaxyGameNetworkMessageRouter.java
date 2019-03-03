@@ -13,7 +13,9 @@ import io.bacta.soe.network.forwarder.SwgRequestMessage;
 import io.bacta.soe.network.forwarder.SwgResponseMessage;
 import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import io.bacta.soe.network.message.SwgTerminateMessage;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 
@@ -23,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GalaxyGameNetworkMessageRouter extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxyGameNetworkMessageRouter.class);

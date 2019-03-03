@@ -61,16 +61,16 @@ public class PlayerCreationSupervisor extends AbstractActor {
      * @param msg
      */
     private void clientCreateCharacter(ClientCreateCharacter msg) {
-        final var client = sender();
+        final ActorRef client = sender();
 
         //TODO: We are going to want to replace the key here with account id.
         //If a session doesn't exist, create one.
         if (!pendingSessions.containsKey(sender())) {
-            final var session = context().actorOf(PlayerCreationSessionActor.props(sessionTimeout));
+            final ActorRef session = context().actorOf(PlayerCreationSessionActor.props(sessionTimeout));
             pendingSessions.put(client, session);
         }
 
-        final var existingSession = pendingSessions.get(client);
+        final ActorRef existingSession = pendingSessions.get(client);
         existingSession.forward(msg, context());
 
         //TODO: Implement checking how quickly an account is creating characters.
@@ -84,9 +84,9 @@ public class PlayerCreationSupervisor extends AbstractActor {
      * @return The directive that specifies what should happen to the session actor.
      */
     private Directive clientCreateCharacterFailed(PlayerCreationException ex) {
-        final var client = ex.getClient();
+        final ActorRef client = ex.getClient();
 
-        final var message = new ClientCreateCharacterFailed(ex.getCharacterName(), ex.getReason());
+        final ClientCreateCharacterFailed message = new ClientCreateCharacterFailed(ex.getCharacterName(), ex.getReason());
         client.tell(message, self());
 
         pendingSessions.remove(client);

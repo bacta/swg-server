@@ -1,15 +1,10 @@
 package io.bacta.game.planet;
 
-import io.bacta.game.object.ServerObjectService;
-import io.bacta.swg.iff.Iff;
-import io.bacta.swg.snapshot.WorldSnapshot;
-import io.bacta.swg.snapshot.WorldSnapshotIffReader;
-import io.bacta.swg.snapshot.WorldSnapshotNode;
+import io.bacta.game.service.object.ServerObjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.List;
 
 /**
  * Loads a world snapshot from the associated .ws IFF file, and then attempts to save it to the
@@ -36,17 +31,17 @@ public class WorldSnapshotDatabaseLoader {
                 "naboo"
         };
 
-        final WorldSnapshotIffReader iffReader = new WorldSnapshotIffReader();
-
-        for (final String planet : planets) {
-            final Iff iff = new Iff(); //TODO: Load external iff file.
-            final WorldSnapshot snapshot = iffReader.load(iff);
-
-            final List<WorldSnapshotNode> nodes = snapshot.getNodeList();
-
-            for (WorldSnapshotNode node : nodes) {
-                final long networkId = node.getNetworkId();
-            }
-        }
+//        final WorldSnapshotIffReader iffReader = new WorldSnapshotIffReader();
+//
+//        for (final String planet : planets) {
+//            final Iff iff = new Iff(); //TODO: Load external iff file.
+//            final WorldSnapshot snapshot = iffReader.load(iff);
+//
+//            final List<WorldSnapshotNode> nodes = snapshot.getNodeList();
+//
+//            for (WorldSnapshotNode node : nodes) {
+//                final long networkId = node.getNetworkId();
+//            }
+//        }
     }
 }

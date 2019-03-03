@@ -44,7 +44,7 @@ class PlayerCreationSessionActor extends AbstractActor {
     }
 
     private void start(ClientCreateCharacter msg) throws PlayerCreationException {
-        final var client = sender();
+        final ActorRef client = sender();
 
         //Any subsequent create character messages we receive cannot succeed if the current session hasn't
         //expired.
@@ -73,12 +73,12 @@ class PlayerCreationSessionActor extends AbstractActor {
     }
 
     private boolean isExpired() {
-        final var currentTimestamp = System.currentTimeMillis();
+        final long currentTimestamp = System.currentTimeMillis();
         return currentTimestamp > startTimestamp + sessionTimeout;
     }
 
     private void validateObjectTemplate() throws PlayerCreationException {
-        final var templateName = createMessage.getTemplateName();
+        final String templateName = createMessage.getTemplateName();
 
         if (templateName == null || templateName.isEmpty())
             throw new PlayerCreationException(client, createMessage.getCharacterName(), NameErrors.NO_TEMPLATE);
