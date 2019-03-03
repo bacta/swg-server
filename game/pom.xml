@@ -20,10 +20,6 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ocdsoft.bacta</groupId>
-            <artifactId>templates</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.ocdsoft.bacta.soe</groupId>
             <artifactId>soe-protocol</artifactId>
         </dependency>
@@ -62,6 +58,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.ocdsoft.bacta</groupId>
+                        <artifactId>templates</artifactId>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
