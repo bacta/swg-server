@@ -10,4 +10,7 @@ public class ActorConstants {
     public static final String GALAXY_SUPERVISOR = "galaxy";
     public static final String CHAT_SUPERVISOR = "chat";
     public static final String CLIENT_SUPERVISOR = "client";
+
+    public static final String PLAYER_CREATION_SERVICE = "playerCreation";
+    public static final String NAME_VALIDATION_SERVICE = "nameValidation";
 }
