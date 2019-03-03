@@ -22,6 +22,10 @@
             <artifactId>engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>templates</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jzlib</artifactId>
         </dependency>
@@ -75,12 +79,6 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.ocdsoft.bacta</groupId>
-                    <artifactId>templates</artifactId>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>

@@ -28,6 +28,10 @@
             <artifactId>shared</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.ocdsoft.bacta</groupId>
+            <artifactId>templates</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.12</artifactId>
         </dependency>
@@ -62,6 +66,7 @@
                     <dependency>
                         <groupId>com.ocdsoft.bacta</groupId>
                         <artifactId>templates</artifactId>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
