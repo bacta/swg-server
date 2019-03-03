@@ -24,6 +24,7 @@ import gnu.trove.map.TIntObjectMap;
 import io.bacta.engine.utils.SOECRC32;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.context.SoeRequestContext;
+import io.bacta.soe.context.SoeSessionContext;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerData;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
@@ -74,10 +75,11 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
         final GameNetworkMessageControllerData controllerData = controllers.get(SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName()));
 
         if (controllerData != null) {
-            if (!controllerData.containsRoles(context.getRoles())) {
+            SoeSessionContext sessionContext = context.getSessionContext();
+            if (!controllerData.containsRoles(sessionContext.getRoles())) {
                 LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
                 LOGGER.error("Connection: {}", context.toString());
-                throw new RuntimeException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + context.getRemoteAddress());
+                throw new RuntimeException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + sessionContext.getRemoteAddress());
             }
 
             try {
@@ -98,8 +100,6 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
         } else {
             handleMissingController(gameNetworkMessage);
         }
-
-        throw new RuntimeException("Unable to dispatch message from " + context.getRemoteAddress());
     }
 
     protected void handleMissingController(final GameNetworkMessage gameNetworkMessage) {

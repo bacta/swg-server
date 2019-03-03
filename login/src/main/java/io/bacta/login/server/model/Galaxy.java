@@ -120,6 +120,8 @@ public class Galaxy {
      */
     private transient int onlineFreeTrialPlayers;
 
+    protected Galaxy() {}
+
     public Galaxy(final String name, final String address, int port, int timeZone, byte[] privateKey, byte[] publicKey) {
         this.name = name;
         this.address = address;
