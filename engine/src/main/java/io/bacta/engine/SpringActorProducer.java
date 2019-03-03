@@ -10,8 +10,7 @@ public class SpringActorProducer implements IndirectActorProducer {
     private final String actorBeanName;
 
     public SpringActorProducer(ApplicationContext applicationContext,
-                               String actorBeanName,
-                               Object... arguments) {
+                               String actorBeanName) {
         this.applicationContext = applicationContext;
         this.actorBeanName = actorBeanName;
     }
