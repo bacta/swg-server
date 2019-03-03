@@ -27,6 +27,7 @@ import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
 import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
+import io.bacta.soe.network.forwarder.GameNetworkMessageForwarder
 import io.bacta.soe.network.handler.GameNetworkMessageHandler
 import io.bacta.soe.network.message.SoeMessageType
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
@@ -102,27 +103,19 @@ class MultiPacketSpec extends Specification {
         controllers.put(SoeMessageType.cUdpPacketConfirm, Mock(SoeMessageController))
         controllers.put(SoeMessageType.cUdpPacketAckAll1, Mock(SoeMessageController))
 
-        def multiController = new MultiController()
-        multiController.setSoeMessageDispatcher(soeMessageRouter)
-        multiController.setGameNetworkMessageDispatcher(swgMessageRouter)
+        def multiController = new MultiController(soeMessageRouter)
 
         controllers.put(SoeMessageType.cUdpPacketMulti, multiController)
 
-        def reliableController = new ReliableMessageController(networkConfig)
-        reliableController.setSoeMessageDispatcher(soeMessageRouter)
-        reliableController.setGameNetworkMessageDispatcher(swgMessageRouter)
+        def reliableController = new ReliableMessageController(networkConfig, soeMessageRouter)
 
         controllers.put(SoeMessageType.cUdpPacketReliable1, reliableController)
 
-        def groupController = new GroupMessageController()
-        groupController.setSoeMessageDispatcher(soeMessageRouter)
-        groupController.setGameNetworkMessageDispatcher(swgMessageRouter)
+        def groupController = new GroupMessageController(soeMessageRouter)
 
         controllers.put(SoeMessageType.cUdpPacketGroup, groupController)
 
-        def zeroController = new ZeroEscapeController()
-        zeroController.setSoeMessageDispatcher(soeMessageRouter)
-        zeroController.setGameNetworkMessageDispatcher(swgMessageRouter)
+        def zeroController = new ZeroEscapeController(Mock(GameNetworkMessageForwarder), Mock(GameNetworkMessageSerializer))
 
         controllers.put(SoeMessageType.cUdpPacketZeroEscape, zeroController)
 

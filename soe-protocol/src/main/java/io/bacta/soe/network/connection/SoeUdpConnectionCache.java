@@ -83,7 +83,9 @@ public final class SoeUdpConnectionCache {
         connectionCache.invalidate(inetSocketAddress);
     }
 
-    public void broadcast(GameNetworkMessage message) {
-        throw new RuntimeException("Not implemented yet");
+    void broadcast(GameNetworkMessage message) {
+        connectionCache.asMap().forEach((inetSocketAddress, soeUdpConnection) -> {
+            soeUdpConnection.sendMessage(message);
+        });
     }
 }
