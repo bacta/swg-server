@@ -10,6 +10,7 @@ import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.shared.MemberConstants;
 import io.bacta.soe.event.PublisherActor;
+import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,7 @@ public class LoginSupervisor extends AbstractActor {
                 ClusterEvent.UnreachableMember.class);
         super.preStart();
 
+        getContext().actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
         getContext().actorOf(ext.props(PublisherActor.class), ActorConstants.PUBLISHER);
     }
 

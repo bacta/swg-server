@@ -27,7 +27,7 @@ import com.typesafe.config.ConfigFactory;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
-import io.bacta.game.actor.galaxy.GalaxyActor;
+import io.bacta.game.galaxy.GalaxyActor;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.handler.DefaultGameNetworkMessageHandler;
 import io.bacta.soe.network.handler.GameNetworkMessageHandler;

@@ -29,9 +29,7 @@ import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.actor.LoginSupervisor;
 import io.bacta.login.server.session.OAuth2SessionTokenProvider;
 import io.bacta.login.server.session.SessionTokenProvider;
-import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +50,6 @@ import java.util.concurrent.Executor;
 @Slf4j
 @Configuration
 @EnableScheduling
-@ConfigurationProperties
 public class LoginServerConfiguration implements SchedulingConfigurer {
 
     private final LoginServerProperties loginServerProperties;
@@ -69,12 +66,11 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context){
         // Create an Akka system
-        actorSystem = ActorSystem.create("login", akkaConfiguration());
+        actorSystem = ActorSystem.create(ActorConstants.LOGIN_SUPERVISOR, akkaConfiguration());
         ext.initialize(context);
 
         // Start root actors
         actorSystem.actorOf(ext.props(LoginSupervisor.class), ActorConstants.LOGIN_SUPERVISOR);
-        actorSystem.actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
 
         return actorSystem;
     }

@@ -1,11 +1,11 @@
-package io.bacta.game.actor.scene;
+package io.bacta.game.scene;
 
 import akka.actor.AbstractActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
-import io.bacta.game.actor.object.scene.Scene;
+import io.bacta.game.object.scene.Scene;
 import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

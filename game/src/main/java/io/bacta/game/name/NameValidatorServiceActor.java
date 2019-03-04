@@ -1,10 +1,15 @@
 package io.bacta.game.name;
 
 import akka.actor.AbstractActor;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class NameValidatorServiceActor extends AbstractActor {
     /**
      * Name validator does its best to keep track of existing names so that it can validate requests against them;

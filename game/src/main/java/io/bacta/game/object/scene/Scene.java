@@ -1,4 +1,4 @@
-package io.bacta.game.actor.object.scene;
+package io.bacta.game.object.scene;
 
 import io.bacta.shared.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;

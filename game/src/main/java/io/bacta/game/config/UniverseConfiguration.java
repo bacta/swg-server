@@ -23,16 +23,19 @@ package io.bacta.game.config;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
 import io.bacta.game.GameServerProperties;
+import io.bacta.game.galaxy.GalaxyActor;
 import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import javax.annotation.PreDestroy;
@@ -42,18 +45,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executor;
 
-
 @Configuration
-@ConfigurationProperties
 @Slf4j
-public class ActorSystemConfiguration {
+public class UniverseConfiguration {
 
     private final GameServerProperties gameServerProperties;
     private final SpringAkkaExtension ext;
     private ActorSystem actorSystem;
 
+    @Value("${io.bacta.galaxy.name}")
+    private String galaxyName;
+
     @Inject
-    public ActorSystemConfiguration(final GameServerProperties gameServerProperties, final SpringAkkaExtension ext) {
+    public UniverseConfiguration(final GameServerProperties gameServerProperties, final SpringAkkaExtension ext) {
         this.gameServerProperties = gameServerProperties;
         this.ext = ext;
     }
@@ -62,8 +66,12 @@ public class ActorSystemConfiguration {
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context) {
         // Create an Akka system
-        actorSystem = ActorSystem.create("Galaxy", akkaConfiguration());
+        Config akkaConfig = akkaConfiguration();
+        actorSystem = ActorSystem.create(ActorConstants.ACTOR_SYSTEM_NAME, akkaConfig);
         ext.initialize(context);
+
+        actorSystem.actorOf(ext.props(GalaxyActor.class), galaxyName);
+
         return actorSystem;
     }
 
@@ -86,6 +94,11 @@ public class ActorSystemConfiguration {
     @Bean
     public Executor taskExecutor() {
         return new SimpleAsyncTaskExecutor();
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigIn() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @PreDestroy

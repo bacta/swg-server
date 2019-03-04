@@ -3,6 +3,7 @@ package io.bacta.game.login;
 import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.game.GameServerProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ public final class LoginUpdaterTask {
     private final LoginRestClient restClient;
     private final GameServerProperties properties;
 
+    @Value("${io.bacta.galaxy.name}")
+    private String galaxyName;
+
     @Inject
     public LoginUpdaterTask(LoginRestClient restClient,
                             GameServerProperties properties) {
@@ -33,7 +37,7 @@ public final class LoginUpdaterTask {
         final int timeZone = ZonedDateTime.now().getOffset().getTotalSeconds();
 
         final GalaxyServerStatus status = new GalaxyServerStatus(
-                properties.getGalaxyName(),
+                galaxyName,
                 properties.getBindAddress().getHostAddress(),
                 properties.getBindPort(),
                 timeZone);
@@ -55,6 +59,6 @@ public final class LoginUpdaterTask {
         final Set<GalaxyServerStatus.ConnectionServerEntry> connectionServers = status.getConnectionServers();
         connectionServers.add(connectionServer);
 
-        this.restClient.updateStatus(properties.getGalaxyName(), status);
+        this.restClient.updateStatus(galaxyName, status);
     }
 }

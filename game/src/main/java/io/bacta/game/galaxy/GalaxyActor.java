@@ -1,4 +1,4 @@
-package io.bacta.game.actor.galaxy;
+package io.bacta.game.galaxy;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
@@ -8,12 +8,14 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
-import io.bacta.game.GameServerProperties;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.name.NameValidatorServiceActor;
 import io.bacta.game.player.PlayerCreationSupervisor;
+import io.bacta.game.universe.ChatSupervisor;
 import io.bacta.shared.MemberConstants;
+import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,22 +30,18 @@ public class GalaxyActor extends AbstractActor {
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), GalaxyActor.class.getSimpleName());
     private final Cluster cluster = Cluster.get(getContext().getSystem());
     private final SpringAkkaExtension ext;
-    private final GameServerProperties properties;
 
     private ActorRef playerCreationService;
 
+    @Value("${io.bacta.galaxy.name}")
     @Getter
     private String name;
 
     @Inject
     public GalaxyActor(
-            final SpringAkkaExtension ext,
-            final GameServerProperties properties) {
+            final SpringAkkaExtension ext) {
 
         this.ext = ext;
-        this.properties = properties;
-
-        this.name = properties.getGalaxyName();
     }
 
     @Override
@@ -55,8 +53,11 @@ public class GalaxyActor extends AbstractActor {
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
+        context().actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
         context().actorOf(ext.props(SceneSupervisor.class), ActorConstants.GALAXY_SCENE_SUPERVISOR);
+
         context().actorOf(ext.props(NameValidatorServiceActor.class), ActorConstants.NAME_VALIDATION_SERVICE);
+        context().actorOf(ext.props(ChatSupervisor.class), ActorConstants.CHAT_SUPERVISOR);
 
         playerCreationService = context().actorOf(ext.props(PlayerCreationSupervisor.class), ActorConstants.PLAYER_CREATION_SERVICE);
 

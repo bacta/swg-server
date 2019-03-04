@@ -28,11 +28,12 @@ endpoints:
 
 io:
   bacta:
+    galaxy:
+      name: "bacta"
     game:
       bindAddress: "0.0.0.0"
       bindPort: 44463
       bindPingPort: 44464
-      galaxyName: "Bacta"
       requiredClientVersion: "20100225-17:43"
       clientPath: "swg-client/dist"
       clientIniFile: "live.cfg"

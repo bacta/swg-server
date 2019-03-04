@@ -35,7 +35,6 @@ public class GameServerProperties {
     private InetAddress bindAddress;
     private int bindPort;
     private int bindPingPort;
-    private String galaxyName;
     private String requiredClientVersion;
     private String clientPath;
     private String clientIniFile;

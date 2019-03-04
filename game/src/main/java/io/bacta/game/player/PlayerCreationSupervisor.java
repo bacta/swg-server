@@ -8,6 +8,9 @@ import akka.japi.pf.DeciderBuilder;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterFailed;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -20,6 +23,8 @@ import static akka.actor.SupervisorStrategy.*;
 /**
  * Manages sessions to create a new player characters.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PlayerCreationSupervisor extends AbstractActor {
     private static final int MAX_PENDING_SESSIONS = 200; //Move this to config
 
@@ -30,7 +35,7 @@ public class PlayerCreationSupervisor extends AbstractActor {
      */
     private int sessionTimeout;
 
-    @Inject()
+    @Inject
     public PlayerCreationSupervisor(SpringAkkaExtension ext) {
         this.ext = ext;
         this.sessionTimeout = 1000 * 5 * 60; //TODO: Pull this in from configuration.

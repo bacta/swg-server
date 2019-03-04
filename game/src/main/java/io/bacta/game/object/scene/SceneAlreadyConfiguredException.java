@@ -1,4 +1,4 @@
-package io.bacta.game.actor.object.scene;
+package io.bacta.game.object.scene;
 
 public class SceneAlreadyConfiguredException extends RuntimeException {
     public SceneAlreadyConfiguredException(String message) {

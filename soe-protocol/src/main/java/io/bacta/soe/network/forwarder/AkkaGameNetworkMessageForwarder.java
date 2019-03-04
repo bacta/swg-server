@@ -7,6 +7,7 @@ import io.bacta.actor.ActorConstants;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -17,8 +18,8 @@ public class AkkaGameNetworkMessageForwarder implements GameNetworkMessageForwar
     private final ActorSelection galaxyUdpMessageDispatcher;
 
     @Inject
-    public AkkaGameNetworkMessageForwarder(final ActorSystem actorSystem, final SpringAkkaExtension ext) {
-        this.galaxyUdpMessageDispatcher = actorSystem.actorSelection("/user/" + ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
+    public AkkaGameNetworkMessageForwarder(final ActorSystem actorSystem, final SpringAkkaExtension ext, @Value("${io.bacta.galaxy.name}") final String galaxyName) {
+        this.galaxyUdpMessageDispatcher = actorSystem.actorSelection("/user/" + galaxyName + "/" + ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
     }
 
     @Override
