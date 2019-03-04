@@ -28,13 +28,13 @@ endpoints:
 
 io:
   bacta:
+    akka:
+      clusterName: "bacta"
+      config: "game.conf"
     game:
       server:
         bindAddress: "0.0.0.0"
         bindPort: 44460
-        galaxyName: "Bacta"
-        akka:
-          config: "game.conf"
         connectionServer: true
         zoneServers:
           - name: "tatooine"

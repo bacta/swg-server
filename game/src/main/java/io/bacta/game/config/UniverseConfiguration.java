@@ -24,6 +24,7 @@ import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.bacta.actor.ActorConstants;
+import io.bacta.engine.AkkaProperties;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
@@ -31,7 +32,6 @@ import io.bacta.game.GameServerProperties;
 import io.bacta.game.galaxy.GalaxyActor;
 import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,15 +50,14 @@ import java.util.concurrent.Executor;
 public class UniverseConfiguration {
 
     private final GameServerProperties gameServerProperties;
+    private final AkkaProperties akkaProperties;
     private final SpringAkkaExtension ext;
     private ActorSystem actorSystem;
 
-    @Value("${io.bacta.galaxy.name}")
-    private String galaxyName;
-
     @Inject
-    public UniverseConfiguration(final GameServerProperties gameServerProperties, final SpringAkkaExtension ext) {
+    public UniverseConfiguration(final GameServerProperties gameServerProperties, final AkkaProperties akkaProperties, final SpringAkkaExtension ext) {
         this.gameServerProperties = gameServerProperties;
+        this.akkaProperties = akkaProperties;
         this.ext = ext;
     }
 
@@ -70,13 +69,13 @@ public class UniverseConfiguration {
         actorSystem = ActorSystem.create(ActorConstants.ACTOR_SYSTEM_NAME, akkaConfig);
         ext.initialize(context);
 
-        actorSystem.actorOf(ext.props(GalaxyActor.class), galaxyName);
+        actorSystem.actorOf(ext.props(GalaxyActor.class), gameServerProperties.getGalaxyName());
 
         return actorSystem;
     }
 
     private Config akkaConfiguration() {
-        return ConfigFactory.load(gameServerProperties.getAkka().getConfig());
+        return ConfigFactory.load(akkaProperties.getConfig());
     }
 
     @Bean

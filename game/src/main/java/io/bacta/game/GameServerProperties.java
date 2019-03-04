@@ -20,10 +20,12 @@
 
 package io.bacta.game;
 
+import io.bacta.engine.AkkaProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -38,12 +40,16 @@ public class GameServerProperties {
     private String requiredClientVersion;
     private String clientPath;
     private String clientIniFile;
-    private Akka akka;
     private List<Scene> scenes;
+    private final AkkaProperties akka;
 
-    @Data
-    public static class Akka {
-        private String config;
+    @Inject
+    public GameServerProperties(final AkkaProperties akkaProperties) {
+        this.akka = akkaProperties;
+    }
+
+    public String getGalaxyName() {
+        return akka.getClusterName();
     }
 
     @Data

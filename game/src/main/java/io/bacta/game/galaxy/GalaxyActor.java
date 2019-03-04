@@ -14,8 +14,6 @@ import io.bacta.game.player.PlayerCreationSupervisor;
 import io.bacta.game.universe.ChatSupervisor;
 import io.bacta.shared.MemberConstants;
 import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,10 +30,6 @@ public class GalaxyActor extends AbstractActor {
     private final SpringAkkaExtension ext;
 
     private ActorRef playerCreationService;
-
-    @Value("${io.bacta.galaxy.name}")
-    @Getter
-    private String name;
 
     @Inject
     public GalaxyActor(

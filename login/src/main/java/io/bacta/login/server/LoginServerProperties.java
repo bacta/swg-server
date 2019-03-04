@@ -59,12 +59,6 @@ public class LoginServerProperties {
 
     private OAuthProperties oauth;
     private LoginSessionMode sessionMode;
-    private Akka akka;
-
-    @Data
-    public static class Akka {
-        private String config;
-    }
 
     @Data
     public static class OAuthProperties {

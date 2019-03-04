@@ -24,6 +24,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import io.bacta.engine.AkkaProperties;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
@@ -52,13 +53,15 @@ import java.nio.file.Paths;
 public class GameServerTestConfiguration {
 
     private final GameServerProperties gameServerProperties;
+    private final AkkaProperties akkaProperties;
     private final SpringAkkaExtension ext;
     private ActorSystem actorSystem;
     private ActorRef galaxySupervisor;
 
     @Inject
-    public GameServerTestConfiguration(final GameServerProperties gameServerProperties, final SpringAkkaExtension ext) {
+    public GameServerTestConfiguration(final GameServerProperties gameServerProperties, final AkkaProperties akkaProperties, final SpringAkkaExtension ext) {
         this.gameServerProperties = gameServerProperties;
+        this.akkaProperties = akkaProperties;
         this.ext = ext;
     }
 
@@ -75,7 +78,7 @@ public class GameServerTestConfiguration {
     }
 
     private Config akkaConfiguration() {
-        return ConfigFactory.load(gameServerProperties.getAkka().getConfig());
+        return ConfigFactory.load(akkaProperties.getConfig());
     }
 
     @Inject

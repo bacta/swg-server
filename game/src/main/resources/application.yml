@@ -28,8 +28,9 @@ endpoints:
 
 io:
   bacta:
-    galaxy:
-      name: "bacta"
+    akka:
+      clusterName: "bacta"
+      config: "game.conf"
     game:
       bindAddress: "0.0.0.0"
       bindPort: 44463
@@ -41,8 +42,6 @@ io:
         rest:
           base:
             "http://localhost:8080/api"
-      akka:
-        config: "game.conf"
       scenes:
           - name: "tatooine"
             iffPath: "/some/iff/path/tatooine"

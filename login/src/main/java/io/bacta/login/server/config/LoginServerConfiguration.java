@@ -24,6 +24,7 @@ import akka.actor.ActorSystem;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import io.bacta.actor.ActorConstants;
+import io.bacta.engine.AkkaProperties;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.login.server.LoginServerProperties;
 import io.bacta.login.server.actor.LoginSupervisor;
@@ -53,12 +54,14 @@ import java.util.concurrent.Executor;
 public class LoginServerConfiguration implements SchedulingConfigurer {
 
     private final LoginServerProperties loginServerProperties;
+    private final AkkaProperties akkaProperties;
     private final SpringAkkaExtension ext;
     private ActorSystem actorSystem;
 
     @Inject
-    public LoginServerConfiguration(final LoginServerProperties loginServerProperties, final SpringAkkaExtension ext) {
+    public LoginServerConfiguration(final LoginServerProperties loginServerProperties, final AkkaProperties akkaProperties, final SpringAkkaExtension ext) {
         this.loginServerProperties = loginServerProperties;
+        this.akkaProperties = akkaProperties;
         this.ext = ext;
     }
 
@@ -76,7 +79,7 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     }
 
     private Config akkaConfiguration() {
-        return ConfigFactory.load(loginServerProperties.getAkka().getConfig());
+        return ConfigFactory.load(akkaProperties.getConfig());
     }
 
     @Bean
