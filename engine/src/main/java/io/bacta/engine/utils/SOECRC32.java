@@ -22,7 +22,7 @@ package io.bacta.engine.utils;
 
 public class SOECRC32 {
 
-    private static int[] crc_table = new int[]{
+    private static int[] crcTable = new int[]{
             0x0000000,
             0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B,
             0x1A864DB2, 0x1E475005, 0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6,
@@ -76,49 +76,31 @@ public class SOECRC32 {
             0x933EB0BB, 0x97FFAD0C, 0xAFB010B1, 0xAB710D06, 0xA6322BDF,
             0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4,
     };
-       /* for (int i = 0; i < 256; i++)
-        {
-            UInt32 entry = (UInt32)i;
-            for (int j = 0; j < 8; j++)
-                if ((entry & 1) == 1)
-                    entry = (entry >> 1) ^ polynomial;
-                else
-                    entry = entry >> 1;
-            createTable[i] = entry;
-        }*/
 
-//
-//
-//        return createTable;
-//    }
+    private SOECRC32() { }
 
-    private SOECRC32() {
-
-    }
-
-    static public final int Null = SOECRC32.hashCode("");
-    static public final int Init = 0xFFFFFFFF;
+    public static final int NULL = SOECRC32.hashCode("");
+    private static final int INIT = 0xFFFFFFFF;
 
 
-    static public int hashCode(String value) {
+    public static int hashCode(String value) {
         return SOECRC32.hashCode(value.getBytes());
     }
 
-    static public int hashCode(byte[] bytes) {
-        return SOECRC32.updateBytesStatic(Init, bytes, 0, bytes.length);
+    public static int hashCode(byte[] bytes) {
+        return SOECRC32.updateBytesStatic(bytes, 0, bytes.length);
     }
 
-    static private int updateBytesStatic(int seed, byte[] buffer, int off, int len) {
-        int crc = Init;// seed;
+    private static int updateBytesStatic(byte[] buffer, int off, int len) {
+        int crc = INIT;
 
         for (int i = off; i < len; i++) {
-            //crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
-            crc = crc_table[buffer[i] ^ (crc >>> 24)] ^ (crc << 8);
+            crc = crcTable[buffer[i] & 0xff ^ (crc >>> 24)] ^ (crc << 8);
         }
         return ~crc;
     }
 
     public static int[] getCRC32Table() {
-        return crc_table;
+        return crcTable;
     }
 }

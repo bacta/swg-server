@@ -72,17 +72,12 @@ final class NettyUdpServer implements Runnable {
 	        b.option(ChannelOption.SO_RCVBUF, 768)
 				.option(ChannelOption.SO_SNDBUF, 768)
 				.option(ChannelOption.SO_BROADCAST, true)
-
-                //.option(ChannelOption.ALLOCATOR, Unpooled.DEFAULT)
                     .handler(new ChannelInitializer<DatagramChannel>() {
 
                         @Override
-                        protected void initChannel(DatagramChannel ch)
-                                throws Exception {
-
+                        protected void initChannel(DatagramChannel ch) {
                             ch.pipeline().addLast(handlers);
                         }
-
                     });
             
             if(port != 0) {
@@ -98,6 +93,7 @@ final class NettyUdpServer implements Runnable {
 			
 		} catch (InterruptedException e) {
             LOGGER.info("Receiver Closing: {}", channel.toString());
+            Thread.currentThread().interrupt();
         } finally {
             if (b != null) {
                 b.group().shutdownGracefully();
@@ -111,7 +107,7 @@ final class NettyUdpServer implements Runnable {
     }
 
     @PreDestroy
-    public void destroy() throws Exception {
+    public void destroy(){
         channel.close();
     }
 

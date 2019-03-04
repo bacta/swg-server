@@ -36,7 +36,7 @@ import java.util.Observable;
 
 public final class TcpClient extends Observable {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(TcpClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TcpClient.class);
 
     @Getter
 	private final InetSocketAddress remoteAddress;
@@ -58,36 +58,33 @@ public final class TcpClient extends Observable {
 
         LOGGER.info("Connecting to {}", remoteAddress);
 
-        final Thread tcpThread = new Thread(new Runnable() {
+        final Thread tcpThread = new Thread(() -> {
 
-            @Override
-            public void run() {
+            try {
+                Bootstrap b = new Bootstrap(); // (1)
+                b.group(workerGroup); // (2)
+                b.channel(NioSocketChannel.class); // (3)
+                b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+                b.handler(handler);
 
-                try {
-                    Bootstrap b = new Bootstrap(); // (1)
-                    b.group(workerGroup); // (2)
-                    b.channel(NioSocketChannel.class); // (3)
-                    b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-                    b.handler(handler);
-
-                    // Start the client.
-                    ChannelFuture f = b.connect(remoteAddress); // (5)
-
-                    update();
-                    notifyObservers(TcpServer.Status.CONNECTED);
-                    // Wait until the soe is closed.
-                    f.channel().closeFuture().sync();
-
-                } catch (InterruptedException e) {
-                    LOGGER.error("Interrupted", e);
-                } finally {
-                    workerGroup.shutdownGracefully();
-                }
+                // Start the client.
+                ChannelFuture f = b.connect(remoteAddress); // (5)
 
                 update();
-                notifyObservers(TcpServer.Status.DISCONNECTED);
-                LOGGER.info("Connection to {} closed", remoteAddress);
+                notifyObservers(TcpServer.Status.CONNECTED);
+                // Wait until the soe is closed.
+                f.channel().closeFuture().sync();
+
+            } catch (InterruptedException e) {
+                LOGGER.error("Interrupted", e);
+                Thread.currentThread().interrupt();
+            } finally {
+                workerGroup.shutdownGracefully();
             }
+
+            update();
+            notifyObservers(TcpServer.Status.DISCONNECTED);
+            LOGGER.info("Connection to {} closed", remoteAddress);
         });
         tcpThread.start();
     }

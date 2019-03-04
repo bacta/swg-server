@@ -53,14 +53,11 @@ import java.util.concurrent.Executor;
 @EnableScheduling
 public class LoginServerConfiguration implements SchedulingConfigurer {
 
-    private final LoginServerProperties loginServerProperties;
     private final AkkaProperties akkaProperties;
     private final SpringAkkaExtension ext;
-    private ActorSystem actorSystem;
 
     @Inject
-    public LoginServerConfiguration(final LoginServerProperties loginServerProperties, final AkkaProperties akkaProperties, final SpringAkkaExtension ext) {
-        this.loginServerProperties = loginServerProperties;
+    public LoginServerConfiguration(final AkkaProperties akkaProperties, final SpringAkkaExtension ext) {
         this.akkaProperties = akkaProperties;
         this.ext = ext;
     }
@@ -69,7 +66,7 @@ public class LoginServerConfiguration implements SchedulingConfigurer {
     @Bean
     public ActorSystem getActorSystem(final ApplicationContext context){
         // Create an Akka system
-        actorSystem = ActorSystem.create(ActorConstants.LOGIN_SUPERVISOR, akkaConfiguration());
+        ActorSystem actorSystem = ActorSystem.create(ActorConstants.LOGIN_SUPERVISOR, akkaConfiguration());
         ext.initialize(context);
 
         // Start root actors

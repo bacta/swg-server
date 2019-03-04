@@ -254,7 +254,7 @@ public final class DataTableColumnType {
                 if (value.length() > 0)
                     return String.valueOf(SOECRC32.hashCode(value));
 
-                return String.valueOf(SOECRC32.Null);
+                return String.valueOf(SOECRC32.NULL);
 
             case Enum:
                 return String.valueOf(lookupEnum(value));

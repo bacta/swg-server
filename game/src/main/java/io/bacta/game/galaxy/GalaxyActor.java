@@ -12,14 +12,12 @@ import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.name.NameValidatorServiceActor;
 import io.bacta.game.player.PlayerCreationSupervisor;
 import io.bacta.game.universe.ChatSupervisor;
-import io.bacta.shared.MemberConstants;
 import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Optional;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -59,16 +57,6 @@ public class GalaxyActor extends AbstractActor {
     }
 
     @Override
-    public void preRestart(Throwable reason, Optional<Object> message) throws Exception {
-        super.preRestart(reason, message);
-    }
-
-    @Override
-    public void postStop() throws Exception {
-        super.postStop();
-    }
-
-    @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(ClusterEvent.MemberUp.class, this::memberUp)
@@ -82,26 +70,14 @@ public class GalaxyActor extends AbstractActor {
 
     private void memberUp(ClusterEvent.MemberUp message) {
         log.info("Member is Up: {} with Roles {}", message.member(), message.member().getRoles());
-
-        if (message.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-
-        }
     }
 
     private void unreachableMember(ClusterEvent.UnreachableMember message) {
         log.info("Member is Unreachable: {} with Roles {}", message.member(), message.member().getRoles());
-
-        if (message.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-
-        }
     }
 
     private void memberRemoved(ClusterEvent.MemberRemoved message) {
         log.info("Member is removed: {} with Roles {}", message.member(), message.member().getRoles());
-
-        if (message.member().hasRole(MemberConstants.CONNECTION_SERVER)) {
-
-        }
     }
 
     private void stringReceived(String s) {

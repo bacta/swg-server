@@ -75,6 +75,7 @@ public final class TcpServer extends Observable {
 
             } catch (InterruptedException e) {
                 LOGGER.error(e.getMessage());
+                Thread.currentThread().interrupt();
             } finally {
                 stop();
             }
@@ -98,7 +99,7 @@ public final class TcpServer extends Observable {
         setChanged();
     }
 
-    public static enum Status {
+    public enum Status {
         CONNECTED,DISCONNECTED
     }
 }

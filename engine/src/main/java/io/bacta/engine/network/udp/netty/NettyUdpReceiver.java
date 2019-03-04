@@ -49,7 +49,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
     private final NettyUdpHandler udpHandler;
     private final NettyUdpServer udpServer;
 
-	public NettyUdpReceiver(final InetAddress bindAddress,
+	NettyUdpReceiver(final InetAddress bindAddress,
                             final int bindPort,
                             final UdpMetrics metrics,
                             final Consumer<ChannelHandlerContext> channelHandlerContextConsumer,
@@ -74,10 +74,11 @@ public final class NettyUdpReceiver implements UdpReceiver {
 
             } catch (InterruptedException e) {
                LOGGER.error("Somehow, this was interrupted");
+                Thread.currentThread().interrupt();
             }
 
             if(attempts > 50) {
-                throw new RuntimeException("Unable to start");
+                throw new UnableToStartReceiverException("Unable to start");
             }
         }
     }
@@ -93,7 +94,7 @@ public final class NettyUdpReceiver implements UdpReceiver {
         return udpHandler.isRegistered();
     }
 
-    public void destroy() throws Exception {
+    public void destroy() {
         thread.interrupt();
     }
 
