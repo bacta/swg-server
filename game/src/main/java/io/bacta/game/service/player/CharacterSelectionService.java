@@ -1,8 +1,6 @@
 package io.bacta.game.service.player;
 
-import io.bacta.game.message.CmdStartScene;
-import io.bacta.game.message.ParametersMessage;
-import io.bacta.game.message.ServerTimeMessage;
+import io.bacta.game.message.*;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.scene.SceneService;
 import io.bacta.game.service.guild.GuildService;
@@ -73,6 +71,41 @@ public final class CharacterSelectionService {
 
         //Send creates and baselines for all the creatures objects.
         //playerCreature.sendCreateAndBaselinesTo(Collections.singleton(context));
+
+
+        //TODO: Remove hack, actually implement
+        SceneCreateObjectByCrc msg = new SceneCreateObjectByCrc(
+                playerCreature.getNetworkId(),
+                playerCreature.getTransformObjectToWorld(),
+                0xffffbbe9,
+                false
+        );
+        context.sendMessage(msg);
+
+
+        UpdateContainmentMessage link = new UpdateContainmentMessage(playerCreature.getNetworkId(), 0, 4);
+        context.sendMessage(link);
+
+        SceneCreateObjectByCrc msg2 = new SceneCreateObjectByCrc(
+                playerCreature.getNetworkId() + 1,
+                playerCreature.getTransformObjectToWorld(),
+                0x619BAE21,
+                false
+        );
+        context.sendMessage(msg2);
+
+        UpdateContainmentMessage link2 = new UpdateContainmentMessage(playerCreature.getNetworkId() + 1, playerCreature.getNetworkId(), 4);
+        context.sendMessage(link2);
+
+        SceneEndBaselines close2 = new SceneEndBaselines(playerCreature.getNetworkId() + 1);
+        context.sendMessage(close2);
+
+        SceneEndBaselines close = new SceneEndBaselines(playerCreature.getNetworkId());
+        context.sendMessage(close);
+
+        CmdSceneReady ready = new CmdSceneReady();
+        context.sendMessage(ready);
+
     }
 
 

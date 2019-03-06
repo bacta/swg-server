@@ -22,6 +22,7 @@ package io.bacta.soe.network.handler;
 
 import gnu.trove.map.TIntObjectMap;
 import io.bacta.engine.utils.SOECRC32;
+import io.bacta.game.MessageId;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.context.SoeSessionContext;
@@ -72,14 +73,14 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
     @Override
     public void handle(final SoeRequestContext context, final GameNetworkMessage gameNetworkMessage) {
 
-        final GameNetworkMessageControllerData controllerData = controllers.get(SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName()));
+        final GameNetworkMessageControllerData controllerData = getControllerData(gameNetworkMessage);
 
         if (controllerData != null) {
             SoeSessionContext sessionContext = context.getSessionContext();
             if (!controllerData.containsRoles(sessionContext.getRoles())) {
                 LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
                 LOGGER.error("Connection: {}", context.toString());
-                throw new RuntimeException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + sessionContext.getRemoteAddress());
+                throw new UnauthorizedControllerAccessException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + sessionContext.getRemoteAddress());
             }
 
             try {
@@ -102,12 +103,36 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
         }
     }
 
+    /**
+     * Get controller data, check CRC override
+     * @param gameNetworkMessage Message to get controller for
+     * @return GameControllerData
+     */
+    private GameNetworkMessageControllerData getControllerData(GameNetworkMessage gameNetworkMessage) {
+        GameNetworkMessageControllerData controllerData = controllers.get(SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName()));
+        if(controllerData == null) {
+            if(gameNetworkMessage.getClass().getAnnotation(MessageId.class) != null) {
+                controllerData = controllers.get(gameNetworkMessage.getClass().getAnnotation(MessageId.class).value());
+            }
+        }
+        return controllerData;
+    }
+
     protected void handleMissingController(final GameNetworkMessage gameNetworkMessage) {
 
-        if(gameNetworkMessageTemplateWriter == null) {
-            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", gameNetworkMessage.getClass().getSimpleName(), SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName()));
-            return;
-        }
+ //       if(gameNetworkMessageTemplateWriter == null) {
+            int hash;
+            if(gameNetworkMessage.getClass().getAnnotation(MessageId.class) != null) {
+                hash = gameNetworkMessage.getClass().getAnnotation(MessageId.class).value();
+            } else {
+                hash = SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName());
+            }
+
+            LOGGER.error("Unhandled SWG Message: '{}' 0x{}",
+                    gameNetworkMessage.getClass().getSimpleName(),
+                    Integer.toHexString(hash));
+ //           return;
+ //       }
 
         // TODO: Re-add class generation
 //        if (gameNetworkMessage.getClass().isAssignableFrom(ObjControllerMessage.class)) {

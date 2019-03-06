@@ -28,7 +28,7 @@ public final class LoginUpdaterTask {
 
     @Scheduled(initialDelay = UPDATE_INTERVAL, fixedRate = UPDATE_INTERVAL)
     private void updateGalaxyStatus() throws UnsupportedEncodingException {
-        LOGGER.info("Updating login with current status.");
+        LOGGER.debug("Updating login with current status.");
 
         final int timeZone = ZonedDateTime.now().getOffset().getTotalSeconds();
 

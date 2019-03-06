@@ -1,6 +1,7 @@
 package io.bacta.soe.network.protocol;
 
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.message.SoeMessageType;
 
 import java.nio.ByteBuffer;
 
@@ -9,5 +10,5 @@ import java.nio.ByteBuffer;
  */
 public interface SoeProtocolHandler {
     ByteBuffer processOutgoing(SoeUdpConnection sender, ByteBuffer buffer);
-    ByteBuffer processIncoming(SoeUdpConnection sender, ByteBuffer buffer);
+    ByteBuffer processIncoming(SoeUdpConnection sender, ByteBuffer buffer, SoeMessageType packetType);
 }

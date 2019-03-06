@@ -58,3 +58,9 @@ logging:
       typesafe:
         akka: INFO
     akka: INFO
+#    io:
+#      bacta:
+#        soe:
+#          network:
+#            connection: DEBUG
+#            controller: TRACE

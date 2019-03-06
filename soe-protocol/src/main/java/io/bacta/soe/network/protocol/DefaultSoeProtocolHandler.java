@@ -83,8 +83,7 @@ public final class DefaultSoeProtocolHandler implements SoeProtocolHandler {
      * @param buffer
      */
     @Override
-    public ByteBuffer processIncoming(SoeUdpConnection soeUdpConnection, ByteBuffer buffer) {
-        SoeMessageType packetType = SoeMessageType.values()[buffer.get(1)];
+    public ByteBuffer processIncoming(SoeUdpConnection soeUdpConnection, ByteBuffer buffer, SoeMessageType packetType) {
 
         ByteBuffer decodedBuffer;
         if (packetType != SoeMessageType.cUdpPacketConnect && packetType != SoeMessageType.cUdpPacketConfirm && packetType != SoeMessageType.cUdpPacketUnreachableConnection) {

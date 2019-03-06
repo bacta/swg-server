@@ -96,11 +96,14 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
     @Override
     public void receiveMessage(final InetSocketAddress sender, final ByteBuffer message) {
 
-        byte type = message.get(1);
+        byte type = message.get(0);
+        if(type == 0) {
+            type = message.get(1);
+        }
 
-        SoeMessageType packetType = SoeMessageType.values()[type];
+        if (type > 0 && type <= 0x1E) {
 
-        if (type <= 0x1E) {
+            SoeMessageType packetType = SoeMessageType.values()[type];
 
             SoeUdpConnection connection;
 
@@ -115,7 +118,7 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
 
                 SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
-                ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message);
+                ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message, packetType);
                 ByteBuffer processedMessage = incomingMessageProcessor.processIncomingProtocol(decodedMessage);
 
                 if (processedMessage != null) {
@@ -125,6 +128,8 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
             } else {
                 LOGGER.debug("Unsolicited Message from {}: {}", sender, BufferUtil.bytesToHex(message));
             }
+        } else {
+            LOGGER.error("Unhandled Message from {}: {}", sender, BufferUtil.bytesToHex(message));
         }
     }
 
@@ -157,58 +162,59 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
     public void run() {
         long nextIteration = 0;
 
-        try {
-
-            while (true) {
-
+        boolean run = true;
+        while (run) {
+            try {
                 long currentTime = System.currentTimeMillis();
 
                 if (nextIteration > currentTime) {
                     Thread.sleep(nextIteration - currentTime);
                 }
 
-                try {
+                nextIteration = currentTime + networkConfiguration.getNetworkThreadSleepTimeMs();
+                sendPendingMessages();
 
-                    nextIteration = currentTime + networkConfiguration.getNetworkThreadSleepTimeMs();
-                    sendPendingMessages();
-
-                } catch (Exception e) {
-                    LOGGER.error("Unknown", e);
-                }
+            } catch (InterruptedException e) {
+                run = false;
+                LOGGER.info("Shutting down", e);
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            LOGGER.info("Shutting down");
         }
     }
 
     private void sendPendingMessages() {
 
-        final Set<InetSocketAddress> connectionList = connectionCache.asMap().keySet();
-        final List<InetSocketAddress> deadClients = new ArrayList<>();
+        try {
+            final Set<InetSocketAddress> connectionList = connectionCache.asMap().keySet();
+            final List<InetSocketAddress> deadClients = new ArrayList<>();
 
-        for (InetSocketAddress inetSocketAddress : connectionList) {
-            final SoeUdpConnection connection = connectionCache.getIfPresent(inetSocketAddress);
+            for (InetSocketAddress inetSocketAddress : connectionList) {
+                final SoeUdpConnection connection = connectionCache.getIfPresent(inetSocketAddress);
 
-            if (connection == null) {
-                continue;
+                if (connection == null) {
+                    continue;
+                }
+
+                if (connection.getConnectionState() == ConnectionState.DISCONNECTED) {
+                    deadClients.add(inetSocketAddress);
+                }
+
+                final List<ByteBuffer> messages = connection.getPendingMessages();
+                if (messages.isEmpty()) {
+                    sendQueueSizes.update(messages.size());
+                }
+
+                for (final ByteBuffer message : messages) {
+                    sendMessage(connection, message);
+                }
             }
 
-            if (connection.getConnectionState() == ConnectionState.DISCONNECTED) {
-                deadClients.add(inetSocketAddress);
+            for (InetSocketAddress inetSocketAddress : deadClients) {
+                connectionCache.invalidate(inetSocketAddress);
             }
 
-            final List<ByteBuffer> messages = connection.getPendingMessages();
-            if(messages.isEmpty()) {
-                sendQueueSizes.update(messages.size());
-            }
-
-            for (final ByteBuffer message : messages) {
-                sendMessage(connection, message);
-            }
-        }
-
-        for (InetSocketAddress inetSocketAddress : deadClients) {
-            connectionCache.invalidate(inetSocketAddress);
+        } catch (Exception e) {
+            LOGGER.error("Unknown", e);
         }
     }
 }

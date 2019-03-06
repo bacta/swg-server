@@ -22,6 +22,7 @@ package io.bacta.soe.serialize;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
+import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.engine.utils.SOECRC32;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
@@ -162,8 +163,9 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
     public <T extends GameNetworkMessage> T readFromBuffer(int gameMessageType, final ByteBuffer buffer) {
         final Constructor<? extends GameNetworkMessage> messageConstructor = messageConstructorMap.get(gameMessageType);
 
-        if (messageConstructor == null)
-            throw new GameNetworkMessageTypeNotFoundException(gameMessageType);
+        if (messageConstructor == null) {
+            throw new GameNetworkMessageTypeNotFoundException(gameMessageType, BufferUtil.bytesToHex(buffer));
+        }
 
         final T message = create(messageConstructor, buffer);
 

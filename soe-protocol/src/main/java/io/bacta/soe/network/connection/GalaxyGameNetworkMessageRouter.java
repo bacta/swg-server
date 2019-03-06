@@ -45,7 +45,7 @@ public class GalaxyGameNetworkMessageRouter extends AbstractActor {
         this.dispatcher = dispatcher;
         this.ext = ext;
         this.clientCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .expireAfterAccess(20, TimeUnit.MINUTES)
                 .removalListener((RemovalListener<InetSocketAddress, ActorRef>) removalNotification -> {
                     publisher.publishEvent(new DisconnectEvent(removalNotification.getKey()));
                     removalNotification.getValue().tell(PoisonPill.getInstance(), ActorRef.noSender());
