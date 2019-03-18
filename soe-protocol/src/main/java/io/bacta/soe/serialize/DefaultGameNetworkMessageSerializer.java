@@ -29,7 +29,10 @@ import io.bacta.game.MessageQueueData;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.Priority;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.soe.util.ClientString;
+import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import io.bacta.soe.util.MessageHashUtil;
+import io.bacta.soe.util.SoeMessageUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
@@ -37,9 +40,6 @@ import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -58,19 +58,22 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer, ApplicationContextAware {
+public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;
     private final IntObjectHashMap<Constructor<? extends GameNetworkMessage>> messageConstructorMap;
     private final Map<Class<? extends GameNetworkMessage>, MessageData> messageDataMap;
     private final Histogram histogram;
 
-    private ApplicationContext context;
+    private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
     @Inject
-    public DefaultGameNetworkMessageSerializer(final MetricRegistry metricRegistry, final ObjControllerMessageSerializer objControllerMessageSerializer) {
+    public DefaultGameNetworkMessageSerializer(final MetricRegistry metricRegistry,
+                                               final ObjControllerMessageSerializer objControllerMessageSerializer,
+                                               final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
 
         this.objControllerMessageSerializer = objControllerMessageSerializer;
+        this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
         this.histogram = metricRegistry.histogram("GameNetworkMessageBufferAllocations");
         this.messageDataMap = new HashMap<>();
         this.messageConstructorMap = new IntObjectHashMap<>();
@@ -164,6 +167,7 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
         final Constructor<? extends GameNetworkMessage> messageConstructor = messageConstructorMap.get(gameMessageType);
 
         if (messageConstructor == null) {
+            generateMessageAndController(gameMessageType, buffer);
             throw new GameNetworkMessageTypeNotFoundException(gameMessageType, BufferUtil.bytesToHex(buffer));
         }
 
@@ -180,9 +184,12 @@ public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSe
         return message;
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
+    private void generateMessageAndController(int gameMessageType, ByteBuffer buffer) {
+        short priority = buffer.get(0);
+        final String propertyName = Integer.toHexString(gameMessageType);
+        gameNetworkMessageTemplateWriter.createGameNetworkMessageFiles(priority, gameMessageType, buffer);
+        LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
+        LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
     }
 
     @Getter

@@ -27,6 +27,7 @@ import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.network.controller.ConnectionRolesAllowed;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.controller.MessageHandled;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 @Component
 @MessageHandled(handles = LoginClientId.class)
 @ConnectionRolesAllowed({})
+@Slf4j
 public class LoginClientIdController implements GameNetworkMessageController<SoeRequestContext, LoginClientId> {
     private final ClientService clientService;
 

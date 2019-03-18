@@ -10,11 +10,15 @@ import io.bacta.game.message.object.CommandQueueEnqueue;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.service.object.ServerObjectService;
 import io.bacta.soe.context.SoeRequestContext;
+import io.bacta.soe.util.CommandNames;
+import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
+import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.nio.ByteBuffer;
 import java.util.ResourceBundle;
 
 /**
@@ -30,12 +34,15 @@ public final class CommandQueueDispatcher {
     private final ServerObjectService serverObjectService;
     private final TIntObjectMap<String> knownCommandNames;
     private final TIntObjectMap<CommandQueueController> controllers;
+    private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
     @Inject
     public CommandQueueDispatcher(final ApplicationContext context,
-                                  final ServerObjectService serverObjectService) {
+                                  final ServerObjectService serverObjectService,
+                                  final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
         this.context = context;
         this.serverObjectService = serverObjectService;
+        this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
         this.knownCommandNames = new TIntObjectHashMap<>();
         this.controllers = new TIntObjectHashMap<>();
 
@@ -97,10 +104,18 @@ public final class CommandQueueDispatcher {
             final ServerObject target = serverObjectService.get(data.getTargetId());
             controller.handleCommand(context, actor, target, data.getParams());
         } else {
+            generateMessageAndController(data);
             LOGGER.error("No controller loaded to handle CommandQueueController for command '{}'(0x{}).",
                     knownCommandNames.get(data.getCommandHash()),
                     Integer.toHexString(data.getCommandHash()));
-            //TODO: Velocity Engine generate template.
         }
+    }
+
+    private void generateMessageAndController(CommandQueueEnqueue data) {
+        ByteBuffer buffer = ByteBuffer.allocate(1000);
+        data.writeToBuffer(buffer);
+        gameNetworkMessageTemplateWriter.createCommandFiles(data, buffer);
+        LOGGER.error("Unhandled Command Controller: '{}'", CommandNames.get(data.getCommandHash()));
+        LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
     }
 }

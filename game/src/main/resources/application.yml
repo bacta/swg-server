@@ -20,6 +20,10 @@
 spring:
   jmx:
     default-domain: agentservice
+  profiles:
+      active:
+        - Galaxy
+        - dev
 
 endpoints:
   jmx:

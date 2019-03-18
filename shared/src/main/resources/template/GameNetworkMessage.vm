@@ -1,9 +1,10 @@
 package $packageName;
 
-import com.ocdsoft.bacta.soe.message.GameNetworkMessage;
-import com.ocdsoft.bacta.soe.util.SOECRC32;
+import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.game.Priority;
+import io.bacta.shared.GameNetworkMessage;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import com.ocdsoft.bacta.soe.message.Priority;
 
 import java.nio.ByteBuffer;
 
@@ -12,6 +13,7 @@ import java.nio.ByteBuffer;
   $messageSimpleName; // $opcode
   */
 @Getter
+@AllArgsConstructor
 @Priority($priority)
 public final class $messageName extends GameNetworkMessage {
 

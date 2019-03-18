@@ -12,6 +12,7 @@ import io.bacta.soe.network.message.SoeMessageType
 import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
 import io.bacta.soe.serialize.ObjControllerMessageSerializer
+import io.bacta.soe.util.GameNetworkMessageTemplateWriter
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -52,7 +53,7 @@ abstract class MessageProcessingBase extends Specification {
         def objSerializer = new ObjControllerMessageSerializer()
         objSerializer.loadMessages()
 
-        serializer = new DefaultGameNetworkMessageSerializer(metrics, objSerializer)
+        serializer = new DefaultGameNetworkMessageSerializer(metrics, objSerializer, Mock(GameNetworkMessageTemplateWriter))
         serializer.loadMessages()
 
         processor = Mock(GameNetworkMessageProcessor) {
@@ -88,12 +89,6 @@ abstract class MessageProcessingBase extends Specification {
         def groupController = new GroupMessageController(soeMessageRouter)
 
         controllers.put(SoeMessageType.cUdpPacketGroup, groupController)
-
-        def objSerializer = new ObjControllerMessageSerializer()
-        objSerializer.loadMessages()
-
-        def serializer = new DefaultGameNetworkMessageSerializer(Mock(MetricRegistry), objSerializer)
-        serializer.loadMessages()
 
         def zeroController = new ZeroEscapeController(serializer)
 

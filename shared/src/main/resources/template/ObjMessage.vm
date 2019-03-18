@@ -1,20 +1,27 @@
 package $packageName;
 
 import java.nio.ByteBuffer;
-import com.ocdsoft.bacta.swg.server.game.message.object.ObjControllerMessage;
+import io.bacta.game.GameControllerMessage;
+import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.MessageQueueData;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@MessageId(0x${controllerid})
-public class $messageName extends ObjControllerMessage {
+/**
+$messageStruct
+*/
+
+@Getter
+@AllArgsConstructor
+@GameControllerMessage(GameControllerMessageType.$type)
+public final class $messageName implements MessageQueueData {
 
     public $messageName(final ByteBuffer buffer) {
-        super(buffer);
+
     }
 
     @Override
     public void writeToBuffer(final ByteBuffer buffer) {
     
     }
-    /**
-     $messageStruct
-     */
 }

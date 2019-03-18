@@ -21,61 +21,45 @@
 package io.bacta.soe.util;
 
 import io.bacta.engine.utils.SOECRC32;
+import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.message.object.CommandQueueEnqueue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 /**
  * Created by kburkhardt on 1/31/15.
  */
 @Slf4j
-@Component
-public final class GameNetworkMessageTemplateWriter implements ApplicationContextAware {
+public class GameNetworkMessageTemplateWriter {
 
     private final VelocityEngine ve;
 
-    private final String controllerClassPath;
-    private final String controllerFilePath;
+    private String controllerPackageName;
+    private Path controllerFilePath;
 
-    private final String messageFilePath;
-    private final String messageClassPath;
+    private String messagePackageName;
+    private Path messageFilePath;
 
-    private final String objControllerClassPath;
-    private final String objControllerFilePath;
+    private String objControllerPackageName;
+    private Path objControllerFilePath;
 
-    private final String objMessageFilePath;
-    private final String objMessageClassPath;
+    private String objMessagePackageName;
+    private Path objMessageFilePath;
 
-    private final String commandControllerClassPath;
-    private final String commandControllerFilePath;
+    private String commandControllerPackage;
+    private Path commandControllerFilePath;
 
-    private final String commandMessageFilePath;
-    private final String commandMessageClassPath;
-
-    private final String tangibleClassPath;
-
-    //@Value("${io.bacta.network.template.path}")
-    private final String baseMessagePath;
-
-    @Inject
-    public GameNetworkMessageTemplateWriter(@Value("${io.bacta.network.template.path}") String baseMessagePath) {
-
-        //baseMessagePath = "";
-        this.baseMessagePath = baseMessagePath;
+    public GameNetworkMessageTemplateWriter() {
 
         ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, LOGGER);
@@ -84,32 +68,31 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
         ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_CACHE, "true");
         ve.init();
+    }
 
-        final String fs = System.getProperty("file.separator");
-        final String basePath = System.getProperty("user.dir");
-        final String javaSource = "src" + fs + "main" + fs + "java";
+    public void setControllerInfo(final Path filePath, final String packageName) {
+        controllerPackageName = packageName;
+        controllerFilePath = filePath;
+    }
 
-        controllerClassPath = "io.bacta.game.controllers";
-        controllerFilePath = basePath + fs + "game" + fs + javaSource + fs +
-                controllerClassPath.replace(".", fs) + fs;
-        
-        messageClassPath = "io.bacta.game.message";
-        messageFilePath = basePath + fs + "shared" + fs + javaSource + fs +
-                messageClassPath.replace(".", fs) + fs;
+    public void setMessagePackage(final Path filePath, final String packageName) {
+        messagePackageName = packageName;
+        messageFilePath = filePath;
+    }
 
-        tangibleClassPath = "io.bacta.game.object.tangible.TangibleObject";
+    public void setObjectControllerInfo(final Path filePath, final String packageName) {
+        objControllerPackageName = packageName;
+        objControllerFilePath = filePath;
+    }
 
-        objControllerClassPath = controllerClassPath  + ".object";
-        objControllerFilePath = controllerFilePath + fs + "object" + fs;
+    public void setObjMessagePackage(final Path filePath, final String packageName) {
+        objMessagePackageName = packageName;
+        objMessageFilePath = filePath;
+    }
 
-        objMessageClassPath = messageClassPath + ".object";
-        objMessageFilePath = messageFilePath + fs + "object" + fs;
-
-        commandControllerClassPath = objControllerClassPath + ".command";
-        commandControllerFilePath = objControllerFilePath + fs + "command" + fs;
-
-        commandMessageClassPath = objMessageClassPath + ".command";
-        commandMessageFilePath = objMessageFilePath + fs + "command" + fs;
+    public void setCommandControllerInfo(final Path filePath, final String packageName) {
+        commandControllerPackage = packageName;
+        commandControllerFilePath = filePath;
     }
 
     public void createGameNetworkMessageFiles(short priority, int opcode, ByteBuffer buffer) {
@@ -117,18 +100,26 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         String messageName = ClientString.get(opcode);
         
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown message opcode: 0x" + Integer.toHexString(opcode));
             return;
         }
 
-        writeGameNetworkMessage(opcode, priority, messageName, buffer);
-        writeGameNetworkController(messageName);
+        if(messageFilePath == null || controllerFilePath == null ||
+                messagePackageName == null || controllerPackageName == null) {
+            LOGGER.error("Unable to create GameNetworkMessage files, paths not configured");
+            return;
+        }
+
+        if(!messageName.equalsIgnoreCase("ObjControllerMessage")) {
+            writeGameNetworkMessage(opcode, priority, messageName, buffer);
+            writeGameNetworkController(messageName);
+        }
     }
 
     private void writeGameNetworkMessage(int opcode, short priority, String messageName, ByteBuffer buffer)  {
 
-        String outFileName = messageFilePath + messageName + ".java";
-        File file = new File(outFileName);
+        Path newMessagePath = messageFilePath.resolve(messageName + ".java");
+        File file = newMessagePath.toFile();
         if(file.exists()) {
             LOGGER.debug("'{}' already exists", messageName);
             return;
@@ -138,7 +129,7 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
         VelocityContext context = new VelocityContext();
 
-        context.put("packageName", messageClassPath);
+        context.put("packageName", messagePackageName);
         context.put("messageName", messageName);
 
         if(SOECRC32.hashCode(messageName) == opcode) {
@@ -154,17 +145,15 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         context.put("opcode", "0x" + Integer.toHexString(opcode));
 
         /* lets render a template */
-        writeTemplate(outFileName, context, template);
+        writeTemplate(file, context, template);
     }
     
     private void writeGameNetworkController(String messageName) {
 
-        String className = messageName + "Controller";
-        
-        String outFileName = controllerFilePath + className + ".java";
-        File file = new File(outFileName);
+        Path newMessagePath = controllerFilePath.resolve(messageName + "Controller.java");
+        File file = newMessagePath.toFile();
         if(file.exists()) {
-            LOGGER.debug("'" + className + "' already exists");
+            LOGGER.debug("'" + messageName + "Controller' already exists");
             return;
         }
 
@@ -172,33 +161,48 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
         VelocityContext context = new VelocityContext();
 
-        context.put("packageName", controllerClassPath);
-        context.put("messageClasspath", messageClassPath);
+        context.put("packageName", controllerPackageName);
+        context.put("messageClasspath", messagePackageName);
         context.put("messageName", messageName);
         context.put("messageNameClass", messageName + ".class");
-        context.put("className", className);
+        context.put("className", messageName + "Controller");
 
         /* lets render a template */
-        writeTemplate(outFileName, context, template);
+        writeTemplate(file, context, template);
     }
 
-    public void createObjFiles(int opcode, ByteBuffer buffer) {
+    public void createObjFiles(GameControllerMessageType type, ByteBuffer buffer) {
 
-        String messageName = ObjectControllerNames.get(opcode);
+        String typeName = type.name();
+        String[] nameParts = typeName.split("_");
+        StringBuilder messageNameBuilder = new StringBuilder();
+        for(int i = 0; i < nameParts.length; ++i) {
+            String part = nameParts[i].toLowerCase();
+            part = part.substring(0, 1).toUpperCase() + part.substring(1, part.length());
+            messageNameBuilder.append(part);
+        }
+
+        String messageName = messageNameBuilder.toString();
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(opcode));
+            LOGGER.error("Unknown obj message opcode: 0x" + Integer.toHexString(type.value));
             return;
         }
 
-        writeObjMessage(opcode, messageName, buffer, messageName);
-        writeObjController(opcode, messageName);
+        if(objControllerPackageName == null || objControllerFilePath == null ||
+                objMessagePackageName == null || objMessageFilePath == null) {
+            LOGGER.error("Unable to create GameNetworkMessage files, paths not configured");
+            return;
+        }
+
+        writeObjMessage(type, buffer, messageName);
+        writeObjController(type, messageName);
     }
 
-    private void writeObjMessage(int opcode, String messageName, ByteBuffer buffer, String objectControllerName)  {
+    private void writeObjMessage(final GameControllerMessageType type, final ByteBuffer buffer, final String messageName)  {
 
-        String outFileName = objMessageFilePath + messageName + ".java";
-        File file = new File(outFileName);
+        Path newMessagePath = objMessageFilePath.resolve(messageName + ".java");
+        File file = newMessagePath.toFile();
         if(file.exists()) {
             LOGGER.debug("'" + messageName + "' already exists");
             return;
@@ -207,26 +211,24 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         Template template = ve.getTemplate("/template/ObjMessage.vm");
 
         VelocityContext context = new VelocityContext();
-
-        context.put("packageName", objMessageClassPath);
-        context.put("objectControllerName", objectControllerName);
-        context.put("messageName", messageName);
-        context.put("controllerid", Integer.toHexString(opcode));
-
         String messageStruct = SoeMessageUtil.makeMessageStruct(buffer);
+
+        context.put("packageName", objMessagePackageName);
         context.put("messageStruct", messageStruct);
 
+        context.put("type", type.name());
+        context.put("messageName", messageName);
+
         /* lets render a template */
-        writeTemplate(outFileName, context, template);
+        writeTemplate(file, context, template);
     }
 
-    private void writeObjController(int opcode, String messageName) {
+    private void writeObjController(GameControllerMessageType type, String messageName) {
 
-        String className = messageName + "ObjController";
-        String outFileName = objControllerFilePath + className + ".java";
-        File file = new File(outFileName);
+        Path newMessagePath = objControllerFilePath.resolve(messageName + "Controller.java");
+        File file = newMessagePath.toFile();
         if(file.exists()) {
-            LOGGER.debug("'" + className + "' already exists");
+            LOGGER.debug("'" + messageName + "Controller' already exists");
             return;
         }
 
@@ -234,86 +236,54 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
 
         VelocityContext context = new VelocityContext();
 
-        context.put("packageName", objControllerClassPath);
-        context.put("tangibleClassPath", tangibleClassPath);
-        context.put("messageClasspath", objMessageClassPath);
+        context.put("packageName", objControllerPackageName);
+        context.put("messageClasspath", objMessagePackageName);
         context.put("messageName", messageName);
-        context.put("className", className);
-        context.put("controllerid", opcode);
+        context.put("className", messageName + "Controller");
+        context.put("type", type.name());
 
         /* lets render a template */
-        writeTemplate(outFileName, context, template);
+        writeTemplate(file, context, template);
     }
 
-    public void createCommandFiles(int commandHash, ByteBuffer buffer) {
+    public void createCommandFiles(CommandQueueEnqueue data, ByteBuffer buffer) {
 
-        String messageName = CommandNames.get(commandHash);
+        String messageName = CommandNames.get(data.getCommandHash());
 
         if (messageName.isEmpty() || messageName.equalsIgnoreCase("unknown")) {
-            LOGGER.error("Unknown com.ocdsoft.bacta.swg.login.message opcode: 0x" + Integer.toHexString(commandHash));
+            LOGGER.error("Unknown command name: {}", messageName);
             return;
         }
 
-        messageName = messageName.substring(0, 1).toUpperCase() + messageName.substring(1);
+        String properName = messageName.substring(0, 1).toUpperCase() + messageName.substring(1);
 
-        writeCommandMessage(commandHash, messageName, buffer);
-        writeCommandController(commandHash, messageName);
+        writeCommandController(messageName, properName);
     }
 
-    private void writeCommandMessage(int opcode, String messageName, ByteBuffer buffer)  {
+    private void writeCommandController(String messageName, String className) {
 
-        String outFileName = commandMessageFilePath + messageName + ".java";
-        File file = new File(outFileName);
+        Path newMessagePath = commandControllerFilePath.resolve(className + "Command.java");
+        File file = newMessagePath.toFile();
         if(file.exists()) {
-            LOGGER.debug("'" + messageName + "' already exists");
+            LOGGER.debug("'" + className + "Command' already exists");
             return;
         }
 
-        Template template = ve.getTemplate("/template/CommandMessage.vm");
+        Template template = ve.getTemplate("/template/CommandController.vm");
 
         VelocityContext context = new VelocityContext();
 
-        context.put("packageName", commandMessageClassPath);
-        //context.put("objectControllerName", objectControllerName);
+        context.put("packageName", commandControllerPackage);
         context.put("messageName", messageName);
-        context.put("controllerid", Integer.toHexString(opcode));
-
-        String messageStruct = SoeMessageUtil.makeMessageStruct(buffer);
-        context.put("messageStruct", messageStruct);
+        context.put("className", className + "Command");
 
         /* lets render a template */
-        writeTemplate(outFileName, context, template);
+        writeTemplate(file, context, template);
     }
 
-    private void writeCommandController(int opcode, String messageName) {
-
-        String className = messageName + "QueueCommandController";
-
-        String outFileName = commandControllerFilePath + className + ".java";
-        File file = new File(outFileName);
-        if(file.exists()) {
-            LOGGER.debug("'" + className + "' already exists");
-            return;
-        }
-
-        Template template = ve.getTemplate("/template/QueueCommandController.vm");
-
-        VelocityContext context = new VelocityContext();
-
-        context.put("packageName", commandControllerClassPath);
-        context.put("tangibleClassPath", tangibleClassPath);
-        context.put("messageClasspath", commandMessageClassPath + "." + messageName);
-        context.put("messageName", messageName);
-        context.put("className", className);
-        context.put("controllerid", opcode);
-
-        /* lets render a template */
-        writeTemplate(outFileName, context, template);
-    }
-
-    private void writeTemplate(String outFileName, VelocityContext context, Template template) {
+    private void writeTemplate(File outFile, VelocityContext context, Template template) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(outFileName)));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
             if (!ve.evaluate(context, writer, template.getName(), "")) {
                 throw new Exception("Failed to convert the template into class.");
@@ -326,10 +296,5 @@ public final class GameNetworkMessageTemplateWriter implements ApplicationContex
         } catch(Exception e) {
             LOGGER.error("Unable to write com.ocdsoft.bacta.swg.login.message", e);
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-
     }
 }

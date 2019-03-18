@@ -33,7 +33,6 @@ import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import io.bacta.soe.network.handler.DefaultGameNetworkMessageHandler;
 import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
-import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -84,10 +83,9 @@ public class GameServerTestConfiguration {
     @Inject
     @Bean
     public GameNetworkMessageHandler getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
-                                                                     final GameNetworkMessageSerializer gameNetworkMessageSerializer,
-                                                                     final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
+                                                                     final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
 
-        return new DefaultGameNetworkMessageHandler(controllerLoader, gameNetworkMessageTemplateWriter);
+        return new DefaultGameNetworkMessageHandler(controllerLoader);
     }
 
     @Bean

@@ -24,13 +24,12 @@ package io.bacta.soe.serialize;
 import io.bacta.game.GameControllerMessage;
 import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.MessageQueueData;
+import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
+import io.bacta.soe.util.SoeMessageUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -46,13 +45,14 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public final class ObjControllerMessageSerializer implements ApplicationContextAware {
+public final class ObjControllerMessageSerializer {
 
     private final Map<GameControllerMessageType, Constructor<? extends MessageQueueData>> messageQueueDataConstructorMap;
-    private ApplicationContext context;
+    private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
 
     @Inject
-    public ObjControllerMessageSerializer() {
+    public ObjControllerMessageSerializer(final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
+        this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
         this.messageQueueDataConstructorMap = new HashMap<>();
     }
 
@@ -95,8 +95,10 @@ public final class ObjControllerMessageSerializer implements ApplicationContextA
     public MessageQueueData createMessageQueueData(final ByteBuffer buffer, final GameControllerMessageType type) {
         final Constructor<? extends MessageQueueData> messageConstructor = messageQueueDataConstructorMap.get(type);
 
-        if (messageConstructor == null)
+        if (messageConstructor == null) {
+            generateMessageAndController(type, buffer);
             throw new MessageQueueDataTypeNotFoundException(type);
+        }
 
         try {
             return messageConstructor.newInstance(buffer);
@@ -106,8 +108,9 @@ public final class ObjControllerMessageSerializer implements ApplicationContextA
         }
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
+    private void generateMessageAndController(GameControllerMessageType type, ByteBuffer buffer) {
+        gameNetworkMessageTemplateWriter.createObjFiles(type, buffer);
+        LOGGER.error("Unhandled Obj Controller: '{}'", type);
+        LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
     }
 }

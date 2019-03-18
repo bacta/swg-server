@@ -10,10 +10,20 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
+/**
+    05 00 46 5E CE 80 21 00 00 00 71 00 00 00 01 E8
+    76 48 17 00 00 00 00 00 00 00 3E 30 12 8F 01 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    80 3F 00 00 F0 C5 27 27 92 43 00 00 20 45 00 00
+    00 00 00 00 00 00 00 
+
+*/
+
 @Getter
 @AllArgsConstructor
 @GameControllerMessage(GameControllerMessageType.NET_UPDATE_TRANSFORM)
-public class DataTransform implements MessageQueueData {
+public final class NetUpdateTransform implements MessageQueueData {
+
     private final int syncStamp;
     private final int sequenceNumber;
     private final Transform transform;
@@ -21,7 +31,7 @@ public class DataTransform implements MessageQueueData {
     private final float lookAtYaw;
     private final boolean useLookAtYaw;
 
-    public DataTransform(final ByteBuffer buffer) {
+    public NetUpdateTransform(final ByteBuffer buffer) {
         syncStamp = buffer.getInt();
         sequenceNumber = buffer.getInt();
         transform = new Transform(buffer);
@@ -39,12 +49,4 @@ public class DataTransform implements MessageQueueData {
         BufferUtil.put(buffer, lookAtYaw);
         BufferUtil.put(buffer, useLookAtYaw);
     }
-    /**
-         21 00 00 00 71 00 00 00 40 42 0F 00 00 00 00 00
-    00 00 00 00 C2 99 2F DE 01 00 00 00 00 00 00 00
-    00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00
-    01 00 43 43 00 00 00 00 00 00 00 00 00 00 00 00
-    00 
-
-     */
 }

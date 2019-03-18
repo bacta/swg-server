@@ -1,24 +1,20 @@
 package $packageName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ocdsoft.bacta.soe.connection.SoeUdpConnection;
-import com.ocdsoft.bacta.soe.controller.ObjController;
-import com.ocdsoft.bacta.swg.server.game.object.tangible.TangibleObject;
-import com.ocdsoft.bacta.soe.controller.MessageHandled;
+import io.bacta.game.GameControllerMessage;
+import io.bacta.game.GameControllerMessageType;
+import io.bacta.game.object.ServerObject;
+import io.bacta.soe.context.SoeRequestContext;
+import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import ${messageClasspath}.${messageName};
-import com.ocdsoft.bacta.soe.controller.ObjController;
 
-@MessageHandled(handles = ${messageName}.class)
-public class $className implements ObjController<$messageName, TangibleObject> {
+@Slf4j
+@Component
+@GameControllerMessage(GameControllerMessageType.$type)
+public class $className implements MessageQueueController<$messageName> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(${className}.class);
-	
 	@Override
-	public void handleIncoming(final SoeUdpConnection connection, final $messageName message, final TangibleObject invoker) {
-
+	public void handleIncoming(SoeRequestContext context, ServerObject actor, int flags, float value, $messageName data) {
 		LOGGER.warn("This object controller is not implemented");
-		
 	}
 }

@@ -29,8 +29,6 @@ import io.bacta.soe.context.SoeSessionContext;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerData;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
-import io.bacta.soe.serialize.GameNetworkMessageTypeNotFoundException;
-import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -54,19 +52,8 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
      */
     private final TIntObjectMap<GameNetworkMessageControllerData> controllers;
 
-    /**
-     * Generates missing {@link GameNetworkMessage} and {@link GameNetworkMessageController} classes for implementation
-     * Writes files directly to the project structure
-     */
-    private final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter;
-
-
     @Inject
-    public DefaultGameNetworkMessageHandler(final GameNetworkMessageControllerLoader controllerLoader,
-                                            final GameNetworkMessageTemplateWriter gameNetworkMessageTemplateWriter) {
-
-
-        this.gameNetworkMessageTemplateWriter = gameNetworkMessageTemplateWriter;
+    public DefaultGameNetworkMessageHandler(final GameNetworkMessageControllerLoader controllerLoader) {
         controllers = controllerLoader.loadControllers();
     }
 
@@ -92,14 +79,12 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
 
                 controller.handleIncoming(context, gameNetworkMessage); //Can't fix this one yet.
 
-            } catch (GameNetworkMessageTypeNotFoundException e) {
-                handleMissingController(gameNetworkMessage);
             } catch (Exception e) {
                 LOGGER.error("SWG Message Handling {}", controllerData.getClass(), e);
             }
 
         } else {
-            handleMissingController(gameNetworkMessage);
+            LOGGER.error("Missing controller data for {}", gameNetworkMessage.getClass());
         }
     }
 
@@ -118,36 +103,4 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
         return controllerData;
     }
 
-    protected void handleMissingController(final GameNetworkMessage gameNetworkMessage) {
-
- //       if(gameNetworkMessageTemplateWriter == null) {
-            int hash;
-            if(gameNetworkMessage.getClass().getAnnotation(MessageId.class) != null) {
-                hash = gameNetworkMessage.getClass().getAnnotation(MessageId.class).value();
-            } else {
-                hash = SOECRC32.hashCode(gameNetworkMessage.getClass().getSimpleName());
-            }
-
-            LOGGER.error("Unhandled SWG Message: '{}' 0x{}",
-                    gameNetworkMessage.getClass().getSimpleName(),
-                    Integer.toHexString(hash));
- //           return;
- //       }
-
-        // TODO: Re-add class generation
-//        if (gameNetworkMessage.getClass().isAssignableFrom(ObjControllerMessage.class)) {
-//            final int objcType = buffer.getInt(4);
-//            final String propertyName = Integer.toHexString(objcType);
-//
-//            gameNetworkMessageTemplateWriter.createObjFiles(objcType, buffer);
-//            LOGGER.error("{} Unhandled ObjC Message: 0x{}", ObjectControllerNames.get(propertyName), propertyName);
-//            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
-//        } else {
-//
-//            final String propertyName = Integer.toHexString(gameMessageType);
-//            gameNetworkMessageTemplateWriter.createGameNetworkMessageFiles(priority, gameMessageType, buffer);
-//            LOGGER.error("Unhandled SWG Message: '{}' 0x{}", ClientString.get(propertyName), propertyName);
-//            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
-//        }
-    }
 }
