@@ -20,6 +20,7 @@
 
 package io.bacta.soe.network.message;
 
+import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
@@ -39,7 +40,7 @@ public final class ReliableNetworkMessage extends SoeMessage implements Comparab
 
     private final List<ByteBuffer> list = new ArrayList<>();
 
-    private transient boolean finished = false;
+    private Boolean finished = false;
 
     /**
      * This constructor is use for standard reliable messages
@@ -60,12 +61,12 @@ public final class ReliableNetworkMessage extends SoeMessage implements Comparab
      * @param sequenceNumber
      * @param inbuffer
      */
-    public ReliableNetworkMessage(short sequenceNumber, ByteBuffer inbuffer, boolean first, int size) {
+    public ReliableNetworkMessage(short sequenceNumber, ByteBuffer inbuffer, int messagePosition, int totalFragmentSize) {
         super(SoeMessageType.cUdpPacketFragment1);
         this.sequenceNumber = sequenceNumber;
         buffer.putShort(sequenceNumber);
-        if(first) {
-            buffer.putInt(size);
+        if(messagePosition == 0) {
+            buffer.putInt(totalFragmentSize);
         }
         list.add(inbuffer);
     }
@@ -85,49 +86,46 @@ public final class ReliableNetworkMessage extends SoeMessage implements Comparab
         return size;
     }
 
+    public boolean hasRoom(final ByteBuffer candidate, final int maxSize) {
+        return size() + candidate.limit() + 1 <= maxSize;
+    }
+
 
     public boolean addMessage(ByteBuffer buffer) {
 
-        if(finished) {
-            return false;
+        synchronized (finished) {
+            if (finished) {
+                return false;
+            }
         }
 
         return list.add(buffer);
     }
 
-    public void finish() {
+    public ReliableNetworkMessage finish() {
 
-        if(finished) {
-            return;
+        synchronized (finished) {
+            if (finished) {
+                return this;
+            } else {
+                finished = true;
+            }
         }
 
         if (list.size() == 1) {
-            buffer.put(list.get(0));
+            ByteBuffer message = list.get(0);
+            buffer.put(message);
         } else {
             buffer.putShort((short) 0x19);
             for (ByteBuffer listBuffer : list) {
+                listBuffer.position(0);
                 int byteCount = listBuffer.limit();
-                if(byteCount > 0xFF) {
-                    int sizeCount = (byteCount / 0xFF) - (byteCount % 0xFF == 0 ? 1 : 0);
-
-                    buffer.put((byte) 0xFF);
-                    buffer.put((byte)sizeCount);
-                    byteCount -= 0xFF;
-
-                    for (int i = 0; i < sizeCount; ++i) {
-                        buffer.put(byteCount > 0xFF ? (byte) 0xFF : (byte) byteCount);
-                        byteCount -= 0xFF;
-                    }
-
-                } else {
-                    buffer.put((byte)byteCount);
-                }
-
+                SoeMessageUtil.putVariableValue(buffer, byteCount);
                 buffer.put(listBuffer);
             }
         }
 
-        finished = true;
+        return this;
     }
 
     public void addSendAttempt() {

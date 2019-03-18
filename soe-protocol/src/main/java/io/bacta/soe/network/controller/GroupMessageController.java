@@ -21,10 +21,11 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.buffer.UnsignedUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -44,13 +45,17 @@ public class GroupMessageController implements SoeMessageController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte,
+                               final SoeMessageType type,
+                               final SoeUdpConnection connection,
+                               final ByteBuffer buffer,
+                               final GameNetworkMessageProcessor processor) {
 
         while (buffer.remaining() > 3) {
 
             LOGGER.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
 
-            int length = UnsignedUtil.getUnsignedByte(buffer);
+            short length = SoeMessageUtil.getVariableValue(buffer);
 
             LOGGER.trace("Length: {}", length);
 
@@ -59,7 +64,7 @@ public class GroupMessageController implements SoeMessageController {
 
             LOGGER.trace("Slice: {} {}", slicedBuffer, BufferUtil.bytesToHex(slicedBuffer));
 
-            soeMessageDispatcher.dispatch(connection, slicedBuffer);
+            soeMessageDispatcher.dispatch(connection, slicedBuffer, processor);
 
             buffer.position(buffer.position() + length);
         }

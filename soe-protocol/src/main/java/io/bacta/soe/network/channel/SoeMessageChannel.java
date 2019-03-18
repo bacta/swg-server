@@ -28,15 +28,17 @@ import io.bacta.engine.network.channel.InboundMessageChannel;
 import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
+import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.protocol.SoeProtocolHandler;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -64,11 +66,13 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
     private final SoeProtocolHandler protocolHandler;
     private final SoeMessageDispatcher soeMessageDispatcher;
     private final SoeUdpConnectionCache connectionCache;
+    private final GameNetworkMessageProcessor processor;
     private UdpChannel udpChannel;
 
     private final Thread sendThread;
     private Histogram sendQueueSizes;
     private final MetricRegistry metricRegistry;
+    private final List<SoeChannelMessageCollector> collectors;
 
     @Inject
     public SoeMessageChannel(final SoeProtocolHandler protocolHandler,
@@ -76,6 +80,8 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
                              final SoeMessageDispatcher soeMessageDispatcher,
                              final SoeNetworkConfiguration networkConfiguration,
                              final ApplicationEventPublisher publisher,
+                             final GameNetworkMessageProcessor processor,
+                             final ApplicationContext context,
                              final MetricRegistry metricRegistry) {
 
         this.networkConfiguration = networkConfiguration;
@@ -83,7 +89,28 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
         this.metricRegistry = metricRegistry;
         this.protocolHandler = protocolHandler;
         this.soeMessageDispatcher = soeMessageDispatcher;
+        this.processor = processor;
+        this.collectors = new ArrayList<>();
+        initializeCollectors(context, networkConfiguration.getMessageCollectors());
         sendThread = new Thread(this);
+    }
+
+    /**
+     * Initilialize message collector classes
+     * @param messageCollectors List of fully qualified class names
+     */
+    private void initializeCollectors(final ApplicationContext context, List<String> messageCollectors) {
+        if(messageCollectors != null) {
+            messageCollectors.forEach(collectorName -> {
+                try {
+                    Class<?> clazz = Class.forName(collectorName);
+                    SoeChannelMessageCollector collector = (SoeChannelMessageCollector) context.getBean(clazz);
+                    collectors.add(collector);
+                } catch (ClassNotFoundException e) {
+                    LOGGER.error("Unable to load collector class {}", collectorName, e);
+                }
+            });
+        }
     }
 
     /**
@@ -115,14 +142,18 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
 
             if (connection != null) {
                 LOGGER.trace("Received raw message from {} {}", sender, SoeMessageUtil.bytesToHex(message));
+                onReceiveEncryptedMessage(connection, message);
 
-                SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
+                IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
                 ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message, packetType);
                 ByteBuffer processedMessage = incomingMessageProcessor.processIncomingProtocol(decodedMessage);
 
+                // Incoming messages, post decoding
+                onReceiveMessage(connection, processedMessage);
+
                 if (processedMessage != null) {
-                    soeMessageDispatcher.dispatch(connection, processedMessage);
+                    soeMessageDispatcher.dispatch(connection, processedMessage, processor);
                 }
 
             } else {
@@ -135,11 +166,34 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
 
     @Override
     public void sendMessage(final SoeUdpConnection connection, final ByteBuffer message) {
+
+        // Outgoing messages, pre-encoded
+        onSendMessage(connection, message);
+
         ByteBuffer encodedMessage = protocolHandler.processOutgoing(connection, message);
+
+        onSendEncryptedMessage(connection, encodedMessage);
+
         udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
         if(LOGGER.isTraceEnabled()) {
             LOGGER.trace("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
         }
+    }
+
+    private void onReceiveEncryptedMessage(SoeUdpConnection connection, ByteBuffer message) {
+        collectors.forEach(collector -> collector.onReceiveEncrypted(connection, message));
+    }
+
+    private void onReceiveMessage(SoeUdpConnection connection, ByteBuffer message) {
+        collectors.forEach(collector -> collector.onReceive(connection, message));
+    }
+
+    private void onSendMessage(SoeUdpConnection connection, ByteBuffer message) {
+        collectors.forEach(collector -> collector.onSend(connection, message));
+    }
+
+    private void onSendEncryptedMessage(SoeUdpConnection connection, ByteBuffer message) {
+        collectors.forEach(collector -> collector.onSendEncrypted(connection, message));
     }
 
     @Override

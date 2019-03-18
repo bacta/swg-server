@@ -38,10 +38,10 @@ public class SoeUdpConnectionFactory {
     }
 
     /**
-     * Creates a new {@link SoeUdpConnection} class this includes injecting
+     * Creates a new {@link DefaultSoeUdpConnection} class this includes injecting
      * the serializer responsible for turning message classes into
      * {@link java.nio.ByteBuffer}
-     * @return new {@link SoeUdpConnection} for the sender
+     * @return new {@link DefaultSoeUdpConnection} for the sender
      */
     public SoeUdpConnection newInstance(final InetSocketAddress sender) {
 
@@ -54,13 +54,13 @@ public class SoeUdpConnectionFactory {
             throw new RuntimeException(e);
         }
 
-        SoeUdpConnection connection = new SoeUdpConnection(
+        SoeUdpConnection connection = new DefaultSoeUdpConnection (
                 objectName,
                 sender,
                 connectionID,
                 networkConfiguration,
-                new SoeIncomingMessageProcessor(networkConfiguration),
-                new SoeOutgoingMessageProcessor(networkConfiguration, messageSerializer)
+                new DefaultIncomingMessageProcessor(networkConfiguration),
+                new OutgoingMessageProcessor(networkConfiguration, messageSerializer)
         );
 
         try {

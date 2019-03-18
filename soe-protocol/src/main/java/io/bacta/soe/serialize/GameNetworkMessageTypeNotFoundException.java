@@ -20,12 +20,14 @@
 
 package io.bacta.soe.serialize;
 
+import io.bacta.soe.util.ClientString;
+
 /**
  * Created by kyle on 4/21/2016.
  */
 public class GameNetworkMessageTypeNotFoundException extends RuntimeException {
 
     public GameNetworkMessageTypeNotFoundException(int gameMessageType, String message) {
-        super("Unable to create message with key: 0x" + Integer.toHexString(gameMessageType) + " [" + message +"]");
+        super("Unable to create message with key: 0x" + Integer.toHexString(gameMessageType) + "(" +  ClientString.get(gameMessageType) + ") [" + message +"]");
     }
 }

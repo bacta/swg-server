@@ -46,7 +46,7 @@ class PlayerCreationSessionActor extends AbstractActor {
     private void start(ClientCreateCharacter msg) throws PlayerCreationException {
         final ActorRef client = sender();
 
-        //Any subsequent create character messages we receive cannot succeed if the current session hasn't
+        //Any subsequent create character messages we onReceive cannot succeed if the current session hasn't
         //expired.
         if (started && !isExpired())
             throw new PlayerCreationException(client, msg.getCharacterName(), NameErrors.RETRY);

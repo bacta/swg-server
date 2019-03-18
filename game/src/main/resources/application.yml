@@ -49,6 +49,8 @@ io:
             iffPath: "/some/iff/path/naboo"
           - name: "yavin"
             iffPath: "/some/iff/path/yavin"
+          - name: "corellia"
+            iffPath: "/some/iff/path/corellia"
 logging:
   file: logs/game.log
   level:

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="ConnectionLogger" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>connection</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="${connection}" class="ch.qos.logback.core.FileAppender">
+                <file>logs/game/connection/${connection}.log</file>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d [%thread] %level %mdc %logger{35} %X{sendType} - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+
+    </appender>
+
+    <logger name="io.bacta.soe.network.channel.NoopMessageCollector" level="INFO" additivity="false">
+        <appender-ref ref="ConnectionLogger" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="ConnectionLogger" />
+    </root>
+
+</configuration>

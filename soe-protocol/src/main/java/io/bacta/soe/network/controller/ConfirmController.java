@@ -21,6 +21,7 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,11 @@ import java.nio.ByteBuffer;
 public class ConfirmController implements SoeMessageController {
 
     @Override
-    public void handleIncoming(final byte zeroByte, final SoeMessageType type, final SoeUdpConnection connection, final ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte,
+                               final SoeMessageType type,
+                               final SoeUdpConnection connection,
+                               final ByteBuffer buffer,
+                               final GameNetworkMessageProcessor processor) {
 
         int connectionID = buffer.getInt();
         int encryptCode = buffer.getInt();

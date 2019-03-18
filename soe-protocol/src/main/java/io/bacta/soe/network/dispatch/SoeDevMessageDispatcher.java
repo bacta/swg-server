@@ -24,6 +24,7 @@ import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     }
 
     @Override
-    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer) {
+    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageProcessor processor) {
 
         byte zeroByte = buffer.get();
         byte type = buffer.get();
@@ -78,7 +79,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
         try {
 
             LOGGER.trace("Routing to {} : {}", controller.getClass().getSimpleName(), BufferUtil.bytesToHex(buffer));
-            controller.handleIncoming(zeroByte, packetType, connection, buffer);
+            controller.handleIncoming(zeroByte, packetType, connection, buffer, processor);
 
         } catch (Exception e) {
             LOGGER.error("SOE Routing", e);

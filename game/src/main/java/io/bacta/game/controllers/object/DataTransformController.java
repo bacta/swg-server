@@ -15,17 +15,17 @@ import javax.inject.Inject;
 @Component
 @GameControllerMessage(GameControllerMessageType.NET_UPDATE_TRANSFORM)
 public class DataTransformController implements MessageQueueController<DataTransform> {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DataTransformController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataTransformController.class);
 
-	private final ServerObjectService serverObjectService;
+    private final ServerObjectService serverObjectService;
 
-	@Inject
-	public DataTransformController(final ServerObjectService serverObjectService) {
-		this.serverObjectService = serverObjectService;
-	}
+    @Inject
+    public DataTransformController(final ServerObjectService serverObjectService) {
+        this.serverObjectService = serverObjectService;
+    }
 
-	@Override
-	public void handleIncoming(SoeRequestContext context, ServerObject actor, int flags, float value, DataTransform data) {
-		LOGGER.warn("This controller is not implemented");
-	}
+    @Override
+    public void handleIncoming(SoeRequestContext context, ServerObject actor, int flags, float value, DataTransform data) {
+        LOGGER.warn("This controller is not implemented");
+    }
 }

@@ -22,6 +22,7 @@ package io.bacta.soe.util;
 
 import com.google.common.io.Files;
 import io.bacta.engine.buffer.BufferUtil;
+import io.bacta.engine.buffer.UnsignedUtil;
 import io.bacta.shared.GameNetworkMessage;
 
 import java.io.File;
@@ -73,5 +74,42 @@ public class SoeMessageUtil {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         message.writeToBuffer(buffer);
         return BufferUtil.bytesToHex(buffer);
+    }
+
+    public static void putVariableValue(final ByteBuffer message, final int size) {
+        if (size < 254) {
+            message.put((byte) size);
+        } else if (size < 0xffff) {
+            message.put((byte) 0xFF);
+            message.put((byte) (size >> 8));
+            message.put((byte) (size & 0xFF));
+        } else  {
+            message.put((byte) 0xFF);
+            message.put((byte) 0xFF);
+            message.put((byte) 0xFF);
+            message.put((byte) (size >> 24));
+            message.put((byte) ((size >> 16) & 0xFF));
+            message.put((byte) ((size >> 8) & 0xFF));
+            message.put((byte) (size & 0xFF));
+        }
+    }
+
+    public static short getVariableValue(final ByteBuffer message) {
+        short length = UnsignedUtil.getUnsignedByte(message);
+        if (length == 0xff)  {
+            short length2 = UnsignedUtil.getUnsignedByte(message);
+            short length3 = UnsignedUtil.getUnsignedByte(message);
+
+            if (length2 == 0xff && length3 == 0xff) {
+                short value1 = UnsignedUtil.getUnsignedByte(message);
+                short value2 = UnsignedUtil.getUnsignedByte(message);
+                short value3 = UnsignedUtil.getUnsignedByte(message);
+                short value4 = UnsignedUtil.getUnsignedByte(message);
+                return (short)((value1 << 24) | (value2 << 16) | (value3 << 8) | (value4));
+            }
+
+            return (short)((length2 << 8) | (length3));
+        }
+        return length;
     }
 }

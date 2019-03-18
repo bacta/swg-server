@@ -32,20 +32,19 @@ import java.util.List;
 public class MultiMessageLineProcessor implements LineProcessor<List<List<Byte>>> {
     
     private List<List<Byte>> messages = new ArrayList<>();
-    
-    private final String newMessageTrigger = "Packet";
-    private final String packetStart = "0000:";
-    
+
     private int currentMessageLine;
     private List<Byte> currentMessage;
 
     @Override
     public boolean processLine(String line) throws IOException {
-        
+
+        String newMessageTrigger = "Packet";
         if(line.startsWith(newMessageTrigger)) {
             return true;
         }
 
+        String packetStart = "0000:";
         if(line.startsWith(packetStart)) {
 
             if(currentMessage != null) {
@@ -57,11 +56,11 @@ public class MultiMessageLineProcessor implements LineProcessor<List<List<Byte>>
         }
 
         String lineStart = String.valueOf(currentMessageLine);
-        lineStart =  String.format("%04d", Integer.parseInt(lineStart)) + ":";
+        lineStart =  String.format("%04X", Integer.parseInt(lineStart)) + ":";
        
         if(line.startsWith(lineStart)) {
             addLineBytes(line.substring(line.indexOf(":") + 1, line.lastIndexOf("  ")).trim());
-            currentMessageLine += 10;
+            currentMessageLine += 16;
         }
 
         return true;

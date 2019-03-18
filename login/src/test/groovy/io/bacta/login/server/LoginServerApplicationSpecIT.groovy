@@ -69,7 +69,7 @@ class LoginServerApplicationSpecIT extends Specification {
 //        connectionMap.setGetConnectionMethod(soeClient.&getConnection)
 //        SoeClient connection = connectionMap.getOrCreate(new InetSocketAddress(serverHost, properties.getBindPort()));
 //        def startingReceivedReliables = connection.soeUdpConnection.incomingMessageProcessor.gameNetworkMessagesReceived.get()
-//        def startingSequence = connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get()
+//        def startingSequence = connection.soeUdpConnection.outgoingMessageQueue.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get()
 //
 //        when:
 //
@@ -80,9 +80,9 @@ class LoginServerApplicationSpecIT extends Specification {
 //        startingReceivedReliables == 0
 //        startingSequence == 0
 //        AwaitUtil.awaitTrue(connection.&isConnected, 5)
-//        connection.soeUdpConnection.outgoingMessageProcessor.gameNetworkMessagesSent.get() == 1
+//        connection.soeUdpConnection.outgoingMessageQueue.gameNetworkMessagesSent.get() == 1
 //        //connection.soeUdpConnection.incomingMessageProcessor.pendingReliablePackets.pendingMap.size() == 0
-//        connection.soeUdpConnection.outgoingMessageProcessor.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get() == 1
+//        connection.soeUdpConnection.outgoingMessageQueue.udpMessageProcessor.reliableUdpMessageBuilder.sequenceNum.get() == 1
 //    }
 
 //    def "Test Broadcast"() {

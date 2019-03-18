@@ -1,5 +1,6 @@
 package io.bacta.game.object.scene;
 
+import io.bacta.game.GameServerProperties;
 import io.bacta.shared.tre.TreeFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
@@ -12,8 +13,7 @@ import javax.inject.Inject;
 @Slf4j
 public final class Scene {
 
-    private String name;
-    private String iffPath;
+    private GameServerProperties.Scene config;
     private final TreeFile treeFile;
 
     @Inject
@@ -21,37 +21,25 @@ public final class Scene {
         this.treeFile = treeFile;
     }
 
-    public void configure(String name, String iffPath) {
-        if(this.name == null && this.iffPath == null) {
-            this.name = name;
-            this.iffPath = iffPath;
+    public void configure(final GameServerProperties.Scene config) {
+        if(this.config == null) {
+            this.config = config;
         } else {
-            throw new SceneAlreadyConfiguredException("The scene '" + this.name + "' is already configured.  New Attempt for scene '" + name + "'");
+            throw new SceneAlreadyConfiguredException("The scene '" + this.config.getName() + "' is already configured.  New Attempt for scene '" + config.getName() + "'");
         }
-    }
-
-    public void restart() {
-        checkConfigured();
-        stop();
-        start();
     }
 
     public void start() {
-        checkConfigured();
-        LOGGER.info("Starting zone {} with iff path {}", name, iffPath);
+        if(config == null) {
+            throw new SceneNotConfiguredException();
+        }
+
+        LOGGER.info("Starting scene {} with iff path {}", config.getName(), config.getIffPath());
     }
 
     public void stop() {
-        checkConfigured();
-        LOGGER.info("Stopping zone {} with iff path {}", name, iffPath);
-    }
-
-    private void checkConfigured() {
-        if(name == null || iffPath == null) {
-            LOGGER.error("Scene not configured");
-            throw new SceneNotConfiguredException();
+        if(config != null) {
+            LOGGER.info("Stopping scene {} with iff path {}", config.getName(), config.getIffPath());
         }
     }
-
-
 }

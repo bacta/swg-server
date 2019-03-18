@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 @Component
-public class AkkaGameNetworkMessageForwarder implements GameNetworkMessageForwarder {
+public class AkkaGameNetworkMessageForwarder implements GameNetworkMessageProcessor {
 
     private final ActorSelection galaxyUdpMessageDispatcher;
 
@@ -23,7 +23,7 @@ public class AkkaGameNetworkMessageForwarder implements GameNetworkMessageForwar
     }
 
     @Override
-    public void forward(SoeUdpConnection connection, GameNetworkMessage gameNetworkMessage) {
+    public void process(SoeUdpConnection connection, GameNetworkMessage gameNetworkMessage) {
         SwgRequestMessage message = new SwgRequestMessage(connection.getRemoteAddress(), gameNetworkMessage);
         galaxyUdpMessageDispatcher.tell(message, ActorRef.noSender());
     }

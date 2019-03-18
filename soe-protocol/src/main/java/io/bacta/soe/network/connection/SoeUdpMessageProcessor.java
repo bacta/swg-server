@@ -31,8 +31,8 @@ import java.nio.ByteBuffer;
 @Slf4j
 public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuffer> {
 
-    private final UdpMessageBuilder<ByteBuffer> udpMessageBuilder;
-    private final UdpMessageBuilder<ByteBuffer> reliableUdpMessageBuilder;
+    private final UdpMessageChannel<ByteBuffer> udpMessageBuilder;
+    private final UdpMessageChannel<ByteBuffer> reliableUdpMessageBuilder;
 
     private final SoeNetworkConfiguration configuration;
 
@@ -40,8 +40,8 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
 
         this.configuration = configuration;
 
-        reliableUdpMessageBuilder = new ReliableUdpMessageBuilder(configuration);
-        udpMessageBuilder = new SoeUdpMessageBuilder(configuration);
+        reliableUdpMessageBuilder = new ReliableMessageChannel(configuration);
+        udpMessageBuilder = new UnreliableMessageChannel(configuration);
     }
 
     @Override
@@ -55,6 +55,7 @@ public final class SoeUdpMessageProcessor implements UdpMessageProcessor<ByteBuf
     public boolean addUnreliable(ByteBuffer buffer) {
         if (buffer == null) throw new NullPointerException();
         buffer.limit(buffer.position());
+        buffer.position(0);
 
         flushReliable();
 

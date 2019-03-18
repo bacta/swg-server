@@ -21,9 +21,10 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
+import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -54,9 +55,13 @@ public class ReliableMessageController implements SoeMessageController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte,
+                               final SoeMessageType type,
+                               final SoeUdpConnection connection,
+                               final ByteBuffer buffer,
+                               final GameNetworkMessageProcessor processor) {
 
-        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
+        IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         long nextClientReliableStamp = incomingMessageProcessor.getReliableStamp();
         short reliableStamp = buffer.getShort();
@@ -73,7 +78,7 @@ public class ReliableMessageController implements SoeMessageController {
             // is this the packet we are waiting for
             if (nextClientReliableStamp == reliableId)  {
                 // if so, process it immediately
-                processPacket(mode, connection, buffer);
+                processPacket(mode, connection, buffer, processor);
                 incomingMessageProcessor.incrementNextReliable();
 
                 // process other packets that have arrived
@@ -83,7 +88,7 @@ public class ReliableMessageController implements SoeMessageController {
                     SoeMessageType nextType = SoeMessageType.values()[pendingBuffer.get(1)];
                     mode = ReliablePacketMode.values()[((nextType.getValue() - SoeMessageType.cUdpPacketReliable1.getValue()) / networkConfiguration.getReliableChannelCount())];
 
-                    processPacket(mode, connection, pendingBuffer);
+                    processPacket(mode, connection, pendingBuffer, processor);
 
                     incomingMessageProcessor.incrementNextReliable();
                 }
@@ -95,22 +100,26 @@ public class ReliableMessageController implements SoeMessageController {
         }
         
         LOGGER.trace("{} Receiving Reliable Message Sequence {} {}", connection.getId(), reliableStamp, buffer.order());
-        connection.ackClient(reliableStamp);
+        if (nextClientReliableStamp > reliableId) {
+            connection.ackAllFromClient(reliableStamp);
+        } else {
+            connection.ackClient(reliableStamp);
+        }
     }
 
-    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer) {
+    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer, final GameNetworkMessageProcessor processor) {
 
-        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
+        IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         if(mode == ReliablePacketMode.cReliablePacketModeReliable) {
 
-            soeMessageDispatcher.dispatch(connection, buffer);
+            soeMessageDispatcher.dispatch(connection, buffer, processor);
 
         } else if (mode == ReliablePacketMode.cReliablePacketModeFragment) {
 
             ByteBuffer completeFragment = incomingMessageProcessor.addIncomingFragment(buffer);
             if(completeFragment != null) {
-                soeMessageDispatcher.dispatch(connection, buffer);
+                soeMessageDispatcher.dispatch(connection, buffer, processor);
             }
         }
     }

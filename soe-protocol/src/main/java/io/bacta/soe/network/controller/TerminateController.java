@@ -22,6 +22,7 @@ package io.bacta.soe.network.controller;
 
 import io.bacta.engine.buffer.UnsignedUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,11 @@ import java.nio.ByteBuffer;
 public class TerminateController implements SoeMessageController {
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte,
+                               final SoeMessageType type,
+                               final SoeUdpConnection connection,
+                               final ByteBuffer buffer,
+                               final GameNetworkMessageProcessor processor) {
 
         long connectionID = UnsignedUtil.getUnsignedInt(buffer);
         TerminateReason terminateReason = TerminateReason.values()[buffer.getShort()];

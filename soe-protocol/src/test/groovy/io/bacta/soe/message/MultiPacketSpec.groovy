@@ -20,109 +20,69 @@
 
 package io.bacta.soe.message
 
-import com.codahale.metrics.MetricRegistry
+
 import io.bacta.shared.GameNetworkMessage
-import io.bacta.soe.config.SoeNetworkConfiguration
-import io.bacta.soe.network.connection.SoeIncomingMessageProcessor
-import io.bacta.soe.network.connection.SoeOutgoingMessageProcessor
-import io.bacta.soe.network.connection.SoeUdpConnection
-import io.bacta.soe.network.controller.*
-import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
-import io.bacta.soe.network.forwarder.GameNetworkMessageForwarder
-import io.bacta.soe.network.message.SoeMessageType
-import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
-import io.bacta.soe.serialize.GameNetworkMessageSerializer
-import io.bacta.soe.serialize.ObjControllerMessageSerializer
+import io.bacta.soe.network.connection.DefaultIncomingMessageProcessor
+import io.bacta.soe.network.connection.DefaultSoeUdpConnection
+import io.bacta.soe.network.connection.OutgoingMessageProcessor
 import io.bacta.soe.util.SoeMessageUtil
-import spock.lang.Shared
-import spock.lang.Specification
 
 import java.nio.ByteBuffer
 
 /**
  * Created by kburkhardt on 2/10/15.
  */
-class MultiPacketSpec extends Specification {
+class MultiPacketSpec extends MessageProcessingBase {
 
-    @Shared
-    def soeMessageRouter
-
-    @Shared
-    def forwarder
-    
-    @Shared
-    List<GameNetworkMessage> processedPackets
-
-    @Shared
-    def networkConfig = new SoeNetworkConfiguration()
-
-    def setupSpec() {
-
-        networkConfig.setMaxInstandingPackets(400)
-        networkConfig.setMaxOutstandingPackets(400)
-        networkConfig.setReliableChannelCount(4)
-
-        processedPackets = new ArrayList<ByteBuffer>()
-
-        forwarder = Mock(GameNetworkMessageForwarder) {
-            forward(_,_,) >> { final SoeUdpConnection connection, final GameNetworkMessage gameNetworkMessage ->
-                processedPackets.add(gameNetworkMessage)
-            }
-        }
-
-        soeMessageRouter = new SoeDevMessageDispatcher(null)
-        loadControllers(soeMessageRouter.metaClass.getProperty(soeMessageRouter, "controllers"))
-
-    }
-
-    def "CollectMessages"() {
+    def "Process incoming messages"() {
         
         setup:
         def multiList = SoeMessageUtil.readTextPacketDump(new File(this.getClass().getResource("/multipackets.txt").getFile()))
-        def messageSerializer = Mock(GameNetworkMessageSerializer)
 
-        def soeUdpConnection = new SoeUdpConnection(null, null, 0, networkConfig, new SoeIncomingMessageProcessor(networkConfig), new SoeOutgoingMessageProcessor(networkConfig, messageSerializer))
+        def soeUdpConnection = new DefaultSoeUdpConnection(null, null, 0, networkConfig, new DefaultIncomingMessageProcessor(networkConfig), new OutgoingMessageProcessor(networkConfig, serializer))
 
         when:
         for(List<Byte> array : multiList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(soeUdpConnection, buffer)
+            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
         }
         
         then:
         noExceptionThrown()
         processedPackets.size() == 2
     }
-    
-    
-    def loadControllers(controllers) {
 
-        controllers.put(SoeMessageType.cUdpPacketConnect, Mock(SoeMessageController))
-        controllers.put(SoeMessageType.cUdpPacketConfirm, Mock(SoeMessageController))
-        controllers.put(SoeMessageType.cUdpPacketAckAll1, Mock(SoeMessageController))
+    def "Process outgoing messages"() {
 
-        def multiController = new MultiController(soeMessageRouter)
+        setup:
+        def multiList = SoeMessageUtil.readTextPacketDump(new File(this.getClass().getResource("/multipackets.txt").getFile()))
+        def soeUdpConnection = new DefaultSoeUdpConnection(null, null, 0, networkConfig, new DefaultIncomingMessageProcessor(networkConfig), new OutgoingMessageProcessor(networkConfig, serializer))
 
-        controllers.put(SoeMessageType.cUdpPacketMulti, multiController)
+        when:
+        for(List<Byte> array : multiList) {
+            ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
+            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
+        }
 
-        def reliableController = new ReliableMessageController(networkConfig, soeMessageRouter)
+        // Reset Connection and reliable counter - Hack
+        soeUdpConnection = new DefaultSoeUdpConnection(null, null, 0, networkConfig, new DefaultIncomingMessageProcessor(networkConfig), new OutgoingMessageProcessor(networkConfig, serializer))
 
-        controllers.put(SoeMessageType.cUdpPacketReliable1, reliableController)
+        for(GameNetworkMessage message : processedPackets) {
+            soeUdpConnection.sendMessage(message)
+        }
 
-        def groupController = new GroupMessageController(soeMessageRouter)
+        def incomingProcessedPackets = processedPackets
+        processedPackets = new ArrayList<ByteBuffer>()
+        List<ByteBuffer> outGoingMessages = soeUdpConnection.getPendingMessages()
+        for(ByteBuffer message : outGoingMessages) {
+            soeMessageRouter.dispatch(soeUdpConnection, message, processor)
+        }
 
-        controllers.put(SoeMessageType.cUdpPacketGroup, groupController)
-
-        def objSerializer = new ObjControllerMessageSerializer()
-        objSerializer.loadMessages()
-
-        def serializer = new DefaultGameNetworkMessageSerializer(Mock(MetricRegistry), objSerializer)
-        serializer.loadMessages()
-
-        def zeroController = new ZeroEscapeController(forwarder, serializer)
-
-        controllers.put(SoeMessageType.cUdpPacketZeroEscape, zeroController)
-
-        return controllers
+        then:
+        noExceptionThrown()
+        incomingProcessedPackets.size() == 2
+        outGoingMessages.size() == 1
+        incomingProcessedPackets.size() == processedPackets.size()
     }
+
 }

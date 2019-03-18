@@ -6,12 +6,10 @@ import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
 import io.bacta.game.object.scene.Scene;
-import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Optional;
 
 @Component
 @Scope("prototype")
@@ -19,35 +17,25 @@ public class SceneActor extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), SceneActor.class.getSimpleName());
     private final SpringAkkaExtension ext;
-    private final GameServerProperties properties;
-    private final GameNetworkMessageHandler dispatcher;
+    private GameServerProperties.Scene config;
     private final Scene scene;
 
     @Inject
     public SceneActor(final SpringAkkaExtension ext,
-                      final GameServerProperties properties,
-                      final GameNetworkMessageHandler dispatcher,
                       final Scene scene) {
         this.ext = ext;
-        this.properties = properties;
-        this.dispatcher = dispatcher;
         this.scene = scene;
     }
 
     @Override
-    public void preStart() throws Exception {
-        super.preStart();
-        scene.start();
+    public void preStart() {
+        if(config != null) {
+            configure(config);
+        }
     }
 
     @Override
-    public void preRestart(Throwable reason, Optional<Object> message) throws Exception {
-        super.preRestart(reason, message);
-    }
-
-    @Override
-    public void postStop() throws Exception {
-        super.postStop();
+    public void postStop() {
         scene.stop();
     }
 
@@ -60,7 +48,9 @@ public class SceneActor extends AbstractActor {
     }
 
     private void configure(GameServerProperties.Scene config) {
-        scene.configure(config.getName(), config.getIffPath());
-        scene.restart();
+        this.config = config;
+        scene.stop();
+        scene.configure(config);
+        scene.start();
     }
 }

@@ -22,8 +22,9 @@ package io.bacta.soe.network.controller;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
-import io.bacta.soe.network.connection.SoeIncomingMessageProcessor;
+import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import org.springframework.stereotype.Component;
 
@@ -45,9 +46,13 @@ public class OrderedController implements SoeMessageController {
     }
 
     @Override
-    public void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer) {
+    public void handleIncoming(final byte zeroByte,
+                               final SoeMessageType type,
+                               final SoeUdpConnection connection,
+                               final ByteBuffer buffer,
+                               final GameNetworkMessageProcessor processor) {
 
-        SoeIncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
+        IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
         short orderedStamp = buffer.getShort();
         int diff = orderedStamp - incomingMessageProcessor.getOrderedStampLast();
@@ -58,11 +63,10 @@ public class OrderedController implements SoeMessageController {
         if (diff < 30000) {
 
             incomingMessageProcessor.setOrderedStampLast(orderedStamp);
-            zeroEscapeController.handleIncoming(zeroByte, type, connection, buffer.slice().order(ByteOrder.LITTLE_ENDIAN));
+            zeroEscapeController.handleIncoming(zeroByte, type, connection, buffer.slice().order(ByteOrder.LITTLE_ENDIAN), processor);
 
         } else {
             rejectedOrderedMessages.inc();
         }
     }
-
 }

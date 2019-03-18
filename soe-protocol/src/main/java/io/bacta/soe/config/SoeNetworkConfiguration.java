@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -116,4 +117,6 @@ public class SoeNetworkConfiguration implements NetworkConfiguration {
 
     private int reliableChannelCount;
     private int hardMaxOutstandingPackets;
+
+    private List<String> messageCollectors;
 }
