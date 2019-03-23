@@ -2,9 +2,7 @@ package io.bacta.game.object;
 
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
-import akka.persistence.AbstractPersistentActor;
-import akka.persistence.RecoveryCompleted;
-import akka.persistence.SnapshotOffer;
+import akka.persistence.*;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.bacta.game.message.*;
@@ -81,19 +79,18 @@ public class ServerObjectActor<T extends ServerObject> extends AbstractPersisten
 
     @Override
     public final Receive createReceiveRecover() {
-        return this.appendReceiveRecoverHandlers(receiveBuilder())
-                .match(RecoveryCompleted.class, this::recoveryCompleted)
-                .build();
+        return this.appendReceiveRecoverHandlers(receiveBuilder()).build();
     }
 
     @Override
     public final Receive createReceive() {
-        return this.appendReceiveHandlers(receiveBuilder())
-                .build();
+        return this.appendReceiveHandlers(receiveBuilder()).build();
     }
 
     protected ReceiveBuilder appendReceiveHandlers(ReceiveBuilder receiveBuilder) {
         return receiveBuilder
+                .match(SaveSnapshotSuccess.class, this::snapshotSuccess)
+                .match(SaveSnapshotFailure.class, this::snapshotFailure)
                 .match(SceneCreateObjectByCrc.class, this::sceneCreateObjectByCrc)
                 .match(UpdateContainmentMessage.class, this::updateContainment)
                 .match(BaselinesMessage.class, this::applyBaselines)
@@ -105,6 +102,7 @@ public class ServerObjectActor<T extends ServerObject> extends AbstractPersisten
     @SuppressWarnings("unchecked")
     protected ReceiveBuilder appendReceiveRecoverHandlers(ReceiveBuilder receiveBuilder) {
         return receiveBuilder
+                .match(RecoveryCompleted.class, this::recoveryCompleted)
                 .match(SnapshotOffer.class, snapshotState -> this.setObject((T) snapshotState.snapshot()));
     }
 
@@ -199,6 +197,14 @@ public class ServerObjectActor<T extends ServerObject> extends AbstractPersisten
 
     protected void endBaselines(SceneEndBaselines msg) {
         //Marks the object as initialized
+    }
+
+    private void snapshotSuccess(SaveSnapshotSuccess msg) {
+        LOGGER.trace("Snapshot saved successfully.");
+    }
+
+    private void snapshotFailure(SaveSnapshotFailure msg) {
+        LOGGER.error("Snapshot failed to save.", msg.cause());
     }
 
 }
