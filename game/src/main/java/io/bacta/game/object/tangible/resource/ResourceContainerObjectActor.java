@@ -6,4 +6,8 @@ public class ResourceContainerObjectActor extends TangibleObjectActor<ResourceCo
     protected ResourceContainerObjectActor(ResourceContainerObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected ResourceContainerObjectActor(long objectId) {
+        super(objectId);
+    }
 }

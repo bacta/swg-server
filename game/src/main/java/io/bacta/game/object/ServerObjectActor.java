@@ -1,25 +1,35 @@
 package io.bacta.game.object;
 
-import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.japi.pf.ReceiveBuilder;
+import akka.persistence.AbstractPersistentActor;
+import akka.persistence.RecoveryCompleted;
+import akka.persistence.SnapshotOffer;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import io.bacta.game.message.*;
+import io.bacta.shared.util.NetworkId;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-public abstract class ServerObjectActor<T extends ServerObject> extends AbstractActor {
+@Slf4j
+public class ServerObjectActor<T extends ServerObject> extends AbstractPersistentActor {
     /**
      * The underlying object that this actor manages. When this object mutates, the actor
      * is configured to send out deltas to nearby objects. It will also periodically send
      * serialize requests to the database.
      */
-    protected final T object;
+    @Getter
+    private T object;
+    /**
+     * The id of the object, cached as a string to serve as the persistence id for the actor
+     * persistence framework.
+     */
+    private String objectIdString;
     /**
      * Other actors who are interested in receiving baselines and deltas from the object this actor controls.
      */
@@ -29,10 +39,51 @@ public abstract class ServerObjectActor<T extends ServerObject> extends Abstract
      */
     protected final TLongObjectMap<ServerObject> localObjectCache;
 
+    /**
+     * This constructor is for injecting an object that has not yet been persisted to the
+     * data store. It's object id should already be set.
+     * @param serverObject
+     */
     protected ServerObjectActor(T serverObject) {
-        this.object = serverObject;
+        this();
+
+        if (serverObject.getNetworkId() == NetworkId.INVALID)
+            throw new IllegalArgumentException("The server object must already have its network id set so that it may be persisted.");
+
+        this.setObject(serverObject);
+
+        //TODO: We should go ahead and save a snapshot immediately for this object.
+    }
+
+    protected ServerObjectActor(long objectId) {
+        this();
+
+        if (objectId == NetworkId.INVALID)
+            throw new IllegalArgumentException("The object id must already be a persistent id so that the snapshot may be loaded.");
+
+        this.objectIdString = String.valueOf(objectId);
+    }
+
+    private ServerObjectActor() {
         this.listeners = new HashSet<>();
         this.localObjectCache = new TLongObjectHashMap<>(100);
+    }
+
+    protected void setObject(T object) {
+        this.object = object;
+        this.objectIdString = String.valueOf(object.getNetworkId());
+    }
+
+    @Override
+    public String persistenceId() {
+        return objectIdString;
+    }
+
+    @Override
+    public final Receive createReceiveRecover() {
+        return this.appendReceiveRecoverHandlers(receiveBuilder())
+                .match(RecoveryCompleted.class, this::recoveryCompleted)
+                .build();
     }
 
     @Override
@@ -49,6 +100,21 @@ public abstract class ServerObjectActor<T extends ServerObject> extends Abstract
                 .match(SceneEndBaselines.class, this::endBaselines)
                 .match(DeltasMessage.class, this::applyDeltas);
 
+    }
+
+    @SuppressWarnings("unchecked")
+    protected ReceiveBuilder appendReceiveRecoverHandlers(ReceiveBuilder receiveBuilder) {
+        return receiveBuilder
+                .match(SnapshotOffer.class, snapshotState -> this.setObject((T) snapshotState.snapshot()));
+    }
+
+    /**
+     * Override this method to define what happens when recovery completes. Don't forget to call
+     * super.
+     * @param recoveryCompleted The recover completed message.
+     */
+    protected void recoveryCompleted(RecoveryCompleted recoveryCompleted) {
+        LOGGER.trace("Recovery completed.");
     }
 
     protected void applyBaselines(BaselinesMessage msg) {

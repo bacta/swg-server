@@ -6,4 +6,8 @@ public class DraftSchematicObjectActor extends IntangibleObjectActor<DraftSchema
     protected DraftSchematicObjectActor(DraftSchematicObject serverObject) {
         super(serverObject);
     }
+
+    protected DraftSchematicObjectActor(long objectId) {
+        super(objectId);
+    }
 }

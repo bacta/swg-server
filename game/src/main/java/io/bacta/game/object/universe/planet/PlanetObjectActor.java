@@ -6,4 +6,8 @@ public class PlanetObjectActor extends UniverseObjectActor<PlanetObject> {
     protected PlanetObjectActor(PlanetObject serverObject) {
         super(serverObject);
     }
+
+    protected PlanetObjectActor(long objectId) {
+        super(objectId);
+    }
 }

@@ -8,6 +8,10 @@ public class TangibleObjectActor<T extends TangibleObject> extends ServerObjectA
         super(tangibleObject);
     }
 
+    protected TangibleObjectActor(long objectId) {
+        super(objectId);
+    }
+
     @Override
     protected ReceiveBuilder appendReceiveHandlers(ReceiveBuilder receiveBuilder) {
         return super.appendReceiveHandlers(receiveBuilder);

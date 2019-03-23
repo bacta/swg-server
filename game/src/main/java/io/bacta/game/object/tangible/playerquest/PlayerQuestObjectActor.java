@@ -6,4 +6,8 @@ public class PlayerQuestObjectActor extends TangibleObjectActor<PlayerQuestObjec
     protected PlayerQuestObjectActor(PlayerQuestObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected PlayerQuestObjectActor(long objectId) {
+        super(objectId);
+    }
 }

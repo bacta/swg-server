@@ -6,4 +6,8 @@ public class GuildObjectActor extends UniverseObjectActor<GuildObject> {
     protected GuildObjectActor(GuildObject serverObject) {
         super(serverObject);
     }
+
+    protected GuildObjectActor(long objectId) {
+        super(objectId);
+    }
 }

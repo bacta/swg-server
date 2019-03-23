@@ -6,4 +6,8 @@ public class CellObjectActor extends ServerObjectActor<CellObject> {
     protected CellObjectActor(CellObject serverObject) {
         super(serverObject);
     }
+
+    protected CellObjectActor(long objectId) {
+        super(objectId);
+    }
 }

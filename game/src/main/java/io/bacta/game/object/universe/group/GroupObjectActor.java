@@ -6,4 +6,8 @@ public class GroupObjectActor extends UniverseObjectActor<GroupObject> {
     protected GroupObjectActor(GroupObject serverObject) {
         super(serverObject);
     }
+
+    protected GroupObjectActor(long objectId) {
+        super(objectId);
+    }
 }

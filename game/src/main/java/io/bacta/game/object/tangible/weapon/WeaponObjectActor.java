@@ -6,4 +6,8 @@ public class WeaponObjectActor extends TangibleObjectActor<WeaponObject> {
     protected WeaponObjectActor(WeaponObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected WeaponObjectActor(long objectId) {
+        super(objectId);
+    }
 }

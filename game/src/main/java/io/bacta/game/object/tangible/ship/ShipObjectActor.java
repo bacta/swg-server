@@ -6,4 +6,8 @@ public class ShipObjectActor extends TangibleObjectActor<ShipObject> {
     protected ShipObjectActor(ShipObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected ShipObjectActor(long objectId) {
+        super(objectId);
+    }
 }

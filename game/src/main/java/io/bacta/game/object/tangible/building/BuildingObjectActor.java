@@ -6,4 +6,8 @@ public class BuildingObjectActor extends TangibleObjectActor<BuildingObject> {
     protected BuildingObjectActor(BuildingObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected BuildingObjectActor(long objectId) {
+        super(objectId);
+    }
 }

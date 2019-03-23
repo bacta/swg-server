@@ -6,4 +6,8 @@ public class InstallationObjectActor<T extends InstallationObject> extends Tangi
     protected InstallationObjectActor(T tangibleObject) {
         super(tangibleObject);
     }
+
+    protected InstallationObjectActor(long objectId) {
+        super(objectId);
+    }
 }

@@ -6,4 +6,8 @@ public class BattlefieldMarkerObjectActor extends TangibleObjectActor<Battlefiel
     protected BattlefieldMarkerObjectActor(BattlefieldMarkerObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected BattlefieldMarkerObjectActor(long objectId) {
+        super(objectId);
+    }
 }

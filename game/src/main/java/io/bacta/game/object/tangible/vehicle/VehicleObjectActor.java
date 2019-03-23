@@ -6,4 +6,8 @@ public class VehicleObjectActor extends TangibleObjectActor<VehicleObject> {
     protected VehicleObjectActor(VehicleObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected VehicleObjectActor(long objectId) {
+        super(objectId);
+    }
 }

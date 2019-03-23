@@ -6,4 +6,8 @@ public class ManufactureInstallationObjectActor extends InstallationObjectActor<
     protected ManufactureInstallationObjectActor(ManufactureInstallationObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected ManufactureInstallationObjectActor(long objectId) {
+        super(objectId);
+    }
 }

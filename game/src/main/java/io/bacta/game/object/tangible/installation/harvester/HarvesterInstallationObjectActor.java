@@ -6,4 +6,8 @@ public class HarvesterInstallationObjectActor extends InstallationObjectActor<Ha
     protected HarvesterInstallationObjectActor(HarvesterInstallationObject tangibleObject) {
         super(tangibleObject);
     }
+
+    protected HarvesterInstallationObjectActor(long objectId) {
+        super(objectId);
+    }
 }

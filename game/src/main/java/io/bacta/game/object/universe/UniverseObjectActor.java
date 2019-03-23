@@ -6,4 +6,8 @@ public class UniverseObjectActor<T extends UniverseObject> extends ServerObjectA
     protected UniverseObjectActor(T serverObject) {
         super(serverObject);
     }
+
+    protected UniverseObjectActor(long objectId) {
+        super(objectId);
+    }
 }

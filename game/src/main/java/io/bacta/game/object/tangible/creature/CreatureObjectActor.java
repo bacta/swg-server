@@ -12,6 +12,10 @@ public class CreatureObjectActor extends TangibleObjectActor<CreatureObject> {
         super(creatureObject);
     }
 
+    protected CreatureObjectActor(long objectId) {
+        super(objectId);
+    }
+
     @Override
     protected ReceiveBuilder appendReceiveHandlers(ReceiveBuilder receiveBuilder) {
         return super.appendReceiveHandlers(

@@ -7,4 +7,8 @@ public class IntangibleObjectActor<T extends ServerObject> extends ServerObjectA
     protected IntangibleObjectActor(T serverObject) {
         super(serverObject);
     }
+
+    protected IntangibleObjectActor(long objectId) {
+        super(objectId);
+    }
 }

@@ -391,6 +391,11 @@
                 <version>${akka.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.typesafe.akka</groupId>
+                <artifactId>akka-persistence_2.12</artifactId>
+                <version>${akka.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectreactor</groupId>
                 <artifactId>reactor-spring</artifactId>
                 <version>${reactor.spring.version}</version>
