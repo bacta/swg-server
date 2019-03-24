@@ -485,5 +485,4 @@
             <version>${checker.version}</version>
         </dependency>
     </dependencies>
-
 </project>
