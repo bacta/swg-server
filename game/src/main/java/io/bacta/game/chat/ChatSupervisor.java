@@ -1,4 +1,4 @@
-package io.bacta.game.universe;
+package io.bacta.game.chat;
 
 import akka.actor.AbstractActor;
 import akka.event.Logging;
