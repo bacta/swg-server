@@ -4,10 +4,14 @@ import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.japi.pf.DeciderBuilder;
 import io.bacta.engine.SpringAkkaExtension;
+import io.bacta.game.galaxy.GalaxyTopics;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterFailed;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,6 +27,7 @@ import static akka.actor.SupervisorStrategy.*;
 /**
  * Manages sessions to create a new player characters.
  */
+@Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PlayerCreationSupervisor extends AbstractActor {
@@ -39,6 +44,9 @@ public class PlayerCreationSupervisor extends AbstractActor {
     public PlayerCreationSupervisor(SpringAkkaExtension ext) {
         this.ext = ext;
         this.sessionTimeout = 1000 * 5 * 60; //TODO: Pull this in from configuration.
+
+        final ActorRef mediator = DistributedPubSub.get(context().system()).mediator();
+        mediator.tell(new DistributedPubSubMediator.Subscribe(GalaxyTopics.PLAYER_CREATION, self()), self());
     }
 
     @Override
@@ -53,6 +61,7 @@ public class PlayerCreationSupervisor extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+                .match(DistributedPubSubMediator.SubscribeAck.class, this::subscribed)
                 .match(ClientCreateCharacter.class, this::clientCreateCharacter)
                 .build();
     }
@@ -97,5 +106,9 @@ public class PlayerCreationSupervisor extends AbstractActor {
         pendingSessions.remove(client);
 
         return stop();
+    }
+
+    private void subscribed(DistributedPubSubMediator.SubscribeAck msg) {
+        LOGGER.trace("Subscribed");
     }
 }

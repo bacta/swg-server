@@ -50,7 +50,6 @@ public final class ClientCreateCharacter extends GameNetworkMessage {
     private final String skillTemplate;
     private final String workingSkill;
 
-
     public ClientCreateCharacter(final ByteBuffer buffer) {
         appearanceData = BufferUtil.getAscii(buffer);
         characterName = BufferUtil.getUnicode(buffer);
@@ -82,6 +81,5 @@ public final class ClientCreateCharacter extends GameNetworkMessage {
         BufferUtil.put(buffer, useNewbieTutorial);
         BufferUtil.putAscii(buffer, skillTemplate);
         BufferUtil.putAscii(buffer, workingSkill);
-
     }
 }
