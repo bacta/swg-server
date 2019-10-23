@@ -1,11 +1,10 @@
-package io.bacta.game.service.object;
+package io.bacta.game.object;
 
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import io.bacta.game.message.object.MessageQueueObjectMenuRequest;
-import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.player.PlayerObjectService;
 import io.bacta.shared.datatable.DataTable;

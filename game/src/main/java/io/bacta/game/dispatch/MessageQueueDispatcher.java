@@ -6,7 +6,7 @@ import io.bacta.game.GameControllerMessageType;
 import io.bacta.game.ObjControllerMessage;
 import io.bacta.game.controllers.object.MessageQueueController;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.game.object.ServerObjectService;
 import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;

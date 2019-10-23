@@ -1,6 +1,6 @@
 package io.bacta.game.planet;
 
-import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.game.object.ServerObjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

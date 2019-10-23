@@ -8,7 +8,7 @@ import io.bacta.game.controllers.object.CommandQueueController;
 import io.bacta.game.controllers.object.QueuesCommand;
 import io.bacta.game.message.object.CommandQueueEnqueue;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.service.object.ServerObjectService;
+import io.bacta.game.object.ServerObjectService;
 import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.util.CommandNames;
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;

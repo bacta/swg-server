@@ -1,9 +1,8 @@
-package io.bacta.game.service.object;
+package io.bacta.game.object;
 
+import io.bacta.game.container.ContainerTransferService;
 import io.bacta.game.db.InMemoryServerObjectDatabase;
-import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
-import io.bacta.game.service.container.ContainerTransferService;
 import io.bacta.shared.container.ContainerResult;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.template.ObjectTemplateList;

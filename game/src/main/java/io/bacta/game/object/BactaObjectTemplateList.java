@@ -1,4 +1,4 @@
-package io.bacta.game.service.object;
+package io.bacta.game.object;
 
 import io.bacta.shared.container.ArrangementDescriptorList;
 import io.bacta.shared.container.SlotDescriptorList;

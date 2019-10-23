@@ -1,8 +1,7 @@
-package io.bacta.game.service.object;
+package io.bacta.game.object;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.intangible.IntangibleObject;
 import io.bacta.game.object.intangible.player.PlayerObject;
 import io.bacta.game.object.tangible.TangibleObject;

@@ -1,4 +1,4 @@
-package io.bacta.game.service.container;
+package io.bacta.game.container;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;

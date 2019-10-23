@@ -1,4 +1,4 @@
-package io.bacta.game.service.container;
+package io.bacta.game.container;
 
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.utils.ReflectionUtil;

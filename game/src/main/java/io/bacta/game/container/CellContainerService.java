@@ -1,4 +1,4 @@
-package io.bacta.game.service.container;
+package io.bacta.game.container;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

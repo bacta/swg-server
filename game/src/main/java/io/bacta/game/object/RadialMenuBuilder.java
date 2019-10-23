@@ -1,4 +1,4 @@
-package io.bacta.game.service.object;
+package io.bacta.game.object;
 
 import com.google.common.collect.ImmutableList;
 import io.bacta.shared.radialmenu.ObjectMenuRequestData;
