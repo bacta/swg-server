@@ -1,4 +1,4 @@
-package io.bacta.game.service.chat;
+package io.bacta.game.chat;
 
 import io.bacta.game.object.ServerObject;
 import io.bacta.shared.localization.StringId;

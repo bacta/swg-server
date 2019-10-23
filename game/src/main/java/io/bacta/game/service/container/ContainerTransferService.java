@@ -1,7 +1,7 @@
 package io.bacta.game.service.container;
 
+import io.bacta.game.chat.GameChatService;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.service.chat.GameChatService;
 import io.bacta.game.service.player.VeteranRewardsService;
 import io.bacta.shared.container.*;
 import io.bacta.shared.foundation.CrcString;
