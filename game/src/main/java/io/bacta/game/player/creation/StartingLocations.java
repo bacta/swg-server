@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import io.bacta.shared.datatable.DataTable;
 import io.bacta.shared.datatable.DataTableManager;

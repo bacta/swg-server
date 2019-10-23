@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;

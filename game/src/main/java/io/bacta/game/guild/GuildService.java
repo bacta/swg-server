@@ -1,4 +1,4 @@
-package io.bacta.game.service.guild;
+package io.bacta.game.guild;
 
 import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -21,7 +21,7 @@ import io.bacta.game.object.template.server.ServerCreatureObjectTemplate;
 import io.bacta.game.service.container.ContainerTransferService;
 import io.bacta.game.service.object.ObjectTemplateService;
 import io.bacta.game.service.object.ServerObjectService;
-import io.bacta.game.service.player.BiographyService;
+import io.bacta.game.player.BiographyService;
 import io.bacta.shared.collision.CollisionProperty;
 import io.bacta.shared.container.ContainerResult;
 import io.bacta.shared.foundation.ConstCharCrcLowerString;

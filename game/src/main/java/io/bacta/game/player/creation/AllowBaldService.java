@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;

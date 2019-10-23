@@ -7,7 +7,7 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import io.bacta.game.message.object.MessageQueueObjectMenuRequest;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.object.tangible.creature.CreatureObject;
-import io.bacta.game.service.player.PlayerObjectService;
+import io.bacta.game.player.PlayerObjectService;
 import io.bacta.shared.datatable.DataTable;
 import io.bacta.shared.datatable.DataTableManager;
 import io.bacta.shared.radialmenu.RadialMenuInfo;

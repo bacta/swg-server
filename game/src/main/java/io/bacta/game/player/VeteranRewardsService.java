@@ -1,4 +1,4 @@
-package io.bacta.game.service.player;
+package io.bacta.game.player;
 
 import io.bacta.game.object.ServerObject;
 import org.springframework.stereotype.Service;

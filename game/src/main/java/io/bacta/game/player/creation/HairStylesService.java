@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import com.google.common.collect.ImmutableMap;
 import io.bacta.shared.iff.Iff;

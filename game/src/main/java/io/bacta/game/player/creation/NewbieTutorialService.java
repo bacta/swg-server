@@ -1,4 +1,4 @@
-package io.bacta.game.service.player.creation;
+package io.bacta.game.player.creation;
 
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.shared.math.Vector;

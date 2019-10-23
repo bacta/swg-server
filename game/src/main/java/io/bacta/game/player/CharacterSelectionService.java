@@ -1,9 +1,9 @@
-package io.bacta.game.service.player;
+package io.bacta.game.player;
 
 import io.bacta.game.message.*;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.scene.SceneService;
-import io.bacta.game.service.guild.GuildService;
+import io.bacta.game.guild.GuildService;
 import io.bacta.game.service.object.ServerObjectService;
 import io.bacta.soe.context.SoeRequestContext;
 import lombok.extern.slf4j.Slf4j;

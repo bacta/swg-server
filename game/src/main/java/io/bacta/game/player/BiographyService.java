@@ -1,4 +1,4 @@
-package io.bacta.game.service.player;
+package io.bacta.game.player;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;

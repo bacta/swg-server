@@ -2,7 +2,7 @@ package io.bacta.game.service.container;
 
 import io.bacta.game.chat.GameChatService;
 import io.bacta.game.object.ServerObject;
-import io.bacta.game.service.player.VeteranRewardsService;
+import io.bacta.game.player.VeteranRewardsService;
 import io.bacta.shared.container.*;
 import io.bacta.shared.foundation.CrcString;
 import io.bacta.shared.math.Transform;
