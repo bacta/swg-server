@@ -12,7 +12,7 @@ import io.bacta.soe.network.message.SoeMessageType
 import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
 import io.bacta.soe.serialize.ObjControllerMessageSerializer
-import io.bacta.soe.util.GameNetworkMessageTemplateWriter
+import io.bacta.soe.util.VelocityGameNetworkMessageTemplateWriter
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -53,7 +53,7 @@ abstract class MessageProcessingBase extends Specification {
         def objSerializer = new ObjControllerMessageSerializer()
         objSerializer.loadMessages()
 
-        serializer = new DefaultGameNetworkMessageSerializer(metrics, objSerializer, Mock(GameNetworkMessageTemplateWriter))
+        serializer = new DefaultGameNetworkMessageSerializer(metrics, objSerializer, Mock(VelocityGameNetworkMessageTemplateWriter))
         serializer.loadMessages()
 
         processor = Mock(GameNetworkMessageProcessor) {

@@ -1,6 +1,8 @@
 package io.bacta.game.config;
 
 import io.bacta.soe.util.GameNetworkMessageTemplateWriter;
+import io.bacta.soe.util.NullGameNetworkMessageTemplateWriter;
+import io.bacta.soe.util.VelocityGameNetworkMessageTemplateWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +13,14 @@ import java.nio.file.Paths;
 
 @Configuration
 @Slf4j
-public class CodeTemplateConfig {
+public class TemplateWriterConfiguration {
 
     @Bean
     @Profile("dev")
     public GameNetworkMessageTemplateWriter getWriter() {
 
         // Game Network Messages
-        GameNetworkMessageTemplateWriter writer = new GameNetworkMessageTemplateWriter();
+        GameNetworkMessageTemplateWriter writer = new VelocityGameNetworkMessageTemplateWriter();
         final Path controllerFilePath = Paths.get("game", "src", "main", "java", "io",
                 "bacta", "game", "controllers");
         final String controllerPackage = "io.bacta.game.controllers";
@@ -49,7 +51,6 @@ public class CodeTemplateConfig {
     @Profile("!dev")
     @Bean
     public GameNetworkMessageTemplateWriter getNullWriter() {
-        LOGGER.info("Not loading GameNetworkMessageTemplateWriter since 'dev' profile not active");
-        return null;
+        return new NullGameNetworkMessageTemplateWriter();
     }
 }
