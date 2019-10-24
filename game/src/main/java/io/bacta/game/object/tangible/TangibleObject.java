@@ -330,7 +330,7 @@ public class TangibleObject extends ServerObject
 ////                        {
 ////                            std::vector<ServerObject *> allowedObservers;
 ////                            for (std::vector<ServerObject *>::const_iterator i = possibleObservers.begin(); i != possibleObservers.end(); ++i) {
-////                                if (m_passiveRevealPlayerCharacter.contains((*i)->getNetworkId()))
+////                                if (m_passiveRevealPlayerCharacter.contains((*i)->getContainerNetworkId()))
 ////                                allowedObservers.push_back(*i);
 ////                            }
 ////
@@ -367,7 +367,7 @@ public class TangibleObject extends ServerObject
 //
 //            //uint32 flags, factionId;
 //            //Pvp::getClientVisibleStatus(client, this, flags, factionId);
-//            final UpdatePvpStatusMessage statusMessage = new UpdatePvpStatusMessage(getNetworkId(), flags, factionsId);
+//            final UpdatePvpStatusMessage statusMessage = new UpdatePvpStatusMessage(getContainerNetworkId(), flags, factionsId);
 //            client.sendMessage(statusMessage);
 //            //PvpUpdateObserver::updatePvpStatusCache(client, this, flags, factionId);
 //        }

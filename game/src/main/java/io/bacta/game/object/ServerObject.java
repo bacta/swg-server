@@ -135,7 +135,7 @@ public abstract class ServerObject extends GameObject {
                     final SlotDescriptor slotDescriptor = localSharedTemplate.getSlotDescriptor();
 
                     if (slotDescriptor != null) {
-                        final SlottedContainer slottedContainer = new SlottedContainer(this, slotDescriptor.getSlots());
+                        final SlottedContainer slottedContainer = new SlottedContainer(slotIdManager, this, slotDescriptor.getSlots());
                         addProperty(slottedContainer);
                     }
                     break;

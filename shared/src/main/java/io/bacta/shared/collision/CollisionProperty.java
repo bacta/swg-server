@@ -587,7 +587,7 @@ public class CollisionProperty extends Property {
 
         if (footprint != null) {
             //-- cached objects don't get footprints because we don't want to drop them to the floors/ground etc...
-//            if (getOwner().getNetworkId() < NetworkObject.INVALID)
+//            if (getOwner().getContainerNetworkId() < NetworkObject.INVALID)
 //                footprint = null;
 //
 //            if (footprint != null)

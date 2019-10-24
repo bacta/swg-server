@@ -282,7 +282,7 @@ public class CreatureObject extends TangibleObject {
 //                        | GameControllerMessageFlags.DEST_AUTH_CLIENT
 //                        | GameControllerMessageFlags.DEST_PROXY_CLIENT,
 //                GameControllerMessageType.SET_POSTURE.value,
-//                getNetworkId(),
+//                getContainerNetworkId(),
 //                0,
 //                postureMessage);
 //
@@ -720,7 +720,7 @@ public final void initializeAttribute(final int attribute, final int value) {
 ////            client.sendMessage(message);
 ////        }
 //
-//        final UpdatePostureMessage updatePostureMessage = new UpdatePostureMessage(getNetworkId(), getPosture());
+//        final UpdatePostureMessage updatePostureMessage = new UpdatePostureMessage(getContainerNetworkId(), getPosture());
 //        client.sendMessage(updatePostureMessage);
 //    }
 //

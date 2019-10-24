@@ -61,7 +61,7 @@ public class HateList {
 //            LOGGER.warn("Owner ({}} is invalid.", owner.getDebugInformation());
 //        } else {
 //            if (!isValidTarget(target)) {
-//                LOGGER.warn("Owner ({}) has invalid target ({}).", owner.getDebugInformation(), target.getNetworkId());
+//                LOGGER.warn("Owner ({}) has invalid target ({}).", owner.getDebugInformation(), target.getContainerNetworkId());
 //            } else {
 //                //If a target AI has a master, the target and the master needs to be added to the hate list (ie. pets should cause their master to gain hate)
 //                final CreatureObject targetCreatureObject = CreatureObject.asCreatureObject(target);

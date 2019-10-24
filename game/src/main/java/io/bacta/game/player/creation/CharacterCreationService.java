@@ -7,7 +7,6 @@ import gnu.trove.list.TIntList;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.utils.StringUtil;
 import io.bacta.game.chat.GameChatService;
-import io.bacta.game.container.ContainerTransferFailedException;
 import io.bacta.game.container.ContainerTransferService;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterFailed;
@@ -27,6 +26,7 @@ import io.bacta.game.object.tangible.creature.Race;
 import io.bacta.game.object.template.server.ServerCreatureObjectTemplate;
 import io.bacta.game.player.BiographyService;
 import io.bacta.shared.collision.CollisionProperty;
+import io.bacta.shared.container.ContainerTransferException;
 import io.bacta.shared.foundation.ConstCharCrcLowerString;
 import io.bacta.shared.localization.StringId;
 import io.bacta.shared.math.Transform;
@@ -209,7 +209,7 @@ public class CharacterCreationService {
 //        final CharacterInfo info = new CharacterInfo(
 //                playerCreature.getAssignedObjectName(),
 //                SOECRC32.hashCode(playerCreature.getObjectTemplateName()),
-//                playerCreature.getNetworkId(),
+//                playerCreature.getContainerNetworkId(),
 //                gameServerState.getClusterId(),
 //                CharacterInfo.Type.NORMAL,
 //                false
@@ -238,7 +238,7 @@ public class CharacterCreationService {
                     NameErrors.CANT_CREATE_AVATAR);
 
             context.sendMessage(message);
-        } catch (ContainerTransferFailedException ex) {
+        } catch (ContainerTransferException ex) {
             LOGGER.error("Unable to transfer player to container. This shouldn't happen.");
 
             final ClientCreateCharacterFailed message = new ClientCreateCharacterFailed(
@@ -253,7 +253,6 @@ public class CharacterCreationService {
         try {
             final int accountId = 1;
             final PlayerObject play = serverObjectService.createObject(GHOST_TEMPLATE, playerCreature);
-            containerTransferService.transferItemToSlottedContainerSlotId(playerCreature, play, null, GHOST_SLOT_NAME);
 
             play.setStationId(accountId);
             play.setBornDate((int) Instant.now().getEpochSecond());
@@ -261,7 +260,7 @@ public class CharacterCreationService {
             play.setWorkingSkill(request.getWorkingSkill(), true);
         } catch (ServerObjectCreationFailedException ex) {
             LOGGER.error("Failed to create player object for character {}.", playerCreature.getNetworkId());
-        } catch (ContainerTransferFailedException ex) {
+        } catch (ContainerTransferException ex) {
             LOGGER.error("Failed to add player object to creature {} ghost slot.", playerCreature.getNetworkId());
         }
     }
@@ -321,7 +320,7 @@ public class CharacterCreationService {
         } catch (ServerObjectCreationFailedException ex) {
             LOGGER.error("Could not create hair with template {}.", hairStyleTemplate);
 
-        } catch (ContainerTransferFailedException ex) {
+        } catch (ContainerTransferException ex) {
             LOGGER.error("Unable to slot hair with template {}.", hairStyleTemplate);
 
         } catch (ClassCastException ex) {
@@ -416,7 +415,7 @@ public class CharacterCreationService {
                     serverObjectService.createObject(templateName, creatureObject);
                 } catch (ServerObjectCreationFailedException ex) {
                     LOGGER.error("Failed creating starting equipment item {}", templateName);
-                } catch (ContainerTransferFailedException ex) {
+                } catch (ContainerTransferException ex) {
                     LOGGER.error("Failed transferring starting equipment item {} to player {} because {}",
                             templateName,
                             creatureObject.getNetworkId(),
@@ -444,7 +443,7 @@ public class CharacterCreationService {
                     templateName,
                     slotName.toString(),
                     creatureObject.getNetworkId());
-        } catch (ContainerTransferFailedException ex) {
+        } catch (ContainerTransferException ex) {
             LOGGER.error("Failed to transfer required slot item {} to slot {} for player {} because {}.",
                     templateName,
                     slotName.getString(),

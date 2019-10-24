@@ -353,16 +353,16 @@ public final class PlayerObject extends IntangibleObject {
 //
 //                final GroupObject group = owner.getGroup();
 //                if (group != null) {
-//                    final short currentProfessionForGroup = group.getMemberProfession(owner.getNetworkId());
+//                    final short currentProfessionForGroup = group.getMemberProfession(owner.getContainerNetworkId());
 //
 //                    if (newProfession != currentProfessionForGroup)
-//                        group.setMemberProfession(owner.getNetworkId(), newProfession);
+//                        group.setMemberProfession(owner.getContainerNetworkId(), newProfession);
 //                }
 //
 //                std::map<NetworkId, LfgCharacterData> const & connectedCharacterLfgData = ServerUniverse::getConnectedCharacterLfgData();
-//                std::map<NetworkId, LfgCharacterData>::const_iterator iterFind = connectedCharacterLfgData.find(owner->getNetworkId());
+//                std::map<NetworkId, LfgCharacterData>::const_iterator iterFind = connectedCharacterLfgData.find(owner->getContainerNetworkId());
 //                if ((iterFind != connectedCharacterLfgData.end()) && (iterFind->second.profession != static_cast<LfgCharacterData::Profession>(newProfession)))
-//                    ServerUniverse::setConnectedCharacterProfessionData(owner->getNetworkId(), static_cast<LfgCharacterData::Profession>(newProfession));
+//                    ServerUniverse::setConnectedCharacterProfessionData(owner->getContainerNetworkId(), static_cast<LfgCharacterData::Profession>(newProfession));
 //                */
 //            }
 //        }

@@ -132,10 +132,10 @@ public final class ObjectMenuService {
 //
 //        //TODO: Append this message to the outgoing message queue.
 //        final MessageQueueObjectMenuRequest data = new MessageQueueObjectMenuRequest(
-//                targetObject.getNetworkId(), creatureObject.getNetworkId(), builder.build(), request.getSequenceId());
+//                targetObject.getContainerNetworkId(), creatureObject.getContainerNetworkId(), builder.build(), request.getSequenceId());
 //
 //        final ObjControllerMessage msg = ObjControllerBuilder.newBuilder().send().reliable().authClient()
-//                .build(creatureObject.getNetworkId(), GameControllerMessageType.OBJECT_MENU_RESPONSE, data);
+//                .build(creatureObject.getContainerNetworkId(), GameControllerMessageType.OBJECT_MENU_RESPONSE, data);
 //
 //        connection.sendMessage(msg);
     }

@@ -1,9 +1,9 @@
 package io.bacta.game.object;
 
-import io.bacta.game.container.ContainerTransferFailedException;
 import io.bacta.game.container.ContainerTransferService;
 import io.bacta.game.db.InMemoryServerObjectDatabase;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
+import io.bacta.shared.container.ContainerTransferException;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.template.ObjectTemplateList;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +37,13 @@ public class ServerObjectService {
 
     public <T extends ServerObject> T createObject(final String templatePath) throws
             ServerObjectCreationFailedException,
-            ContainerTransferFailedException {
+            ContainerTransferException {
         return createObject(templatePath, null);
     }
 
     public <T extends ServerObject> T createObject(final String templatePath, final ServerObject parent) throws
             ServerObjectCreationFailedException,
-            ContainerTransferFailedException {
+            ContainerTransferException {
 
         final T object = internalCreateObject(templatePath);
 
@@ -56,7 +56,7 @@ public class ServerObjectService {
 
     public <T extends ServerObject> T createObjectInSlot(final String templatePath, final ServerObject parent, final int slotId) throws
             ServerObjectCreationFailedException,
-            ContainerTransferFailedException {
+            ContainerTransferException {
 
         final T object = internalCreateObject(templatePath);
 
@@ -99,7 +99,7 @@ public class ServerObjectService {
 
             //newObject.setOnDirtyCallback(new ServerObjectServiceOnDirtyCallback(newObject));
 
-            //internalMap.put(newObject.getNetworkId(), newObject);
+            //internalMap.put(newObject.getContainerNetworkId(), newObject);
 
             return newObject;
         } catch (final Exception ex) {

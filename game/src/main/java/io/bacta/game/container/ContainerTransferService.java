@@ -1,6 +1,5 @@
 package io.bacta.game.container;
 
-import io.bacta.game.chat.GameChatService;
 import io.bacta.game.object.ServerObject;
 import io.bacta.game.player.VeteranRewardsService;
 import io.bacta.shared.container.*;
@@ -23,36 +22,24 @@ import javax.inject.Inject;
 @Slf4j
 @Service
 public final class ContainerTransferService {
-    private final GameChatService gameChatService;
     private final SlotIdManager slotIdManager;
-    private final ContainerService containerService;
-    private final VolumeContainerService volumeContainerService;
-    private final SlottedContainerService slottedContainerService;
     private final VeteranRewardsService veteranRewardService;
 
     @Inject
     public ContainerTransferService(
-            GameChatService gameChatService,
-            SlotIdManager slotIdManager,
-            ContainerService containerService,
-            VolumeContainerService volumeContainerService,
-            SlottedContainerService slottedContainerService,
-            VeteranRewardsService veteranRewardService) {
-        this.gameChatService = gameChatService;
+            final SlotIdManager slotIdManager,
+            final VeteranRewardsService veteranRewardService) {
         this.slotIdManager = slotIdManager;
-        this.containerService = containerService;
-        this.volumeContainerService = volumeContainerService;
-        this.slottedContainerService = slottedContainerService;
         this.veteranRewardService = veteranRewardService;
     }
 
-    public boolean canTransferTo(final ServerObject destination, final ServerObject item, final ServerObject transferer)
-            throws ContainerTransferFailedException {
+    public boolean canTransferTo(final ServerObject destination, final ServerObject item, final ServerObject actor)
+            throws ContainerTransferException {
         //skipping authoritative check
 
         //Cannot move a reward item that is in the middle of the trade in process.
         if (veteranRewardService.isTradeInProgress(item)) {
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.BLOCKED_BY_ITEM_BEING_TRANSFERRED);
@@ -65,16 +52,10 @@ public final class ContainerTransferService {
         if (destination != null) {
             final Container container = destination.getContainerProperty();
 
-            if (container != null) {
-                final boolean mayAdd = containerService.mayAdd(container, item);
-
-                if (!mayAdd)
-                    LOGGER.debug("Container prevented transfer.");
-
-                return mayAdd;
-            } else {
+            if (container == null) {
                 LOGGER.debug("Destination {} is not a container.", destination.getNetworkId());
-                throw new ContainerTransferFailedException(
+
+                throw new ContainerTransferException(
                         item.getNetworkId(),
                         destination.getNetworkId(),
                         ContainerErrorCode.NO_CONTAINER);
@@ -84,24 +65,19 @@ public final class ContainerTransferService {
         return true;
     }
 
-    public boolean canTransferToSlot(final ServerObject destination, final ServerObject item, final int slotId, final ServerObject transferer)
-            throws ContainerTransferFailedException {
+    public boolean canTransferToSlot(final ServerObject destination, final ServerObject item, final int slotId, final ServerObject actor)
+            throws ContainerTransferException {
         final SlottedContainer slottedContainer = destination.getSlottedContainerProperty();
 
         if (slottedContainer == null) {
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.NO_CONTAINER);
         }
 
-        if (!slottedContainerService.mayAddToSlot(slottedContainer, item, slotId)) {
-            LOGGER.debug("Container {} prevented transfoer for item {}.", destination.getDebugInformation(), item.getDebugInformation());
-            return false;
-        }
-
         if (veteranRewardService.isTradeInProgress(item)) {
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.BLOCKED_BY_ITEM_BEING_TRANSFERRED);
@@ -112,54 +88,54 @@ public final class ContainerTransferService {
         return true;
     }
 
-    public boolean transferItemToGeneralContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer)
-            throws ContainerTransferFailedException {
-        return transferItemToGeneralContainer(destination, item, transferer, false);
+    public boolean transferItemToGeneralContainer(final ServerObject destination, final ServerObject item, final ServerObject actor)
+            throws ContainerTransferException {
+        return transferItemToGeneralContainer(destination, item, actor, false);
     }
 
-    public boolean transferItemToGeneralContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer, final boolean allowOverloaded)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToGeneralContainer(final ServerObject destination, final ServerObject item, final ServerObject actor, final boolean allowOverloaded)
+            throws ContainerTransferException {
         final VolumeContainer volumeContainer = destination.getVolumeContainerProperty();
 
         if (volumeContainer != null)
-            return transferItemToVolumeContainer(destination, item, transferer, allowOverloaded);
+            return transferItemToVolumeContainer(destination, item, actor, allowOverloaded);
 
         final SlottedContainer slottedContainer = destination.getSlottedContainerProperty();
 
         if (slottedContainer != null) {
-            final int arrangement = slottedContainerService.getFirstUnoccupiedArrangement(slottedContainer, item);
+            final int arrangementIndex = slottedContainer.getFirstUnoccupiedArrangement(item);
 
-            if (arrangement != -1)
-                return transferItemToSlottedContainer(destination, item, transferer, arrangement);
+            if (arrangementIndex != -1)
+                return transferItemToSlottedContainer(destination, item, actor, arrangementIndex);
         }
 
         return false;
     }
 
-    public boolean transferItemToSlottedContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer, final int arrangementIndex)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToSlottedContainer(final ServerObject destination, final ServerObject item, final ServerObject actor, final int arrangementIndex)
+            throws ContainerTransferException {
 
         if (arrangementIndex < 0) {
             LOGGER.warn("Invalid arrangement index in transferItemToSlottedContainer");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.INVALID_ARRANGEMENT);
         }
 
-        if (transferer != null) {
+        if (actor != null) {
             final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
             if (slottedProperty == null) {
                 LOGGER.warn("Invalid item (no slottedContainmentProperty)");
-                throw new ContainerTransferFailedException(
+                throw new ContainerTransferException(
                         item.getNetworkId(),
                         destination.getNetworkId(),
                         ContainerErrorCode.WRONG_TYPE);
             }
 
             if (!slottedProperty.canManipulateArrangement(slotIdManager, arrangementIndex)) {
-                throw new ContainerTransferFailedException(
+                throw new ContainerTransferException(
                         item.getNetworkId(),
                         destination.getNetworkId(),
                         ContainerErrorCode.NO_PERMISSION);
@@ -178,22 +154,27 @@ public final class ContainerTransferService {
 
         if (slottedContainer == null) {
             LOGGER.warn("This destination is not a slot container");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.NO_CONTAINER);
         }
 
-        if (!canTransferTo(destination, item, transferer))
+        //First checks if the container service will allow the transfer...
+        if (!canTransferTo(destination, item, actor))
             return false;
 
-        if (!slottedContainerService.mayAdd(slottedContainer, item, arrangementIndex))
-            return false;
+        //Then checks if the Slotted Container Service will allow the transfer...
+//        if (!slottedContainerService.mayAdd(slottedContainer, item, arrangementIndex))
+//            return false;
 
+        //Finally, attempts to make the transfer...
         if (!handleTransferSource(sourceContainer, item))
             return false;
 
-        slottedContainerService.add(slottedContainer, item, arrangementIndex);
+        //Adds the actual items to the slotted container.
+        //slottedContainerService.add(slottedContainer, item, arrangementIndex);
+        slottedContainer.add(item, arrangementIndex);
 
         //item.onContainerTransferComplete(sourceObject, destination);
         //TODO: Post transfer script hook
@@ -201,12 +182,12 @@ public final class ContainerTransferService {
     }
 
     public boolean transferItemToSlottedContainerSlotId(final ServerObject destination, final ServerObject item, final ServerObject actor, final CrcString slotName)
-            throws ContainerTransferFailedException {
+            throws ContainerTransferException {
         final int slotId = slotIdManager.findSlotId(slotName);
 
         if (slotId == SlotId.INVALID) {
             LOGGER.warn("Invalid slot {}", slotName.getString());
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.NO_SLOT);
@@ -215,23 +196,24 @@ public final class ContainerTransferService {
         return transferItemToSlottedContainerSlotId(destination, item, actor, slotId);
     }
 
-    public boolean transferItemToSlottedContainerSlotId(final ServerObject destination, final ServerObject item, final ServerObject transferer, final int slotId)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToSlottedContainerSlotId(final ServerObject destination, final ServerObject item, final ServerObject actor, final int slotId)
+            throws ContainerTransferException {
         final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedProperty == null) {
             LOGGER.warn("Invalid item (no slottedContainmentProperty)");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.NO_SLOT);
         }
 
-        return transferItemToSlottedContainer(destination, item, transferer, slottedProperty.getBestArrangementForSlot(slotId));
+        final int arrangementIndex = slottedProperty.getBestArrangementForSlot(slotId);
+        return transferItemToSlottedContainer(destination, item, actor, arrangementIndex);
     }
 
     public boolean transferItemToUnknownContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer, final int arrangementIndex, final Transform transform)
-            throws ContainerTransferFailedException {
+            throws ContainerTransferException {
         final VolumeContainer volumeContainer = destination.getVolumeContainerProperty();
 
         if (volumeContainer != null)
@@ -247,19 +229,23 @@ public final class ContainerTransferService {
         if (cellProperty != null)
             return transferItemToCell(destination, item, transferer, transform);
 
-        throw new ContainerTransferFailedException(
+        throw new ContainerTransferException(
                 item.getNetworkId(),
                 destination.getNetworkId(),
                 ContainerErrorCode.NO_CONTAINER);
     }
 
-    public boolean transferItemToVolumeContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer)
-            throws ContainerTransferFailedException {
-        return transferItemToVolumeContainer(destination, item, transferer, false);
+    public boolean transferItemToVolumeContainer(final ServerObject destination, final ServerObject item, final ServerObject actor)
+            throws ContainerTransferException {
+        return transferItemToVolumeContainer(destination, item, actor, false);
     }
 
-    public boolean transferItemToVolumeContainer(final ServerObject destination, final ServerObject item, final ServerObject transferer, final boolean allowOverloaded)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToVolumeContainer(final ServerObject destination,
+                                                 final ServerObject item,
+                                                 final ServerObject actor,
+                                                 final boolean allowOverloaded)
+            throws ContainerTransferException {
+
         final SharedTransfer sharedTransfer = sharedTransferBegin(item);
 
         if (!sharedTransfer.result)
@@ -269,7 +255,7 @@ public final class ContainerTransferService {
 
         if (volumeContainer == null) {
             LOGGER.warn("This destination is not a volume container.");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.WRONG_TYPE);
@@ -278,7 +264,7 @@ public final class ContainerTransferService {
 
         if (item.isPlayerControlled()) {
             //Trying to put a player inside a volume container.
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.BLOCKED_BY_ITEM_BEING_TRANSFERRED);
@@ -286,7 +272,7 @@ public final class ContainerTransferService {
 
 
         //TODO: Revisit overloading
-//        if (!canTransferTo(destination, item, transferer)) {
+//        if (!canTransferTo(destination, item, actor)) {
 //            if (allowOverloaded) {
 //                if (!(containerResult.getError() == ContainerErrorCode.FULL || containerResult.getError() == ContainerErrorCode.TOO_LARGE))
 //                    return false;
@@ -301,7 +287,7 @@ public final class ContainerTransferService {
         if (allowOverloaded)
             LOGGER.warn("May need to implement some hacks here to allowOverload when transfering to volume container.");
 
-        final boolean success = volumeContainerService.add(volumeContainer, item, allowOverloaded);
+        final boolean success = volumeContainer.add(item, allowOverloaded);
 
         if (!success)
             LOGGER.warn("Checks to add an item succeeded, but the add failed.");
@@ -311,14 +297,14 @@ public final class ContainerTransferService {
         return true;
     }
 
-    public boolean transferItemToCell(final ServerObject destination, final ServerObject item, final ServerObject transferer)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToCell(final ServerObject destination, final ServerObject item, final ServerObject actor)
+            throws ContainerTransferException {
         final Transform transform = destination.getTransformObjectToWorld().rotateTranslateLocalToParent(item.getTransformObjectToParent());
-        return transferItemToCell(destination, item, transferer, transform);
+        return transferItemToCell(destination, item, actor, transform);
     }
 
-    public boolean transferItemToCell(final ServerObject destination, final ServerObject item, final ServerObject transferer, final Transform transform)
-            throws ContainerTransferFailedException {
+    public boolean transferItemToCell(final ServerObject destination, final ServerObject item, final ServerObject actor, final Transform transform)
+            throws ContainerTransferException {
         final SharedTransfer sharedTransfer = sharedTransferBegin(item);
 
         if (!sharedTransfer.result) {
@@ -330,7 +316,7 @@ public final class ContainerTransferService {
 
         if (cellProperty == null) {
             LOGGER.warn("This destination is not a cell.");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.NO_CONTAINER);
@@ -341,7 +327,7 @@ public final class ContainerTransferService {
 //            return false;
 //        }
 
-        if (!canTransferTo(destination, item, transferer)) {
+        if (!canTransferTo(destination, item, actor)) {
             LOGGER.debug("Could not transfer to dest cell.");
             return false;
         }
@@ -360,7 +346,7 @@ public final class ContainerTransferService {
     }
 
     public boolean transferItemToWorld(final ServerObject destination, final ServerObject item, final ServerObject transferer, final Transform transform)
-            throws ContainerTransferFailedException {
+            throws ContainerTransferException {
 //        if (transferer != null) {
 //            final SoeRequestContext client = transferer.getConnection();
 //
@@ -390,7 +376,7 @@ public final class ContainerTransferService {
         if (sharedTransfer.sourceContainer == null) {
             //Already in world
             LOGGER.debug("Failed transfer to world because it was already there.");
-            throw new ContainerTransferFailedException(
+            throw new ContainerTransferException(
                     item.getNetworkId(),
                     destination.getNetworkId(),
                     ContainerErrorCode.UNKNOWN);
@@ -463,27 +449,14 @@ public final class ContainerTransferService {
     }
 
     private boolean handleTransferSource(final Container source, final ServerObject item)
-            throws ContainerTransferFailedException {
-        //containerResult.setError(ContainerErrorCode.SUCCESS);
-        return source == null || containerService.remove(source, item);
-    }
-
-    public static GameObject getContainedByObject(final GameObject obj) {
-        final ContainedByProperty containedBy = getContainedByProperty(obj);
-        return containedBy != null ? containedBy.getContainedBy() : null;
+            throws ContainerTransferException {
+        return source == null || source.remove(item);
     }
 
     public static ContainedByProperty getContainedByProperty(final GameObject obj) {
         return obj.getContainedByProperty();
     }
 
-    public static SlottedContainmentProperty getSlottedContainmentProperty(final GameObject obj) {
-        return obj.getProperty(SlottedContainmentProperty.getClassPropertyId());
-    }
-
-    public static VolumeContainmentProperty getVolumeContainmentProperty(final GameObject obj) {
-        return obj.getProperty(VolumeContainmentProperty.getClassPropertyId());
-    }
 
     @AllArgsConstructor
     private static final class SharedTransfer {

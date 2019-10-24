@@ -40,7 +40,7 @@ public class WorldSnapshotDatabaseLoader {
 //            final List<WorldSnapshotNode> nodes = snapshot.getNodeList();
 //
 //            for (WorldSnapshotNode node : nodes) {
-//                final long networkId = node.getNetworkId();
+//                final long networkId = node.getContainerNetworkId();
 //            }
 //        }
     }
