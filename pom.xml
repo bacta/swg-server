@@ -20,25 +20,24 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spock.version>1.1-groovy-2.4</spock.version>
+        <spock.version>1.3-groovy-2.5</spock.version>
         <akka.version>2.5.26</akka.version>
         <spring.data.version>1.4.6.RELEASE</spring.data.version>
-        <spring.security.version>5.1.4.RELEASE</spring.security.version>
-        <spring.security.oauth2.version>2.3.4.RELEASE</spring.security.oauth2.version>
-        <spring.security.jwt.version>1.0.10.RELEASE</spring.security.jwt.version>
+        <spring.security.version>5.2.0.RELEASE</spring.security.version>
+        <spring.security.oauth2.version>2.3.7.RELEASE</spring.security.oauth2.version>
+        <spring.security.jwt.version>1.0.11.RELEASE</spring.security.jwt.version>
         <reactor.spring.version>1.0.1.RELEASE</reactor.spring.version>
-        <bouncycastle.pkix.version>1.61</bouncycastle.pkix.version>
-        <checker.version>2.7.0</checker.version>
-        <cglib-nodep.version>3.2.10</cglib-nodep.version>
+        <bouncycastle.pkix.version>1.64</bouncycastle.pkix.version>
+        <checker.version>2.11.1</checker.version>
+        <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <metrics-spring.version>3.1.3</metrics-spring.version>
-        <groovy-all.version>2.4.6</groovy-all.version>
-        <guava.version>27.0.1-jre</guava.version>
+        <guava.version>28.1-jre</guava.version>
         <trove4j.version>3.0.3</trove4j.version>
         <hibernate-core.version>5.4.1.Final</hibernate-core.version>
         <commons-modeler.version>2.0.1</commons-modeler.version>
         <jzlib.version>1.1.3</jzlib.version>
         <velocity.version>1.7</velocity.version>
-        <classgraph.version>4.8.11</classgraph.version>
+        <classgraph.version>4.8.52</classgraph.version>
 
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>bacta</sonar.organization>
@@ -156,7 +155,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.5</version>
+                <version>1.8.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -164,7 +163,7 @@
                             <goal>addTestSources</goal>
                             <goal>generateStubs</goal>
                             <goal>compile</goal>
-                            <goal>testCompile</goal>
+                            <goal>compileTests</goal>
                             <goal>removeStubs</goal>
                         </goals>
                     </execution>
@@ -452,15 +451,26 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy-all.version}</version>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
         </dependency>
         <dependency>
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
             <version>${metrics-spring.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
