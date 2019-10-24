@@ -33,6 +33,10 @@ public abstract class ServerObject extends GameObject {
     private final AutoDeltaInt authServerProcessId;
     private final AutoDeltaVariable<StringId> descriptionStringId;
 
+    private final AutoDeltaBoolean playerControlled;
+    private final AutoDeltaBoolean persisted;
+    private final AutoDeltaString sceneId;
+
     //private transient ServerSynchronizedUi synchornizedUi;
 
     private transient boolean initialized = false;
@@ -76,7 +80,9 @@ public abstract class ServerObject extends GameObject {
         descriptionStringId = new AutoDeltaVariable<>(StringId.INVALID, StringId::new);
         authServerProcessId = new AutoDeltaInt();
 
-        //sceneId = "tatooine";
+        playerControlled = new AutoDeltaBoolean();
+        persisted = new AutoDeltaBoolean();
+        sceneId = new AutoDeltaString("tatooine");
 
         listeners = Collections.synchronizedSet(new HashSet<>());
 
@@ -189,6 +195,36 @@ public abstract class ServerObject extends GameObject {
         addMembersToPackages();
     }
 
+    public String getObjectName() {
+        return this.objectName.get();
+    }
+
+    public boolean isPlayerControlled() {
+        return this.playerControlled.get();
+    }
+
+    public void setObjectName(final String name) {
+        this.objectName.set(name);
+        setDirty(true);
+    }
+
+    public void setPlayerControlled(boolean playerControlled) {
+        this.playerControlled.set(playerControlled);
+        setDirty(true);
+    }
+
+    public final boolean getLocalFlag(final int flag) {
+        return (localFlags & (1 << flag)) != 0;
+    }
+
+    public final void setLocalFlag(final int flag, final boolean enabled) {
+        if (enabled)
+            localFlags |= (1 << flag);
+        else
+            localFlags &= ~(1 << flag);
+    }
+
+
     private void setupPackages() {
         dirtyCallback.set(this, this::deltaChanged);
         authClientServerPackage.addOnDirtyCallback(dirtyCallback);
@@ -212,17 +248,10 @@ public abstract class ServerObject extends GameObject {
 
         sharedPackageNp.addVariable(authServerProcessId);
         sharedPackageNp.addVariable(descriptionStringId);
-    }
 
-    public final boolean getLocalFlag(final int flag) {
-        return (localFlags & (1 << flag)) != 0;
-    }
-
-    public final void setLocalFlag(final int flag, final boolean enabled) {
-        if (enabled)
-            localFlags |= (1 << flag);
-        else
-            localFlags &= ~(1 << flag);
+        serverPackage.addVariable(persisted);
+        serverPackage.addVariable(playerControlled);
+        serverPackage.addVariable(sceneId);
     }
 
     private void deltaChanged() {

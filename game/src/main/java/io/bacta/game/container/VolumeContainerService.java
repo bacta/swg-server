@@ -2,7 +2,10 @@ package io.bacta.game.container;
 
 import io.bacta.engine.utils.ReflectionUtil;
 import io.bacta.game.object.ServerObject;
-import io.bacta.shared.container.*;
+import io.bacta.shared.container.ContainedByProperty;
+import io.bacta.shared.container.ContainerErrorCode;
+import io.bacta.shared.container.VolumeContainer;
+import io.bacta.shared.container.VolumeContainmentProperty;
 import io.bacta.shared.object.GameObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,29 +30,33 @@ public class VolumeContainerService {
         this.containerService = containerService;
     }
 
-    public boolean add(final VolumeContainer container, final GameObject item, final ContainerResult containerResult) {
-        return add(container, item, containerResult, false);
+    public boolean add(final VolumeContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
+        return add(container, item, false);
     }
 
-    public boolean add(final VolumeContainer container, final GameObject item, final ContainerResult containerResult, boolean allowOverloaded) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
+    public boolean add(final VolumeContainer container, final GameObject item, boolean allowOverloaded)
+            throws ContainerTransferFailedException {
         final int oldVolume = container.getCurrentVolume();
 
         final VolumeContainmentProperty property = item.getProperty(VolumeContainmentProperty.getClassPropertyId());
 
         if (property == null) {
             LOGGER.warn("Cannot add an item to a volume container without a containment property.");
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         if (!allowOverloaded && !checkVolume(container, property)) {
-            containerResult.setError(ContainerErrorCode.FULL);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.FULL);
         }
 
-        if (containerService.addToContents(container, item, containerResult) == -1)
+        if (containerService.addToContents(container, item) == -1)
             return false;
 
         insertNewItem(container, item, property);
@@ -90,19 +97,23 @@ public class VolumeContainerService {
         return returnValue;
     }
 
-    public boolean mayAdd(final VolumeContainer container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+    public boolean mayAdd(final VolumeContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
 
         if (item == container.getOwner()) {
-            containerResult.setError(ContainerErrorCode.ADD_SELF);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.ADD_SELF);
         }
 
         final VolumeContainmentProperty property = item.getProperty(VolumeContainmentProperty.getClassPropertyId());
 
         if (property == null) {
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         final VolumeContainer itemVolumeContainer = item.getVolumeContainerProperty();
@@ -112,17 +123,21 @@ public class VolumeContainerService {
 
             if (totalVolume != VolumeContainer.NO_VOLUME_LIMIT && itemVolumeContainer.getTotalVolume() >= totalVolume) {
                 //Some BS about moving a holocron into another one...we aren't doing that.
-                containerResult.setError(ContainerErrorCode.TOO_LARGE);
-                return false;
+                throw new ContainerTransferFailedException(
+                        item.getNetworkId(),
+                        container.getOwner().getNetworkId(),
+                        ContainerErrorCode.TOO_LARGE);
             }
         }
 
         if (!checkVolume(container, property)) {
-            containerResult.setError(ContainerErrorCode.FULL);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.FULL);
         }
 
-        return containerService.mayAdd(container, item, containerResult);
+        return containerService.mayAdd(container, item);
     }
 
     public int recalculateVolume(final VolumeContainer container) {
@@ -156,20 +171,21 @@ public class VolumeContainerService {
         return container.getCurrentVolume();
     }
 
-    public boolean remove(final VolumeContainer container, final GameObject item, final ContainerResult containerResult) {
+    public boolean remove(final VolumeContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
         final int oldVolume = container.getCurrentVolume();
-
-        containerResult.setError(ContainerErrorCode.SUCCESS);
 
         final VolumeContainmentProperty prop = item.getProperty(VolumeContainmentProperty.getClassPropertyId());
 
         if (prop == null) {
             LOGGER.warn("Cannot remove an item from a volume container without a containment property.");
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        boolean returnValue = containerService.remove(container, item, containerResult);
+        boolean returnValue = containerService.remove(container, item);
 
         if (!returnValue) {
             return false;
@@ -177,8 +193,10 @@ public class VolumeContainerService {
 
         if (!internalRemove(container, item, prop)) {
             LOGGER.warn("Tried to remove item {} from volume container in internal routine but failed.", item.getNetworkId());
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         //if volume has changed, update parent volume count.

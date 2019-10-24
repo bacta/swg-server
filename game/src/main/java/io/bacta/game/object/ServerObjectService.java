@@ -1,9 +1,9 @@
 package io.bacta.game.object;
 
+import io.bacta.game.container.ContainerTransferFailedException;
 import io.bacta.game.container.ContainerTransferService;
 import io.bacta.game.db.InMemoryServerObjectDatabase;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
-import io.bacta.shared.container.ContainerResult;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.template.ObjectTemplateList;
 import lombok.extern.slf4j.Slf4j;
@@ -35,40 +35,40 @@ public class ServerObjectService {
         this.containerTransferService = containerTransferService;
     }
 
-    public <T extends ServerObject> T createObject(final String templatePath) {
+    public <T extends ServerObject> T createObject(final String templatePath) throws
+            ServerObjectCreationFailedException,
+            ContainerTransferFailedException {
         return createObject(templatePath, null);
     }
 
-    public <T extends ServerObject> T createObject(final String templatePath, final ServerObject parent) {
+    public <T extends ServerObject> T createObject(final String templatePath, final ServerObject parent) throws
+            ServerObjectCreationFailedException,
+            ContainerTransferFailedException {
+
         final T object = internalCreateObject(templatePath);
 
         if (object != null && parent != null) {
-            final ContainerResult containerResult = new ContainerResult();
-
-            if (!containerTransferService.transferItemToGeneralContainer(parent, object, null, containerResult))
-                LOGGER.error("Unable to transfer object {} to parent object {} during creation. Error: {}",
-                        object.getNetworkId(), parent.getNetworkId(), containerResult.getError());
+            containerTransferService.transferItemToGeneralContainer(parent, object, null);
         }
 
         return object;
     }
 
-    public <T extends ServerObject> T createObjectInSlot(final String templatePath, final ServerObject parent, final int slotId) {
+    public <T extends ServerObject> T createObjectInSlot(final String templatePath, final ServerObject parent, final int slotId) throws
+            ServerObjectCreationFailedException,
+            ContainerTransferFailedException {
+
         final T object = internalCreateObject(templatePath);
 
         if (object != null && parent != null) {
-            final ContainerResult containerResult = new ContainerResult();
-
-            if (!containerTransferService.transferItemToSlottedContainerSlotId(parent, object, null, slotId, containerResult)) {
-                LOGGER.error("Unable to transfer object {} to parent object {} in slot {} during creation. Error: {}",
-                        object.getNetworkId(), parent.getNetworkId(), slotId, containerResult.getError());
-            }
+            containerTransferService.transferItemToSlottedContainerSlotId(parent, object, null, slotId);
         }
 
         return object;
     }
 
-    private <T extends ServerObject> T internalCreateObject(final String templatePath) {
+    private <T extends ServerObject> T internalCreateObject(final String templatePath)
+            throws ServerObjectCreationFailedException {
         try {
             final ObjectTemplateList objectTemplateList = applicationContext.getBean(ObjectTemplateList.class);
             final SlotIdManager slotIdManager = applicationContext.getBean(SlotIdManager.class);
@@ -85,8 +85,6 @@ public class ServerObjectService {
 
             //Put it in the database.
             database.put(newObject);
-
-            //Send a message to object supervisor?!
 
             //Create the object
             //final T newObject = (T) networkObjectFactory.createNetworkObject(objectClass, serverObjectTemplate);
@@ -105,8 +103,8 @@ public class ServerObjectService {
 
             return newObject;
         } catch (final Exception ex) {
-            LOGGER.error("Exception creating object {}. Message: {}", templatePath, ex.getMessage());
-            return null;
+            //LOGGER.error("Exception creating object {}. Message: {}", templatePath, ex.getMessage());
+            throw new ServerObjectCreationFailedException(templatePath);
         }
     }
 

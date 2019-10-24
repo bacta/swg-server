@@ -48,12 +48,14 @@ public class ContainerService {
         return false;
     }
 
-    public boolean mayAdd(final Container container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+    public boolean mayAdd(final Container container, final GameObject item)
+            throws ContainerTransferFailedException {
 
         if (item == container.getOwner()) {
-            containerResult.setError(ContainerErrorCode.ADD_SELF);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.ADD_SELF);
         }
 
         if (loopChecking) {
@@ -72,8 +74,10 @@ public class ContainerService {
                         for (int count = 0; iterObject != null; ++count) {
                             if (count > maxDepth) {
                                 LOGGER.warn("Too deep a container hierarchy.");
-                                containerResult.setError(ContainerErrorCode.TOO_DEEP);
-                                return false;
+                                throw new ContainerTransferFailedException(
+                                        item.getNetworkId(),
+                                        container.getOwner().getNetworkId(),
+                                        ContainerErrorCode.TOO_DEEP);
                             }
 
                             checkList.add(iterObject);
@@ -93,8 +97,10 @@ public class ContainerService {
                                     item.getNetworkId(),
                                     container.getOwner().getNetworkId());
 
-                            containerResult.setError(ContainerErrorCode.ALREADY_IN);
-                            return false;
+                            throw new ContainerTransferFailedException(
+                                    item.getNetworkId(),
+                                    container.getOwner().getNetworkId(),
+                                    ContainerErrorCode.ALREADY_IN);
                         }
                     }
                 }
@@ -102,16 +108,17 @@ public class ContainerService {
         }
 
         if (checkDepth(container) > maxDepth) {
-            containerResult.setError(ContainerErrorCode.TOO_DEEP);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.TOO_DEEP);
         }
 
         return true;
     }
 
-    public boolean remove(final Container container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.UNKNOWN);
-
+    public boolean remove(final Container container, final GameObject item)
+            throws ContainerTransferFailedException {
         boolean returnValue = false;
 
         ContainedByProperty property = item.getContainedByProperty();
@@ -121,15 +128,17 @@ public class ContainerService {
                 LOGGER.warn("Cannot remove an item [{}] from container [{}] whose containedBy says it isn't in this container.",
                         item.getNetworkId(),
                         container.getOwner().getNetworkId());
-                containerResult.setError(ContainerErrorCode.NOT_FOUND);
-                return false;
+
+                throw new ContainerTransferFailedException(
+                        item.getNetworkId(),
+                        container.getOwner().getNetworkId(),
+                        ContainerErrorCode.NOT_FOUND);
             }
 
             final List<GameObject> contents = ReflectionUtil.getFieldValue(contentsField, container);
             returnValue = contents.remove(item);
 
             if (returnValue) {
-                containerResult.setError(ContainerErrorCode.SUCCESS);
                 property.setContainedBy(null);
             }
         }
@@ -165,10 +174,9 @@ public class ContainerService {
         return false;
     }
 
-    protected int addToContents(final Container container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
-        if (!mayAdd(container, item, containerResult))
+    protected int addToContents(final Container container, final GameObject item)
+            throws ContainerTransferFailedException {
+        if (!mayAdd(container, item))
             return -1;
 
         ContainedByProperty containedItem = item.getContainedByProperty();
@@ -179,8 +187,11 @@ public class ContainerService {
             LOGGER.warn("Cannot add an item [{}] to a container [{}] when it is already contained!",
                     item.getNetworkId(),
                     container.getOwner().getNetworkId());
-            containerResult.setError(ContainerErrorCode.ALREADY_IN);
-            return -1;
+
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.ALREADY_IN);
         }
 
         if (loopChecking) {
@@ -199,8 +210,10 @@ public class ContainerService {
                         for (int count = 0; iterObject != null; ++count) {
                             if (count > maxDepth) {
                                 LOGGER.warn("Too deep a container hierarchy.");
-                                containerResult.setError(ContainerErrorCode.TOO_DEEP);
-                                return -1;
+                                throw new ContainerTransferFailedException(
+                                        item.getNetworkId(),
+                                        container.getOwner().getNetworkId(),
+                                        ContainerErrorCode.TOO_DEEP);
                             }
 
                             checkList.add(iterObject);
@@ -219,8 +232,10 @@ public class ContainerService {
                             LOGGER.warn("Adding item {} to {} would have introduced a container loop.",
                                     item.getNetworkId(),
                                     container.getOwner().getNetworkId());
-                            containerResult.setError(ContainerErrorCode.ALREADY_IN);
-                            return -1;
+                            throw new ContainerTransferFailedException(
+                                    item.getNetworkId(),
+                                    container.getOwner().getNetworkId(),
+                                    ContainerErrorCode.ALREADY_IN);
                         }
                     }
                 }
@@ -228,16 +243,20 @@ public class ContainerService {
         }
 
         if (checkDepth(container) > maxDepth) {
-            containerResult.setError(ContainerErrorCode.TOO_DEEP);
-            return -1;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.TOO_DEEP);
         }
 
-        if (isItemContained(container, item, containerResult)) {
+        if (isItemContained(container, item)) {
             LOGGER.warn("Cannot add an item {} to a container {} when it is already in it! This shouldn't happen because the item's contained by property says it is not in this container, but it is in the container's internal list.",
                     item.getNetworkId(),
                     container.getOwner().getNetworkId());
-            containerResult.setError(ContainerErrorCode.ALREADY_IN);
-            return -1;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.ALREADY_IN);
         }
 
         containedItem.setContainedBy(container.getOwner());
@@ -248,14 +267,17 @@ public class ContainerService {
         return contents.size() - 1;
     }
 
-    protected int find(final Container container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
+    protected int find(final Container container, final GameObject item)
+            throws ContainerTransferFailedException {
         final List<GameObject> contents = ReflectionUtil.getFieldValue(contentsField, container);
         int index = contents.indexOf(item);
 
-        if (index == -1)
-            containerResult.setError(ContainerErrorCode.NOT_FOUND);
+        if (index == -1) {
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.NOT_FOUND);
+        }
 
         return index;
     }
@@ -265,8 +287,9 @@ public class ContainerService {
         return contents.get(position);
     }
 
-    private boolean isItemContained(final Container container, final GameObject item, final ContainerResult containerResult) {
-        return find(container, item, containerResult) != -1;
+    private boolean isItemContained(final Container container, final GameObject item)
+            throws ContainerTransferFailedException {
+        return find(container, item) != -1;
     }
 
     public static int checkDepth(final Container container) {

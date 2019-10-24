@@ -7,6 +7,7 @@ import gnu.trove.list.TIntList;
 import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.utils.StringUtil;
 import io.bacta.game.chat.GameChatService;
+import io.bacta.game.container.ContainerTransferFailedException;
 import io.bacta.game.container.ContainerTransferService;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.message.ClientCreateCharacterFailed;
@@ -15,7 +16,10 @@ import io.bacta.game.name.NameErrors;
 import io.bacta.game.name.NameService;
 import io.bacta.game.object.ObjectTemplateService;
 import io.bacta.game.object.ServerObject;
+import io.bacta.game.object.ServerObjectCreationFailedException;
 import io.bacta.game.object.ServerObjectService;
+import io.bacta.game.object.intangible.player.PlayerObject;
+import io.bacta.game.object.tangible.TangibleObject;
 import io.bacta.game.object.tangible.creature.Attribute;
 import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.object.tangible.creature.Gender;
@@ -23,7 +27,6 @@ import io.bacta.game.object.tangible.creature.Race;
 import io.bacta.game.object.template.server.ServerCreatureObjectTemplate;
 import io.bacta.game.player.BiographyService;
 import io.bacta.shared.collision.CollisionProperty;
-import io.bacta.shared.container.ContainerResult;
 import io.bacta.shared.foundation.ConstCharCrcLowerString;
 import io.bacta.shared.localization.StringId;
 import io.bacta.shared.math.Transform;
@@ -34,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -126,80 +130,161 @@ public class CharacterCreationService {
         final int accountId = 1;
         final String username = "crush";
 
-        final String serverTemplateName = createMessage.getTemplateName();
-        final String speciesGender = Files.getNameWithoutExtension(serverTemplateName);
-        final Gender gender = Gender.fromSpeciesGender(speciesGender);
-        final Race race = Race.fromSpeciesGender(speciesGender);
+        try {
+            final String serverTemplateName = createMessage.getTemplateName();
+            final String speciesGender = Files.getNameWithoutExtension(serverTemplateName);
+            final Gender gender = Gender.fromSpeciesGender(speciesGender);
+            final Race race = Race.fromSpeciesGender(speciesGender);
+            final String profession = getValidProfession(createMessage);
+            final String firstName = StringUtil.getFirstWord(createMessage.getCharacterName()).toLowerCase();
 
-        final String profession;
+            //Validate the name.
+            StringId result = nameService.validate(NameService.PLAYER, accountId, createMessage.getCharacterName(), race, gender);
 
-        if (createMessage.getProfession().isEmpty() || this.disabledProfessions.contains(createMessage.getProfession())) {
-            profession = this.defaultProfession;
-        } else {
-            profession = createMessage.getProfession();
-        }
+            //Override for developers to use developer names if it is the same name as their account.
+            if (result.equals(NameErrors.DEVELOPER) && firstName.equalsIgnoreCase(username)) {
+                result = NameErrors.APPROVED;
+            }
 
-        final String firstName = StringUtil.getFirstWord(createMessage.getCharacterName()).toLowerCase();
+            //If approval failed, then send character created failed message.
+            if (!NameErrors.APPROVED.equals(result)) {
+                ClientCreateCharacterFailed failed = new ClientCreateCharacterFailed(createMessage.getCharacterName(), result);
+                context.sendMessage(failed);
 
-        //Validate the name.
-        StringId result = nameService.validate(NameService.PLAYER, accountId, createMessage.getCharacterName(), race, gender);
+                return;
+            }
 
-        //Override for developers to use developer names if it is the same name as their account.
-        if (result.equals(NameErrors.DEVELOPER) && firstName.equalsIgnoreCase(username)) {
-            result = NameErrors.APPROVED;
-        }
+            final ServerCreatureObjectTemplate objectTemplate = objectTemplateService.getObjectTemplate(serverTemplateName);
 
-        //If approval failed, then send character created failed message.
-        if (!NameErrors.APPROVED.equals(result)) {
-            ClientCreateCharacterFailed failed = new ClientCreateCharacterFailed(createMessage.getCharacterName(), result);
-            context.sendMessage(failed);
+            if (objectTemplate == null) {
+                LOGGER.error("Account {} attempted to create a player with invalid player template {}.",
+                        username,
+                        createMessage.getTemplateName());
 
-            return;
-        }
+                context.sendMessage(new ClientCreateCharacterFailed(createMessage.getCharacterName(), NameErrors.NO_TEMPLATE));
+                return;
+            }
 
-        final ServerCreatureObjectTemplate objectTemplate = objectTemplateService.getObjectTemplate(serverTemplateName);
+            //If someone else is already creating a character with this name, then we need to reject the attempt to create.
+            if (pendingCreations.getIfPresent(firstName) != null) {
+                ClientCreateCharacterFailed failed = new ClientCreateCharacterFailed(createMessage.getCharacterName(), NameErrors.IN_USE);
+                context.sendMessage(failed);
+                return;
+            }
 
-        if (objectTemplate == null) {
-            LOGGER.error("Account {} attempted to create a player with invalid player template {}.",
-                    username,
-                    createMessage.getTemplateName());
+            pendingCreations.put(firstName, accountId);
 
-            context.sendMessage(new ClientCreateCharacterFailed(createMessage.getCharacterName(), NameErrors.NO_TEMPLATE));
-            return;
-        }
+            final CreatureObject playerCreature = serverObjectService.createObject(objectTemplate.getResourceName());
+            final String sharedTemplateName = playerCreature.getSharedTemplate().getResourceName();
+            final ProfessionInfo professionInfo = professionDefaultsService.getDefaults(profession);
 
-        //If someone else is already creating a character with this name, then we need to reject the attempt to create.
-        if (pendingCreations.getIfPresent(firstName) != null) {
-            ClientCreateCharacterFailed failed = new ClientCreateCharacterFailed(createMessage.getCharacterName(), NameErrors.IN_USE);
-            context.sendMessage(failed);
-            return;
-        }
+            playerCreature.setObjectName(createMessage.getCharacterName());
+            playerCreature.setOwnerId(playerCreature.getNetworkId());
+            playerCreature.setPlayerControlled(true);
+            playerCreature.setAppearanceData(createMessage.getAppearanceData());
 
-        pendingCreations.put(firstName, accountId);
+            configurePlayerPosition(playerCreature, createMessage);
 
-        final CreatureObject playerCreature = serverObjectService.createObject(objectTemplate.getResourceName());
+            final CollisionProperty collision = playerCreature.getCollisionProperty();
 
-        if (playerCreature == null) {
+            if (collision != null)
+                collision.setPlayerControlled(true);
+
+            applyScaleLimits(playerCreature, createMessage.getScaleFactor());
+            configurePlayerHair(playerCreature, speciesGender, createMessage);
+            createStartingEquipment(playerCreature, sharedTemplateName, professionInfo);
+            createRequiredSlots(playerCreature);
+            applyAttributeMods(playerCreature, speciesGender, profession);
+            configureBiography(playerCreature, createMessage.getBiography());
+            configurePlayerObject(playerCreature, createMessage);
+//
+
+//
+//        playerCreature.setSceneIdOnThisAndContents(startingLocationInfo.getPlanet());
+
+            // Persist object (Done in Object Manager)
+
+            //Post character setup.
+            //Send this to the login server so that it knows about this character.
+//        final CharacterInfo info = new CharacterInfo(
+//                playerCreature.getAssignedObjectName(),
+//                SOECRC32.hashCode(playerCreature.getObjectTemplateName()),
+//                playerCreature.getNetworkId(),
+//                gameServerState.getClusterId(),
+//                CharacterInfo.Type.NORMAL,
+//                false
+//        );
+
+            //nameService.addPlayerName(firstName);
+
+            final ClientCreateCharacterSuccess responseMessage = new ClientCreateCharacterSuccess(
+                    playerCreature.getNetworkId());
+
+            context.sendMessage(responseMessage);
+
+            pendingCreations.invalidate(firstName);
+
+            chatService.destroyAvatar(firstName);
+
+        } catch (ServerObjectCreationFailedException ex) {
+            //The only time this should hit here is if the player creature failed to create. Other items failing should
+            //be caught in their respective methods.
             LOGGER.error("Account {} attempted to create a character but the object service failed to create it. {}",
                     username,
                     createMessage.getTemplateName());
 
-            context.sendMessage(new ClientCreateCharacterFailed(createMessage.getCharacterName(), NameErrors.CANT_CREATE_AVATAR));
-            return;
+            final ClientCreateCharacterFailed message = new ClientCreateCharacterFailed(
+                    createMessage.getCharacterName(),
+                    NameErrors.CANT_CREATE_AVATAR);
+
+            context.sendMessage(message);
+        } catch (ContainerTransferFailedException ex) {
+            LOGGER.error("Unable to transfer player to container. This shouldn't happen.");
+
+            final ClientCreateCharacterFailed message = new ClientCreateCharacterFailed(
+                    createMessage.getCharacterName(),
+                    NameErrors.CANT_CREATE_AVATAR);
+
+            context.sendMessage(message);
         }
+    }
 
-        applyScaleLimits(playerCreature, createMessage.getScaleFactor());
-//        playerCreature.setObjectName(createMessage.getCharacterName());
-//        playerCreature.setOwnerId(playerCreature.getNetworkId());
-//        playerCreature.setPlayerControlled(true);
+    private void configurePlayerObject(final CreatureObject playerCreature, final ClientCreateCharacter request) {
+        try {
+            final int accountId = 1;
+            final PlayerObject play = serverObjectService.createObject(GHOST_TEMPLATE, playerCreature);
+            containerTransferService.transferItemToSlottedContainerSlotId(playerCreature, play, null, GHOST_SLOT_NAME);
 
-        StartingLocations.StartingLocationInfo startingLocationInfo = startingLocations.getStartingLocationInfo(createMessage.getStartingLocation());
+            play.setStationId(accountId);
+            play.setBornDate((int) Instant.now().getEpochSecond());
+            play.setSkillTemplate(request.getSkillTemplate(), true);
+            play.setWorkingSkill(request.getWorkingSkill(), true);
+        } catch (ServerObjectCreationFailedException ex) {
+            LOGGER.error("Failed to create player object for character {}.", playerCreature.getNetworkId());
+        } catch (ContainerTransferFailedException ex) {
+            LOGGER.error("Failed to add player object to creature {} ghost slot.", playerCreature.getNetworkId());
+        }
+    }
 
+    private void configureBiography(final CreatureObject playerCreature, final String biography) {
+        if (biography != null && !biography.isEmpty()) {
+            biographyService.setBiography(playerCreature.getNetworkId(), biography);
+        }
+    }
+
+    private void configurePlayerPosition(final CreatureObject playerCreature, final ClientCreateCharacter request) {
+        final String startingLocation = request.getStartingLocation();
         final Transform transform = new Transform();
-        if (createMessage.isUseNewbieTutorial()) {
+
+        final StartingLocations.StartingLocationInfo startingLocationInfo
+                = startingLocations.getStartingLocationInfo(startingLocation);
+
+        if (request.isUseNewbieTutorial()) {
             newbieTutorialService.setupCharacterForTutorial(playerCreature);
+
             final Vector newbieTutorialLocation = newbieTutorialService.getTutorialLocation();
             transform.setPositionInParentSpace(newbieTutorialLocation);
+
         } else {
             newbieTutorialService.setupCharacterToSkipTutorial(playerCreature);
 
@@ -214,86 +299,46 @@ public class CharacterCreationService {
         }
 
         playerCreature.setTransformObjectToParent(transform);
-
-        final CollisionProperty collision = playerCreature.getCollisionProperty();
-
-        if (collision != null)
-            collision.setPlayerControlled(true);
-//
-//        final TangibleObject tangibleObject = TangibleObject.asTangibleObject(playerCreature);
-//
-//        if (tangibleObject != null)
-//            tangibleObject.setAppearanceData(createMessage.getAppearanceData());
-//
-//        final String hairStyleTemplate;
-//
-//        //Validate the hair style. If it is invalid, then use the default hair template.
-//        if (!isValidHairSelection(createMessage.getHairTemplateName(), speciesGender)) {
-//            hairStyleTemplate = hairStylesService.getDefaultHairStyle(speciesGender);
-//
-//            LOGGER.error("{} used an invalid hair style {} for species/gender {}.",
-//                    username, createMessage.getHairTemplateName(), speciesGender);
-//        } else {
-//            hairStyleTemplate = createMessage.getHairTemplateName();
-//        }
-//
-//        // hair equip hack - lives on
-//        if (!hairStyleTemplate.isEmpty()) {
-//            final ServerObject hair = serverObjectService.createObject(createMessage.getHairTemplateName(), playerCreature);
-//            assert hair != null : String.format("Could not create hair %s\n", createMessage.getHairTemplateName());
-//
-//            final TangibleObject tangibleHair = TangibleObject.asTangibleObject(hair);
-//
-//            assert tangibleHair != null : "Hair is not tangible, wtf.  Can't customize it.  (among other things, probably)...";
-//
-//            tangibleHair.setAppearanceData(createMessage.getHairAppearanceData());
-//        }
-//
-//        setupPlayer(playerCreature, speciesGender, profession, createMessage.isJedi());
-//
-//        if (!createMessage.getBiography().isEmpty())
-//            biographyService.setBiography(playerCreature.getNetworkId(), createMessage.getBiography());
-//
-//        final PlayerObject play = serverObjectService.createObject("object/player/player.iff", playerCreature);
-//
-//        assert play != null : String.format("%d unable to create player object for new character %s", accountId, playerCreature.getNetworkId());
-//
-//        play.setStationId(accountId);
-//        play.setBornDate((int) Instant.now().getEpochSecond());
-//        play.setSkillTemplate(createMessage.getSkillTemplate(), true);
-//        play.setWorkingSkill(createMessage.getWorkingSkill(), true);
-//
-//        playerCreature.setSceneIdOnThisAndContents(startingLocationInfo.getPlanet());
-
-        // Persist object (Done in Object Manager)
-
-        //Post character setup.
-//        final CharacterInfo info = new CharacterInfo(
-//                playerCreature.getAssignedObjectName(),
-//                SOECRC32.hashCode(playerCreature.getObjectTemplateName()),
-//                playerCreature.getNetworkId(),
-//                gameServerState.getClusterId(),
-//                CharacterInfo.Type.NORMAL,
-//                false
-//        );
-
-        //nameService.addPlayerName(firstName);
-
-        context.sendMessage(new ClientCreateCharacterSuccess(playerCreature.getNetworkId()));
-
-        pendingCreations.invalidate(firstName);
-
-        chatService.destroyAvatar(firstName);
     }
 
-    public void setupPlayer(final CreatureObject creatureObject, final String speciesGender, final String profession, final boolean jedi) {
-        final String sharedTemplateName = creatureObject.getSharedTemplate().getResourceName();
-        final ProfessionInfo professionInfo = professionDefaultsService.getDefaults(profession);
+    private void configurePlayerHair(final CreatureObject playerCreature, final String speciesGender, final ClientCreateCharacter request) {
+        String hairStyleTemplate = request.getHairTemplateName();
 
-        createStartingEquipment(creatureObject, sharedTemplateName, professionInfo);
-        createRequiredSlots(creatureObject);
+        try {
+            //If hair is invalid, use default.
+            if (!isValidHairSelection(request.getHairTemplateName(), speciesGender)) {
+                LOGGER.error("Invalid hair style {} for species/gender {}.", hairStyleTemplate, speciesGender);
+                hairStyleTemplate = hairStylesService.getDefaultHairStyle(speciesGender);
+            }
 
-        applyAttributeMods(creatureObject, speciesGender, profession);
+            //Create the hair and equip it to the player.
+            if (!hairStyleTemplate.isEmpty()) {
+                final ServerObject hair = serverObjectService.createObject(hairStyleTemplate, playerCreature);
+                final TangibleObject tangibleHair = (TangibleObject) hair;
+                tangibleHair.setAppearanceData(request.getHairAppearanceData());
+            }
+
+        } catch (ServerObjectCreationFailedException ex) {
+            LOGGER.error("Could not create hair with template {}.", hairStyleTemplate);
+
+        } catch (ContainerTransferFailedException ex) {
+            LOGGER.error("Unable to slot hair with template {}.", hairStyleTemplate);
+
+        } catch (ClassCastException ex) {
+            LOGGER.error("Requested hair template was not tangible.");
+        }
+    }
+
+    private String getValidProfession(final ClientCreateCharacter request) {
+        final String professionName = request.getProfession();
+
+        final boolean validProfessionName = professionName != null
+                && !professionName.isEmpty()
+                && !this.disabledProfessions.contains(professionName);
+
+        return validProfessionName
+                ? professionName
+                : this.defaultProfession;
     }
 
     /**
@@ -346,7 +391,7 @@ public class CharacterCreationService {
 
         for (int i = 0; i < Attribute.SIZE; ++i) {
             final int value = profList.get(i) + raceList.get(i);
-            //creatureObject.initializeAttribute(i, value);
+            creatureObject.initializeAttribute(i, value);
         }
     }
 
@@ -365,49 +410,46 @@ public class CharacterCreationService {
 
             //TODO: Use arrangementIndex.
             for (final EquipmentInfo equipmentInfo : equipmentList) {
-                serverObjectService.createObject(
-                        equipmentInfo.getServerTemplateName(),
-                        creatureObject);
+                final String templateName = equipmentInfo.getServerTemplateName();
+
+                try {
+                    serverObjectService.createObject(templateName, creatureObject);
+                } catch (ServerObjectCreationFailedException ex) {
+                    LOGGER.error("Failed creating starting equipment item {}", templateName);
+                } catch (ContainerTransferFailedException ex) {
+                    LOGGER.error("Failed transferring starting equipment item {} to player {} because {}",
+                            templateName,
+                            creatureObject.getNetworkId(),
+                            ex.getErrorCode().name());
+                }
             }
         }
     }
 
     private void createRequiredSlots(final CreatureObject creatureObject) {
-        final ContainerResult containerResult = new ContainerResult();
+        createRequiredSlotItem(creatureObject, INVENTORY_TEMPLATE, INVENTORY_SLOT_NAME);
+        createRequiredSlotItem(creatureObject, DATAPAD_TEMPLATE, DATAPAD_SLOT_NAME);
+        createRequiredSlotItem(creatureObject, BANK_TEMPLATE, BANK_SLOT_NAME);
+        createRequiredSlotItem(creatureObject, MISSION_BAG_TEMPLATE, MISSION_BAG_SLOT_NAME);
+        createRequiredSlotItem(creatureObject, APPEARANCE_TEMPLATE, APPEARANCE_SLOT_NAME);
+    }
 
-        final ServerObject inventory = serverObjectService.createObject(INVENTORY_TEMPLATE);
-        if (!containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, inventory, null, INVENTORY_SLOT_NAME, containerResult)) {
-            LOGGER.error("Could not slot inventory on creature {} because {}",
-                    creatureObject.getDebugInformation(),
-                    containerResult.getError());
-        }
+    private void createRequiredSlotItem(final CreatureObject creatureObject, final String templateName, final ConstCharCrcLowerString slotName) {
+        try {
+            final ServerObject item = serverObjectService.createObject(templateName);
+            containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, item, null, slotName);
 
-        final ServerObject datapad = serverObjectService.createObject(DATAPAD_TEMPLATE);
-        if (!containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, datapad, null, DATAPAD_SLOT_NAME, containerResult)) {
-            LOGGER.error("Could not slot datapad on creature {} because {}",
-                    creatureObject.getDebugInformation(),
-                    containerResult.getError());
-        }
-
-        final ServerObject bank = serverObjectService.createObject(BANK_TEMPLATE);
-        if (!containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, bank, null, BANK_SLOT_NAME, containerResult)) {
-            LOGGER.error("Could not slot bank on creature {} because {}",
-                    creatureObject.getDebugInformation(),
-                    containerResult.getError());
-        }
-
-        final ServerObject missionBag = serverObjectService.createObject(MISSION_BAG_TEMPLATE);
-        if (!containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, missionBag, null, MISSION_BAG_SLOT_NAME, containerResult)) {
-            LOGGER.error("Could not slot mission bag on creature {} because {}",
-                    creatureObject.getDebugInformation(),
-                    containerResult.getError());
-        }
-
-        final ServerObject appearanceInventory = serverObjectService.createObject(APPEARANCE_TEMPLATE);
-        if (!containerTransferService.transferItemToSlottedContainerSlotId(creatureObject, appearanceInventory, null, APPEARANCE_SLOT_NAME, containerResult)) {
-            LOGGER.error("Could not slot appearance inventory on creature {} because {}",
-                    creatureObject.getDebugInformation(),
-                    containerResult.getError());
+        } catch (ServerObjectCreationFailedException ex) {
+            LOGGER.error("Failed to create required slot item {} in slot {} for player {}.",
+                    templateName,
+                    slotName.toString(),
+                    creatureObject.getNetworkId());
+        } catch (ContainerTransferFailedException ex) {
+            LOGGER.error("Failed to transfer required slot item {} to slot {} for player {} because {}.",
+                    templateName,
+                    slotName.getString(),
+                    creatureObject.getNetworkId(),
+                    ex.getErrorCode().name());
         }
     }
 }

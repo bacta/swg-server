@@ -10,10 +10,12 @@ import io.bacta.archive.delta.vector.AutoDeltaStringVector;
 import io.bacta.game.matchmaking.MatchMakingId;
 import io.bacta.game.object.intangible.IntangibleObject;
 import io.bacta.game.object.intangible.schematic.DraftSchematicCombinedCrcs;
+import io.bacta.game.object.tangible.creature.CreatureObject;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.game.waypoint.Waypoint;
 import io.bacta.shared.container.SlotIdManager;
 import io.bacta.shared.foundation.BitArray;
+import io.bacta.shared.object.GameObject;
 import io.bacta.shared.template.ObjectTemplateList;
 import lombok.Getter;
 import lombok.Setter;
@@ -258,7 +260,8 @@ public final class PlayerObject extends IntangibleObject {
         sharedPackageNp.addVariable(environmentFlags);
         sharedPackageNp.addVariable(defaultAttackOverride);
     }
-//
+
+    //
 //    public final int getRoleIconChoice() {
 //        return roleIconChoice.get();
 //    }
@@ -271,20 +274,22 @@ public final class PlayerObject extends IntangibleObject {
 //        return biography;
 //    }
 //
-//    public final void setBiography(final String biography) {
-//        this.biography = biography;
-//        //setDirty(true);
-//    }
-//
+    public final void setBiography(final String biography) {
+        this.biography = biography;
+        //setDirty(true);
+    }
+
+    //
 //    public final int getBornDate() {
 //        return bornDate.get();
 //    }
 //
-//    public final void setBornDate(int value) {
-//        bornDate.set(value);
-//        //setDirty(true);
-//    }
-//
+    public final void setBornDate(int value) {
+        bornDate.set(value);
+        //setDirty(true);
+    }
+
+    //
 //    public final int getPlayedTime() {
 //        return playedTime.get();
 //    }
@@ -313,13 +318,13 @@ public final class PlayerObject extends IntangibleObject {
 //        //setDirty(true);
 //    }
 //
-//    public boolean setSkillTemplate(final String templateName, final boolean clientRequest) {
-//        final String previousTemplateName = skillTemplate.get();
-//
-//        // we need to pass an empty string to script to do cleanup, but we don't want to actually change the player's skill
-//        if (!templateName.isEmpty())
-//            skillTemplate.set(templateName);
-//
+    public boolean setSkillTemplate(final String templateName, final boolean clientRequest) {
+        final String previousTemplateName = skillTemplate.get();
+
+        // we need to pass an empty string to script to do cleanup, but we don't want to actually change the player's skill
+        if (!templateName.isEmpty())
+            skillTemplate.set(templateName);
+
 //        final CreatureObject owner = getCreatureObject();
 //
 //        if (owner != null) {
@@ -361,15 +366,16 @@ public final class PlayerObject extends IntangibleObject {
 //                */
 //            }
 //        }
-//
-//        return (!templateName.equals(previousTemplateName));
-//    }
-//
-//    public boolean setWorkingSkill(final String skillName, final boolean clientRequest) {
-//        final String previousWorkingSkill = workingSkill.get();
-//
-//        workingSkill.set(skillName);
-//
+
+        return (!templateName.equals(previousTemplateName));
+    }
+
+    //
+    public boolean setWorkingSkill(final String skillName, final boolean clientRequest) {
+        final String previousWorkingSkill = workingSkill.get();
+
+        workingSkill.set(skillName);
+
 //        CreatureObject owner = getCreatureObject();
 //        if (owner != null) {
 //
@@ -388,17 +394,16 @@ public final class PlayerObject extends IntangibleObject {
 ////                }
 ////            }
 //        }
-//
-//        return (!previousWorkingSkill.equals(skillName));
-//    }
 
-//    public CreatureObject getCreatureObject() {
-//        final GameObject owner = this.getContainedByProperty().getContainedBy();
-//
-//        if (owner != null) {
-//            return CreatureObject.asCreatureObject(owner);
-//        }
-//
-//        return null;
-//    }
+        return (!previousWorkingSkill.equals(skillName));
+    }
+
+    public CreatureObject getCreatureObject() {
+        try {
+            final GameObject owner = this.getContainedByProperty().getContainedBy();
+            return (CreatureObject) owner;
+        } catch (ClassCastException ex) {
+            return null;
+        }
+    }
 }

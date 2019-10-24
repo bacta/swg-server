@@ -50,6 +50,7 @@ public class TangibleObject extends ServerObject
     //private LocationData locationTargets
 
     @Getter
+    @Setter
     private long ownerId;
 
     @Getter

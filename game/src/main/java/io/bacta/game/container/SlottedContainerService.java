@@ -33,39 +33,61 @@ public class SlottedContainerService {
 
     public boolean isContentItemObservedWith(final SlottedContainer container,
                                              final GameObject item) {
-        //-- Rule 1: if base container claims that the item is visible with the container,
-        //   we stick with that.  This prevents us from changing any existing behavior at
-        //   the time this code is written.
-        final boolean observedWithBaseContainer = containerService.isContentItemObservedWith(container, item);
+        try {
+            //-- Rule 1: if base container claims that the item is visible with the container,
+            //   we stick with that.  This prevents us from changing any existing behavior at
+            //   the time this code is written.
+            final boolean observedWithBaseContainer = containerService.isContentItemObservedWith(container, item);
 
-        if (observedWithBaseContainer)
-            return true;
+            if (observedWithBaseContainer)
+                return true;
 
-        //-- Rule 2: if the item is in this container, check if any of the current arrangement's
-        //   slots have the observeWithParent attribute set.  If so, return true, if not, return false.
-        final ContainedByProperty containedByProperty = item.getContainedByProperty();
+            //-- Rule 2: if the item is in this container, check if any of the current arrangement's
+            //   slots have the observeWithParent attribute set.  If so, return true, if not, return false.
+            final ContainedByProperty containedByProperty = item.getContainedByProperty();
 
-        if (containedByProperty == null)
-            return false;
+            if (containedByProperty == null)
+                return false;
 
-        final SlottedContainmentProperty slottedContainmentProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
+            final SlottedContainmentProperty slottedContainmentProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
-        if (slottedContainmentProperty == null)
-            return false;
+            if (slottedContainmentProperty == null)
+                return false;
 
-        int arrangementIndex = slottedContainmentProperty.getCurrentArrangement();
+            int arrangementIndex = slottedContainmentProperty.getCurrentArrangement();
 
-        // Note: when checking if item is in container, we must also check
-        // that contained item's arrangement is set to a valid arrangement.
-        // This function can be called during container transfers prior to
-        // the arrangementIndex being set.  When this occurs, handle this
-        // case as if the item is not in the container because it's not really
-        // there in its entirety yet.
+            // Note: when checking if item is in container, we must also check
+            // that contained item's arrangement is set to a valid arrangement.
+            // This function can be called during container transfers prior to
+            // the arrangementIndex being set.  When this occurs, handle this
+            // case as if the item is not in the container because it's not really
+            // there in its entirety yet.
 
-        final GameObject containedByObject = containedByProperty.getContainedBy();
-        final boolean isInThisContainer = containedByObject == container.getOwner() && arrangementIndex >= 0;
+            final GameObject containedByObject = containedByProperty.getContainedBy();
+            final boolean isInThisContainer = containedByObject == container.getOwner() && arrangementIndex >= 0;
 
-        if (isInThisContainer) {
+            if (isInThisContainer) {
+                final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
+
+                for (int i = 0; i < slots.size(); ++i) {
+                    final boolean observeWithParent = slotIdManager.getSlotObserveWithParent(slots.get(i));
+
+                    if (observeWithParent)
+                        return true;
+                }
+
+                return false;
+            }
+
+            //-- Rule 3: if the item is not in this container, determine which arrangement it would
+            //   use if it went in this slot.  If no arrangement is valid, return false.  If an arrangement
+            //   is valid, check each slot in the arrangement.  If any slot has observeWithParent set true,
+            //   return true; otherwise, return false.
+            arrangementIndex = getFirstUnoccupiedArrangement(container, item);
+
+            if (arrangementIndex == -1)
+                return false;
+
             final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
 
             for (int i = 0; i < slots.size(); ++i) {
@@ -76,65 +98,67 @@ public class SlottedContainerService {
             }
 
             return false;
-        }
-
-        //-- Rule 3: if the item is not in this container, determine which arrangement it would
-        //   use if it went in this slot.  If no arrangement is valid, return false.  If an arrangement
-        //   is valid, check each slot in the arrangement.  If any slot has observeWithParent set true,
-        //   return true; otherwise, return false.
-        final ContainerResult containerResult = new ContainerResult();
-        arrangementIndex = getFirstUnoccupiedArrangement(container, item, containerResult);
-
-        if (arrangementIndex == -1 || containerResult.getError() != ContainerErrorCode.SUCCESS)
+        } catch (ContainerTransferFailedException ex) {
             return false;
-
-        final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
-
-        for (int i = 0; i < slots.size(); ++i) {
-            final boolean observeWithParent = slotIdManager.getSlotObserveWithParent(slots.get(i));
-
-            if (observeWithParent)
-                return true;
         }
-
-        return false;
     }
 
     public boolean isContentItemExposedWith(final SlottedContainer container,
                                             final GameObject item) {
-        //-- Rule 1: if base container claims that the item is visible with the container,
-        //   we stick with that.  This prevents us from changing any existing behavior at
-        //   the time this code is written.
-        final boolean exposedWithBaseContainer = containerService.isContentItemExposedWith(container, item);
+        try {
+            //-- Rule 1: if base container claims that the item is visible with the container,
+            //   we stick with that.  This prevents us from changing any existing behavior at
+            //   the time this code is written.
+            final boolean exposedWithBaseContainer = containerService.isContentItemExposedWith(container, item);
 
-        if (exposedWithBaseContainer)
-            return true;
+            if (exposedWithBaseContainer)
+                return true;
 
-        //-- Rule 2: if the item is in this container, check if any of the current arrangement's
-        //   slots have the exposeWithParent attribute set.  If so, return true, if not, return false.
-        final ContainedByProperty containedByProperty = item.getContainedByProperty();
+            //-- Rule 2: if the item is in this container, check if any of the current arrangement's
+            //   slots have the exposeWithParent attribute set.  If so, return true, if not, return false.
+            final ContainedByProperty containedByProperty = item.getContainedByProperty();
 
-        if (containedByProperty == null)
-            return false;
+            if (containedByProperty == null)
+                return false;
 
-        final SlottedContainmentProperty slottedContainmentProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
+            final SlottedContainmentProperty slottedContainmentProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
-        if (slottedContainmentProperty == null)
-            return false;
+            if (slottedContainmentProperty == null)
+                return false;
 
-        int arrangementIndex = slottedContainmentProperty.getCurrentArrangement();
+            int arrangementIndex = slottedContainmentProperty.getCurrentArrangement();
 
-        // Note: when checking if item is in container, we must also check
-        // that contained item's arrangement is set to a valid arrangement.
-        // This function can be called during container transfers prior to
-        // the arrangementIndex being set.  When this occurs, handle this
-        // case as if the item is not in the container because it's not really
-        // there in its entirety yet.
+            // Note: when checking if item is in container, we must also check
+            // that contained item's arrangement is set to a valid arrangement.
+            // This function can be called during container transfers prior to
+            // the arrangementIndex being set.  When this occurs, handle this
+            // case as if the item is not in the container because it's not really
+            // there in its entirety yet.
 
-        final GameObject containedByObject = containedByProperty.getContainedBy();
-        final boolean isInThisContainer = (containedByObject == container.getOwner()) && (arrangementIndex >= 0);
+            final GameObject containedByObject = containedByProperty.getContainedBy();
+            final boolean isInThisContainer = (containedByObject == container.getOwner()) && (arrangementIndex >= 0);
 
-        if (isInThisContainer) {
+            if (isInThisContainer) {
+                final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
+
+                for (int i = 0; i < slots.size(); ++i) {
+                    final boolean exposeWithParent = slotIdManager.getSlotExposeWithParent(slots.get(i));
+                    if (exposeWithParent)
+                        return true;
+                }
+
+                return false;
+            }
+
+            //-- Rule 3: if the item is not in this container, determine which arrangement it would
+            //   use if it went in this slot.  If no arrangement is valid, return false.  If an arrangement
+            //   is valid, check each slot in the arrangement.  If any slot has exposeWithParent set true,
+            //   return true; otherwise, return false.
+            arrangementIndex = getFirstUnoccupiedArrangement(container, item);
+
+            if (arrangementIndex == -1)
+                return false;
+
             final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
 
             for (int i = 0; i < slots.size(); ++i) {
@@ -144,27 +168,9 @@ public class SlottedContainerService {
             }
 
             return false;
-        }
-
-        //-- Rule 3: if the item is not in this container, determine which arrangement it would
-        //   use if it went in this slot.  If no arrangement is valid, return false.  If an arrangement
-        //   is valid, check each slot in the arrangement.  If any slot has exposeWithParent set true,
-        //   return true; otherwise, return false.
-        final ContainerResult containerResult = new ContainerResult();
-        arrangementIndex = getFirstUnoccupiedArrangement(container, item, containerResult);
-
-        if (arrangementIndex == -1 || (containerResult.getError() != ContainerErrorCode.SUCCESS))
+        } catch (ContainerTransferFailedException ex) {
             return false;
-
-        final TIntList slots = slottedContainmentProperty.getSlotArrangement(arrangementIndex);
-
-        for (int i = 0; i < slots.size(); ++i) {
-            final boolean exposeWithParent = slotIdManager.getSlotExposeWithParent(slots.get(i));
-            if (exposeWithParent)
-                return true;
         }
-
-        return false;
     }
 
     public boolean canContentsBeObservedWith(final SlottedContainer container) {
@@ -181,13 +187,14 @@ public class SlottedContainerService {
 
     public boolean add(final SlottedContainer container,
                        final GameObject item,
-                       final int arrangementIndex,
-                       final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+                       final int arrangementIndex)
+            throws ContainerTransferFailedException {
 
         if (arrangementIndex < 0) {
-            containerResult.setError(ContainerErrorCode.INVALID_ARRANGEMENT);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.INVALID_ARRANGEMENT);
         }
 
         final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
@@ -195,22 +202,28 @@ public class SlottedContainerService {
         if (slottedProperty == null) {
             LOGGER.warn("Tried to add an item {} to slot container with no slotted property. Make sure its shared object template has a valid arrangement.",
                     item.getNetworkId());
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        if (!internalCheckSlottedAdd(container, item, arrangementIndex, containerResult))
-            return false;
+//        if (!internalCheckSlottedAdd(container, item, arrangementIndex, containerResult))
+//            return false;
 
-        int position = containerService.addToContents(container, item, containerResult);
+        int position = containerService.addToContents(container, item);
 
         if (position < 0)
             return false;
 
         if (!internalDoSlottedAdd(container, item, position, arrangementIndex)) {
             LOGGER.warn("Internal check add worked, but trying to do it failed.");
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         slottedProperty.setCurrentArrangement(arrangementIndex);
@@ -220,32 +233,34 @@ public class SlottedContainerService {
 
     public boolean addToSlot(final SlottedContainer container,
                              final GameObject item,
-                             final int slotId,
-                             final ContainerResult containerResult) {
-
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
+                             final int slotId)
+            throws ContainerTransferFailedException {
         final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedProperty == null) {
             LOGGER.warn("Tried to add an item {} to a slot container with no slotted property. Make sure its shared object template has a valid arrangement.",
                     item.getNetworkId());
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        return add(container, item, slottedProperty.getBestArrangementForSlot(slotId), containerResult);
+        final int bestArrangement = slottedProperty.getBestArrangementForSlot(slotId);
+        return add(container, item, bestArrangement);
     }
 
     private boolean internalCheckSlottedAdd(final SlottedContainer container,
                                             final GameObject item,
-                                            final int arrangementIndex,
-                                            final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+                                            final int arrangementIndex)
+            throws ContainerTransferFailedException {
 
         if (arrangementIndex < 0) {
-            containerResult.setError(ContainerErrorCode.INVALID_ARRANGEMENT);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.INVALID_ARRANGEMENT);
         }
 
         final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
@@ -253,11 +268,13 @@ public class SlottedContainerService {
         if (slottedProperty == null) {
             LOGGER.warn("Tried to add an item {} to a slot container with no slotted property. Make sure its shared object template has a valid arrangement.",
                     item.getNetworkId());
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        if (!mayAdd(container, item, arrangementIndex, containerResult))
+        if (!mayAdd(container, item, arrangementIndex))
             return false;
 
         return true;
@@ -302,20 +319,19 @@ public class SlottedContainerService {
     }
 
     public GameObject getObjectInSlot(final SlottedContainer container,
-                                      final int slotId,
-                                      final ContainerResult containerResult) {
-
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+                                      final int slotId) {
 
         if (!hasSlot(container, slotId)) {
-            containerResult.setError(ContainerErrorCode.NO_SLOT);
+            //TODO: Need a diff kind of exception here.
+            //containerResult.setError(ContainerErrorCode.NO_SLOT);
             return null;
         }
 
         final int position = find(container, slotId);
 
         if (position < 0) {
-            containerResult.setError(ContainerErrorCode.NOT_FOUND);
+            //TODO: Another kind of exception
+            //containerResult.setError(ContainerErrorCode.NOT_FOUND);
             return null;
         }
 
@@ -327,10 +343,8 @@ public class SlottedContainerService {
         final TIntList slots = slotIdManager.findSlotIdsForCombatBone(bone);
         final List<GameObject> objects = new ArrayList<>(slots.size()); //Can't be more bones than slots.
 
-        final ContainerResult containerResult = new ContainerResult();
-
         for (int i = 0, size = slots.size(); i < size; ++i) {
-            final GameObject item = getObjectInSlot(container, i, containerResult);
+            final GameObject item = getObjectInSlot(container, i);
 
             if (item != null)
                 objects.add(item);
@@ -340,12 +354,10 @@ public class SlottedContainerService {
     }
 
     public int getFirstUnoccupiedArrangement(final SlottedContainer container,
-                                             final GameObject item,
-                                             final ContainerResult containerResult) {
+                                             final GameObject item)
+            throws ContainerTransferFailedException {
 
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
-        final TIntList validArrangements = getValidArrangements(container, item, containerResult, true, true);
+        final TIntList validArrangements = getValidArrangements(container, item, true, true);
 
         if (validArrangements.isEmpty())
             return -1;
@@ -353,29 +365,31 @@ public class SlottedContainerService {
         return validArrangements.get(0);
     }
 
-    public TIntList getValidArrangements(final SlottedContainer container, final GameObject item, final ContainerResult containerResult) {
-        return getValidArrangements(container, item, containerResult, false, false);
+    public TIntList getValidArrangements(final SlottedContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
+        return getValidArrangements(container, item, false, false);
     }
 
-    public TIntList getValidArrangements(final SlottedContainer container, final GameObject item, final ContainerResult containerResult, final boolean returnOnFirst) {
-        return getValidArrangements(container, item, containerResult, returnOnFirst, false);
+    public TIntList getValidArrangements(final SlottedContainer container, final GameObject item, final boolean returnOnFirst)
+            throws ContainerTransferFailedException {
+        return getValidArrangements(container, item, returnOnFirst, false);
     }
 
     public TIntList getValidArrangements(final SlottedContainer container,
                                          final GameObject item,
-                                         final ContainerResult containerResult,
                                          final boolean returnOnFirst,
-                                         final boolean unoccupiedArrangementsOnly) {
-
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+                                         final boolean unoccupiedArrangementsOnly)
+            throws ContainerTransferFailedException {
 
         final TIntList returnList = new TIntArrayList();
 
         final SlottedContainmentProperty slottedContainment = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedContainment == null) {
-            containerResult.setError(ContainerErrorCode.WRONG_TYPE);
-            return returnList;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.WRONG_TYPE);
         }
 
         final int numArrangements = slottedContainment.getNumberOfArrangements();
@@ -393,7 +407,7 @@ public class SlottedContainerService {
                     break;
                 }
 
-                if (unoccupiedArrangementsOnly && isSlotEmpty(container, slot, containerResult))
+                if (unoccupiedArrangementsOnly && isSlotEmpty(container, slot))
                     ++availableSlots;
             }
 
@@ -407,8 +421,10 @@ public class SlottedContainerService {
             }
         }
 
-        containerResult.setError(ContainerErrorCode.SLOT_OCCUPIED);
-        return returnList;
+        throw new ContainerTransferFailedException(
+                item.getNetworkId(),
+                container.getOwner().getNetworkId(),
+                ContainerErrorCode.SLOT_OCCUPIED);
     }
 
     public boolean hasSlot(final SlottedContainer container, final int slotId) {
@@ -421,54 +437,61 @@ public class SlottedContainerService {
         return new TIntArrayList(slotMap.keySet());
     }
 
-    public boolean isSlotEmpty(final SlottedContainer container, final int slotId, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
+    public boolean isSlotEmpty(final SlottedContainer container, final int slotId) {
         if (!hasSlot(container, slotId)) {
-            containerResult.setError(ContainerErrorCode.NO_SLOT);
+            //containerResult.setError(ContainerErrorCode.NO_SLOT);
+
+            //TODO: Diff exception
             return false;
         }
 
         final boolean empty = find(container, slotId) == -1;
 
-        if (!empty)
-            containerResult.setError(ContainerErrorCode.SLOT_OCCUPIED);
+        if (!empty) {
+            //TODO: Diff exception
+            //containerResult.setError(ContainerErrorCode.SLOT_OCCUPIED);
+        }
 
         return empty;
     }
 
-    public boolean mayAdd(final SlottedContainer container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
-        final TIntList validArrangements = getValidArrangements(container, item, containerResult);
+    public boolean mayAdd(final SlottedContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
+        final TIntList validArrangements = getValidArrangements(container, item);
 
         for (int i = 0, size = validArrangements.size(); i < size; ++i) {
-            if (mayAdd(container, item, validArrangements.get(i), containerResult))
+            if (mayAdd(container, item, validArrangements.get(i)))
                 return true;
         }
 
         return false;
     }
 
-    public boolean mayAdd(final SlottedContainer container, final GameObject item, final int arrangementIndex, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+    public boolean mayAdd(final SlottedContainer container, final GameObject item, final int arrangementIndex)
+            throws ContainerTransferFailedException {
 
         if (arrangementIndex < 0) {
-            containerResult.setError(ContainerErrorCode.INVALID_ARRANGEMENT);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.INVALID_ARRANGEMENT);
         }
 
         if (item == container.getOwner()) {
-            containerResult.setError(ContainerErrorCode.ADD_SELF);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.ADD_SELF);
         }
 
         final SlottedContainmentProperty slottedContainment = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedContainment == null) {
             LOGGER.warn("Tried to check slots with an item with no slotted containment property.");
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         final int numSlots = slottedContainment.getNumberOfSlots(arrangementIndex);
@@ -476,86 +499,95 @@ public class SlottedContainerService {
         for (int i = 0; i < numSlots; ++i) {
             final int slotId = slottedContainment.getSlotId(arrangementIndex, i);
 
-            if (!isSlotEmpty(container, slotId, containerResult))
+            if (!isSlotEmpty(container, slotId))
                 return false;
         }
 
-        return containerService.mayAdd(container, item, containerResult);
+        return containerService.mayAdd(container, item);
     }
 
-    public boolean mayAddToSlot(final SlottedContainer container, final GameObject item, final int slotId, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
-        if (!isSlotEmpty(container, slotId, containerResult))
+    public boolean mayAddToSlot(final SlottedContainer container, final GameObject item, final int slotId)
+            throws ContainerTransferFailedException {
+        if (!isSlotEmpty(container, slotId))
             return false;
 
         final SlottedContainmentProperty slottedContainment = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedContainment == null) {
             LOGGER.warn("Tried to check slots with an item with no slotted containment property.");
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        return mayAdd(container, item, slottedContainment.getBestArrangementForSlot(slotId), containerResult);
+        final int bestArrangement = slottedContainment.getBestArrangementForSlot(slotId);
+        return mayAdd(container, item, bestArrangement);
     }
 
-    public boolean remove(final SlottedContainer container, final GameObject item, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
+    public boolean remove(final SlottedContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
 
         final SlottedContainmentProperty slottedProperty = item.getProperty(SlottedContainmentProperty.getClassPropertyId());
 
         if (slottedProperty == null) {
             LOGGER.warn("Tried to remove an item {} to a slot container with no slotted property.",
                     item.getNetworkId());
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
         //Check for the item's position in contents.
-        final int position = containerService.find(container, item, containerResult);
+        final int position = containerService.find(container, item);
 
         if (position == -1) {
             LOGGER.debug("Called with item {} from container {}, but the item was not found int he base container's contents. This means the item was not in the container.",
                     item.getNetworkId(),
                     container.getOwner().getNetworkId());
-            containerResult.setError(ContainerErrorCode.NOT_FOUND);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.NOT_FOUND);
         }
 
         //try to remove it from contents.
 
         if (!internalRemove(container, item, -1)) {
-            containerResult.setError(ContainerErrorCode.UNKNOWN);
-            return false;
+            throw new ContainerTransferFailedException(
+                    item.getNetworkId(),
+                    container.getOwner().getNetworkId(),
+                    ContainerErrorCode.UNKNOWN);
         }
 
-        if (!containerService.remove(container, item, containerResult))
+        if (!containerService.remove(container, item))
             return false;
 
         slottedProperty.setCurrentArrangement(-1);
         return true;
     }
 
-    public boolean remove(final SlottedContainer container, final int position, final ContainerResult containerResult) {
-        containerResult.setError(ContainerErrorCode.SUCCESS);
-
+    public boolean remove(final SlottedContainer container, final int position)
+            throws ContainerTransferFailedException {
         final GameObject object = containerService.getContents(container, position);
 
         if (object != null)
-            return remove(container, object, containerResult);
+            return remove(container, object);
 
-        containerResult.setError(ContainerErrorCode.UNKNOWN);
+        //TODO: Diff exception
+        //containerResult.setError(ContainerErrorCode.UNKNOWN);
         return false;
     }
 
-    public void removeItemFromSlotOnly(final SlottedContainer container, final GameObject item) {
+    public void removeItemFromSlotOnly(final SlottedContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
         internalRemove(container, item, -1);
     }
 
-    public int findFirstSlotIdForObject(final SlottedContainer container, final GameObject item) {
-        final ContainerResult containerResult = new ContainerResult();
-        final int position = containerService.find(container, item, containerResult);
+    public int findFirstSlotIdForObject(final SlottedContainer container, final GameObject item)
+            throws ContainerTransferFailedException {
+        final int position = containerService.find(container, item);
 
         if (position >= 0) {
             final TIntIntMap slotMap = ReflectionUtil.getFieldValue(slotMapField, container);
@@ -572,13 +604,13 @@ public class SlottedContainerService {
         return SlotId.INVALID;
     }
 
-    public void updateArrangement(final SlottedContainer container, final GameObject item, final int oldArrangement, final int newArrangement) {
-        final ContainerResult containerResult = new ContainerResult();
+    public void updateArrangement(final SlottedContainer container, final GameObject item, final int oldArrangement, final int newArrangement)
+            throws ContainerTransferFailedException {
         if (!internalRemove(container, item, oldArrangement)) {
             LOGGER.debug("Remove part of update failed in slotted container");
         }
 
-        final int position = containerService.find(container, item, containerResult);
+        final int position = containerService.find(container, item);
 
         if (position < 0) {
             LOGGER.warn("could not find object in update slotted container");
@@ -587,10 +619,9 @@ public class SlottedContainerService {
         }
     }
 
-    private boolean internalRemove(final SlottedContainer container, final GameObject item, final int overrideArrangement) {
-        final ContainerResult containerResult = new ContainerResult();
-
-        final int position = containerService.find(container, item, containerResult);
+    private boolean internalRemove(final SlottedContainer container, final GameObject item, final int overrideArrangement)
+            throws ContainerTransferFailedException {
+        final int position = containerService.find(container, item);
 
         if (position == -1) {
             LOGGER.warn("called with an invalid item: container owner id={}, template={}; item id={}, template={}",
