@@ -32,10 +32,6 @@ public class TemplateDefinitionCompiler {
     }
 
     public void compile(final File sourceDirectory, final File destinationDirectory, final String templatePackage) throws IOException {
-        final File[] files = sourceDirectory.listFiles((dir, name) -> {
-            return name.endsWith(".tdf");
-        });
-
         final TemplateDefinitionWriter writer = new TemplateDefinitionWriter(templatePackage);
         final String destinationPath = destinationDirectory.getAbsolutePath();
 

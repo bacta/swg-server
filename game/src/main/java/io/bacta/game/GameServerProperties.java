@@ -40,6 +40,7 @@ public class GameServerProperties {
     private String requiredClientVersion;
     private String clientPath;
     private String clientIniFile;
+    private String serverPath;
     private List<Scene> scenes;
     private final AkkaProperties akka;
 

@@ -33,6 +33,8 @@ public class GameDataConfiguration {
         final SetupSharedFile setupSharedFile = new SetupSharedFile(configuration, treeFile);
         setupSharedFile.install();
 
+        treeFile.addSearchPath(gameServerProperties.getServerPath(), 1);
+
         return treeFile;
     }
 

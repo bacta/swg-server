@@ -27,7 +27,7 @@ class SearchPath extends SearchNode {
             final Path path = pathName.resolve(filePath);
             return Files.readAllBytes(path);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             return null;
         }
     }

@@ -42,6 +42,7 @@ io:
       requiredClientVersion: "20100225-17:43"
       clientPath: "swg-client/dist"
       clientIniFile: "live.cfg"
+      serverPath: "swg-client/dsrc/sku.0/sys.server/compiled/game"
       login:
         rest:
           base:
