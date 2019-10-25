@@ -283,7 +283,7 @@ public abstract class ServerObject extends GameObject {
      */
     private void sendAuthClientBaselines(SoeRequestContext client) {
         final BaselinesMessage pkg = new BaselinesMessage(this, authClientServerPackage, BaselinesMessage.BASELINES_CLIENT_SERVER);
-        final BaselinesMessage pkgNp = new BaselinesMessage(this, authClientServerPackage, BaselinesMessage.BASELINES_CLIENT_SERVER_NP);
+        final BaselinesMessage pkgNp = new BaselinesMessage(this, authClientServerPackageNp, BaselinesMessage.BASELINES_CLIENT_SERVER_NP);
         client.sendMessage(pkg);
         client.sendMessage(pkgNp);
     }

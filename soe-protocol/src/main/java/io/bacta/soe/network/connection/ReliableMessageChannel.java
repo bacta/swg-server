@@ -34,23 +34,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 /**
- struct UdpManager::ReliableConfig
- {
-     int maxOutstandingBytes;
-     int maxOutstandingPackets;
-     int maxInstandingPackets;
-     int fragmentSize;
-     int trickleSize;
-     int trickleRate;
-     int resendDelayAdjust;
-     int resendDelayPercent;
-     int resendDelayCap;
-     int congestionWindowMinimum;
-     bool outOfOrder;
-     bool processOnSend;
-     bool coalesce;
-     bool ackDeduping;
- };
+ * struct UdpManager::ReliableConfig
+ * {
+ * int maxOutstandingBytes;
+ * int maxOutstandingPackets;
+ * int maxInstandingPackets;
+ * int fragmentSize;
+ * int trickleSize;
+ * int trickleRate;
+ * int resendDelayAdjust;
+ * int resendDelayPercent;
+ * int resendDelayCap;
+ * int congestionWindowMinimum;
+ * bool outOfOrder;
+ * bool processOnSend;
+ * bool coalesce;
+ * bool ackDeduping;
+ * };
  */
 
 @Slf4j
@@ -68,7 +68,7 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
     public ReliableMessageChannel(final SoeNetworkConfiguration configuration) {
 
         this.configuration = configuration;
-        
+
         this.maxOutstandingPackets = configuration.getMaxOutstandingPackets();
 
         containerList = Collections.synchronizedSet(new TreeSet<>());
@@ -80,7 +80,7 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
     private short getAndIncrement() {
 
         int value = sequenceNum.getAndIncrement();
-        if(value > Short.MAX_VALUE) {
+        if (value > Short.MAX_VALUE) {
             value = 0;
             sequenceNum.set(value);
         }
@@ -96,17 +96,19 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
             return false;
         }
 
+        final ReliableNetworkMessage container = pendingContainer;
+
         // In container has content, add to it
-        if (pendingContainer != null) {
+        if (container != null) {
 
             // Add next message if it fits
             if (configuration.isMultiGameMessages() &&
-                    pendingContainer.hasRoom(buffer, configuration.getMaxReliablePayload())) {
-                return pendingContainer.addMessage(buffer);
+                    container.hasRoom(buffer, configuration.getMaxReliablePayload())) {
+                return container.addMessage(buffer);
             } else {
                 // If it doesn't fit, finish existing and add to queue
-                pendingContainer.finish();
-                containerList.add(pendingContainer);
+                container.finish();
+                containerList.add(container);
             }
         }
 
@@ -114,7 +116,7 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
         if (buffer.limit() > configuration.getMaxReliablePayload()) {
             int size = buffer.remaining();
             List<ByteBuffer> fragments = FragmentUtil.createFragments(buffer, configuration.getMaxReliablePayload());
-            for(int i = 0; i < fragments.size(); i++) {
+            for (int i = 0; i < fragments.size(); i++) {
                 ByteBuffer fragment = fragments.get(i);
                 ReliableNetworkMessage reliable = new ReliableNetworkMessage(
                         getAndIncrement(),
@@ -151,14 +153,18 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
         Iterator<ReliableNetworkMessage> iterator = containerList.iterator();
 
         if (!iterator.hasNext()) {
-            if (pendingContainer != null) {
-                pendingContainer.finish();
-                pendingContainer.addSendAttempt();
-                unacknowledgedQueue.add(pendingContainer);
-                ByteBuffer slice = pendingContainer.slice();
+            final ReliableNetworkMessage container = pendingContainer;
+
+            if (container != null) {
+                container.finish();
+                container.addSendAttempt();
+                unacknowledgedQueue.add(container);
+                ByteBuffer slice = container.slice();
                 pendingContainer = null;
+
                 return slice;
             }
+
             return null;
         }
 
@@ -174,14 +180,14 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
         LOGGER.debug("Client Ack: " + sequenceNumber);
 
         Iterator<ReliableNetworkMessage> iter = unacknowledgedQueue.iterator();
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             ReliableNetworkMessage message = iter.next();
 
-            if(message.getSequenceNumber() == sequenceNumber) {
+            if (message.getSequenceNumber() == sequenceNumber) {
                 unacknowledgedQueue.remove(message);
             }
 
-            if(message.getSequenceNumber() >= sequenceNumber) {
+            if (message.getSequenceNumber() >= sequenceNumber) {
                 break;
             }
         }
