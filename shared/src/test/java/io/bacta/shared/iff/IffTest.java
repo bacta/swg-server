@@ -41,7 +41,7 @@ public class IffTest {
         iff.enterForm();
             iff.enterForm();
                 iff.enterChunk();
-                    Assert.assertTrue("object/creature/player/shared_human_male.iff".equals(iff.readString()));
+        Assert.assertEquals("object/creature/player/shared_human_male.iff", iff.readString());
                 iff.exitChunk();
             iff.exitForm();
         iff.exitForm();
@@ -53,7 +53,7 @@ public class IffTest {
         iff.enterForm(ID_SCOT);
             iff.enterForm(ID_DERV);
                 iff.enterChunk(ID_XXXX);
-                    Assert.assertTrue("object/creature/player/shared_human_male.iff".equals(iff.readString()));
+        Assert.assertEquals("object/creature/player/shared_human_male.iff", iff.readString());
                 iff.exitChunk(ID_XXXX);
             iff.exitForm(ID_DERV);
             iff.enterForm(ID_0012);

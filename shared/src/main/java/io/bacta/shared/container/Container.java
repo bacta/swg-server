@@ -5,6 +5,7 @@ import io.bacta.shared.property.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by crush on 8/26/2014.
  */
-public abstract class Container extends Property {
+public abstract class Container extends Property implements Iterable<GameObject> {
     protected static final Logger LOGGER = LoggerFactory.getLogger(Container.class);
 
     public static int getClassPropertyId() {
@@ -26,10 +27,6 @@ public abstract class Container extends Property {
         super(propertyId, owner);
     }
 
-    public Iterator<GameObject> iterator() {
-        return contents.iterator();
-    }
-
     public boolean hasChanged() {
         return changed;
     }
@@ -40,6 +37,12 @@ public abstract class Container extends Property {
 
     public GameObject get(int position) {
         return contents.get(position);
+    }
+
+    @Nonnull
+    @Override
+    public Iterator<GameObject> iterator() {
+        return contents.iterator();
     }
 
     /**

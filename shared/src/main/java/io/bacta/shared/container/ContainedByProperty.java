@@ -2,6 +2,7 @@ package io.bacta.shared.container;
 
 import io.bacta.shared.object.GameObject;
 import io.bacta.shared.property.Property;
+import io.bacta.shared.util.NetworkId;
 
 public class ContainedByProperty extends Property {
     public static int getClassPropertyId() {
@@ -23,7 +24,7 @@ public class ContainedByProperty extends Property {
     }
 
     public long getContainedByNetworkId() {
-        return containedByObject.getNetworkId();
+        return containedByObject != null ? containedByObject.getNetworkId() : NetworkId.INVALID;
     }
 
     public void setContainedBy(final GameObject object) {

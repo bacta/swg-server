@@ -209,8 +209,8 @@ public final class PlayerObject extends IntangibleObject {
         firstParentAuthClientServerPackageNp.addVariable(petId);
         firstParentAuthClientServerPackageNp.addVariable(petCommandList);
         firstParentAuthClientServerPackageNp.addVariable(petToggledCommands);
-        firstParentAuthClientServerPackageNp.addVariable(unknownByte);
-        firstParentAuthClientServerPackageNp.addVariable(unknownInt);
+//        firstParentAuthClientServerPackageNp.addVariable(unknownByte);
+//        firstParentAuthClientServerPackageNp.addVariable(unknownInt);
         firstParentAuthClientServerPackageNp.addVariable(guildRank);
         firstParentAuthClientServerPackageNp.addVariable(citizenRank);
         firstParentAuthClientServerPackageNp.addVariable(galacticReserveDeposit);

@@ -91,6 +91,22 @@ public class ContainerTransferServiceTest {
         assertEquals(player, containedBy.getContainedBy());
     }
 
+    @Test
+    @DisplayName("Should transfer item to inventory")
+    public void shouldTransferItemToInventory() {
+        final ServerObject inventory = mockInventory();
+        final ServerObject item = mockItem();
+
+        //Add our item to the inventory.
+        final VolumeContainer volumeContainer = inventory.getVolumeContainerProperty();
+        assertDoesNotThrow(() -> volumeContainer.add(item));
+
+        final ContainedByProperty containedBy = item.getContainedByProperty();
+
+        assertEquals(1, volumeContainer.getCurrentVolume());
+        assertEquals(inventory, containedBy.getContainedBy());
+    }
+
     private ServerObject mockPlayer() {
         final ServerObject player = mock(CreatureObject.class);
         final long networkId = networkIdGenerator.getAndIncrement();

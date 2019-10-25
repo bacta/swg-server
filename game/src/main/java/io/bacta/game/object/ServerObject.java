@@ -3,6 +3,10 @@ package io.bacta.game.object;
 
 import io.bacta.archive.OnDirtyCallback;
 import io.bacta.archive.delta.*;
+import io.bacta.game.message.BaselinesMessage;
+import io.bacta.game.message.SceneCreateObjectByCrc;
+import io.bacta.game.message.SceneEndBaselines;
+import io.bacta.game.message.UpdateContainmentMessage;
 import io.bacta.game.object.template.server.ServerObjectTemplate;
 import io.bacta.shared.container.*;
 import io.bacta.shared.localization.StringId;
@@ -10,6 +14,7 @@ import io.bacta.shared.object.GameObject;
 import io.bacta.shared.object.template.SharedObjectTemplate;
 import io.bacta.shared.portal.PortalProperty;
 import io.bacta.shared.template.ObjectTemplateList;
+import io.bacta.shared.util.NetworkId;
 import io.bacta.soe.context.SoeRequestContext;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +23,8 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import static io.bacta.engine.utils.TypeCastUtil.safeCast;
 
 @Slf4j
 @Getter
@@ -77,8 +84,8 @@ public abstract class ServerObject extends GameObject {
         nameStringId = new AutoDeltaVariable<>(StringId.INVALID, StringId::new);
         objectName = new AutoDeltaUnicodeString();
         volume = new AutoDeltaInt(template.getVolume());
-        descriptionStringId = new AutoDeltaVariable<>(StringId.INVALID, StringId::new);
         authServerProcessId = new AutoDeltaInt();
+        descriptionStringId = new AutoDeltaVariable<>(StringId.INVALID, StringId::new);
 
         playerControlled = new AutoDeltaBoolean();
         persisted = new AutoDeltaBoolean();
@@ -222,6 +229,86 @@ public abstract class ServerObject extends GameObject {
             localFlags |= (1 << flag);
         else
             localFlags &= ~(1 << flag);
+    }
+
+    //TODO: For now, we can only send this upon a request until client/connection is finished being worked.
+    public void sendCreateAndBaselinesToClient(final SoeRequestContext client) {
+        final SceneCreateObjectByCrc createObjectMessage = new SceneCreateObjectByCrc(
+                getNetworkId(),
+                getTransformObjectToParent(),
+                getSharedTemplate().getCrcName().getCrc(),
+                getLocalFlag(LocalObjectFlags.HYPERSPACE_ON_CREATE));
+
+        client.sendMessage(createObjectMessage);
+
+        sendUpdateContainmentToClient(client);
+
+        sendSharedDataBaselines(client);
+        //TODO: Ensure the clients here are auth clients only.
+        sendAuthClientBaselines(client);
+        //TODO: Ensure the clients here are first parent only.
+        sendFirstParentBaselines(client);
+
+        sendContainerCreateAndBaselinesToClient(client);
+        //sendObjectSpecificBaselinesToClient(clients);
+
+        final SceneEndBaselines endBaselinesMessage = new SceneEndBaselines(networkId);
+        client.sendMessage(endBaselinesMessage);
+    }
+
+    private void sendUpdateContainmentToClient(SoeRequestContext client) {
+        final SlottedContainmentProperty slottedContainment = getProperty(SlottedContainmentProperty.getClassPropertyId());
+
+        final UpdateContainmentMessage ucm = new UpdateContainmentMessage(
+                getNetworkId(),
+                getContainedByProperty().getContainedByNetworkId(),
+                slottedContainment.getCurrentArrangement());
+
+        final boolean sendContainmentUpdate = ucm.getContainerId() != NetworkId.INVALID
+                || ucm.getSlotArrangement() != -1;
+
+        if (sendContainmentUpdate)
+            client.sendMessage(ucm);
+    }
+
+    private void sendSharedDataBaselines(SoeRequestContext client) {
+        final BaselinesMessage pkg = new BaselinesMessage(this, sharedPackage, BaselinesMessage.BASELINES_SHARED);
+        final BaselinesMessage pkgNp = new BaselinesMessage(this, sharedPackageNp, BaselinesMessage.BASELINES_SHARED_NP);
+        client.sendMessage(pkg);
+        client.sendMessage(pkgNp);
+    }
+
+    /**
+     * Should only go to the authoritative client for this object.
+     */
+    private void sendAuthClientBaselines(SoeRequestContext client) {
+        final BaselinesMessage pkg = new BaselinesMessage(this, authClientServerPackage, BaselinesMessage.BASELINES_CLIENT_SERVER);
+        final BaselinesMessage pkgNp = new BaselinesMessage(this, authClientServerPackage, BaselinesMessage.BASELINES_CLIENT_SERVER_NP);
+        client.sendMessage(pkg);
+        client.sendMessage(pkgNp);
+    }
+
+    /**
+     * Should only go to the player parent who owns this object.
+     */
+    private void sendFirstParentBaselines(SoeRequestContext client) {
+        final BaselinesMessage pkg = new BaselinesMessage(this, firstParentAuthClientServerPackage, BaselinesMessage.BASELINES_FIRST_PARENT_CLIENT_SERVER);
+        final BaselinesMessage pkgNp = new BaselinesMessage(this, firstParentAuthClientServerPackageNp, BaselinesMessage.BASELINES_FIRST_PARENT_CLIENT_SERVER_NP);
+        client.sendMessage(pkg);
+        client.sendMessage(pkgNp);
+    }
+
+    private void sendContainerCreateAndBaselinesToClient(SoeRequestContext client) {
+        final Container container = getContainerProperty();
+
+        if (container != null) {
+            for (final GameObject item : container) {
+                final ServerObject serverObject = safeCast(ServerObject.class, item);
+
+                if (serverObject != null)
+                    serverObject.sendCreateAndBaselinesToClient(client);
+            }
+        }
     }
 
 
