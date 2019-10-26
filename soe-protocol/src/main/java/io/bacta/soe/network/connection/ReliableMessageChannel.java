@@ -25,7 +25,10 @@ import io.bacta.soe.network.message.ReliableNetworkMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,22 +61,17 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
 
     private final SoeNetworkConfiguration configuration;
     private final AtomicInteger sequenceNum = new AtomicInteger();
-    private final Set<ReliableNetworkMessage> containerList;
     private final int maxOutstandingPackets;
 
-    private ReliableNetworkMessage pendingContainer;
-
+    private final Queue<ReliableNetworkMessage> pendingMessages;
+    private final Queue<ByteBuffer> unprocessedBuffers;
     private final Queue<ReliableNetworkMessage> unacknowledgedQueue;
 
     public ReliableMessageChannel(final SoeNetworkConfiguration configuration) {
-
         this.configuration = configuration;
-
         this.maxOutstandingPackets = configuration.getMaxOutstandingPackets();
-
-        containerList = Collections.synchronizedSet(new TreeSet<>());
-        pendingContainer = null;
-
+        pendingMessages =  new PriorityBlockingQueue<>(10);
+        unprocessedBuffers = new ArrayBlockingQueue<>(maxOutstandingPackets);
         unacknowledgedQueue = new PriorityBlockingQueue<>(maxOutstandingPackets);
     }
 
@@ -96,47 +94,7 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
             return false;
         }
 
-        final ReliableNetworkMessage container = pendingContainer;
-
-        // In container has content, add to it
-        if (container != null) {
-
-            // Add next message if it fits
-            if (configuration.isMultiGameMessages() &&
-                    container.hasRoom(buffer, configuration.getMaxReliablePayload())) {
-                return container.addMessage(buffer);
-            } else {
-                // If it doesn't fit, finish existing and add to queue
-                container.finish();
-                containerList.add(container);
-            }
-        }
-
-        // Check for messages larger than max payload
-        if (buffer.limit() > configuration.getMaxReliablePayload()) {
-            int size = buffer.remaining();
-            List<ByteBuffer> fragments = FragmentUtil.createFragments(buffer, configuration.getMaxReliablePayload());
-            for (int i = 0; i < fragments.size(); i++) {
-                ByteBuffer fragment = fragments.get(i);
-                ReliableNetworkMessage reliable = new ReliableNetworkMessage(
-                        getAndIncrement(),
-                        fragment,
-                        i,
-                        size
-                );
-                containerList.add(reliable.finish());
-            }
-            return true;
-        } else {
-
-            // Start new reliable message, increase our sequence number
-            pendingContainer = new ReliableNetworkMessage(getAndIncrement(), buffer);
-//            if(configuration.isMultiGameMessageSizeLimitToFF() && buffer.limit() >= 0xFF) {
-//                containerList.add(pendingContainer.finish());
-//                pendingContainer = null;
-//            }
-            return true;
-        }
+        return unprocessedBuffers.add(buffer);
     }
 
     @Override
@@ -150,29 +108,57 @@ public class ReliableMessageChannel implements UdpMessageChannel<ByteBuffer> {
 //            }
 //        }
 
-        Iterator<ReliableNetworkMessage> iterator = containerList.iterator();
+        ReliableNetworkMessage nextMessage = pendingMessages.poll();
 
-        if (!iterator.hasNext()) {
-            final ReliableNetworkMessage container = pendingContainer;
+        if (nextMessage == null) {
+            ByteBuffer buffer = unprocessedBuffers.poll();
 
-            if (container != null) {
-                container.finish();
-                container.addSendAttempt();
-                unacknowledgedQueue.add(container);
-                ByteBuffer slice = container.slice();
-                pendingContainer = null;
+            if (buffer != null) {
 
-                return slice;
+                // Fragment large messages
+                if (buffer.limit() > configuration.getMaxReliablePayload()) {
+                    int size = buffer.remaining();
+                    List<ByteBuffer> fragments = FragmentUtil.createFragments(buffer, configuration.getMaxReliablePayload());
+                    for (int i = 0; i < fragments.size(); i++) {
+                        ByteBuffer fragment = fragments.get(i);
+                        ReliableNetworkMessage reliable = new ReliableNetworkMessage(
+                                getAndIncrement(),
+                                fragment,
+                                i,
+                                size
+                        );
+                        pendingMessages.add(reliable.finish());
+                    }
+
+                    nextMessage = pendingMessages.poll();
+
+                } else {
+
+                    nextMessage = new ReliableNetworkMessage(getAndIncrement(), buffer);
+                    if (configuration.isMultiGameMessages()) {
+                        while ((buffer = unprocessedBuffers.peek()) != null &&
+                                nextMessage.hasRoom(buffer, configuration.getMaxReliablePayload())) {
+                            buffer = unprocessedBuffers.poll();
+                            nextMessage.addMessage(buffer);
+                        }
+                    }
+
+                }
+            }
+
+            if(nextMessage != null) {
+                nextMessage.finish();
+                nextMessage.addSendAttempt();
+                unacknowledgedQueue.add(nextMessage);
+                return nextMessage.slice();
             }
 
             return null;
         }
 
-        ReliableNetworkMessage message = iterator.next();
-        containerList.remove(message);
-        message.addSendAttempt();
-        unacknowledgedQueue.add(message);
-        return message.slice();
+        nextMessage.addSendAttempt();
+        unacknowledgedQueue.add(nextMessage);
+        return nextMessage.slice();
     }
 
     @Override
