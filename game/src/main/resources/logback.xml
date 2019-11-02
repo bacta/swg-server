@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <appender name="ConnectionLogger" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <discriminator>
-            <key>connection</key>
-            <defaultValue>unknown</defaultValue>
-        </discriminator>
-        <sift>
-            <appender name="${connection}" class="ch.qos.logback.core.FileAppender">
-                <file>logs/game/connection/${connection}.log</file>
-                <layout class="ch.qos.logback.classic.PatternLayout">
-                    <pattern>%d [%thread] %level %mdc %logger{35} %X{sendType} - %msg%n</pattern>
-                </layout>
-            </appender>
-        </sift>
-
+    <appender name="naboo" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/naboo/naboo.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/naboo/naboo-%d{yyyy-MM-dd_HH}.log</fileNamePattern>
+            <maxHistory>360</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
     </appender>
 
-    <logger name="io.bacta.soe.network.channel.NoopMessageCollector" level="INFO" additivity="false">
-        <appender-ref ref="ConnectionLogger" />
+    <logger name="io.bacta.game.scene" level="INFO" additivity="true">
+        <appender-ref ref="naboo"/>
     </logger>
 
-    <root level="INFO">
-        <appender-ref ref="ConnectionLogger" />
-    </root>
+
 
 </configuration>

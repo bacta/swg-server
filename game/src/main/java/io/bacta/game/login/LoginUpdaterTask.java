@@ -2,6 +2,7 @@ package io.bacta.game.login;
 
 import io.bacta.galaxy.message.GalaxyServerStatus;
 import io.bacta.game.GameServerProperties;
+import io.bacta.soe.config.ConnectionServerConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,16 @@ public final class LoginUpdaterTask {
     private static final int UPDATE_INTERVAL = 5000;
 
     private final LoginRestClient restClient;
-    private final GameServerProperties properties;
+    private final ConnectionServerConfiguration connectionProperties;
+    private final GameServerProperties gameProperties;
 
     @Inject
-    public LoginUpdaterTask(LoginRestClient restClient,
-                            GameServerProperties properties) {
+    public LoginUpdaterTask(final LoginRestClient restClient,
+                            final ConnectionServerConfiguration connectionProperties,
+                            final GameServerProperties gameProperties) {
         this.restClient = restClient;
-        this.properties = properties;
+        this.connectionProperties = connectionProperties;
+        this.gameProperties = gameProperties;
     }
 
     @Scheduled(initialDelay = UPDATE_INTERVAL, fixedRate = UPDATE_INTERVAL)
@@ -33,9 +37,9 @@ public final class LoginUpdaterTask {
         final int timeZone = ZonedDateTime.now().getOffset().getTotalSeconds();
 
         final GalaxyServerStatus status = new GalaxyServerStatus(
-                properties.getGalaxyName(),
-                properties.getBindAddress().getHostAddress(),
-                properties.getBindPort(),
+                gameProperties.getGalaxyName(),
+                connectionProperties.getBindAddress().getHostAddress(),
+                connectionProperties.getBindPort(),
                 timeZone);
 
         status.setAcceptingConnections(true);
@@ -47,14 +51,14 @@ public final class LoginUpdaterTask {
 
         final GalaxyServerStatus.ConnectionServerEntry connectionServer = new GalaxyServerStatus.ConnectionServerEntry(
                 1,
-                properties.getBindAddress().getHostAddress(),
-                properties.getBindPort(),
-                properties.getBindPingPort(),
+                connectionProperties.getBindAddress().getHostAddress(),
+                connectionProperties.getBindPort(),
+                connectionProperties.getBindPingPort(),
                 0);
 
         final Set<GalaxyServerStatus.ConnectionServerEntry> connectionServers = status.getConnectionServers();
         connectionServers.add(connectionServer);
 
-        this.restClient.updateStatus(properties.getGalaxyName(), status);
+        this.restClient.updateStatus(gameProperties.getGalaxyName(), status);
     }
 }

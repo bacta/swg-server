@@ -7,8 +7,8 @@ import io.bacta.soe.config.SoeNetworkConfiguration
 import io.bacta.soe.network.connection.DefaultSoeUdpConnection
 import io.bacta.soe.network.controller.*
 import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor
 import io.bacta.soe.network.message.SoeMessageType
+import io.bacta.soe.network.relay.GameNetworkMessageRelay
 import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
 import io.bacta.soe.serialize.GameNetworkMessageSerializer
 import io.bacta.soe.serialize.ObjControllerMessageSerializer
@@ -56,8 +56,8 @@ abstract class MessageProcessingBase extends Specification {
         serializer = new DefaultGameNetworkMessageSerializer(metrics, objSerializer, Mock(VelocityGameNetworkMessageTemplateWriter))
         serializer.loadMessages()
 
-        processor = Mock(GameNetworkMessageProcessor) {
-            process(_,_,) >> { final DefaultSoeUdpConnection connection, final GameNetworkMessage gameNetworkMessage ->
+        processor = Mock(GameNetworkMessageRelay) {
+            receiveMessage(_,_,) >> { final DefaultSoeUdpConnection connection, final GameNetworkMessage gameNetworkMessage ->
                 processedPackets.add(gameNetworkMessage)
             }
         }

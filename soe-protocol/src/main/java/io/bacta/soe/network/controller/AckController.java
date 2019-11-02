@@ -21,8 +21,8 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +38,7 @@ public class AckController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor processor) throws Exception {
+                               final GameNetworkMessageRelay processor) throws Exception {
 
         short sequenceNum = buffer.getShort();
 

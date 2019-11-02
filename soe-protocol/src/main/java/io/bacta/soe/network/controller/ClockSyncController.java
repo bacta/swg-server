@@ -21,9 +21,9 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.ClockReflectMessage;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.Clock;
 import org.springframework.stereotype.Component;
 
@@ -101,7 +101,7 @@ public class ClockSyncController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor processor) {
+                               final GameNetworkMessageRelay processor) {
 
         short timeStamp = buffer.getShort();
 		int masterPingTime = buffer.getInt();

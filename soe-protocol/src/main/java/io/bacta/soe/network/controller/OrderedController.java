@@ -24,8 +24,8 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -50,7 +50,7 @@ public class OrderedController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor processor) {
+                               final GameNetworkMessageRelay processor) {
 
         IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 

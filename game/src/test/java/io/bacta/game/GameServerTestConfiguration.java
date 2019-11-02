@@ -82,10 +82,11 @@ public class GameServerTestConfiguration {
 
     @Inject
     @Bean
-    public GameNetworkMessageHandler getGameNetworkMessageDispatcher(final GameNetworkMessageControllerLoader controllerLoader,
+    public GameNetworkMessageHandler getGameNetworkMessageDispatcher(final ApplicationContext context,
+                                                                     final GameNetworkMessageControllerLoader controllerLoader,
                                                                      final GameNetworkMessageSerializer gameNetworkMessageSerializer) {
 
-        return new DefaultGameNetworkMessageHandler(controllerLoader);
+        return new DefaultGameNetworkMessageHandler(controllerLoader.loadControllers(context));
     }
 
     @Bean

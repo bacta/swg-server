@@ -220,7 +220,7 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     @Override
     public void sendClusterEnum(SoeRequestContext context) {
-        LOGGER.debug("Sending cluster enumeration to client {}.", context.getSessionContext().getRemoteAddress());
+        LOGGER.debug("Sending cluster enumeration to client {}.", context.getSessionContext().getConnectionId());
 
         final boolean privateClient = false; //TODO: Determine if the client is on the same local network.
 
@@ -316,7 +316,7 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     @Override
     public void sendClusterStatus(SoeRequestContext context) {
-        LOGGER.debug("Sending cluster status to client {}.", context.getSessionContext().getRemoteAddress());
+        LOGGER.debug("Sending cluster status to client {}.", context.getSessionContext().getConnectionId());
 
         final LoginClusterStatus clusterStatusMessage = createLoginClusterStatusMessage();
         context.sendMessage(clusterStatusMessage);
@@ -332,7 +332,7 @@ public final class DefaultGalaxyService implements GalaxyService {
 
     @Override
     public void sendExtendedClusterStatus(SoeRequestContext context) {
-        LOGGER.info("Sending extended cluster info to {}.", context.getSessionContext().getRemoteAddress());
+        LOGGER.info("Sending extended cluster info to {}.", context.getSessionContext().getConnectionId());
 
         final Collection<Galaxy> galaxies = getGalaxies();
         final Set<LoginClusterStatusEx.ClusterData> clusterDataEx = new TreeSet<>();

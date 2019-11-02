@@ -89,6 +89,9 @@
         <module>templates</module>
         <module>shared</module>
         <module>login</module>
+        <module>galaxy</module>
+        <module>connection</module>
+        <module>scene</module>
         <module>game</module>
         <module>ui</module>
     </modules>
@@ -300,6 +303,11 @@
             <dependency>
                 <groupId>io.bacta.swg</groupId>
                 <artifactId>login</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bacta.swg</groupId>
+                <artifactId>game</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

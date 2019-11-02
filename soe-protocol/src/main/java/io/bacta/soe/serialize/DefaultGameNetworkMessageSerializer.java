@@ -40,6 +40,8 @@ import io.netty.util.collection.IntObjectHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -58,6 +60,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultGameNetworkMessageSerializer implements GameNetworkMessageSerializer {
 
     private final ObjControllerMessageSerializer objControllerMessageSerializer;

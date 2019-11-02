@@ -5,7 +5,8 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import io.bacta.engine.SpringAkkaExtension;
 import io.bacta.game.GameServerProperties;
-import io.bacta.game.object.scene.Scene;
+import io.bacta.shared.tre.TreeFile;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +22,9 @@ public class SceneActor extends AbstractActor {
     private final Scene scene;
 
     @Inject
-    public SceneActor(final SpringAkkaExtension ext,
-                      final Scene scene) {
+    public SceneActor(final SpringAkkaExtension ext, final ConfigurableApplicationContext context, final TreeFile treeFile) {
         this.ext = ext;
-        this.scene = scene;
+        this.scene = new Scene(context, treeFile);
     }
 
     @Override

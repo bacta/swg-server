@@ -32,9 +32,9 @@ import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.protocol.SoeProtocolHandler;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,6 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Core inbound message channel for the SOE Protocol.  This channel is the entry point
@@ -66,7 +65,7 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
     private final SoeProtocolHandler protocolHandler;
     private final SoeMessageDispatcher soeMessageDispatcher;
     private final SoeUdpConnectionCache connectionCache;
-    private final GameNetworkMessageProcessor processor;
+    private final GameNetworkMessageRelay processor;
     private UdpChannel udpChannel;
 
     private final Thread sendThread;
@@ -80,7 +79,7 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
                              final SoeMessageDispatcher soeMessageDispatcher,
                              final SoeNetworkConfiguration networkConfiguration,
                              final ApplicationEventPublisher publisher,
-                             final GameNetworkMessageProcessor processor,
+                             final GameNetworkMessageRelay processor,
                              final ApplicationContext context,
                              final MetricRegistry metricRegistry) {
 
@@ -215,6 +214,7 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
     @Override
     public void run() {
         long nextIteration = 0;
+        long idleTimestamp = System.currentTimeMillis() - (1000 * 60 * 2);
 
         boolean run = true;
         while (run) {
@@ -226,7 +226,12 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
                 }
 
                 nextIteration = currentTime + networkConfiguration.getNetworkThreadSleepTimeMs();
-                sendPendingMessages();
+
+                if((currentTime - (1000 * 60 * 2)) > idleTimestamp) {
+                    idleTimestamp = currentTime - (1000 * 60 * 2);
+                }
+
+                sendPendingMessages(idleTimestamp);
 
             } catch (InterruptedException e) {
                 run = false;
@@ -236,25 +241,27 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
         }
     }
 
-    private void sendPendingMessages() {
+    private void sendPendingMessages(long idleTimeStamp) {
 
         try {
-            final Set<InetSocketAddress> connectionList = connectionCache.asMap().keySet();
-            final List<InetSocketAddress> deadClients = new ArrayList<>();
+            final List<SoeUdpConnection> deadClients = new ArrayList<>();
 
-            for (InetSocketAddress inetSocketAddress : connectionList) {
-                final SoeUdpConnection connection = connectionCache.getIfPresent(inetSocketAddress);
+            for (SoeUdpConnection connection : connectionCache.getAsCollection()) {
 
                 if (connection == null) {
                     continue;
                 }
 
+                if(connection.getLastRemoteActivity() < idleTimeStamp || connection.getLastActivity() < idleTimeStamp) {
+                    connection.setConnectionState(ConnectionState.DISCONNECTED);
+                }
+
                 if (connection.getConnectionState() == ConnectionState.DISCONNECTED) {
-                    deadClients.add(inetSocketAddress);
+                    deadClients.add(connection);
                 }
 
                 final List<ByteBuffer> messages = connection.getPendingMessages();
-                if (messages.isEmpty()) {
+                if (!messages.isEmpty()) {
                     sendQueueSizes.update(messages.size());
                 }
 
@@ -263,8 +270,8 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
                 }
             }
 
-            for (InetSocketAddress inetSocketAddress : deadClients) {
-                connectionCache.invalidate(inetSocketAddress);
+            for (SoeUdpConnection connection : deadClients) {
+                connectionCache.invalidate(connection.getRemoteAddress());
             }
 
         } catch (Exception e) {

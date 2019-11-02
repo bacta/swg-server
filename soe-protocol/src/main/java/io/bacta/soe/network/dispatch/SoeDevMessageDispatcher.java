@@ -24,8 +24,8 @@ import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -58,7 +58,7 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
     }
 
     @Override
-    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageProcessor processor) {
+    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageRelay processor) {
 
         byte zeroByte = buffer.get();
         byte type = buffer.get();

@@ -24,8 +24,8 @@ import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +59,7 @@ public class ReliableMessageController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor processor) {
+                               final GameNetworkMessageRelay processor) {
 
         IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 
@@ -107,7 +107,7 @@ public class ReliableMessageController implements SoeMessageController {
         }
     }
 
-    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer, final GameNetworkMessageProcessor processor) {
+    private void processPacket(final ReliablePacketMode mode, final SoeUdpConnection connection, final ByteBuffer buffer, final GameNetworkMessageRelay processor) {
 
         IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
 

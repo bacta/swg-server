@@ -26,7 +26,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.net.InetAddress;
 import java.util.List;
 
 
@@ -34,9 +33,6 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "io.bacta.game")
 public class GameServerProperties {
-    private InetAddress bindAddress;
-    private int bindPort;
-    private int bindPingPort;
     private String requiredClientVersion;
     private String clientPath;
     private String clientIniFile;
@@ -57,6 +53,7 @@ public class GameServerProperties {
     public static class Scene {
         private String name;
         private String iffPath;
+        private String[] args;
     }
 }
 

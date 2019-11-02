@@ -15,8 +15,8 @@ import java.util.Random;
 /**
  * This factory creates the underlying UDP connection
  */
-@Component
 @Slf4j
+@Component
 public class SoeUdpConnectionFactory {
 
     private final Random randomId;

@@ -28,11 +28,7 @@ import io.bacta.soe.context.SoeRequestContext;
 import io.bacta.soe.context.SoeSessionContext;
 import io.bacta.soe.network.controller.GameNetworkMessageController;
 import io.bacta.soe.network.dispatch.GameNetworkMessageControllerData;
-import io.bacta.soe.network.dispatch.GameNetworkMessageControllerLoader;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 
 /**
  * GameNetworkMessageDispatcher receives and dispatches {@link GameNetworkMessage} instances.  It is able to process
@@ -45,29 +41,28 @@ import javax.inject.Inject;
  */
 
 @Slf4j
-@Component
 public final class DefaultGameNetworkMessageHandler implements GameNetworkMessageHandler {
     /**
      * Map of controller data to dispatch messages
      */
     private final TIntObjectMap<GameNetworkMessageControllerData> controllers;
 
-    @Inject
-    public DefaultGameNetworkMessageHandler(final GameNetworkMessageControllerLoader controllerLoader) {
-        controllers = controllerLoader.loadControllers();
+    public DefaultGameNetworkMessageHandler(final TIntObjectMap<GameNetworkMessageControllerData> controllers) {
+        this.controllers = controllers;
     }
 
     @Override
-    public void handle(final SoeRequestContext context, final GameNetworkMessage gameNetworkMessage) {
+    public void handle(final SoeSessionContext context, final GameNetworkMessage gameNetworkMessage) {
 
         final GameNetworkMessageControllerData controllerData = getControllerData(gameNetworkMessage);
 
+        SoeRequestContext requestContext = new SoeRequestContext(context);
+
         if (controllerData != null) {
-            SoeSessionContext sessionContext = context.getSessionContext();
-            if (!controllerData.containsRoles(sessionContext.getRoles())) {
+            if (!controllerData.containsRoles(context.getRoles())) {
                 LOGGER.error("Controller security blocked access: {}", controllerData.getController().getClass().getName());
                 LOGGER.error("Connection: {}", context.toString());
-                throw new UnauthorizedControllerAccessException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + sessionContext.getRemoteAddress());
+                throw new UnauthorizedControllerAccessException("Unauthorized Attempt to use controller " + controllerData.getController().getClass().getName() + " by " + context.getConnectionId());
             }
 
             try {
@@ -77,7 +72,7 @@ public final class DefaultGameNetworkMessageHandler implements GameNetworkMessag
 
                 LOGGER.debug("Routing to {}", controller.getClass().getSimpleName());
 
-                controller.handleIncoming(context, gameNetworkMessage); //Can't fix this one yet.
+                controller.handleIncoming(requestContext, gameNetworkMessage); //Can't fix this one yet.
 
             } catch (Exception e) {
                 LOGGER.error("SWG Message Handling {}", controllerData.getClass(), e);

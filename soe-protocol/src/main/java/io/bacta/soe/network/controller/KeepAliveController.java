@@ -21,8 +21,8 @@
 package io.bacta.soe.network.controller;
 
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
@@ -36,7 +36,7 @@ public class KeepAliveController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor forwarder) {
+                               final GameNetworkMessageRelay forwarder) {
         connection.updateLastClientActivity();
     }
 

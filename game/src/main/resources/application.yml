@@ -20,25 +20,21 @@
 spring:
   jmx:
     default-domain: agentservice
+    unique-names: true
   profiles:
       active:
         - Galaxy
         - dev
-
-endpoints:
-  jmx:
-    domain: agentservice
-    unique-names: true
-
 io:
   bacta:
     akka:
       clusterName: "bacta"
       config: "game.conf"
-    game:
+    connection:
       bindAddress: "0.0.0.0"
       bindPort: 44463
       bindPingPort: 44464
+    game:
       requiredClientVersion: "20100225-17:43"
       clientPath: "swg-client/dist"
       clientIniFile: "live.cfg"

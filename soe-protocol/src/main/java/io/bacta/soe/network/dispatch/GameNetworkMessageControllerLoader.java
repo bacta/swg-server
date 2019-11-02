@@ -30,10 +30,7 @@ import io.bacta.soe.network.controller.MessageHandled;
 import io.bacta.soe.util.ClientString;
 import io.bacta.soe.util.MessageHashUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Modifier;
 
@@ -41,12 +38,9 @@ import java.lang.reflect.Modifier;
  * Created by kyle on 4/22/2016.
  */
 @Slf4j
-@Component
-public final class GameNetworkMessageControllerLoader implements ApplicationContextAware {
+public final class GameNetworkMessageControllerLoader {
 
-    private ApplicationContext context;
-
-    public TIntObjectMap<GameNetworkMessageControllerData> loadControllers() {
+    public TIntObjectMap<GameNetworkMessageControllerData> loadControllers(final ApplicationContext context) {
 
         final TIntObjectMap<GameNetworkMessageControllerData> controllers = new TIntObjectHashMap<>();
         String[] controllerBeanNames = context.getBeanNamesForType(GameNetworkMessageController.class);
@@ -106,10 +100,5 @@ public final class GameNetworkMessageControllerLoader implements ApplicationCont
         } catch (Throwable e) {
             LOGGER.error("Unable to add controller: " + controller.getClass().getName(), e);
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
     }
 }

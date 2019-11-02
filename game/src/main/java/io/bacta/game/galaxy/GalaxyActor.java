@@ -12,7 +12,6 @@ import io.bacta.game.chat.ChatSupervisor;
 import io.bacta.game.message.ClientCreateCharacter;
 import io.bacta.game.name.NameValidatorServiceActor;
 import io.bacta.game.player.PlayerCreationSupervisor;
-import io.bacta.soe.network.connection.GalaxyGameNetworkMessageRouter;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -45,9 +44,7 @@ public class GalaxyActor extends AbstractActor {
                 ClusterEvent.MemberEvent.class,
                 ClusterEvent.UnreachableMember.class);
 
-        context().actorOf(ext.props(GalaxyGameNetworkMessageRouter.class), ActorConstants.GAME_NETWORK_MESSAGE_RELAY);
         context().actorOf(ext.props(SceneSupervisor.class), ActorConstants.GALAXY_SCENE_SUPERVISOR);
-
         context().actorOf(ext.props(NameValidatorServiceActor.class), ActorConstants.NAME_VALIDATION_SERVICE);
         context().actorOf(ext.props(ChatSupervisor.class), ActorConstants.CHAT_SUPERVISOR);
 

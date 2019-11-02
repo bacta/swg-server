@@ -54,7 +54,7 @@ public final class DefaultClientService implements ClientService {
             //Client wants to know the difference in time between the server and client.
             final int epoch = (int) (System.currentTimeMillis() / 1000);
 
-            LOGGER.info("Sending server epoch {} to client {}.", epoch, sessionContext.getRemoteAddress());
+            LOGGER.info("Sending server epoch {} to client {}.", epoch, sessionContext.getConnectionId());
 
             final ServerNowEpochTime serverEpoch = new ServerNowEpochTime(epoch);
             context.sendMessage(serverEpoch);
@@ -87,7 +87,7 @@ public final class DefaultClientService implements ClientService {
 
         } catch (InvalidClientException ex) {
             LOGGER.warn("Client {} tried to establish with version {} but {} was required.",
-                    sessionContext.getRemoteAddress(),
+                    sessionContext.getConnectionId(),
                     ex.getClientVersion(),
                     requiredClientVersion);
 

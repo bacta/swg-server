@@ -30,6 +30,8 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -45,6 +47,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ObjControllerMessageSerializer {
 
     private final Map<GameControllerMessageType, Constructor<? extends MessageQueueData>> messageQueueDataConstructorMap;

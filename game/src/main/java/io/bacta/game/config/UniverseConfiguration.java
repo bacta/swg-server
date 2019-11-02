@@ -30,7 +30,6 @@ import io.bacta.engine.conf.BactaConfiguration;
 import io.bacta.engine.conf.ini.IniBactaConfiguration;
 import io.bacta.game.GameServerProperties;
 import io.bacta.game.galaxy.GalaxyActor;
-import io.bacta.soe.network.udp.SoeTransceiver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -82,12 +81,6 @@ public class UniverseConfiguration {
     public BactaConfiguration getBactaConfiguration() throws FileNotFoundException {
         final Path configPath = Paths.get(gameServerProperties.getClientPath(), gameServerProperties.getClientIniFile());
         return new IniBactaConfiguration(configPath);
-    }
-
-    @Inject
-    @Bean
-    public SoeTransceiver startTransceiver(final SoeTransceiver soeTransceiver) {
-        return soeTransceiver;
     }
 
     @Bean

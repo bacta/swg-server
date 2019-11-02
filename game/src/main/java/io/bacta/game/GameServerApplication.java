@@ -25,16 +25,14 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
-@EnableScheduling
-@ComponentScan({
+@SpringBootApplication(scanBasePackages = {
         "io.bacta.game",
         "io.bacta.soe",
         "io.bacta.shared",
         "io.bacta.engine"})
+@EnableScheduling
 public class GameServerApplication {
     public static void main(String[] args) {
 

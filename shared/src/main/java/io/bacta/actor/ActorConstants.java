@@ -8,6 +8,7 @@ public class ActorConstants {
 
     public static final String PUBLISHER = "publisher";
     public static final String GALAXY_SCENE_SUPERVISOR = "scene";
+    public static final String CONNECTION_SERVER = "connection";
 
     public static final String CHAT_SUPERVISOR = "chat";
 

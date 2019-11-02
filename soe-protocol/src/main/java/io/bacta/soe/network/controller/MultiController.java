@@ -23,8 +23,8 @@ package io.bacta.soe.network.controller;
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
-import io.bacta.soe.network.forwarder.GameNetworkMessageProcessor;
 import io.bacta.soe.network.message.SoeMessageType;
+import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -79,7 +79,7 @@ public class MultiController implements SoeMessageController {
                                final SoeMessageType type,
                                final SoeUdpConnection connection,
                                final ByteBuffer buffer,
-                               final GameNetworkMessageProcessor processor) {
+                               final GameNetworkMessageRelay processor) {
 
         while (buffer.remaining() > 3) {
             

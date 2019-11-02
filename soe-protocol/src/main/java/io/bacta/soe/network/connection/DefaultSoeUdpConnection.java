@@ -272,7 +272,6 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
         }
     }
 
-
 //    013CA650	UdpManager::UdpManager(UdpManager::Params const *)
 //    013CAEB0	UdpManager::~UdpManager(void)
 //    013CB150	UdpManager::CreateAndBindSocket(int)

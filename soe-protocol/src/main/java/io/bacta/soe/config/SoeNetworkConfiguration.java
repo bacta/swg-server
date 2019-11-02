@@ -20,14 +20,11 @@
 
 package io.bacta.soe.config;
 
-import io.bacta.engine.conf.NetworkConfiguration;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -39,12 +36,7 @@ import java.util.Set;
 @Data
 @PropertySource("classpath:soenetworking.properties")
 @ConfigurationProperties(prefix = "io.bacta.network")
-public class SoeNetworkConfiguration implements NetworkConfiguration {
-    private InetAddress bindAddress;
-    private int bindPort;
-
-    private InetAddress publicAddress;
-    private Collection<String> trustedClients;
+public class SoeNetworkConfiguration {
     private boolean compression;
     private int protocolVersion;
 
