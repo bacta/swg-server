@@ -34,7 +34,7 @@ public final class UnicodeString implements ByteBufferWritable {
     private String string;
 
     public UnicodeString() {
-        string = new String();
+        string = "";
     }
 
     public UnicodeString(String string) {

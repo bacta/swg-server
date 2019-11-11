@@ -25,7 +25,8 @@ import java.io.Serializable;
 /**
  * Created by kyle on 4/3/2017.
  */
-public interface CrudRepository<Key, Value extends Serializable> {
+public interface CrudRepository<K, V extends Serializable> {
+
     /**
      * Number of entries in the repository
      * @return number of entries
@@ -36,19 +37,19 @@ public interface CrudRepository<Key, Value extends Serializable> {
      * Delete a single specific entry from the repository
      * @param key Key of item to delete
      */
-    void delete(Key key);
+    void delete(K key);
 
     /**
      * Delete a group of entries from the repository
      * @param entries Group of entries to delete
      */
-    void delete(Iterable<? extends Value> entries);
+    void delete(Iterable<? extends V> entries);
 
     /**
      * Delete single specific value in repository
      * @param entry entry to delete
      */
-    void delete(Value entry);
+    void delete(V entry);
 
     /**
      * Delete all entries in the repository
@@ -60,27 +61,27 @@ public interface CrudRepository<Key, Value extends Serializable> {
      * @param key
      * @return true if key is found in repository
      */
-    boolean exists(Key key);
+    boolean exists(K key);
 
     /**
      * Get all values held in repository
      * @return Iterable of contained values
      */
-    Iterable<Value> findAll();
+    Iterable<V> findAll();
 
     /**
      * Find a group of items in a repository
      * @param keys keys to fine
      * @return interable of matching items
      */
-    Iterable<Value> findAll(Iterable<Key> keys);
+    Iterable<V> findAll(Iterable<K> keys);
 
     /**
      * Find single entry by key
      * @param key key of entry to find
      * @return
      */
-    Value findOne(Key key);
+    V findOne(K key);
 
     /**
      * Save a group of entries
@@ -88,7 +89,7 @@ public interface CrudRepository<Key, Value extends Serializable> {
      * @param <S> Type of entry
      * @return list of entries saved
      */
-    <S extends Value> Iterable<S> save(Iterable<S> entries);
+    <S extends V> Iterable<S> save(Iterable<S> entries);
 
     /**
      * Save single entry
@@ -96,5 +97,5 @@ public interface CrudRepository<Key, Value extends Serializable> {
      * @param <S> Type of entry
      * @return entry saved
      */
-    <S extends Value> S save(S entry);
+    <S extends V> S save(S entry);
 }

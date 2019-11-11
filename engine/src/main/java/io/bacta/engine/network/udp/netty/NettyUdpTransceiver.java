@@ -53,7 +53,7 @@ class NettyUdpTransceiver implements UdpTransceiver {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         udpReceiver.destroy();
     }
 

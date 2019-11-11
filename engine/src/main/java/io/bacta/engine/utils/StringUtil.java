@@ -24,6 +24,9 @@ package io.bacta.engine.utils;
  * Created by crush on 4/19/2016.
  */
 public class StringUtil {
+
+    private StringUtil() {}
+
     public static String convertUnderscoreToUpper(final String filename) {
         final StringBuilder sb = new StringBuilder(filename.length());
 

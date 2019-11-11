@@ -22,7 +22,7 @@ public final class BactaAccountUserDetailsService implements UserDetailsService 
     private PasswordEncoder userPasswordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String username) {
         LOGGER.trace("Looking up user with username {}.", username);
 
         final Account account = accountRepository.findByUsername(username);

@@ -22,7 +22,6 @@ package io.bacta.engine.conf.ini;
 
 import io.bacta.engine.conf.BactaConfiguration;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.Collection;
 
@@ -34,7 +33,7 @@ import java.util.Collection;
 public class IniBactaConfiguration implements BactaConfiguration {
     private final IniFile iniFile;
 
-    public IniBactaConfiguration(final Path iniPath) throws FileNotFoundException {
+    public IniBactaConfiguration(final Path iniPath) {
         iniFile = new IniFile(iniPath.toString());
     }
 

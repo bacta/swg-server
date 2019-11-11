@@ -23,11 +23,13 @@ package io.bacta.engine.object;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * Created by kburkhardt on 2/23/14.
  */
 
-public abstract class NetworkObject implements Comparable<NetworkObject> {
+public abstract class NetworkObject implements Comparable<NetworkObject>, Serializable {
     public static final long INVALID = 0;
 
     @Getter @Setter
@@ -56,9 +58,7 @@ public abstract class NetworkObject implements Comparable<NetworkObject> {
 
         NetworkObject that = (NetworkObject) o;
 
-        if (networkId != that.networkId) return false;
-
-        return true;
+        return (networkId == that.networkId);
     }
 
     @Override

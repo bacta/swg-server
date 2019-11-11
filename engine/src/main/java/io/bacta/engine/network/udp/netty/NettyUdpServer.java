@@ -96,7 +96,7 @@ final class NettyUdpServer implements Runnable {
             Thread.currentThread().interrupt();
         } finally {
             if (b != null) {
-                b.group().shutdownGracefully();
+                b.config().group().shutdownGracefully();
             }
         }
     }

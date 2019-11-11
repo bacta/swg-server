@@ -27,6 +27,8 @@ import java.nio.ByteBuffer;
  */
 public class UnsignedUtil {
 
+    private UnsignedUtil() {}
+
     public static short getUnsignedByte(ByteBuffer bb) {
         return ((short) (bb.get() & 0xff));
     }

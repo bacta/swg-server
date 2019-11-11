@@ -33,15 +33,18 @@ import io.bacta.engine.lang.UnicodeString;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "squid:S1319"})
 public class BufferUtil {
 
-    private static final Charset UTF_16LE = Charset.forName("UTF-16LE");
-    private static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+    private BufferUtil() {}
+
+    private static final Charset UTF_16LE = StandardCharsets.UTF_16LE;
+    private static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
 
     public static String bytesToHex(byte[] bytes, char seperator) {
         final char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -83,10 +86,10 @@ public class BufferUtil {
 
     public static String bytesToAscii(byte[] bytes) {
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int v;
-        for (int j = 0; j < bytes.length; j++) {
-            v = (bytes[j] & 0xFF);
+        for (byte aByte : bytes) {
+            v = (aByte & 0xFF);
             if (v < 32) {
                 v = 46;
             }
@@ -183,55 +186,58 @@ public class BufferUtil {
     public static String getNullTerminatedString(ByteBuffer buffer) {
         final StringBuilder builder = new StringBuilder();
 
-        byte b = 0;
+        byte b;
         while ((b = buffer.get()) != 0)
             builder.append((char) b);
 
         return builder.toString();
     }
 
-//    public static Vec3 getVec3(ByteBuffer buffer) {
-//        float px = buffer.getFloat();
-//        float pz = buffer.getFloat();
-//        float py = buffer.getFloat();
-//
-//        return new Vec3(px, pz, py);
-//    }
-//
-//    public static Quat4f getQuat4f(ByteBuffer buffer) {
-//        float rx = buffer.getFloat();
-//        float ry = buffer.getFloat();
-//        float rz = buffer.getFloat();
-//        float rw = buffer.getFloat();
-//
-//        return new Quat4f(rx, ry, rz, rw);
-//    }
-//
-//    public static void put(ByteBuffer buffer, Vec3 vector) {
-//        if (vector != null) {
-//            buffer.putFloat(vector.x);
-//            buffer.putFloat(vector.z);
-//            buffer.putFloat(vector.y);
-//        } else {
-//            buffer.putFloat(0.f);
-//            buffer.putFloat(0.f);
-//            buffer.putFloat(0.f);
-//        }
-//    }
-//
-//    public static void put(ByteBuffer buffer, Quat4f quaternion) {
-//        if (quaternion != null) {
-//            buffer.putFloat(quaternion.x); // X Direction
-//            buffer.putFloat(quaternion.y); // Y Direction
-//            buffer.putFloat(quaternion.z); // Z Direction
-//            buffer.putFloat(quaternion.w); // W Direction
-//        } else {
-//            buffer.putFloat(0.f);
-//            buffer.putFloat(0.f);
-//            buffer.putFloat(0.f);
-//            buffer.putFloat(1.f);
-//        }
-//    }
+    /*
+    public static Vec3 getVec3(ByteBuffer buffer) {
+        float px = buffer.getFloat();
+        float pz = buffer.getFloat();
+        float py = buffer.getFloat();
+
+        return new Vec3(px, pz, py);
+    }
+
+    public static Quat4f getQuat4f(ByteBuffer buffer) {
+        float rx = buffer.getFloat();
+        float ry = buffer.getFloat();
+        float rz = buffer.getFloat();
+        float rw = buffer.getFloat();
+
+        return new Quat4f(rx, ry, rz, rw);
+    }
+
+    public static void put(ByteBuffer buffer, Vec3 vector) {
+        if (vector != null) {
+            buffer.putFloat(vector.x);
+            buffer.putFloat(vector.z);
+            buffer.putFloat(vector.y);
+        } else {
+            buffer.putFloat(0.f);
+            buffer.putFloat(0.f);
+            buffer.putFloat(0.f);
+        }
+    }
+
+    public static void put(ByteBuffer buffer, Quat4f quaternion) {
+        if (quaternion != null) {
+            buffer.putFloat(quaternion.x); // X Direction
+            buffer.putFloat(quaternion.y); // Y Direction
+            buffer.putFloat(quaternion.z); // Z Direction
+            buffer.putFloat(quaternion.w); // W Direction
+        } else {
+            buffer.putFloat(0.f);
+            buffer.putFloat(0.f);
+            buffer.putFloat(0.f);
+            buffer.putFloat(1.f);
+        }
+    }
+
+     */
 
     public static void put(ByteBuffer buffer, boolean value) {
         buffer.put(value ? (byte) 1 : (byte) 0);

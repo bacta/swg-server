@@ -9,6 +9,9 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 
 public final class CryptoUtil {
+
+    private CryptoUtil() {}
+
     /**
      * Simple wrapper around {@link KeyGenerator#getInstance(String)} to replace the checked exception with a runtime
      * exception.

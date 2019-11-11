@@ -88,14 +88,14 @@ public final class FileSystemWatcher {
                             continue;
 
                         final WatchEvent<Path> watchEvent = (WatchEvent<Path>) event;
-                        final Path filePath = watchEvent.context();
+                        final Path localFilePath = watchEvent.context();
 
                         if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind) && createCallback != null) {
-                            createCallback.accept(filePath);
+                            createCallback.accept(localFilePath);
                         } else if (StandardWatchEventKinds.ENTRY_DELETE.equals(kind) && deleteCallback != null) {
-                            deleteCallback.accept(filePath);
+                            deleteCallback.accept(localFilePath);
                         } else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(kind) && modifyCallback != null) {
-                            modifyCallback.accept(filePath);
+                            modifyCallback.accept(localFilePath);
                         }
                     }
 

@@ -29,11 +29,4 @@ public class SpringAkkaExtension implements Extension {
                 applicationContext,
                 Introspector.decapitalize(clazz.getSimpleName()));
     }
-
-//    public Props props(Class clazz, Object...args) {
-//        return Props.create(SpringActorProducer.class,
-//                applicationContext,
-//                Introspector.decapitalize(clazz.getSimpleName()),
-//                ...args);
-//    }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClassGraphActorMessageControllerClassLoader implements ActorMessageControllerClassLoader {
-    private static final String controllerInterfaceName = ActorMessageController.class.getName();
+    private static final String CONTROLLER_INTERFACE_NAME = ActorMessageController.class.getName();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -21,11 +21,11 @@ public class ClassGraphActorMessageControllerClassLoader implements ActorMessage
                 .whitelistPackages(packageNames)
                 .scan()) {
 
-            final ClassInfoList controllerClasses = scanResult.getSubclasses(controllerInterfaceName);
+            final ClassInfoList controllerClasses = scanResult.getSubclasses(CONTROLLER_INTERFACE_NAME);
             final List<Class<?>> controllerClassRefs = controllerClasses.loadClasses();
 
             //If none are found, return an empty map.
-            if (controllerClassRefs.size() == 0) {
+            if (controllerClassRefs.isEmpty()) {
                 return Collections.emptyMap();
             }
 

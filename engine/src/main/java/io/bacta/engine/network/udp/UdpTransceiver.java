@@ -7,5 +7,5 @@ public interface UdpTransceiver {
     UdpReceiver getReceiver();
     UdpEmitter getEmitter();
     boolean isReady();
-    void stop() throws Exception;
+    void stop();
 }

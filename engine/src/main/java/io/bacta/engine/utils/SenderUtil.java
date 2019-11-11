@@ -4,6 +4,8 @@ import akka.actor.ActorRef;
 
 public class SenderUtil {
 
+    private SenderUtil() {}
+
     /**
      * This method determines if the sender is only a single level
      * below the initial user actor.  Used to filter messages from
