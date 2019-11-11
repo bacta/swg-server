@@ -1,5 +1,7 @@
 package io.bacta.soe.network.connection;
 
+import io.bacta.shared.GameNetworkMessage;
+
 import java.nio.ByteBuffer;
 
 public interface IncomingMessageProcessor {
@@ -20,4 +22,6 @@ public interface IncomingMessageProcessor {
     void incrementNextReliable();
 
     void addReliable(long reliableId, ByteBuffer buffer);
+
+    GameNetworkMessage processIncomingGNM(GameNetworkMessage gameNetworkMessage);
 }

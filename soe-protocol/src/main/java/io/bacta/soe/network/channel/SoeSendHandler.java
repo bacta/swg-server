@@ -20,16 +20,18 @@
 
 package io.bacta.soe.network.channel;
 
-import io.bacta.engine.network.udp.UdpChannel;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.function.BiConsumer;
 
 /**
  * Created by kyle on 7/3/2017.
  */
 public interface SoeSendHandler {
-    void start(final String metricsPrefix, final UdpChannel udpChannel);
+    void start(final String metricPrefix, final InetAddress bindAddress, final int bindPort, final BiConsumer<InetSocketAddress, ByteBuffer> messageHandlerFunction);
     void stop();
     void sendMessage(final SoeUdpConnection connection, final ByteBuffer message);
 }

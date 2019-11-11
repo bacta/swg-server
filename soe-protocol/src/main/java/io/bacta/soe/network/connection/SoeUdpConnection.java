@@ -2,6 +2,7 @@ package io.bacta.soe.network.connection;
 
 import io.bacta.engine.network.udp.UdpConnection;
 import io.bacta.shared.GameNetworkMessage;
+import io.bacta.soe.network.connection.interceptor.SoeUdpConnectionOrderedMessageInterceptor;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessage;
 import io.bacta.soe.network.message.TerminateReason;
@@ -25,9 +26,13 @@ public interface SoeUdpConnection extends UdpConnection {
 
     void ackAllFromClient(short sequenceNum);
 
+    void connect();
+
     void connect(Consumer<SoeUdpConnection> connectCallback);
 
-    void doConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2);
+    void connect(Consumer<SoeUdpConnection> connectCallback, List<SoeUdpConnectionOrderedMessageInterceptor> interceptors);
+
+    void handleConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2);
 
     void confirmed(int connectionID, int encryptCode, byte crcBytes, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2, int maxRawPacketSize);
 
@@ -88,4 +93,8 @@ public interface SoeUdpConnection extends UdpConnection {
     Consumer<SoeUdpConnection> getConnectCallback();
 
     void setConnectionState(io.bacta.engine.network.connection.ConnectionState connectionState);
+
+    ByteBuffer processIncomingProtocol(ByteBuffer decodedMessage);
+
+    GameNetworkMessage processIncomingGNM(GameNetworkMessage gameNetworkMessage);
 }

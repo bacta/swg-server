@@ -13,8 +13,8 @@ import io.bacta.login.server.model.GalaxyPopulationStatus;
 import io.bacta.login.server.model.GalaxyStatus;
 import io.bacta.login.server.repository.GalaxyRepository;
 import io.bacta.soe.context.SoeRequestContext;
-import io.bacta.soe.event.TransceiverStartedEvent;
-import io.bacta.soe.network.connection.BroadcastService;
+import io.bacta.soe.event.SoeChannelStartedEvent;
+import io.bacta.soe.network.channel.BroadcastService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
@@ -460,7 +460,7 @@ public final class DefaultGalaxyService implements GalaxyService {
     }
 
     @EventListener
-    public void onTransceiverStart(TransceiverStartedEvent transceiverStartedEvent) {
+    public void onTransceiverStart(SoeChannelStartedEvent transceiverStartedEvent) {
         scheduleMaintenanceTasks();
     }
 }

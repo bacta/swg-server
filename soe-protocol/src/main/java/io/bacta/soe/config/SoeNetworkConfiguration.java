@@ -22,8 +22,8 @@ package io.bacta.soe.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -32,10 +32,10 @@ import java.util.Set;
  * Created by kyle on 6/28/2017.
  */
 
-@Component
 @Data
 @PropertySource("classpath:soenetworking.properties")
 @ConfigurationProperties(prefix = "io.bacta.network")
+@Configuration
 public class SoeNetworkConfiguration {
     private boolean compression;
     private int protocolVersion;

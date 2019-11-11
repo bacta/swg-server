@@ -18,54 +18,56 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package io.bacta.soe.network.controller;
+package io.bacta.soe.network.dispatch;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.dispatch.SoeMessageHandler;
+import io.bacta.soe.network.controller.SoeMessageController;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
-@Component
-@SoeController(handles = {SoeMessageType.cUdpPacketGroup})
-public class GroupMessageController implements SoeMessageController {
+public final class SoeDevMessageHandler implements SoeMessageHandler {
 
-    private SoeMessageHandler soeMessageHandler;
+    private Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
 
     @Override
-    public void setSoeHandler(final SoeMessageHandler soeMessageHandler) {
-        this.soeMessageHandler = soeMessageHandler;
+    public void setControllers(Map<SoeMessageType, SoeMessageController> controllers) {
+        this.controllers = controllers;
     }
 
     @Override
-    public void handleIncoming(final byte zeroByte,
-                               final SoeMessageType type,
-                               final SoeUdpConnection connection,
-                               final ByteBuffer buffer,
-                               final GameNetworkMessageRelay processor) {
+    public void handleMessage(SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageRelay processor) {
 
-        while (buffer.remaining() > 3) {
+        byte zeroByte = buffer.get();
+        byte type = buffer.get();
+        if(type < 0 || type > 0x1E) {
+            throw new RuntimeException("Type out of range: " + type + " " + buffer.toString() + " " + SoeMessageUtil.bytesToHex(buffer));
+        }
 
-            LOGGER.trace("Buffer: {} {}", buffer, BufferUtil.bytesToHex(buffer));
+        SoeMessageType packetType = SoeMessageType.values()[type];
 
-            short length = SoeMessageUtil.getVariableValue(buffer);
+        SoeMessageController controller = controllers.get(packetType);
 
-            LOGGER.trace("Length: {}", length);
+        if (controller == null) {
+            LOGGER.error("Unhandled SOE Opcode 0x{}", Integer.toHexString(packetType.ordinal()).toUpperCase());
+            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
+            return;
+        }
 
-            ByteBuffer slicedBuffer = buffer.slice();
-            slicedBuffer.limit(length);
+        try {
 
-            LOGGER.trace("Slice: {} {}", slicedBuffer, BufferUtil.bytesToHex(slicedBuffer));
+            LOGGER.trace("Routing to {} : {}", controller.getClass().getSimpleName(), BufferUtil.bytesToHex(buffer));
+            controller.handleIncoming(zeroByte, packetType, connection, buffer, processor);
 
-            soeMessageHandler.handleMessage(connection, slicedBuffer, processor);
-
-            buffer.position(buffer.position() + length);
+        } catch (Exception e) {
+            LOGGER.error("SOE Routing", e);
         }
     }
 }

@@ -1,39 +1,51 @@
 package io.bacta.soe.network.connection;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.event.UdpConnectEvent;
 import io.bacta.soe.event.UdpDisconnectEvent;
+import io.bacta.soe.network.message.ConfirmMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class SoeUdpConnectionCache {
 
-    private final LoadingCache<InetSocketAddress, SoeUdpConnection> connectionCache;
+    private final ApplicationEventPublisher publisher;
+    private final Cache<InetSocketAddress, SoeUdpConnection> connectionCache;
+    private final DefaultSoeUdpConnectionFactory udpConnectionFactory;
     private final TIntObjectMap<SoeUdpConnection> connectionIdMap;
+    private final MBeanServer mBeanServer;
 
     @Inject
     public SoeUdpConnectionCache(final ApplicationEventPublisher publisher,
                                  final SoeNetworkConfiguration networkConfiguration,
-                                 final SoeUdpConnectionFactory udpConnectionFactory) {
+                                 final DefaultSoeUdpConnectionFactory udpConnectionFactory) {
 
+        this.publisher = publisher;
         this.connectionIdMap = new TIntObjectHashMap<>();
+        this.udpConnectionFactory = udpConnectionFactory;
+        this.mBeanServer = ManagementFactory.getPlatformMBeanServer();
         this.connectionCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .removalListener((RemovalListener<InetSocketAddress, SoeUdpConnection>) removalNotification -> {
@@ -47,18 +59,7 @@ public final class SoeUdpConnectionCache {
                 })
                 .initialCapacity(200)
                 .maximumSize(3000)
-                .build(new CacheLoader<InetSocketAddress, SoeUdpConnection>() {
-                    @Override
-                    public SoeUdpConnection load(InetSocketAddress sender) throws Exception {
-                        SoeUdpConnection connection = udpConnectionFactory.newInstance(sender);
-                        connection.setConnectionState(ConnectionState.ONLINE);
-                        connectionCache.invalidate(sender);
-                        connectionCache.put(sender, connection);
-                        connectionIdMap.put(connection.getId(), connection);
-                        publisher.publishEvent(new UdpConnectEvent(connection));
-                        return connection;
-                    }
-                });
+                .build();
     }
 
     public long size() {
@@ -70,15 +71,22 @@ public final class SoeUdpConnectionCache {
     }
 
     public SoeUdpConnection getNewConnection(InetSocketAddress sender) {
-        try {
-            SoeUdpConnection connection = getIfPresent(sender);
-            if(connection != null) {
-                invalidate(sender);
-            }
+        return udpConnectionFactory.newInstance(sender);
+    }
 
-            return connectionCache.get(sender);
-        } catch (ExecutionException e) {
-            throw new RuntimeException("Unable to get or load connection", e);
+    public void confirm(SoeUdpConnection connection) {
+
+        connectionCache.put(connection.getRemoteAddress(), connection);
+        connectionIdMap.put(connection.getId(), connection);
+        publisher.publishEvent(new UdpConnectEvent(connection));
+
+        ConfirmMessage response = new ConfirmMessage(connection);
+        connection.sendMessage(response);
+
+        try {
+            mBeanServer.registerMBean(connection, connection.getObjectName());
+        } catch (InstanceAlreadyExistsException | NotCompliantMBeanException | MBeanRegistrationException e) {
+            LOGGER.error("Unable to register MBean", e);
         }
     }
 
@@ -86,7 +94,7 @@ public final class SoeUdpConnectionCache {
         connectionCache.invalidate(inetSocketAddress);
     }
 
-    void broadcast(GameNetworkMessage message) {
+    public void broadcast(GameNetworkMessage message) {
         connectionCache.asMap().forEach((inetSocketAddress, soeUdpConnection) -> {
             soeUdpConnection.sendMessage(message);
         });

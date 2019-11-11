@@ -23,7 +23,7 @@ package io.bacta.soe.network.controller;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.connection.IncomingMessageProcessor;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.dispatch.SoeMessageHandler;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import lombok.extern.slf4j.Slf4j;
@@ -46,12 +46,16 @@ import java.nio.ByteBuffer;
 public class ReliableMessageController implements SoeMessageController {
 
     private final SoeNetworkConfiguration networkConfiguration;
-    private final SoeMessageDispatcher soeMessageDispatcher;
+    private SoeMessageHandler soeMessageHandler;
 
     @Inject
-    public ReliableMessageController(final SoeNetworkConfiguration networkConfiguration, final SoeMessageDispatcher soeMessageDispatcher) {
+    public ReliableMessageController(final SoeNetworkConfiguration networkConfiguration) {
         this.networkConfiguration = networkConfiguration;
-        this.soeMessageDispatcher = soeMessageDispatcher;
+    }
+
+    @Override
+    public void setSoeHandler(final SoeMessageHandler soeMessageHandler) {
+        this.soeMessageHandler = soeMessageHandler;
     }
 
     @Override
@@ -113,13 +117,13 @@ public class ReliableMessageController implements SoeMessageController {
 
         if(mode == ReliablePacketMode.cReliablePacketModeReliable) {
 
-            soeMessageDispatcher.dispatch(connection, buffer, processor);
+            soeMessageHandler.handleMessage(connection, buffer, processor);
 
         } else if (mode == ReliablePacketMode.cReliablePacketModeFragment) {
 
             ByteBuffer completeFragment = incomingMessageProcessor.addIncomingFragment(buffer);
             if(completeFragment != null) {
-                soeMessageDispatcher.dispatch(connection, buffer, processor);
+                soeMessageHandler.handleMessage(connection, buffer, processor);
             }
         }
     }

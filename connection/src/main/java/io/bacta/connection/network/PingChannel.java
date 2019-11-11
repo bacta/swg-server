@@ -1,10 +1,10 @@
-package io.bacta.soe.ping;
+package io.bacta.connection.network;
 
+import io.bacta.connection.config.PingChannelProperties;
 import io.bacta.engine.network.udp.UdpChannel;
-import io.bacta.soe.config.ConnectionServerConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -13,30 +13,29 @@ import java.nio.ByteBuffer;
 
 @Component
 @Slf4j
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public final class PingTransceiver {
+public class PingChannel {
 
-    private final ConnectionServerConfiguration config;
+    private final PingChannelProperties config;
     private final UdpChannel channel;
 
     @Inject
-    public PingTransceiver(final ConnectionServerConfiguration config, final UdpChannel channel) {
+    public PingChannel(final PingChannelProperties config, final UdpChannel channel) {
         this.config = config;
         this.channel = channel;
     }
 
-    public void start() {
-        channel.start("Ping", config.getBindAddress(), config.getBindPingPort(), this::receiveMessage);
+    private void start() {
+        channel.start("Ping", config.getBindAddress(), config.getBindPort(), this::receiveMessage);
         LOGGER.info("PING Transceiver started on /{}:{}",
                 config.getBindAddress().getHostAddress(),
-                config.getBindPingPort());
+                config.getBindPort());
     }
 
     public void stop() {
         channel.stop();
     }
 
-    public void sendMessage(InetSocketAddress inetSocketAddress, ByteBuffer buffer) {
+    private void sendMessage(InetSocketAddress inetSocketAddress, ByteBuffer buffer) {
         channel.writeOutgoing(inetSocketAddress, buffer);
     }
 
@@ -46,5 +45,10 @@ public final class PingTransceiver {
         pong.rewind();
 
         sendMessage(inetSocketAddress, pong);
+    }
+
+    @EventListener
+    public void handleOrderCreatedEvent(ApplicationStartedEvent startedEvent) {
+       start();
     }
 }

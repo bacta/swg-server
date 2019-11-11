@@ -23,16 +23,18 @@ package io.bacta.soe.network.connection;
 import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
+import io.bacta.soe.network.connection.interceptor.SoeUdpConnectionOrderedMessageInterceptor;
 import io.bacta.soe.network.message.*;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -46,7 +48,7 @@ import java.util.function.Consumer;
 @Getter
 public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultSoeUdpConnectionMBean {
 
-    private final ObjectName objectName;
+    private ObjectName objectName;
 
     private final InetSocketAddress remoteAddress;
     private int id;
@@ -78,14 +80,24 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
     private int lastPingTime;
 
     private Consumer<SoeUdpConnection> connectCallback;
+    private List<SoeUdpConnectionOrderedMessageInterceptor> interceptors;
 
-    @Inject
     public DefaultSoeUdpConnection(final ObjectName objectName,
                                    final InetSocketAddress sender,
                                    final int id,
                                    final SoeNetworkConfiguration networkConfiguration,
                                    final IncomingMessageProcessor incomingMessageProcessor,
                                    final OutgoingMessageProcessor outgoingMessageQueue) {
+        this(objectName, sender, id, networkConfiguration, incomingMessageProcessor, outgoingMessageQueue, Collections.emptyList());
+    }
+
+    public DefaultSoeUdpConnection(final ObjectName objectName,
+                                   final InetSocketAddress sender,
+                                   final int id,
+                                   final SoeNetworkConfiguration networkConfiguration,
+                                   final IncomingMessageProcessor incomingMessageProcessor,
+                                   final OutgoingMessageProcessor outgoingMessageQueue,
+                                   final List<SoeUdpConnectionOrderedMessageInterceptor> interceptors) {
 
         this.objectName = objectName;
         this.remoteAddress = sender;
@@ -104,6 +116,8 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
 
         this.encryptMethod1 = EncryptMethod.USERSUPPLIED;
         this.encryptMethod2 = EncryptMethod.XOR;
+
+        this.interceptors = interceptors;
 
         masterPingTime = 0;
         averagePingTime = 0;
@@ -138,6 +152,9 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
 
     @Override
     public void sendMessage(GameNetworkMessage message) {
+        for(SoeUdpConnectionOrderedMessageInterceptor interceptor : interceptors) {
+            interceptor.outgoingGameNetworkMessage(this, message);
+        }
         if(!outgoingMessageQueue.add(message)) {
             terminate(TerminateReason.RELIABLEOVERFLOW);
         }
@@ -149,6 +166,11 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
         List<ByteBuffer> messages = outgoingMessageQueue.getPendingMessages();
         if(!messages.isEmpty()) {
             updateLastActivity();
+            for(ByteBuffer buffer : messages) {
+                for(SoeUdpConnectionOrderedMessageInterceptor interceptor : interceptors) {
+                    interceptor.outgoingProtocol(this, buffer);
+                }
+            }
         }
         return messages;
     }
@@ -168,38 +190,54 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
     }
 
     @Override
+    public void connect() {
+        this.connect(null);
+    }
+
+    @Override
     public void connect(Consumer<SoeUdpConnection> connectCallback) {
+        this.connect(connectCallback, Collections.emptyList());
+    }
+
+    @Override
+    public void connect(Consumer<SoeUdpConnection> connectCallback, List<SoeUdpConnectionOrderedMessageInterceptor> interceptors) {
         this.connectCallback = connectCallback;
+        this.interceptors = interceptors;
         ConnectMessage connectMessage = new ConnectMessage(protocolVersion, id, maxRawPacketSize);
         sendMessage(connectMessage);
     }
 
     @Override
-    public void doConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2) {
+    public void handleConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2) {
 
         this.id = connectionId;
+
+        try {
+            objectName = new ObjectName("Bacta:type=SoeUdpConnection,id=" + this.id);
+        } catch (MalformedObjectNameException e) {
+            LOGGER.error("Improper name", e);
+            throw new RuntimeException(e);
+        }
+
         this.encryptCode = encryptCode;
         this.maxRawPacketSize = maxRawPacketSize;
         this.encryptMethod1 = encryptMethod1;
         this.encryptMethod2 = encryptMethod2;
 
         setConnectionState(ConnectionState.ONLINE);
-
-        ConfirmMessage response = new ConfirmMessage(
-                crcBytes,
-                connectionId,
-                encryptCode,
-                encryptMethod1,
-                encryptMethod2,
-                maxRawPacketSize
-        );
-
-        sendMessage(response);
     }
 
     @Override
     public void confirmed(int connectionID, int encryptCode, byte crcBytes, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2, int maxRawPacketSize) {
         this.id = connectionID;
+
+        try {
+            objectName = new ObjectName("Bacta:type=SoeUdpConnection,id=" + this.id);
+        } catch (MalformedObjectNameException e) {
+            LOGGER.error("Improper name", e);
+            throw new RuntimeException(e);
+        }
+
         this.encryptCode = encryptCode;
         this.crcBytes = crcBytes;
         this.compression = compression;
@@ -270,6 +308,24 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
         if(LOGGER.isTraceEnabled()) {
             LOGGER.trace("{} received {} {}", objectName, incomingMessage.getClass().getSimpleName(), SoeMessageUtil.bytesToHex(incomingMessage));
         }
+    }
+
+    @Override
+    public ByteBuffer processIncomingProtocol(ByteBuffer decodedMessage) {
+        for(SoeUdpConnectionOrderedMessageInterceptor interceptor : interceptors) {
+            interceptor.incomingProtocol(this, decodedMessage);
+        }
+
+        return incomingMessageProcessor.processIncomingProtocol(decodedMessage);
+    }
+
+    @Override
+    public GameNetworkMessage processIncomingGNM(GameNetworkMessage gameNetworkMessage) {
+        for(SoeUdpConnectionOrderedMessageInterceptor interceptor : interceptors) {
+            interceptor.incomingGameNetworkMessage(this, gameNetworkMessage);
+        }
+
+        return incomingMessageProcessor.processIncomingGNM(gameNetworkMessage);
     }
 
 //    013CA650	UdpManager::UdpManager(UdpManager::Params const *)

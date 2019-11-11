@@ -6,7 +6,7 @@ import io.bacta.shared.GameNetworkMessage
 import io.bacta.soe.config.SoeNetworkConfiguration
 import io.bacta.soe.network.connection.DefaultSoeUdpConnection
 import io.bacta.soe.network.controller.*
-import io.bacta.soe.network.dispatch.SoeDevMessageDispatcher
+import io.bacta.soe.network.dispatch.SoeDevMessageHandler
 import io.bacta.soe.network.message.SoeMessageType
 import io.bacta.soe.network.relay.GameNetworkMessageRelay
 import io.bacta.soe.serialize.DefaultGameNetworkMessageSerializer
@@ -20,7 +20,7 @@ import java.nio.ByteBuffer
 
 abstract class MessageProcessingBase extends Specification {
     @Shared
-    def soeMessageRouter
+    def soeMessageHandler
 
     @Shared
     def processor
@@ -62,8 +62,8 @@ abstract class MessageProcessingBase extends Specification {
             }
         }
 
-        soeMessageRouter = new SoeDevMessageDispatcher(null)
-        loadControllers(soeMessageRouter.metaClass.getProperty(soeMessageRouter, "controllers"))
+        soeMessageHandler = new SoeDevMessageHandler()
+        loadControllers(soeMessageHandler.metaClass.getProperty(soeMessageHandler, "controllers"))
 
     }
 
@@ -78,15 +78,18 @@ abstract class MessageProcessingBase extends Specification {
         controllers.put(SoeMessageType.cUdpPacketAckAll1, Mock(SoeMessageController))
         controllers.put(SoeMessageType.cUdpPacketAck1, Mock(SoeMessageController))
 
-        def multiController = new MultiController(soeMessageRouter)
+        def multiController = new MultiController()
+        multiController.setSoeHandler(soeMessageHandler)
 
         controllers.put(SoeMessageType.cUdpPacketMulti, multiController)
 
-        def reliableController = new ReliableMessageController(networkConfig, soeMessageRouter)
+        def reliableController = new ReliableMessageController(networkConfig)
+        reliableController.setSoeHandler(soeMessageHandler)
 
         controllers.put(SoeMessageType.cUdpPacketReliable1, reliableController)
 
-        def groupController = new GroupMessageController(soeMessageRouter)
+        def groupController = new GroupMessageController()
+        groupController.setSoeHandler(soeMessageHandler)
 
         controllers.put(SoeMessageType.cUdpPacketGroup, groupController)
 

@@ -1,11 +1,24 @@
 package io.bacta.login.server
 
-
+import com.google.common.collect.Lists
 import groovy.util.logging.Slf4j
+import io.bacta.engine.network.connection.ConnectionState
+import io.bacta.engine.util.AwaitUtil
+import io.bacta.login.message.LoginClientId
+import io.bacta.login.message.LoginClientToken
+import io.bacta.login.server.service.InvalidClientException
+import io.bacta.soe.config.SoeNetworkConfiguration
+import io.bacta.soe.network.channel.SoeMessageChannel
+import io.bacta.soe.network.connection.SoeUdpConnection
+import io.bacta.soe.network.message.TerminateReason
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
+import javax.inject.Inject
+
 @Slf4j
-//@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = Application.class)
 class LoginServerApplicationSpecIT extends Specification {
 
 //    @Inject
@@ -17,32 +30,56 @@ class LoginServerApplicationSpecIT extends Specification {
 //
 //    String serverHost = "127.0.0.1"
 //
-//    @Inject
-//    LoginServerProperties properties;
-//
-//    void setup() {
-//        soeClient.start("Client")
-//    }
-//
-//    void cleanup() {
-//        soeClient.stop()
-//        metricRegistry.removeMatching(MetricFilter.ALL)
-//    }
+    @Inject
+    ClientChannelProperties properties
 
-//    def "TestConnect"() {
-//
-//        setup:
-//
-//        SoeClient connection = soeClient.getConnection(new InetSocketAddress(serverHost, properties.getBindPort()));
-//
-//        when:
-//
-//        connection.connect({udpConnection -> log.info("I connected")})
-//        AwaitUtil.awaitTrue(connection.&isConnected, 5)
-//
-//        then:
-//        noExceptionThrown()
-//    }
+    @Inject
+    SoeNetworkConfiguration networkConfiguration
+
+    @Inject
+    @Qualifier("ClientChannel")
+    SoeMessageChannel soeMessageChannel;
+
+    SoeUdpConnection connection
+    TestAwaitMessageInterceptor intercept
+
+    def setup() {
+        connection = soeMessageChannel.getConnectionCache().getNewConnection(
+                new InetSocketAddress(properties.getLoginAddress(), properties.getLoginPort())
+        )
+
+        connection.connect(null, Lists.asList(new TestAwaitMessageInterceptor()))
+        AwaitUtil.awaitTrue({connection.getConnectionState() == ConnectionState.ONLINE}, 5)
+        AwaitUtil.awaitTrue({connection.getEncryptCode() != 0}, 5)
+    }
+
+    def teardown() {
+        connection.terminate(TerminateReason.APPLICATION)
+    }
+
+    def "TestConnect"() {
+
+        when:
+        AwaitUtil.awaitTrue({connection.getEncryptCode() != 0}, 5)
+
+        then:
+        noExceptionThrown()
+        connection.getConnectionState() == ConnectionState.ONLINE
+        connection.getEncryptCode() != 0
+    }
+
+    def "BadClientVersion"() {
+
+        when:
+        connection.sendMessage(new LoginClientId("DEADBABE", "DEADBABE", "DEADBABE"))
+        AwaitUtil.awaitTrue({intercept.hasMessage(LoginClientToken.class)}, 5)
+        LoginClientId message = intercept.getReceivedMessage(LoginClientId.class)
+
+        then:
+        thrown(InvalidClientException)
+        connection.getConnectionState() == ConnectionState.ONLINE
+        connection.terminate(TerminateReason.APPLICATION)
+    }
 //
 //    def "TestConnect with ConnectionMap"() {
 //

@@ -33,7 +33,9 @@ io:
     connection:
       bindAddress: "0.0.0.0"
       bindPort: 44463
-      bindPingPort: 44464
+    ping:
+      bindAddress: "0.0.0.0"
+      bindPort: 44464
 logging:
   file: logs/connection.log
   level:

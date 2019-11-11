@@ -22,7 +22,6 @@ package io.bacta;
 
 import io.bacta.engine.lang.StringToInetAddress;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +29,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 
 @SpringBootApplication
-@EnableAutoConfiguration
 @EnableConfigurationProperties
 public class Application {
 

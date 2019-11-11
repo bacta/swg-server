@@ -22,6 +22,8 @@ package io.bacta.soe.network.controller;
 
 import io.bacta.engine.network.controller.MessageController;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeUdpConnectionCache;
+import io.bacta.soe.network.dispatch.SoeMessageHandler;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 
@@ -29,4 +31,10 @@ import java.nio.ByteBuffer;
 
 public interface SoeMessageController extends MessageController {
     void handleIncoming(byte zeroByte, SoeMessageType type, SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageRelay processor) throws Exception;
+    default void setSoeHandler(final SoeMessageHandler handler) {
+
+    }
+    default void setSoeConnectionCache(final SoeUdpConnectionCache cache) {
+
+    }
 }

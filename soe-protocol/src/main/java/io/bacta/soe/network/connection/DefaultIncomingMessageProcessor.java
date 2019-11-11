@@ -1,5 +1,6 @@
 package io.bacta.soe.network.connection;
 
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
 
 import java.nio.ByteBuffer;
@@ -35,6 +36,12 @@ public class DefaultIncomingMessageProcessor implements IncomingMessageProcessor
     @Override
     public ByteBuffer processIncomingProtocol(ByteBuffer message) {
         protocolMessagesReceived.incrementAndGet();
+        return message;
+    }
+
+    @Override
+    public GameNetworkMessage processIncomingGNM(GameNetworkMessage message) {
+        gameNetworkMessagesReceived.incrementAndGet();
         return message;
     }
 

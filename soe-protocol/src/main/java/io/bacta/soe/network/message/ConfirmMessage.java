@@ -20,23 +20,20 @@
 
 package io.bacta.soe.network.message;
 
+import io.bacta.soe.network.connection.SoeUdpConnection;
+
 public final class ConfirmMessage extends SoeMessage {
 
-    public ConfirmMessage(final byte crcLength,
-                          final int connectionID,
-                          final int sessionKey,
-                          final EncryptMethod encryptMethod1,
-                          final EncryptMethod encryptMethod2,
-                          final int udpSize) {
+    public ConfirmMessage(final SoeUdpConnection connection) {
 
         super(SoeMessageType.cUdpPacketConfirm);
 
-        buffer.putInt(connectionID);
-        buffer.putInt(sessionKey);
-        buffer.put(crcLength);
-        encryptMethod1.writeToBuffer(buffer);
-        encryptMethod2.writeToBuffer(buffer);
-        buffer.putInt(udpSize);
+        buffer.putInt(connection.getId());
+        buffer.putInt(connection.getEncryptCode());
+        buffer.put(connection.getCrcBytes());
+        connection.getEncryptMethod1().writeToBuffer(buffer);
+        connection.getEncryptMethod2().writeToBuffer(buffer);
+        buffer.putInt(connection.getMaxRawPacketSize());
     }
 }
 

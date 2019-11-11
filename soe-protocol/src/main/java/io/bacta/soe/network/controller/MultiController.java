@@ -22,14 +22,13 @@ package io.bacta.soe.network.controller;
 
 import io.bacta.engine.buffer.BufferUtil;
 import io.bacta.soe.network.connection.SoeUdpConnection;
-import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.dispatch.SoeMessageHandler;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import java.nio.ByteBuffer;
 
 /**
@@ -67,11 +66,11 @@ import java.nio.ByteBuffer;
 @SoeController(handles = {SoeMessageType.cUdpPacketMulti})
 public class MultiController implements SoeMessageController {
 
-    private final SoeMessageDispatcher soeMessageDispatcher;
+    private SoeMessageHandler soeMessageHandler;
 
-    @Inject
-    public MultiController(final SoeMessageDispatcher soeMessageDispatcher) {
-        this.soeMessageDispatcher = soeMessageDispatcher;
+    @Override
+    public void setSoeHandler(final SoeMessageHandler soeMessageHandler) {
+        this.soeMessageHandler = soeMessageHandler;
     }
 
     @Override
@@ -94,7 +93,7 @@ public class MultiController implements SoeMessageController {
 
             LOGGER.trace("Slice: {} {}", slicedMessage, BufferUtil.bytesToHex(slicedMessage));
 
-            soeMessageDispatcher.dispatch(connection, slicedMessage, processor);
+            soeMessageHandler.handleMessage(connection, slicedMessage, processor);
             
             buffer.position(buffer.position() + length);
         }

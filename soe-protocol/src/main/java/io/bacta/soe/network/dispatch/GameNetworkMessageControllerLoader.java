@@ -40,7 +40,9 @@ import java.lang.reflect.Modifier;
 @Slf4j
 public final class GameNetworkMessageControllerLoader {
 
-    public TIntObjectMap<GameNetworkMessageControllerData> loadControllers(final ApplicationContext context) {
+    private GameNetworkMessageControllerLoader() {}
+
+    public static TIntObjectMap<GameNetworkMessageControllerData> loadControllers(final ApplicationContext context) {
 
         final TIntObjectMap<GameNetworkMessageControllerData> controllers = new TIntObjectHashMap<>();
         String[] controllerBeanNames = context.getBeanNamesForType(GameNetworkMessageController.class);
@@ -53,7 +55,7 @@ public final class GameNetworkMessageControllerLoader {
         return controllers;
     }
 
-    private <T> void loadControllerClass(final TIntObjectMap<GameNetworkMessageControllerData> controllers,
+    private static <T> void loadControllerClass(final TIntObjectMap<GameNetworkMessageControllerData> controllers,
                                          final GameNetworkMessageController controller) {
         try {
 

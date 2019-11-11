@@ -37,10 +37,12 @@ class OutgoingMessageProcessor {
     }
 
     void add(SoeMessage message) {
+        LOGGER.trace("Sending SOE message: {}", SoeMessageUtil.bytesToHex(message.getBuffer()));
         udpMessageProcessor.addUnreliable(message.getBuffer());
     }
 
     boolean add(GameNetworkMessage message) {
+        LOGGER.trace("Sending GNM {} {}", message.getClass().getSimpleName(), SoeMessageUtil.bytesToHex(message));
         gameNetworkMessagesSent.incrementAndGet();
         ByteBuffer buffer = messageSerializer.writeToBuffer(message);
 

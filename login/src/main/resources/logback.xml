@@ -11,14 +11,14 @@
             <appender name="${connection}" class="ch.qos.logback.core.FileAppender">
                 <file>logs/login/connection/${connection}.log</file>
                 <layout class="ch.qos.logback.classic.PatternLayout">
-                    <pattern>%d [%thread] %level %mdc %logger{35} %X{sendType} - %msg%n</pattern>
+                    <pattern>%X{sendType} %msg%n</pattern>
                 </layout>
             </appender>
         </sift>
 
     </appender>
 
-    <logger name="io.bacta.soe.network.channel.NoopMessageCollector" level="INFO" additivity="false">
+    <logger name="io.bacta.soe.network.connection.interceptor.MessageLoggingInterceptor" level="INFO" additivity="false">
         <appender-ref ref="ConnectionLogger" />
     </logger>
 

@@ -24,25 +24,28 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.engine.network.channel.InboundMessageChannel;
 import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.engine.network.udp.UdpChannel;
+import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.config.SoeNetworkConfiguration;
-import io.bacta.soe.network.connection.IncomingMessageProcessor;
+import io.bacta.soe.event.SoeChannelStartedEvent;
+import io.bacta.soe.event.SoeChannelStoppedEvent;
 import io.bacta.soe.network.connection.SoeUdpConnection;
 import io.bacta.soe.network.connection.SoeUdpConnectionCache;
-import io.bacta.soe.network.dispatch.SoeMessageDispatcher;
+import io.bacta.soe.network.dispatch.SoeControllerLoader;
+import io.bacta.soe.network.dispatch.SoeMessageHandler;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.protocol.SoeProtocolHandler;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import io.bacta.soe.util.SoeMessageUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
-import javax.inject.Inject;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -56,60 +59,46 @@ import java.util.List;
  * @since 1.0
  */
 @Slf4j
-@Component
 @Getter
-public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler, Runnable {
+public class SoeMessageChannel implements Runnable {
 
     private final SoeNetworkConfiguration networkConfiguration;
 
     private final SoeProtocolHandler protocolHandler;
-    private final SoeMessageDispatcher soeMessageDispatcher;
+    private final SoeMessageHandler soeMessageHandler;
     private final SoeUdpConnectionCache connectionCache;
-    private final GameNetworkMessageRelay processor;
+    private final GameNetworkMessageRelay gameNetworkMessageRelay;
     private UdpChannel udpChannel;
-
+    private final ApplicationEventPublisher publisher;
     private final Thread sendThread;
     private Histogram sendQueueSizes;
     private final MetricRegistry metricRegistry;
-    private final List<SoeChannelMessageCollector> collectors;
+    private final BroadcastService broadcastService;
 
-    @Inject
-    public SoeMessageChannel(final SoeProtocolHandler protocolHandler,
+    private String channelName = null;
+    private InetAddress bindAddress = null;
+    private int bindPort = 0;
+
+    public SoeMessageChannel(final UdpChannel udpChannel,
+                             final SoeProtocolHandler protocolHandler,
                              final SoeUdpConnectionCache connectionCache,
-                             final SoeMessageDispatcher soeMessageDispatcher,
+                             final SoeMessageHandler soeMessageHandler,
                              final SoeNetworkConfiguration networkConfiguration,
+                             final GameNetworkMessageRelay gameNetworkMessageRelay,
                              final ApplicationEventPublisher publisher,
-                             final GameNetworkMessageRelay processor,
-                             final ApplicationContext context,
+                             final BroadcastService broadcastService,
                              final MetricRegistry metricRegistry) {
 
+        this.udpChannel = udpChannel;
         this.networkConfiguration = networkConfiguration;
         this.connectionCache = connectionCache;
         this.metricRegistry = metricRegistry;
         this.protocolHandler = protocolHandler;
-        this.soeMessageDispatcher = soeMessageDispatcher;
-        this.processor = processor;
-        this.collectors = new ArrayList<>();
-        initializeCollectors(context, networkConfiguration.getMessageCollectors());
+        this.publisher = publisher;
+        this.soeMessageHandler = soeMessageHandler;
+        this.gameNetworkMessageRelay = gameNetworkMessageRelay;
+        this.broadcastService = broadcastService;
         sendThread = new Thread(this);
-    }
-
-    /**
-     * Initilialize message collector classes
-     * @param messageCollectors List of fully qualified class names
-     */
-    private void initializeCollectors(final ApplicationContext context, List<String> messageCollectors) {
-        if(messageCollectors != null) {
-            messageCollectors.forEach(collectorName -> {
-                try {
-                    Class<?> clazz = Class.forName(collectorName);
-                    SoeChannelMessageCollector collector = (SoeChannelMessageCollector) context.getBean(clazz);
-                    collectors.add(collector);
-                } catch (ClassNotFoundException e) {
-                    LOGGER.error("Unable to load collector class {}", collectorName, e);
-                }
-            });
-        }
     }
 
     /**
@@ -119,7 +108,6 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
      * @param sender remote address of this message
      * @param message {@link ByteBuffer} representation of sent message
      */
-    @Override
     public void receiveMessage(final InetSocketAddress sender, final ByteBuffer message) {
 
         byte type = message.get(0);
@@ -140,19 +128,17 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
             }
 
             if (connection != null) {
-                LOGGER.trace("Received raw message from {} {}", sender, SoeMessageUtil.bytesToHex(message));
+
                 onReceiveEncryptedMessage(connection, message);
 
-                IncomingMessageProcessor incomingMessageProcessor = connection.getIncomingMessageProcessor();
-
                 ByteBuffer decodedMessage = protocolHandler.processIncoming(connection, message, packetType);
-                ByteBuffer processedMessage = incomingMessageProcessor.processIncomingProtocol(decodedMessage);
+                ByteBuffer processedMessage = connection.processIncomingProtocol(decodedMessage);
 
                 // Incoming messages, post decoding
                 onReceiveMessage(connection, processedMessage);
 
                 if (processedMessage != null) {
-                    soeMessageDispatcher.dispatch(connection, processedMessage, processor);
+                    soeMessageHandler.handleMessage(connection, processedMessage, gameNetworkMessageRelay);
                 }
 
             } else {
@@ -163,7 +149,10 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
         }
     }
 
-    @Override
+    public InetSocketAddress getAddress() {
+        return udpChannel.getAddress();
+    }
+
     public void sendMessage(final SoeUdpConnection connection, final ByteBuffer message) {
 
         // Outgoing messages, pre-encoded
@@ -174,41 +163,60 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
         onSendEncryptedMessage(connection, encodedMessage);
 
         udpChannel.writeOutgoing(connection.getRemoteAddress(), encodedMessage);
-        if(LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Sending to {} {}", connection.getRemoteAddress(), SoeMessageUtil.bytesToHex(encodedMessage));
-        }
     }
 
     private void onReceiveEncryptedMessage(SoeUdpConnection connection, ByteBuffer message) {
-        collectors.forEach(collector -> collector.onReceiveEncrypted(connection, message));
-    }
-
-    private void onReceiveMessage(SoeUdpConnection connection, ByteBuffer message) {
-        collectors.forEach(collector -> collector.onReceive(connection, message));
-    }
-
-    private void onSendMessage(SoeUdpConnection connection, ByteBuffer message) {
-        collectors.forEach(collector -> collector.onSend(connection, message));
-    }
-
-    private void onSendEncryptedMessage(SoeUdpConnection connection, ByteBuffer message) {
-        collectors.forEach(collector -> collector.onSendEncrypted(connection, message));
-    }
-
-    @Override
-    public void start(final String metricPrefix, final UdpChannel udpChannel) {
-
-        if (!sendThread.isAlive()) {
-            sendThread.setName(metricPrefix + "-Send");
-            sendQueueSizes = metricRegistry.histogram(metricPrefix + ".outgoing-queue");
-            metricRegistry.register(metricPrefix, (Gauge<Long>) connectionCache::size);
-            this.udpChannel = udpChannel;
-            sendThread.start();
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Received encrypted message. Client: {}  Message: {}", connection.getId(), SoeMessageUtil.bytesToHex(message));
         }
     }
 
-    public void stop() {
+    private void onReceiveMessage(SoeUdpConnection connection, ByteBuffer message) {
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Decrypted message. Client: {}  Message: {}", connection.getId(), SoeMessageUtil.bytesToHex(message));
+        }
+    }
+
+    private void onSendMessage(SoeUdpConnection connection, ByteBuffer message) {
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sending message before encryption. Client: {}  Message: {}", connection.getId(), SoeMessageUtil.bytesToHex(message));
+        }
+    }
+
+    private void onSendEncryptedMessage(SoeUdpConnection connection, ByteBuffer message) {
+        if(LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sending message after encryption. Client: {}  Message: {}", connection.getId(), SoeMessageUtil.bytesToHex(message));
+        }
+    }
+
+    public void broadcast(GameNetworkMessage message) {
+        connectionCache.broadcast(message);
+    }
+
+    @EventListener
+    public void handleApplicationStarted(ApplicationStartedEvent startedEvent) {
+        if(channelName == null || bindAddress == null) {
+            throw new ChannelNotConfiguredException("channelName or bindAddress not configured");
+        }
+
+        soeMessageHandler.setControllers(SoeControllerLoader.loadControllers(startedEvent.getApplicationContext(), connectionCache, soeMessageHandler));
+        broadcastService.setChannel(this);
+
+        if (!sendThread.isAlive()) {
+            sendThread.setName(channelName + "-Send");
+            sendQueueSizes = metricRegistry.histogram(channelName + ".outgoing-queue");
+            metricRegistry.register(channelName, (Gauge<Long>) connectionCache::size);
+            this.udpChannel.start(channelName, bindAddress, bindPort, this::receiveMessage);
+            sendThread.start();
+            publisher.publishEvent(new SoeChannelStartedEvent());
+        }
+    }
+
+    @EventListener
+    public void handleShutdown(ContextClosedEvent closedEvent) {
         sendThread.interrupt();
+        this.udpChannel.stop();
+        publisher.publishEvent(new SoeChannelStoppedEvent());
     }
 
     @Override
@@ -277,5 +285,11 @@ public class SoeMessageChannel implements InboundMessageChannel, SoeSendHandler,
         } catch (Exception e) {
             LOGGER.error("Unknown", e);
         }
+    }
+
+    public void configure(String channelName, InetAddress bindAddress, int bindPort) {
+        this.channelName = channelName;
+        this.bindAddress = bindAddress;
+        this.bindPort = bindPort;
     }
 }

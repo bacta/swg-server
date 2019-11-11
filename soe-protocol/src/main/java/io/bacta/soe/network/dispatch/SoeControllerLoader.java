@@ -20,89 +20,47 @@
 
 package io.bacta.soe.network.dispatch;
 
-import io.bacta.engine.buffer.BufferUtil;
-import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.controller.SoeController;
 import io.bacta.soe.network.controller.SoeMessageController;
 import io.bacta.soe.network.message.SoeMessageType;
-import io.bacta.soe.network.relay.GameNetworkMessageRelay;
-import io.bacta.soe.util.SoeMessageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by kyle on 4/22/2016.
+ */
 @Slf4j
-@Component
-public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, ApplicationContextAware {
+public final class SoeControllerLoader {
 
-    private final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
-    private final ApplicationContext context;
+    private SoeControllerLoader() {}
 
-    @Inject
-    public SoeDevMessageDispatcher(final ApplicationContext applicationContext) {
-        this.context = applicationContext;
-    }
+    public static Map<SoeMessageType, SoeMessageController> loadControllers(final ApplicationContext applicationContext,
+                                                                            final SoeUdpConnectionCache connectionCache,
+                                                                            final SoeMessageHandler handler) {
 
-    @PostConstruct
-    private void initialize() {
-        load(context);
-    }
-
-    @Override
-    public void dispatch(SoeUdpConnection connection, ByteBuffer buffer, GameNetworkMessageRelay processor) {
-
-        byte zeroByte = buffer.get();
-        byte type = buffer.get();
-        if(type < 0 || type > 0x1E) {
-            throw new RuntimeException("Type out of range: " + type + " " + buffer.toString() + " " + SoeMessageUtil.bytesToHex(buffer));
-        }
-
-        SoeMessageType packetType = SoeMessageType.values()[type];
-
-        SoeMessageController controller = controllers.get(packetType);
-
-        if (controller == null) {
-            LOGGER.error("Unhandled SOE Opcode 0x{}", Integer.toHexString(packetType.ordinal()).toUpperCase());
-            LOGGER.error(SoeMessageUtil.bytesToHex(buffer));
-            return;
-        }
-
-        try {
-
-            LOGGER.trace("Routing to {} : {}", controller.getClass().getSimpleName(), BufferUtil.bytesToHex(buffer));
-            controller.handleIncoming(zeroByte, packetType, connection, buffer, processor);
-
-        } catch (Exception e) {
-            LOGGER.error("SOE Routing", e);
-        }
-    }
-
-    private void load(final ApplicationContext applicationContext) {
+        final Map<SoeMessageType, SoeMessageController> controllers = new HashMap<>();
 
         String[] controllerBeanNames = applicationContext.getBeanNamesForType(SoeMessageController.class);
-        controllers.clear();
 
         for (String controllerBeanName : controllerBeanNames) {
 
             SoeMessageController controller = (SoeMessageController) applicationContext.getBean(controllerBeanName);
+            controller.setSoeHandler(handler);
+            controller.setSoeConnectionCache(connectionCache);
 
             try {
-                
+
                 Class<? extends SoeMessageController> controllerClass = controller.getClass();
-                
+
                 if(Modifier.isAbstract(controllerClass.getModifiers())) {
                     continue;
                 }
-                
+
                 SoeController controllerAnnotation = controllerClass.getAnnotation(SoeController.class);
 
                 if (controllerAnnotation == null) {
@@ -112,6 +70,8 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
 
                 SoeMessageType[] types = controllerAnnotation.handles();
                 LOGGER.debug("Loading SoeMessageController: {}", controllerClass.getSimpleName());
+
+
 
                 for(SoeMessageType udpPacketType : types) {
 
@@ -126,10 +86,6 @@ public final class SoeDevMessageDispatcher implements SoeMessageDispatcher, Appl
                 LOGGER.error("Unable to add controller", e);
             }
         }
-    }
-
-    @Override
-    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-        load(applicationContext);
+        return controllers;
     }
 }

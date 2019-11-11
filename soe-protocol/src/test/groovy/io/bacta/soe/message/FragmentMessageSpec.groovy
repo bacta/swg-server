@@ -18,7 +18,7 @@ class FragmentMessageSpec extends MessageProcessingBase {
         when:
         for(List<Byte> array : fragmentList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, buffer, processor)
         }
 
         then:
@@ -36,7 +36,7 @@ class FragmentMessageSpec extends MessageProcessingBase {
         // Collect processed packets
         for(List<Byte> array : fragmentList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, buffer, processor)
         }
 
         def acks = soeUdpConnection.getPendingMessages()
@@ -52,7 +52,7 @@ class FragmentMessageSpec extends MessageProcessingBase {
         int sequenceNumber = outGoingMessages.size()
         for(ByteBuffer message : outGoingMessages) {
             message.putShort(2, (short)sequenceNumber++);
-            soeMessageRouter.dispatch(soeUdpConnection, message, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, message, processor)
         }
 
         then:

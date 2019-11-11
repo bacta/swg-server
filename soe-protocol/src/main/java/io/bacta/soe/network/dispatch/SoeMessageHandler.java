@@ -22,13 +22,17 @@ package io.bacta.soe.network.dispatch;
 
 import io.bacta.engine.network.handler.MessageHandler;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.controller.SoeMessageController;
+import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * Created by kburkhardt on 2/10/15.
  */
-public interface SoeMessageDispatcher extends MessageHandler {
-    void dispatch(SoeUdpConnection client, ByteBuffer buffer, GameNetworkMessageRelay processor);
+public interface SoeMessageHandler extends MessageHandler {
+    void handleMessage(SoeUdpConnection client, ByteBuffer buffer, GameNetworkMessageRelay processor);
+    void setControllers(Map<SoeMessageType, SoeMessageController> controllers);
 }

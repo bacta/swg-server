@@ -22,6 +22,7 @@ package io.bacta.soe.network.controller;
 
 import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.connection.SoeUdpConnection;
+import io.bacta.soe.network.connection.SoeUdpConnectionCache;
 import io.bacta.soe.network.message.EncryptMethod;
 import io.bacta.soe.network.message.SoeMessageType;
 import io.bacta.soe.network.message.TerminateReason;
@@ -41,11 +42,18 @@ public class ConnectController implements SoeMessageController {
     private final SoeNetworkConfiguration networkConfiguration;
     private final SessionKeyService keyService;
 
+    private SoeUdpConnectionCache connectionCache;
+
     @Inject
     public ConnectController(final SessionKeyService keyService,
                              final SoeNetworkConfiguration networkConfiguration) {
         this.networkConfiguration = networkConfiguration;
         this.keyService = keyService;
+    }
+
+    @Override
+    public void setSoeConnectionCache(final SoeUdpConnectionCache cache) {
+        this.connectionCache = cache;
     }
 
     @Override
@@ -76,12 +84,14 @@ public class ConnectController implements SoeMessageController {
             encryptMethod2 = EncryptMethod.NONE;
         }
 
-        connection.doConfirm(
+        connection.handleConfirm(
                 connectionId,
                 encryptCode,
                 maxRawPacketSize,
                 encryptMethod1,
                 encryptMethod2
         );
+
+        connectionCache.confirm(connection);
     }
 }

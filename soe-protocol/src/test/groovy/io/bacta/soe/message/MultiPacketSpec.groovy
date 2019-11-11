@@ -44,7 +44,7 @@ class MultiPacketSpec extends MessageProcessingBase {
         when:
         for(List<Byte> array : multiList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, buffer, processor)
         }
         
         then:
@@ -61,7 +61,7 @@ class MultiPacketSpec extends MessageProcessingBase {
         when:
         for(List<Byte> array : multiList) {
             ByteBuffer buffer = ByteBuffer.wrap(array.toArray(new byte[array.size()]))
-            soeMessageRouter.dispatch(soeUdpConnection, buffer, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, buffer, processor)
         }
 
         // Reset Connection and reliable counter - Hack
@@ -75,7 +75,7 @@ class MultiPacketSpec extends MessageProcessingBase {
         processedPackets = new ArrayList<ByteBuffer>()
         List<ByteBuffer> outGoingMessages = soeUdpConnection.getPendingMessages()
         for(ByteBuffer message : outGoingMessages) {
-            soeMessageRouter.dispatch(soeUdpConnection, message, processor)
+            soeMessageHandler.handleMessage(soeUdpConnection, message, processor)
         }
 
         then:

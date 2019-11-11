@@ -58,6 +58,7 @@ public class ZeroEscapeController implements SoeMessageController {
         int opcode = buffer.getInt();
 
         final GameNetworkMessage gameNetworkMessage = gameNetworkMessageSerializer.readFromBuffer(opcode, buffer);
+        connection.processIncomingGNM(gameNetworkMessage);
         processor.receiveMessage(connection, gameNetworkMessage);
     }
 }
