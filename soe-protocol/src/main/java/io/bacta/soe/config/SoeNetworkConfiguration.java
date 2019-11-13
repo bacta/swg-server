@@ -23,7 +23,6 @@ package io.bacta.soe.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 import java.util.List;
 import java.util.Set;
@@ -33,7 +32,6 @@ import java.util.Set;
  */
 
 @Data
-@PropertySource("classpath:soenetworking.properties")
 @ConfigurationProperties(prefix = "io.bacta.network")
 @Configuration
 public class SoeNetworkConfiguration {
@@ -110,5 +108,5 @@ public class SoeNetworkConfiguration {
     private int reliableChannelCount;
     private int hardMaxOutstandingPackets;
 
-    private List<String> messageCollectors;
+    private List<String> messageInterceptors;
 }

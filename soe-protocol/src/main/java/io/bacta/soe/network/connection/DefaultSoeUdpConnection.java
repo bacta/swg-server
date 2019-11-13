@@ -196,13 +196,8 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
 
     @Override
     public void connect(Consumer<SoeUdpConnection> connectCallback) {
-        this.connect(connectCallback, Collections.emptyList());
-    }
 
-    @Override
-    public void connect(Consumer<SoeUdpConnection> connectCallback, List<SoeUdpConnectionOrderedMessageInterceptor> interceptors) {
         this.connectCallback = connectCallback;
-        this.interceptors = interceptors;
         ConnectMessage connectMessage = new ConnectMessage(protocolVersion, id, maxRawPacketSize);
         sendMessage(connectMessage);
     }
@@ -326,6 +321,16 @@ public final class DefaultSoeUdpConnection implements SoeUdpConnection, DefaultS
         }
 
         return incomingMessageProcessor.processIncomingGNM(gameNetworkMessage);
+    }
+
+    @Override
+    public <T extends SoeUdpConnectionOrderedMessageInterceptor> T getInterceptor(Class<T> p) {
+        for(SoeUdpConnectionOrderedMessageInterceptor interceptor : interceptors) {
+            if(interceptor.getClass().isAssignableFrom(p)) {
+                return (T) interceptor;
+            }
+        }
+        return null;
     }
 
 //    013CA650	UdpManager::UdpManager(UdpManager::Params const *)

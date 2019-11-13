@@ -12,7 +12,7 @@ import io.bacta.soe.network.dispatch.SoeMessageHandler;
 import io.bacta.soe.network.handler.DefaultGameNetworkMessageHandler;
 import io.bacta.soe.network.handler.GameNetworkMessageHandler;
 import io.bacta.soe.network.protocol.SoeProtocolHandler;
-import io.bacta.soe.network.relay.AkkaGameNetworkMessageRelay;
+import io.bacta.soe.network.relay.ClientGameNetworkMessageRelay;
 import io.bacta.soe.network.relay.GameNetworkMessageRelay;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,7 +50,7 @@ public class ClientChannelConfiguration {
         final SoeMessageHandler soeMessageHandler = new SoeDevMessageHandler();
 
         final GameNetworkMessageHandler gameNetworkMessageHandler = new DefaultGameNetworkMessageHandler(GameNetworkMessageControllerLoader.loadControllers(context));
-        final GameNetworkMessageRelay gameNetworkMessageRelay = new AkkaGameNetworkMessageRelay(connectionCache, gameNetworkMessageHandler);
+        final GameNetworkMessageRelay gameNetworkMessageRelay = new ClientGameNetworkMessageRelay(connectionCache, gameNetworkMessageHandler);
 
 
         SoeMessageChannel soeMessageChannel = new SoeMessageChannel(udpChannel, protocolHandler, connectionCache, soeMessageHandler, networkConfiguration, gameNetworkMessageRelay, publisher, broadcastService, metricRegistry);

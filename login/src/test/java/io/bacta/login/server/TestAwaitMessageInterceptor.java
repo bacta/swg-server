@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-class TestAwaitMessageInterceptor implements SoeUdpConnectionOrderedMessageInterceptor {
+public class TestAwaitMessageInterceptor implements SoeUdpConnectionOrderedMessageInterceptor {
 
     List<ByteBuffer> protocolMessageList = new ArrayList<>();
     List<GameNetworkMessage> messageList = new ArrayList<>();

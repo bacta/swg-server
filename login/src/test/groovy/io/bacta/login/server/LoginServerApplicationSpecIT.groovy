@@ -1,35 +1,27 @@
 package io.bacta.login.server
 
-import com.google.common.collect.Lists
+
 import groovy.util.logging.Slf4j
 import io.bacta.engine.network.connection.ConnectionState
 import io.bacta.engine.util.AwaitUtil
 import io.bacta.login.message.LoginClientId
-import io.bacta.login.message.LoginClientToken
-import io.bacta.login.server.service.InvalidClientException
+import io.bacta.login.message.LoginIncorrectClientId
 import io.bacta.soe.config.SoeNetworkConfiguration
 import io.bacta.soe.network.channel.SoeMessageChannel
 import io.bacta.soe.network.connection.SoeUdpConnection
 import io.bacta.soe.network.message.TerminateReason
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import spock.lang.Specification
 
 import javax.inject.Inject
 
 @Slf4j
 @SpringBootTest(classes = Application.class)
+@Import(ITTestConfiguration.class)
 class LoginServerApplicationSpecIT extends Specification {
 
-//    @Inject
-//    MetricRegistry metricRegistry;
-//
-//    @Inject
-//    @Qualifier("soeTransceiver")
-//    SoeTransceiver soeClient;
-//
-//    String serverHost = "127.0.0.1"
-//
     @Inject
     ClientChannelProperties properties
 
@@ -44,11 +36,13 @@ class LoginServerApplicationSpecIT extends Specification {
     TestAwaitMessageInterceptor intercept
 
     def setup() {
-        connection = soeMessageChannel.getConnectionCache().getNewConnection(
+        connection = soeMessageChannel.getConnectionCache().getAndAddNewConnection(
                 new InetSocketAddress(properties.getLoginAddress(), properties.getLoginPort())
         )
 
-        connection.connect(null, Lists.asList(new TestAwaitMessageInterceptor()))
+        connection.connect(null)
+        intercept = connection.getInterceptor(TestAwaitMessageInterceptor.class)
+        assert intercept != null
         AwaitUtil.awaitTrue({connection.getConnectionState() == ConnectionState.ONLINE}, 5)
         AwaitUtil.awaitTrue({connection.getEncryptCode() != 0}, 5)
     }
@@ -72,11 +66,9 @@ class LoginServerApplicationSpecIT extends Specification {
 
         when:
         connection.sendMessage(new LoginClientId("DEADBABE", "DEADBABE", "DEADBABE"))
-        AwaitUtil.awaitTrue({intercept.hasMessage(LoginClientToken.class)}, 5)
-        LoginClientId message = intercept.getReceivedMessage(LoginClientId.class)
+        AwaitUtil.awaitTrue({intercept.hasMessage(LoginIncorrectClientId.class)}, 5)
 
         then:
-        thrown(InvalidClientException)
         connection.getConnectionState() == ConnectionState.ONLINE
         connection.terminate(TerminateReason.APPLICATION)
     }

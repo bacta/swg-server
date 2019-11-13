@@ -1,6 +1,5 @@
 package io.bacta.login.server.session;
 
-import com.sun.tools.javac.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
@@ -10,6 +9,8 @@ import org.springframework.security.oauth2.client.token.grant.password.ResourceO
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
+
+import java.util.Collections;
 
 @Slf4j
 public class OAuth2SessionTokenProvider implements SessionTokenProvider {
@@ -24,14 +25,14 @@ public class OAuth2SessionTokenProvider implements SessionTokenProvider {
     }
 
     @Override
-    public SessionToken Provide(String username, String password) throws SessionException {
+    public SessionToken provide(String username, String password) throws SessionException {
         try {
             final ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
             resource.setAccessTokenUri(tokenUri);
             resource.setClientId(clientId);
             resource.setClientSecret(clientSecret);
             resource.setGrantType("password");
-            resource.setScope(List.of("all"));
+            resource.setScope(Collections.singletonList("all"));
             resource.setUsername(username);
             resource.setPassword(password);
             resource.setClientAuthenticationScheme(AuthenticationScheme.header);

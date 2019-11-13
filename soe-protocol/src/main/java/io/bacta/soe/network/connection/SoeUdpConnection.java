@@ -1,5 +1,6 @@
 package io.bacta.soe.network.connection;
 
+import io.bacta.engine.network.connection.ConnectionState;
 import io.bacta.engine.network.udp.UdpConnection;
 import io.bacta.shared.GameNetworkMessage;
 import io.bacta.soe.network.connection.interceptor.SoeUdpConnectionOrderedMessageInterceptor;
@@ -29,8 +30,6 @@ public interface SoeUdpConnection extends UdpConnection {
     void connect();
 
     void connect(Consumer<SoeUdpConnection> connectCallback);
-
-    void connect(Consumer<SoeUdpConnection> connectCallback, List<SoeUdpConnectionOrderedMessageInterceptor> interceptors);
 
     void handleConfirm(int connectionId, int encryptCode, int maxRawPacketSize, EncryptMethod encryptMethod1, EncryptMethod encryptMethod2);
 
@@ -78,7 +77,7 @@ public interface SoeUdpConnection extends UdpConnection {
 
     TerminateReason getTerminateReason();
 
-    io.bacta.engine.network.connection.ConnectionState getConnectionState();
+    ConnectionState getConnectionState();
 
     int getMasterPingTime();
 
@@ -97,4 +96,6 @@ public interface SoeUdpConnection extends UdpConnection {
     ByteBuffer processIncomingProtocol(ByteBuffer decodedMessage);
 
     GameNetworkMessage processIncomingGNM(GameNetworkMessage gameNetworkMessage);
+
+    <T extends SoeUdpConnectionOrderedMessageInterceptor> T getInterceptor(Class<T> p);
 }

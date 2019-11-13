@@ -4,9 +4,7 @@ import io.bacta.soe.config.SoeNetworkConfiguration;
 import io.bacta.soe.network.connection.interceptor.SoeUdpConnectionOrderedMessageInterceptor;
 import io.bacta.soe.serialize.GameNetworkMessageSerializer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +24,6 @@ import java.util.Random;
 @Slf4j
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-@ConfigurationProperties("io.bacta.soe.network.connection")
 public class DefaultSoeUdpConnectionFactory {
 
     private final Random randomId;
@@ -41,27 +38,28 @@ public class DefaultSoeUdpConnectionFactory {
      */
     @Inject
     public DefaultSoeUdpConnectionFactory(final SoeNetworkConfiguration networkConfiguration,
-                                          final GameNetworkMessageSerializer messageSerializer,
-                                          @Value("#{'${io.bacta.soe.network.connection.interceptorClasses}'.split(',')}") final String[] injectorClasses) {
+                                          final GameNetworkMessageSerializer messageSerializer) {
         this.networkConfiguration = networkConfiguration;
         this.messageSerializer = messageSerializer;
         this.randomId = new SecureRandom();
 
-        this.interceptors = loadInterceptorClasses(injectorClasses);
+        this.interceptors = loadInterceptorClasses();
     }
 
-    private List<SoeUdpConnectionOrderedMessageInterceptor> loadInterceptorClasses(String[] injectorClasses) {
+    private List<SoeUdpConnectionOrderedMessageInterceptor> loadInterceptorClasses() {
         List<SoeUdpConnectionOrderedMessageInterceptor> injectors = new ArrayList<>();
-        for(String className : injectorClasses) {
-            try {
-                Class<SoeUdpConnectionOrderedMessageInterceptor> clazz = (Class<SoeUdpConnectionOrderedMessageInterceptor>) Class.forName(className);
-                if(clazz != null && SoeUdpConnectionOrderedMessageInterceptor.class.isAssignableFrom(clazz)) {
-                    injectors.add(clazz.getDeclaredConstructor().newInstance());
-                } else {
-                    LOGGER.warn("Not a injector candidate {}", className);
+        if(networkConfiguration.getMessageInterceptors() != null) {
+            for (String className : networkConfiguration.getMessageInterceptors()) {
+                try {
+                    Class<SoeUdpConnectionOrderedMessageInterceptor> clazz = (Class<SoeUdpConnectionOrderedMessageInterceptor>) Class.forName(className);
+                    if (clazz != null && SoeUdpConnectionOrderedMessageInterceptor.class.isAssignableFrom(clazz)) {
+                        injectors.add(clazz.getDeclaredConstructor().newInstance());
+                    } else {
+                        LOGGER.warn("Not a injector candidate {}", className);
+                    }
+                } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    LOGGER.error("Unable to load class {} as an injector", className);
                 }
-            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                LOGGER.warn("Unable to load class {} as an injector", className);
             }
         }
         return injectors;

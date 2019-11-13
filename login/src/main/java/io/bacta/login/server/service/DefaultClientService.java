@@ -137,7 +137,7 @@ public final class DefaultClientService implements ClientService {
 
     private void establishSessionMode(SoeRequestContext context, String username, String password)
             throws SessionException {
-        final SessionToken sessionToken = sessionTokenProvider.Provide(username, password);
+        final SessionToken sessionToken = sessionTokenProvider.provide(username, password);
 
         //We need to send the "SetSessionKey" message to the client so that it knows about the session key.
         final SetSessionKey message = new SetSessionKey(sessionToken.getToken());

@@ -26,6 +26,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 /**
  * Created by kburkhardt on 2/14/14.
@@ -36,7 +37,10 @@ import org.springframework.context.annotation.PropertySource;
         "io.bacta.login",
         "io.bacta.soe",
         "io.bacta.engine"})
-@PropertySource("classpath:soenetworking.properties")
+@PropertySources({
+        @PropertySource("classpath:soenetworking.properties"),
+        @PropertySource("classpath:application.properties")
+})
 public class LoginServerApplication {
     public static void main(String[] args) {
 

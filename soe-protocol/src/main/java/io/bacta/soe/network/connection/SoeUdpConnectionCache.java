@@ -17,10 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.NotCompliantMBeanException;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -52,6 +49,11 @@ public final class SoeUdpConnectionCache {
                     publisher.publishEvent(new UdpDisconnectEvent(removalNotification.getKey()));
                     SoeUdpConnection connection = removalNotification.getValue();
                     connectionIdMap.remove(connection.getId());
+//                    try {
+//                        mBeanServer.unregisterMBean(connection.getObjectName());
+//                    } catch (MBeanRegistrationException | InstanceNotFoundException e) {
+//                        LOGGER.error("Unable to unregister connection MBean", e);
+//                    }
                     if (networkConfiguration.isReportUdpDisconnects()) {
                         LOGGER.info("Client disconnected: {}  Connection: {}  Reason: {}", connection.getRemoteAddress(), connection.getId(), connection.getTerminateReason().getReason());
                         LOGGER.info("Clients still connected: {}", size());
@@ -74,20 +76,30 @@ public final class SoeUdpConnectionCache {
         return udpConnectionFactory.newInstance(sender);
     }
 
+    public SoeUdpConnection getAndAddNewConnection(InetSocketAddress sender) {
+        SoeUdpConnection connection = getNewConnection(sender);
+        addConnection(connection);
+        return connection;
+    }
+
     public void confirm(SoeUdpConnection connection) {
 
+        addConnection(connection);
+
+        ConfirmMessage response = new ConfirmMessage(connection);
+        connection.sendMessage(response);
+    }
+
+    private void addConnection(SoeUdpConnection connection) {
         connectionCache.put(connection.getRemoteAddress(), connection);
         connectionIdMap.put(connection.getId(), connection);
         publisher.publishEvent(new UdpConnectEvent(connection));
 
-        ConfirmMessage response = new ConfirmMessage(connection);
-        connection.sendMessage(response);
-
-        try {
-            mBeanServer.registerMBean(connection, connection.getObjectName());
-        } catch (InstanceAlreadyExistsException | NotCompliantMBeanException | MBeanRegistrationException e) {
-            LOGGER.error("Unable to register MBean", e);
-        }
+//        try {
+//            mBeanServer.registerMBean(connection, connection.getObjectName());
+//        } catch (InstanceAlreadyExistsException | NotCompliantMBeanException | MBeanRegistrationException e) {
+//            LOGGER.error("Unable to register MBean", e);
+//        }
     }
 
     public void invalidate(InetSocketAddress inetSocketAddress) {

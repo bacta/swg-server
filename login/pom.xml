@@ -40,7 +40,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${build.directory}/dependencies</outputDirectory>
+                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
