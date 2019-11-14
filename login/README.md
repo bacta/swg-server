@@ -3,7 +3,7 @@
 ## Docker
 
 Build image: `docker build -t bacta-login .`<br>
-Create Container: `docker run --name bacta-login -p 44453:44453/udp -p 8080:8080/tcp bacta-login`<br>
+Create Container: `docker run --name bacta-login -p 44453:44453/udp -p 8080:8080/tcp -p 8053:8053/tcp bacta-login`<br>
 Start Container: `docker start bacta-login`<br>
 Stop Container: `docker stop bacta-login`
 

@@ -4,5 +4,6 @@ COPY target/login*-spring-boot.jar /login.jar
 
 EXPOSE 8080
 EXPOSE 44453
+EXPOSE 8053
 
-CMD ["java", "-Dspring.pid.file=login.pid -Dlogging.file=logs/login.log", "-jar", "/login.jar"]
+CMD ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8053", "-jar", "/login.jar"]
