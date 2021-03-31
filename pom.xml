@@ -31,7 +31,7 @@
         <checker.version>2.11.1</checker.version>
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <metrics-spring.version>3.1.3</metrics-spring.version>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <trove4j.version>3.0.3</trove4j.version>
         <hibernate-core.version>5.4.1.Final</hibernate-core.version>
         <commons-modeler.version>2.0.1</commons-modeler.version>
